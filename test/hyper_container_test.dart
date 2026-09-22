@@ -46,8 +46,10 @@ void main() {
     final base = HyperThemeData.light();
     final theme = base.copyWith(
       sizes: base.sizes.copyWith(
-        controlRadius: 30,
-        controlPadding: const EdgeInsets.all(14),
+        tablet: base.sizes.tablet.copyWith(
+          controlRadius: 30,
+          controlPadding: const EdgeInsets.all(14),
+        ),
       ),
       containerTheme: HyperContainerThemeData(
         background: const HyperFill.color(Colors.green),
@@ -108,5 +110,42 @@ void main() {
     expect(second.color, isNull);
     expect(second.gradient, isNull);
     expect(second.boxShadow, isEmpty);
+  });
+
+  testWidgets('带圆角的容器默认裁切子内容且仍可显式允许溢出', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Column(
+          children: [
+            HyperContainer(
+              key: Key('clipped'),
+              animationDuration: Duration.zero,
+              child: ColoredBox(color: Colors.red),
+            ),
+            HyperContainer(
+              key: Key('overflow'),
+              animationDuration: Duration.zero,
+              clipBehavior: Clip.none,
+              child: ColoredBox(color: Colors.blue),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final clipped = tester.widget<Container>(
+      find.descendant(
+        of: find.byKey(const Key('clipped')),
+        matching: find.byType(Container),
+      ),
+    );
+    final overflow = tester.widget<Container>(
+      find.descendant(
+        of: find.byKey(const Key('overflow')),
+        matching: find.byType(Container),
+      ),
+    );
+    expect(clipped.clipBehavior, Clip.antiAlias);
+    expect(overflow.clipBehavior, Clip.none);
   });
 }

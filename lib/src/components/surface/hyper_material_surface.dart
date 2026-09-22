@@ -4,8 +4,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
-import '../../theme/hyper_material_theme.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
+import '../../theme/material/hyper_material_theme.dart';
 
 /// 使用统一材质配方绘制的轻量表面。
 class HyperMaterialSurface extends StatelessWidget {
@@ -60,6 +60,7 @@ class HyperMaterialSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hyperTheme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final materialTheme = HyperMaterialTheme.of(context);
     final source =
         material ??
@@ -73,16 +74,67 @@ class HyperMaterialSurface extends StatelessWidget {
       reduceTransparency:
           reduceTransparency ?? materialTheme.reduceTransparency ?? false,
     );
-    final radius = (borderRadius ?? hyperTheme.borderRadius).resolve(
-      Directionality.of(context),
-    );
+    final radius = (borderRadius ?? BorderRadius.circular(sizes.controlRadius))
+        .resolve(Directionality.of(context));
     final fill = resolved.background;
-    final decoration = BoxDecoration(
+    final backgroundDecoration = BoxDecoration(
       color: fill?.color,
       gradient: fill?.gradient,
       borderRadius: radius,
-      boxShadow: resolved.boxShadow,
     );
+    final borderDecoration =
+        resolved.border == null || resolved.border == BorderSide.none
+        ? null
+        : BoxDecoration(
+            border: Border.fromBorderSide(resolved.border!),
+            borderRadius: radius,
+          );
+
+    if (resolved.usesBackdrop) {
+      // 背景滤镜与前景内容必须是兄弟层。若把文字作为 BackdropFilter 的
+      // child 一起提交，部分桌面合成器会在文字边缘产生模糊重影。
+      Widget filteredBackground = DecoratedBox(
+        decoration: backgroundDecoration,
+        child: resolved.tint == null ? null : ColoredBox(color: resolved.tint!),
+      );
+      filteredBackground = BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: resolved.blurSigmaX,
+          sigmaY: resolved.blurSigmaY,
+        ),
+        child: filteredBackground,
+      );
+
+      Widget content = ClipRRect(
+        borderRadius: radius,
+        clipBehavior: clipBehavior == Clip.none ? Clip.antiAlias : clipBehavior,
+        child: Stack(
+          children: [
+            Positioned.fill(child: filteredBackground),
+            Container(
+              width: width,
+              height: height,
+              padding: padding,
+              alignment: alignment,
+              foregroundDecoration: borderDecoration,
+              child: child,
+            ),
+          ],
+        ),
+      );
+      if (resolved.boxShadow.isNotEmpty) {
+        content = DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            boxShadow: resolved.boxShadow,
+          ),
+          child: content,
+        );
+      }
+      if (margin != null) content = Padding(padding: margin!, child: content);
+      return content;
+    }
+
     Widget? surfaceChild = child;
     if (resolved.tint != null) {
       surfaceChild = Stack(
@@ -107,31 +159,12 @@ class HyperMaterialSurface extends StatelessWidget {
       height: height,
       padding: padding,
       alignment: alignment,
-      decoration: decoration,
-      foregroundDecoration:
-          resolved.border == null || resolved.border == BorderSide.none
-          ? null
-          : BoxDecoration(
-              border: Border.fromBorderSide(resolved.border!),
-              borderRadius: radius,
-            ),
+      decoration: backgroundDecoration.copyWith(boxShadow: resolved.boxShadow),
+      foregroundDecoration: borderDecoration,
       clipBehavior: Clip.none,
       child: surfaceChild,
     );
     Widget content = surface;
-    if (resolved.usesBackdrop) {
-      content = ClipRRect(
-        borderRadius: radius,
-        clipBehavior: clipBehavior == Clip.none ? Clip.antiAlias : clipBehavior,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: resolved.blurSigmaX,
-            sigmaY: resolved.blurSigmaY,
-          ),
-          child: surface,
-        ),
-      );
-    }
     if (margin != null) content = Padding(padding: margin!, child: content);
     return content;
   }

@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
-import '../../theme/hyper_contrast_theme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
 
 const _unchanged = Object();
 

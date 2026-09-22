@@ -17,7 +17,7 @@ void main() {
     expect(material.colorScheme.primary, hyper.colors.primary);
     expect(material.appBarTheme.backgroundColor, hyper.colors.background);
     final deviceType = HyperDeviceDetector.of(context);
-    expect(hyper.sizes, HyperSizeScheme.forDevice(deviceType));
+    expect(HyperTheme.sizesOf(context), hyper.sizes.resolve(deviceType));
 
     expect(find.text('Lemon UI 组件演示'), findsOneWidget);
     expect(find.text('基础能力'), findsOneWidget);

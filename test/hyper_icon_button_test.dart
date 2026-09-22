@@ -48,6 +48,11 @@ void main() {
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    final progress = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+    expect(progress.color, isNot(progress.backgroundColor));
+    expect(progress.backgroundColor!.a, lessThan(progress.color!.a));
     expect(tester.getSize(find.byType(HyperIconButton)), before);
     expect(
       tester.getSize(find.byType(CircularProgressIndicator)),
@@ -57,6 +62,29 @@ void main() {
     completer.complete();
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.refresh), findsOneWidget);
+  });
+
+  testWidgets('自定义图标按钮加载内容受进度尺寸约束', (tester) async {
+    await tester.pumpWidget(
+      app(
+        HyperIconButton.filled(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {},
+          loading: true,
+          loadingIndicator: const ColoredBox(
+            key: Key('custom-icon-loading'),
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('custom-icon-loading')), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('custom-icon-loading'))),
+      const Size.square(18),
+    );
   });
 
   testWidgets('实例样式覆盖独立的全局图标按钮主题', (tester) async {
@@ -111,7 +139,14 @@ void main() {
           icon: const Icon(Icons.settings),
           onPressed: () {},
         ),
-        theme: HyperThemeData.light(sizes: sizes),
+        theme: HyperThemeData.light(
+          sizes: HyperSizeThemeData(
+            phone: sizes,
+            tablet: sizes,
+            desktop: sizes,
+            watch: sizes,
+          ),
+        ),
       ),
     );
 

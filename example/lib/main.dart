@@ -13,10 +13,7 @@ class LemonUiExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // MaterialApp 启动阶段使用桌面回退；实际整棵应用子树由设备探测结果驱动。
-    final fallbackTheme = HyperThemeData.light(
-      sizes: const HyperSizeScheme.desktop(),
-    );
+    final fallbackTheme = HyperThemeData.light();
     return MaterialApp(
       title: 'Lemon UI',
       debugShowCheckedModeBanner: false,
@@ -24,15 +21,11 @@ class LemonUiExampleApp extends StatelessWidget {
       theme: fallbackTheme.toMaterialThemeData(
         ThemeData(useMaterial3: true, brightness: fallbackTheme.brightness),
       ),
-      builder: (context, child) => HyperDeviceDetector(
-        child: child,
-        builder: (context, deviceType, child) => HyperTheme(
-          data: HyperThemeData.light(
-            sizes: HyperSizeScheme.forDevice(deviceType),
-          ),
-          duration: Duration.zero,
-          child: child!,
-        ),
+      // HyperTheme 在作用域建立时解析一次设备类型。
+      builder: (context, child) => HyperTheme(
+        data: HyperThemeData.light(),
+        duration: Duration.zero,
+        child: child!,
       ),
       home: const GalleryShell(),
     );

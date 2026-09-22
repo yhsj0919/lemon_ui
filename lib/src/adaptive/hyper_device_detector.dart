@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../foundation/hyper_device_type.dart';
 
-/// 根据当前上下文和布局约束自定义设备类型。
+/// 根据应用启动时的上下文和布局约束自定义设备类型。
 typedef HyperDeviceResolver = HyperDeviceType Function(
   BuildContext context,
   BoxConstraints constraints,
@@ -16,11 +16,12 @@ typedef HyperDeviceWidgetBuilder = Widget Function(
   Widget? child,
 );
 
-/// 在主题之前解析设备类型的轻量作用域。
+/// 在主题之前一次性解析设备类型的轻量作用域。
 ///
-/// 自动判断只选择离散的 phone、tablet、desktop 或 watch，不计算尺寸倍率。
-/// 手表和特殊窗口建议通过 [deviceType] 或 [resolver] 显式确认。
-class HyperDeviceDetector extends StatelessWidget {
+/// Windows、Linux 和 macOS 固定使用 desktop。只有 Android 和 iOS 会在作用域
+/// 首次建立时根据初始窗口区分 phone、tablet 或 watch；之后的窗口缩放不改变
+/// 设备类型。预览、测试和特殊设备可以通过 [deviceType] 或 [resolver] 覆盖。
+class HyperDeviceDetector extends StatefulWidget {
   const HyperDeviceDetector({
     super.key,
     required this.builder,
@@ -67,17 +68,38 @@ class HyperDeviceDetector extends StatelessWidget {
       ?.deviceType;
 
   @override
+  State<HyperDeviceDetector> createState() => _HyperDeviceDetectorState();
+}
+
+class _HyperDeviceDetectorState extends State<HyperDeviceDetector> {
+  HyperDeviceType? _detectedDeviceType;
+
+  @override
+  void didUpdateWidget(HyperDeviceDetector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.deviceType != widget.deviceType ||
+        oldWidget.resolver != widget.resolver ||
+        oldWidget.tabletMinShortestSide != widget.tabletMinShortestSide ||
+        oldWidget.watchMaxShortestSide != widget.watchMaxShortestSide ||
+        oldWidget.watchMaxAspectRatio != widget.watchMaxAspectRatio) {
+      _detectedDeviceType = null;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final resolved =
-            deviceType ??
-            resolver?.call(context, constraints) ??
-            _resolveBuiltIn(context, constraints);
+            widget.deviceType ??
+            (_detectedDeviceType ??=
+                widget.resolver?.call(context, constraints) ??
+                _resolveBuiltIn(context, constraints));
         return _HyperDeviceScope(
           deviceType: resolved,
           child: Builder(
-            builder: (context) => builder(context, resolved, child),
+            builder: (context) =>
+                widget.builder(context, resolved, widget.child),
           ),
         );
       },
@@ -88,6 +110,10 @@ class HyperDeviceDetector extends StatelessWidget {
     BuildContext context,
     BoxConstraints constraints,
   ) {
+    if (!_isMobilePlatform(defaultTargetPlatform)) {
+      return HyperDeviceType.desktop;
+    }
+
     final mediaSize = MediaQuery.maybeSizeOf(context);
     final width = constraints.hasBoundedWidth
         ? constraints.maxWidth
@@ -102,25 +128,19 @@ class HyperDeviceDetector extends StatelessWidget {
         : double.infinity;
 
     if (shortestSide > 0 &&
-        shortestSide <= watchMaxShortestSide &&
-        aspectRatio <= watchMaxAspectRatio) {
+        shortestSide <= widget.watchMaxShortestSide &&
+        aspectRatio <= widget.watchMaxAspectRatio) {
       return HyperDeviceType.watch;
     }
 
-    if (_isDesktopPlatform(defaultTargetPlatform)) {
-      return HyperDeviceType.desktop;
-    }
-
-    if (shortestSide >= tabletMinShortestSide) {
+    if (shortestSide >= widget.tabletMinShortestSide) {
       return HyperDeviceType.tablet;
     }
     return HyperDeviceType.phone;
   }
 
-  bool _isDesktopPlatform(TargetPlatform platform) => switch (platform) {
-    TargetPlatform.windows ||
-    TargetPlatform.macOS ||
-    TargetPlatform.linux => true,
+  bool _isMobilePlatform(TargetPlatform platform) => switch (platform) {
+    TargetPlatform.android || TargetPlatform.iOS => true,
     _ => false,
   };
 }

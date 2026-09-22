@@ -50,8 +50,9 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
       ),
     ];
     final theme = HyperTheme.of(context);
-    final buttonSizeDescription = switch (theme.sizes.deviceType) {
-      HyperDeviceType.phone => '手机：最小 58×40，字号 16，图标 24',
+    final buttonSizeDescription = switch (HyperTheme.sizesOf(context)
+        .deviceType) {
+      HyperDeviceType.phone => '手机：最小 58×48，字号 16，图标 24',
       HyperDeviceType.tablet => '平板：最小 64×44，字号 16，图标 24',
       HyperDeviceType.desktop => '桌面：最小 52×36，字号 14，图标 18',
       HyperDeviceType.watch => '手表：最小 52×40，字号 16，图标 20',
@@ -71,7 +72,13 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
           const SizedBox(height: 20),
           Text('最近事件：$_event', key: const Key('hyper-button-event')),
           const SizedBox(height: 20),
-          HyperButton.outlined(onPressed: null, child: const Text('禁用按钮')),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: HyperButton.outlined(
+              onPressed: null,
+              child: const Text('禁用按钮'),
+            ),
+          ),
           const SizedBox(height: 28),
           Text('材质变化', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),

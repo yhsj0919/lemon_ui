@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
 
 /// 轻量的主题化容器。
 ///
@@ -65,21 +65,27 @@ class HyperContainer extends StatelessWidget {
   /// 样式变化动画曲线。
   final Curve? animationCurve;
 
-  /// 内容裁切方式。
+  /// 内容裁切方式；默认按容器圆角抗锯齿裁切。
+  ///
+  /// 容器阴影属于装饰层，不受子内容裁切影响。需要允许子内容越界时可明确
+  /// 传入 [Clip.none]。
   final Clip? clipBehavior;
 
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final componentTheme = theme.containerTheme;
     final resolvedBackground =
         background ??
         componentTheme.background ??
         HyperFill.color(theme.colors.surface);
     final resolvedBorderRadius =
-        borderRadius ?? componentTheme.borderRadius ?? theme.borderRadius;
+        borderRadius ??
+        componentTheme.borderRadius ??
+        BorderRadius.circular(sizes.controlRadius);
     final resolvedPadding =
-        padding ?? componentTheme.padding ?? theme.controlPadding;
+        padding ?? componentTheme.padding ?? sizes.controlPadding;
     final resolvedDuration =
         animationDuration ??
         componentTheme.animationDuration ??
@@ -102,7 +108,7 @@ class HyperContainer extends StatelessWidget {
         componentTheme.animationCurve ??
         theme.motion.standardCurve;
     final resolvedClip =
-        clipBehavior ?? componentTheme.clipBehavior ?? Clip.none;
+        clipBehavior ?? componentTheme.clipBehavior ?? Clip.antiAlias;
 
     if (effectiveDuration == Duration.zero) {
       return Container(

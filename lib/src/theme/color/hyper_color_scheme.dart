@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Hyper 控件使用的语义颜色集合。
+/// Hyper 控件使用的集中式语义颜色集合。
 ///
 /// 颜色名称优先与 Flutter [ColorScheme] 保持一致，并补充 success、warning
 /// 和 disabled。控件只消费语义颜色，不直接依赖种子色或固定色板。

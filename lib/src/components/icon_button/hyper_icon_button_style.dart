@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
-import '../../theme/hyper_contrast_theme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
 
 /// 图标按钮自己的视觉样式，不继承普通按钮样式。
 @immutable
@@ -21,6 +21,7 @@ final class HyperIconButtonStyle {
     this.iconSize,
     this.margin,
     this.progressColor,
+    this.progressTrackColor,
     this.progressSize,
     this.progressThickness,
     this.clipBehavior,
@@ -66,6 +67,9 @@ final class HyperIconButtonStyle {
   /// 加载指示器颜色。
   final Color? progressColor;
 
+  /// 加载指示器轨道颜色。
+  final Color? progressTrackColor;
+
   /// 加载指示器尺寸。
   final double? progressSize;
 
@@ -91,6 +95,7 @@ final class HyperIconButtonStyle {
       iconSize: other.iconSize ?? iconSize,
       margin: other.margin ?? margin,
       progressColor: other.progressColor ?? progressColor,
+      progressTrackColor: other.progressTrackColor ?? progressTrackColor,
       progressSize: other.progressSize ?? progressSize,
       progressThickness: other.progressThickness ?? progressThickness,
       clipBehavior: other.clipBehavior ?? clipBehavior,
@@ -123,6 +128,11 @@ final class HyperIconButtonStyle {
     iconSize: _lerpDouble(a.iconSize, b.iconSize, t),
     margin: EdgeInsetsGeometry.lerp(a.margin, b.margin, t),
     progressColor: Color.lerp(a.progressColor, b.progressColor, t),
+    progressTrackColor: Color.lerp(
+      a.progressTrackColor,
+      b.progressTrackColor,
+      t,
+    ),
     progressSize: _lerpDouble(a.progressSize, b.progressSize, t),
     progressThickness: _lerpDouble(a.progressThickness, b.progressThickness, t),
     clipBehavior: t < .5 ? a.clipBehavior : b.clipBehavior,
@@ -155,6 +165,7 @@ final class HyperIconButtonStyle {
           other.iconSize == iconSize &&
           other.margin == margin &&
           other.progressColor == progressColor &&
+          other.progressTrackColor == progressTrackColor &&
           other.progressSize == progressSize &&
           other.progressThickness == progressThickness &&
           other.clipBehavior == clipBehavior;
@@ -174,6 +185,7 @@ final class HyperIconButtonStyle {
     iconSize,
     margin,
     progressColor,
+    progressTrackColor,
     progressSize,
     progressThickness,
     clipBehavior,

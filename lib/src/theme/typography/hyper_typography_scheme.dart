@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Hyper 界面的语义字号规范。
+/// Hyper 界面的集中式语义字号规范。
 ///
 /// 所有值均为 Flutter 逻辑像素，是明确字号而不是倍率。修改某一级不会按比例
 /// 改动其他级别，控件应按使用场景读取对应语义。

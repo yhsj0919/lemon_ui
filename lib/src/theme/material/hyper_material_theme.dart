@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import '../foundation/hyper_surface_material.dart';
-import 'hyper_theme.dart';
+import '../../foundation/hyper_surface_material.dart';
+import '../core/hyper_theme.dart';
 
 const _unchanged = Object();
 

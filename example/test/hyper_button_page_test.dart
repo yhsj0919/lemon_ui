@@ -27,10 +27,20 @@ void main() {
     }
     await tester.tap(find.text('异步渐变'));
     await tester.pump();
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    int runningProgressCount() => tester
+        .widgetList<TickerMode>(
+          find.descendant(
+            of: find.byType(HyperButton),
+            matching: find.byType(TickerMode),
+          ),
+        )
+        .where((ticker) => ticker.enabled)
+        .length;
+    expect(runningProgressCount(), 1);
     expect(find.text('最近事件：异步执行中'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pumpAndSettle();
+    expect(runningProgressCount(), 0);
     expect(find.text('最近事件：异步完成'), findsOneWidget);
 
     await tester.scrollUntilVisible(

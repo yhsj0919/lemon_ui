@@ -20,31 +20,41 @@ void main() {
 
   test('默认主题提供显式逻辑尺寸且不进行倍率缩放', () {
     final theme = HyperThemeData.light();
-    expect(theme.controlHeight, 48);
+    expect(theme.sizes.phone.controlHeightMd, 48);
     expect(
-      theme.controlPadding,
+      theme.sizes.phone.controlPadding,
       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     );
-    expect(theme.borderRadius, BorderRadius.circular(16));
+    expect(theme.sizes.phone.controlRadius, 16);
 
     final changed = theme.copyWith(
-      sizes: theme.sizes.copyWith(controlHeightMd: 64),
+      sizes: theme.sizes.copyWith(
+        phone: theme.sizes.phone.copyWith(controlHeightMd: 64),
+      ),
     );
-    expect(changed.controlHeight, 64);
-    expect(changed.controlPadding, theme.controlPadding);
+    expect(changed.sizes.phone.controlHeightMd, 64);
+    expect(
+      changed.sizes.phone.controlPadding,
+      theme.sizes.phone.controlPadding,
+    );
   });
 
   test('主题插值包含基础尺寸与组件主题', () {
     final start = HyperThemeData.light();
     final end = start.copyWith(
-      sizes: start.sizes.copyWith(controlHeightMd: 64, controlRadius: 24),
+      sizes: start.sizes.copyWith(
+        phone: start.sizes.phone.copyWith(
+          controlHeightMd: 64,
+          controlRadius: 24,
+        ),
+      ),
       containerTheme: HyperContainerThemeData(
         padding: const EdgeInsets.all(24),
       ),
     );
     final middle = start.lerp(end, .5);
-    expect(middle.controlHeight, 56);
-    expect(middle.borderRadius, BorderRadius.circular(20));
+    expect(middle.sizes.phone.controlHeightMd, 56);
+    expect(middle.sizes.phone.controlRadius, 20);
     expect(middle.containerTheme.padding, const EdgeInsets.all(24));
   });
 
@@ -71,7 +81,9 @@ void main() {
   testWidgets('局部主题只覆盖子树并同步 Material 主题', (tester) async {
     final outer = HyperThemeData.light();
     final inner = outer.copyWith(
-      sizes: outer.sizes.copyWith(controlHeightMd: 72),
+      sizes: outer.sizes.copyWith(
+        tablet: outer.sizes.tablet.copyWith(controlHeightMd: 72),
+      ),
     );
     late double outerBefore;
     late double innerValue;
@@ -85,7 +97,7 @@ void main() {
           duration: Duration.zero,
           child: Builder(
             builder: (context) {
-              outerBefore = HyperTheme.of(context).controlHeight;
+              outerBefore = HyperTheme.sizesOf(context).controlHeightMd;
               materialPrimary = Theme.of(context).colorScheme.primary;
               return Column(
                 children: [
@@ -94,14 +106,15 @@ void main() {
                     duration: Duration.zero,
                     child: Builder(
                       builder: (context) {
-                        innerValue = HyperTheme.of(context).controlHeight;
+                        innerValue = HyperTheme.sizesOf(context)
+                            .controlHeightMd;
                         return const SizedBox();
                       },
                     ),
                   ),
                   Builder(
                     builder: (context) {
-                      outerAfter = HyperTheme.of(context).controlHeight;
+                      outerAfter = HyperTheme.sizesOf(context).controlHeightMd;
                       return const SizedBox();
                     },
                   ),
@@ -113,9 +126,9 @@ void main() {
       ),
     );
 
-    expect(outerBefore, 48);
+    expect(outerBefore, 52);
     expect(innerValue, 72);
-    expect(outerAfter, 48);
+    expect(outerAfter, 52);
     expect(materialPrimary, outer.colors.primary);
   });
 }

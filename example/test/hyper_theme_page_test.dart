@@ -9,7 +9,7 @@ void main() {
 
     expect(find.text('全局默认值'), findsOneWidget);
     expect(find.text('局部显式覆盖'), findsOneWidget);
-    expect(tester.getSize(find.byKey(const Key('global-control'))).height, 48);
+    expect(tester.getSize(find.byKey(const Key('global-control'))).height, 52);
     expect(tester.getSize(find.byKey(const Key('local-control'))).height, 68);
 
     await tester.tap(find.text('暗色'));

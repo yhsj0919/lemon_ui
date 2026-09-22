@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
@@ -11,6 +12,20 @@ void main() {
       data: theme ?? HyperThemeData.light(),
       duration: Duration.zero,
       child: Center(child: child),
+    ),
+  );
+
+  Finder buttonVisual() => find.descendant(
+    of: find.byType(HyperButton),
+    matching: find.byWidgetPredicate(
+      (widget) => widget is AnimatedContainer && widget.decoration != null,
+    ),
+  );
+
+  Finder buttonPadding(EdgeInsetsGeometry padding) => find.descendant(
+    of: buttonVisual(),
+    matching: find.byWidgetPredicate(
+      (widget) => widget is Padding && widget.padding == padding,
     ),
   );
 
@@ -41,12 +56,74 @@ void main() {
     await tester.tap(find.text('异步保存'));
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    final progress = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+    expect(progress.color, isNot(progress.backgroundColor));
+    expect(progress.backgroundColor!.a, lessThan(progress.color!.a));
+    expect(tester.getSize(find.byType(HyperButton)), before);
+
+    final loadingVisual = tester
+        .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+        .firstWhere((widget) => widget.decoration != null);
+    final loadingDecoration = loadingVisual.decoration! as BoxDecoration;
+    expect(loadingDecoration.gradient, isNotNull);
+
+    await tester.pump(const Duration(milliseconds: 60));
+    final opacityValues = tester
+        .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+        .map((widget) => widget.opacity)
+        .toList();
+    expect(opacityValues, containsAll(<double>[0, 1]));
+
+    completer.complete();
+    await tester.pumpAndSettle();
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(
+      tester
+          .widget<TickerMode>(
+            find
+                .ancestor(
+                  of: find.byType(CircularProgressIndicator),
+                  matching: find.byType(TickerMode),
+                )
+                .first,
+          )
+          .enabled,
+      isFalse,
+    );
+    expect(find.text('异步保存'), findsOneWidget);
+  });
+
+  testWidgets('自定义加载内容替换默认圆环且不改变按钮尺寸', (tester) async {
+    final completer = Completer<void>();
+    await tester.pumpWidget(
+      app(
+        HyperButton.filled(
+          onPressed: () => completer.future,
+          loadingIndicator: const ColoredBox(
+            key: Key('custom-loading'),
+            color: Colors.white,
+          ),
+          child: const Text('提交'),
+        ),
+      ),
+    );
+    final before = tester.getSize(find.byType(HyperButton));
+
+    await tester.tap(find.text('提交'));
+    await tester.pump();
+
+    expect(find.byKey(const Key('custom-loading')), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const Key('custom-loading'))),
+      const Size.square(18),
+    );
     expect(tester.getSize(find.byType(HyperButton)), before);
 
     completer.complete();
     await tester.pumpAndSettle();
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.text('异步保存'), findsOneWidget);
   });
 
   testWidgets('禁用按钮不触发操作', (tester) async {
@@ -62,7 +139,9 @@ void main() {
     await tester.pumpWidget(
       app(
         HyperButton.filled(onPressed: () {}, child: const Text('手机')),
-        theme: HyperThemeData.light(sizes: const HyperSizeScheme.phone()),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.phone()),
+        ),
       ),
     );
     final visual = tester.widget<Container>(
@@ -71,10 +150,11 @@ void main() {
       ),
     );
     expect(visual.constraints?.minWidth, 58);
-    expect(visual.constraints?.minHeight, 40);
+    expect(visual.constraints?.minHeight, 48);
+    expect(visual.padding, isNull);
     expect(
-      visual.padding,
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      buttonPadding(const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+      findsOneWidget,
     );
     expect(
       (visual.decoration! as BoxDecoration).borderRadius,
@@ -91,11 +171,98 @@ void main() {
     expect(text.style.fontSize, 16);
   });
 
+  testWidgets('40 高度手机按钮的文字完整并垂直居中', (tester) async {
+    await tester.pumpWidget(
+      app(
+        HyperButton.filled(
+          onPressed: () {},
+          style: HyperButtonStyle(height: 40, minimumSize: const Size(58, 40)),
+          child: const HyperText('紧凑按钮'),
+        ),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.phone()),
+        ),
+      ),
+    );
+
+    final visual = buttonVisual();
+    final visualRect = tester.getRect(visual);
+    final textRect = tester.getRect(find.text('紧凑按钮'));
+    final text = tester.widget<Text>(find.text('紧凑按钮'));
+
+    expect(visualRect.height, 40);
+    expect(text.style?.fontSize, 16);
+    expect(text.style?.height, isNull);
+    expect(textRect.top, greaterThanOrEqualTo(visualRect.top));
+    expect(textRect.bottom, lessThanOrEqualTo(visualRect.bottom));
+    expect(textRect.center.dy, closeTo(visualRect.center.dy, .01));
+  });
+
+  testWidgets('不对称内边距作为整体相对固定尺寸按钮居中', (tester) async {
+    const padding = EdgeInsets.fromLTRB(8, 3, 24, 11);
+    await tester.pumpWidget(
+      app(
+        HyperButton.filled(
+          onPressed: () {},
+          style: HyperButtonStyle(width: 180, height: 72, padding: padding),
+          child: const HyperText('居中内容'),
+        ),
+      ),
+    );
+
+    final visualRect = tester.getRect(buttonVisual());
+    final paddedRect = tester.getRect(buttonPadding(padding));
+    expect(paddedRect.center, visualRect.center);
+  });
+
+  testWidgets('图标和文字作为完整内容组居中', (tester) async {
+    await tester.pumpWidget(
+      app(
+        HyperButton.filled(
+          onPressed: () {},
+          style: HyperButtonStyle(width: 200, height: 64),
+          icon: const Icon(Icons.remove),
+          label: const HyperText('减少'),
+        ),
+      ),
+    );
+
+    final row = find.descendant(of: buttonVisual(), matching: find.byType(Row));
+    expect(tester.getRect(row).center, tester.getRect(buttonVisual()).center);
+    final paragraph = tester.renderObject<RenderParagraph>(find.text('减少'));
+    expect(paragraph.size.height, greaterThan(0));
+  });
+
+  testWidgets('手机按钮在Wrap中按内容收缩而不占满整行', (tester) async {
+    await tester.pumpWidget(
+      app(
+        SizedBox(
+          width: 320,
+          child: Wrap(
+            children: [
+              HyperButton.filled(onPressed: () {}, child: const Text('Filled')),
+            ],
+          ),
+        ),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.phone()),
+        ),
+      ),
+    );
+
+    final visual = buttonVisual();
+    expect(tester.getSize(visual).width, lessThan(320));
+    expect(tester.getSize(visual).width, greaterThanOrEqualTo(58));
+    expect(tester.getSize(visual).height, 48);
+  });
+
   testWidgets('桌面按钮使用独立紧凑尺寸', (tester) async {
     await tester.pumpWidget(
       app(
         HyperButton.filled(onPressed: () {}, child: const Text('桌面')),
-        theme: HyperThemeData.light(sizes: const HyperSizeScheme.desktop()),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.desktop()),
+        ),
       ),
     );
     final visual = tester.widget<Container>(
@@ -105,9 +272,10 @@ void main() {
     );
     expect(visual.constraints?.minWidth, 52);
     expect(visual.constraints?.minHeight, 36);
+    expect(visual.padding, isNull);
     expect(
-      visual.padding,
-      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      buttonPadding(const EdgeInsets.symmetric(horizontal: 14, vertical: 8)),
+      findsOneWidget,
     );
     expect(
       (visual.decoration! as BoxDecoration).borderRadius,
@@ -122,6 +290,38 @@ void main() {
           .first,
     );
     expect(text.style.fontSize, 14);
+  });
+
+  testWidgets('按钮消费主题中覆盖的组件尺寸', (tester) async {
+    const base = HyperSizeScheme.desktop();
+    final sizes = base.copyWith(
+      button: base.button.copyWith(
+        minimumSize: const Size(88, 42),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+      ),
+    );
+
+    await tester.pumpWidget(
+      app(
+        HyperButton.filled(onPressed: () {}, child: const Text('自定义')),
+        theme: HyperThemeData.light(
+          sizes: HyperSizeThemeData(
+            phone: sizes,
+            tablet: sizes,
+            desktop: sizes,
+            watch: sizes,
+          ),
+        ),
+      ),
+    );
+
+    final visual = tester.widget<AnimatedContainer>(buttonVisual());
+    expect(visual.constraints?.minWidth, 88);
+    expect(visual.constraints?.minHeight, 42);
+    expect(
+      buttonPadding(const EdgeInsets.symmetric(horizontal: 20, vertical: 9)),
+      findsOneWidget,
+    );
   });
 
   testWidgets('禁用按钮同时使用独立背景与前景颜色', (tester) async {

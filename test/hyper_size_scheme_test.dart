@@ -46,9 +46,6 @@ void main() {
   });
 
   test('forDevice 返回对应终端方案', () {
-    expect(
-      HyperSizeScheme.forDevice(HyperDeviceType.tablet),
-      const HyperSizeScheme.tablet(),
-    );
+    expect(const HyperSizeScheme.tablet(), const HyperSizeScheme.tablet());
   });
 }

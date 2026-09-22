@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_device_type.dart';
 import '../../foundation/hyper_surface_material.dart';
 import '../../interaction/hyper_pressable.dart';
-import '../../theme/hyper_material_theme.dart';
-import '../../theme/hyper_contrast_theme.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
+import '../../theme/core/hyper_theme.dart';
+import '../../theme/material/hyper_material_theme.dart';
+import '../progress/hyper_circular_progress_indicator.dart';
 import 'hyper_button_style.dart';
 import 'hyper_button_theme.dart';
 
@@ -28,6 +28,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.filled,
@@ -44,6 +45,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.tonal,
@@ -60,6 +62,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.outlined,
@@ -76,6 +79,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.ghost,
@@ -92,6 +96,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.text,
@@ -108,6 +113,7 @@ class HyperButton extends StatefulWidget {
     this.style,
     this.loading = false,
     this.progress,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperButtonVariant.gradient,
@@ -140,6 +146,11 @@ class HyperButton extends StatefulWidget {
 
   /// 确定进度，取值范围为 0 到 1；null 表示不确定进度。
   final double? progress;
+
+  /// 自定义加载内容；未指定时使用默认圆形进度。
+  ///
+  /// 内容会被 [HyperButtonStyle.progressSize] 约束，不改变按钮外部尺寸。
+  final Widget? loadingIndicator;
 
   /// 同步或异步操作失败时的错误回调。
   final void Function(Object error, StackTrace stackTrace)? onError;
@@ -185,51 +196,14 @@ class _HyperButtonState extends State<HyperButton> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final colors = theme.colors;
-    final metrics = switch (theme.sizes.deviceType) {
-      HyperDeviceType.phone => (
-        minimumSize: const Size(58, 40),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        radius: 16.0,
-        fontSize: 16.0,
-        iconSize: 24.0,
-        iconSpacing: 8.0,
-        progressSize: 18.0,
-      ),
-      HyperDeviceType.tablet => (
-        minimumSize: const Size(64, 44),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        radius: 16.0,
-        fontSize: 16.0,
-        iconSize: 24.0,
-        iconSpacing: 8.0,
-        progressSize: 18.0,
-      ),
-      HyperDeviceType.desktop => (
-        minimumSize: const Size(52, 36),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        radius: 10.0,
-        fontSize: 14.0,
-        iconSize: 18.0,
-        iconSpacing: 6.0,
-        progressSize: 16.0,
-      ),
-      HyperDeviceType.watch => (
-        minimumSize: const Size(52, 40),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        radius: 20.0,
-        fontSize: 16.0,
-        iconSize: 20.0,
-        iconSpacing: 6.0,
-        progressSize: 18.0,
-      ),
-    };
+    // 组件只消费主题已经解析好的当前设备规格，不再自行判断设备类型。
+    final metrics = sizes.button;
     final defaults = HyperButtonStyle(
       height: metrics.minimumSize.height,
       minimumSize: metrics.minimumSize,
-      minimumTapTargetSize: Size.square(
-        theme.sizes.minimumInteractiveDimension,
-      ),
+      minimumTapTargetSize: Size.square(sizes.minimumInteractiveDimension),
       padding: metrics.padding,
       borderRadius: BorderRadius.circular(metrics.radius),
       textStyle: TextStyle(fontSize: metrics.fontSize),
@@ -240,20 +214,16 @@ class _HyperButtonState extends State<HyperButton> {
       animationCurve: theme.motion.fastCurve,
       progressSize: metrics.progressSize,
       progressThickness: 2,
-      hoverOverlayOpacity: theme.sizes.deviceType == HyperDeviceType.desktop
-          ? .05
-          : .06,
-      focusOverlayOpacity: theme.sizes.deviceType == HyperDeviceType.desktop
-          ? .07
-          : .08,
-      pressOverlayOpacity: theme.sizes.deviceType == HyperDeviceType.desktop
-          ? .08
-          : .10,
+      hoverOverlayOpacity: metrics.hoverOverlayOpacity,
+      focusOverlayOpacity: metrics.focusOverlayOpacity,
+      pressOverlayOpacity: metrics.pressOverlayOpacity,
     ).merge(_variantDefaults(context));
     final style = defaults
         .merge(HyperButtonTheme.of(context).resolve(widget.variant))
         .merge(widget.style);
     final enabled = widget.onPressed != null && !_loading;
+    // 加载期间只锁定交互，不切换为禁用配色，避免渐变按钮闪成纯色。
+    final visuallyEnabled = widget.onPressed != null || _loading;
 
     return HyperPressable(
       enabled: enabled,
@@ -271,12 +241,12 @@ class _HyperButtonState extends State<HyperButton> {
           (_, _, true) => style.hoverOverlayOpacity!,
           _ => 0.0,
         };
-        final baseForeground = enabled
+        final baseForeground = visuallyEnabled
             ? style.foregroundColor ?? colors.onSurface
             : style.disabledForegroundColor ?? colors.disabled;
         final foregroundColor = HyperContrastTheme.of(context).resolve(
           foreground: baseForeground,
-          background: enabled
+          background: visuallyEnabled
               ? style.material?.background ?? style.background
               : style.disabledBackground ??
                     style.material?.background ??
@@ -284,13 +254,13 @@ class _HyperButtonState extends State<HyperButton> {
           canvasColor: colors.background,
           mode: style.contrastMode,
         );
-        final content = _buildContent(style, foregroundColor);
+        final content = _buildContent(context, style, foregroundColor);
         final visual = _buildVisual(
           context,
           style,
           content,
           overlay.withValues(alpha: overlayAlpha),
-          enabled,
+          visuallyEnabled,
         );
         final tapSize = style.minimumTapTargetSize;
         if (tapSize == null) return visual;
@@ -354,7 +324,11 @@ class _HyperButtonState extends State<HyperButton> {
     };
   }
 
-  Widget _buildContent(HyperButtonStyle style, Color foregroundColor) {
+  Widget _buildContent(
+    BuildContext context,
+    HyperButtonStyle style,
+    Color foregroundColor,
+  ) {
     Widget normal = widget.child ?? widget.label!;
     if (widget.icon != null) {
       final icon = IconTheme(
@@ -375,18 +349,49 @@ class _HyperButtonState extends State<HyperButton> {
       ),
       child: normal,
     );
-    if (!_loading) return normal;
+    final reduceMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final duration = reduceMotion ? Duration.zero : style.animationDuration!;
+    final curve = style.animationCurve!;
     return Stack(
       alignment: Alignment.center,
       children: [
-        Opacity(opacity: 0, child: normal),
-        SizedBox.square(
-          dimension: style.progressSize,
-          child: CircularProgressIndicator(
-            value: widget.progress?.clamp(0, 1),
-            strokeWidth: style.progressThickness ?? 2,
-            color: style.progressColor ?? foregroundColor,
-            backgroundColor: style.progressTrackColor,
+        AnimatedOpacity(
+          opacity: _loading ? 0 : 1,
+          duration: duration,
+          curve: curve,
+          child: normal,
+        ),
+        AnimatedOpacity(
+          opacity: _loading ? 1 : 0,
+          duration: duration,
+          curve: curve,
+          child: IgnorePointer(
+            child: ExcludeSemantics(
+              child: AnimatedScale(
+                scale: _loading ? 1 : .8,
+                duration: duration,
+                curve: curve,
+                child: TickerMode(
+                  enabled: _loading,
+                  child: SizedBox.square(
+                    dimension: style.progressSize,
+                    child:
+                        widget.loadingIndicator ??
+                        HyperCircularProgressIndicator(
+                          value: widget.progress,
+                          size: style.progressSize,
+                          thickness: style.progressThickness ?? 2,
+                          color: style.progressColor ?? foregroundColor,
+                          trackColor:
+                              style.progressTrackColor ??
+                              foregroundColor.withValues(alpha: .24),
+                          excludeSemantics: true,
+                        ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],
@@ -441,12 +446,19 @@ class _HyperButtonState extends State<HyperButton> {
         maxWidth: style.maximumSize?.width ?? double.infinity,
         maxHeight: style.maximumSize?.height ?? double.infinity,
       ),
-      padding: style.padding,
       margin: style.margin,
-      alignment: style.alignment ?? Alignment.center,
       decoration: decoration,
       foregroundDecoration: foregroundDecoration,
-      child: content,
+      child: Align(
+        alignment: style.alignment ?? Alignment.center,
+        widthFactor: 1,
+        heightFactor: 1,
+        // 对齐负责定位完整的“内边距 + 内容”组，内边距不参与按钮外框约束。
+        child: Padding(
+          padding: style.padding ?? EdgeInsets.zero,
+          child: content,
+        ),
+      ),
     );
     if (material?.usesBackdrop ?? false) {
       result = ClipRRect(

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import '../foundation/hyper_fill.dart';
-import 'hyper_theme.dart';
+import '../../foundation/hyper_fill.dart';
+import '../core/hyper_theme.dart';
 
 /// 前景颜色与背景之间的反色策略。
 enum HyperContrastMode { standard, adaptive, inverted }

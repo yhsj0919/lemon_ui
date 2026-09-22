@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_device_type.dart';
 import '../../interaction/hyper_pressable.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
 import 'hyper_radio_style.dart';
 import 'hyper_radio_theme.dart';
 
@@ -99,15 +98,11 @@ class HyperRadio<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final size = switch (theme.sizes.deviceType) {
-      HyperDeviceType.phone => 26.0,
-      HyperDeviceType.tablet => 26.0,
-      HyperDeviceType.desktop => 22.0,
-      HyperDeviceType.watch => 26.0,
-    };
+    final sizes = HyperTheme.sizesOf(context);
+    final size = sizes.radio.size;
     final defaults = HyperRadioStyle(
       size: size,
-      minimumTapTargetSize: theme.sizes.minimumInteractiveDimension,
+      minimumTapTargetSize: sizes.minimumInteractiveDimension,
       selectedColor: theme.colors.primary,
       disabledSelectedColor: theme.colors.disabled,
       strokeWidth: size * (7 / 56),

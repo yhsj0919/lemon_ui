@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 
+import '../../adaptive/hyper_device_detector.dart';
+import '../../foundation/hyper_device_type.dart';
+import '../size/hyper_size_scheme.dart';
 import 'hyper_theme_data.dart';
 
 /// 为子树提供全局或局部 Hyper 主题，并在主题变化时统一执行动画。
@@ -46,8 +50,32 @@ class HyperTheme extends StatelessWidget {
     return Theme.of(context).extension<HyperThemeData>();
   }
 
+  /// 获取当前设备已解析的单套尺寸。
+  static HyperSizeScheme sizesOf(BuildContext context) {
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<_HyperThemeScope>();
+    if (scope != null) return scope.sizes;
+    final data = Theme.of(context).extension<HyperThemeData>();
+    final deviceType =
+        HyperDeviceDetector.maybeOf(context) ??
+        _fallbackDeviceType(defaultTargetPlatform);
+    return (data ?? HyperThemeData.fromMaterial(Theme.of(context))).sizes
+        .resolve(deviceType);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final detected = HyperDeviceDetector.maybeOf(context);
+    if (detected == null) {
+      return HyperDeviceDetector(
+        builder: (context, deviceType, _) =>
+            _buildResolved(context, deviceType),
+      );
+    }
+    return _buildResolved(context, detected);
+  }
+
+  Widget _buildResolved(BuildContext context, HyperDeviceType deviceType) {
     final media = MediaQuery.maybeOf(context);
     final reduceMotion = media?.disableAnimations ?? false;
     final effectiveDuration = reduceMotion
@@ -56,7 +84,11 @@ class HyperTheme extends StatelessWidget {
     final material = Theme.of(context);
 
     Widget buildScope(HyperThemeData value) {
-      Widget result = _HyperThemeScope(data: value, child: child);
+      Widget result = _HyperThemeScope(
+        data: value,
+        sizes: value.sizes.resolve(deviceType),
+        child: child,
+      );
       if (applyToMaterial) {
         result = Theme(
           data: value.toMaterialThemeData(material),
@@ -79,16 +111,28 @@ class HyperTheme extends StatelessWidget {
   }
 }
 
+HyperDeviceType _fallbackDeviceType(TargetPlatform platform) =>
+    switch (platform) {
+      TargetPlatform.android || TargetPlatform.iOS => HyperDeviceType.phone,
+      _ => HyperDeviceType.desktop,
+    };
+
 class _HyperThemeScope extends InheritedTheme {
-  const _HyperThemeScope({required this.data, required super.child});
+  const _HyperThemeScope({
+    required this.data,
+    required this.sizes,
+    required super.child,
+  });
 
   final HyperThemeData data;
+  final HyperSizeScheme sizes;
 
   @override
-  bool updateShouldNotify(_HyperThemeScope oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(_HyperThemeScope oldWidget) =>
+      data != oldWidget.data || sizes != oldWidget.sizes;
 
   @override
   Widget wrap(BuildContext context, Widget child) {
-    return HyperTheme(data: data, child: child);
+    return _HyperThemeScope(data: data, sizes: sizes, child: child);
   }
 }

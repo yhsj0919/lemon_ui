@@ -1,18 +1,23 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
-import '../components/container/hyper_container_theme.dart';
-import '../components/checkbox/hyper_checkbox_theme.dart';
-import '../components/button/hyper_button_theme.dart';
-import '../components/icon_button/hyper_icon_button_theme.dart';
-import '../components/radio/hyper_radio_theme.dart';
-import '../components/switch/hyper_switch_theme.dart';
-import 'hyper_color_scheme.dart';
-import 'hyper_contrast_theme.dart';
-import 'hyper_motion_theme.dart';
-import 'hyper_material_theme.dart';
-import 'hyper_size_scheme.dart';
-import 'hyper_typography_scheme.dart';
+import '../../components/button/hyper_button_theme.dart';
+import '../../components/checkbox/hyper_checkbox_theme.dart';
+import '../../components/container/hyper_container_theme.dart';
+import '../../components/divider/hyper_divider_theme.dart';
+import '../../components/icon/hyper_icon_theme.dart';
+import '../../components/icon_button/hyper_icon_button_theme.dart';
+import '../../components/list_tile/hyper_list_tile_theme.dart';
+import '../../components/progress/hyper_progress_indicator_theme.dart';
+import '../../components/radio/hyper_radio_theme.dart';
+import '../../components/switch/hyper_switch_theme.dart';
+import '../../components/text/hyper_text_theme.dart';
+import '../color/hyper_color_scheme.dart';
+import '../color/hyper_contrast_theme.dart';
+import '../material/hyper_material_theme.dart';
+import '../motion/hyper_motion_theme.dart';
+import '../size/hyper_size_theme_data.dart';
+import '../typography/hyper_typography_scheme.dart';
 
 /// 返回当前平台原生 UI 字体，不依赖随 Flutter 或应用打包的字体文件。
 String _systemFontFamily() => switch (defaultTargetPlatform) {
@@ -49,16 +54,21 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     required this.containerTheme,
     this.buttonTheme = const HyperButtonThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
+    this.iconTheme = const HyperIconThemeData(),
+    this.dividerTheme = const HyperDividerThemeData(),
+    this.progressIndicatorTheme = const HyperProgressIndicatorThemeData(),
     this.switchTheme = const HyperSwitchThemeData(),
     this.checkboxTheme = const HyperCheckboxThemeData(),
     this.radioTheme = const HyperRadioThemeData(),
+    this.listTileTheme = const HyperListTileThemeData(),
+    this.textComponentTheme = const HyperTextThemeData(),
     this.materialTheme = const HyperMaterialThemeData(),
     this.contrastTheme = const HyperContrastThemeData(),
   });
 
   factory HyperThemeData.light({
     Color seedColor = const Color(0xFF3482FF),
-    HyperSizeScheme sizes = const HyperSizeScheme.phone(),
+    HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme typography = const HyperTypographyScheme(),
   }) => HyperThemeData.fromSeed(
     seedColor: seedColor,
@@ -68,7 +78,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   factory HyperThemeData.dark({
     Color seedColor = const Color(0xFF3482FF),
-    HyperSizeScheme sizes = const HyperSizeScheme.phone(),
+    HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme typography = const HyperTypographyScheme(),
   }) => HyperThemeData.fromSeed(
     seedColor: seedColor,
@@ -81,7 +91,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   factory HyperThemeData.fromSeed({
     required Color seedColor,
     Brightness brightness = Brightness.light,
-    HyperSizeScheme sizes = const HyperSizeScheme.phone(),
+    HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme typography = const HyperTypographyScheme(),
   }) {
     final colors = HyperColorScheme.fromSeed(
@@ -103,9 +113,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       containerTheme: HyperContainerThemeData(),
       buttonTheme: const HyperButtonThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
+      iconTheme: const HyperIconThemeData(),
+      dividerTheme: const HyperDividerThemeData(),
+      progressIndicatorTheme: const HyperProgressIndicatorThemeData(),
       switchTheme: const HyperSwitchThemeData(),
       checkboxTheme: const HyperCheckboxThemeData(),
       radioTheme: const HyperRadioThemeData(),
+      listTileTheme: const HyperListTileThemeData(),
+      textComponentTheme: const HyperTextThemeData(),
       materialTheme: const HyperMaterialThemeData(),
       contrastTheme: const HyperContrastThemeData(),
     );
@@ -114,7 +129,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 从当前 Flutter Material 主题建立 Hyper 主题回退值。
   factory HyperThemeData.fromMaterial(
     ThemeData material, {
-    HyperSizeScheme sizes = const HyperSizeScheme.phone(),
+    HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme typography = const HyperTypographyScheme(),
   }) {
     final colorScheme = material.colorScheme;
@@ -152,9 +167,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       containerTheme: HyperContainerThemeData(),
       buttonTheme: const HyperButtonThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
+      iconTheme: const HyperIconThemeData(),
+      dividerTheme: const HyperDividerThemeData(),
+      progressIndicatorTheme: const HyperProgressIndicatorThemeData(),
       switchTheme: const HyperSwitchThemeData(),
       checkboxTheme: const HyperCheckboxThemeData(),
       radioTheme: const HyperRadioThemeData(),
+      listTileTheme: const HyperListTileThemeData(),
+      textComponentTheme: const HyperTextThemeData(),
       materialTheme: const HyperMaterialThemeData(),
       contrastTheme: const HyperContrastThemeData(),
     );
@@ -166,8 +186,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 已应用系统字体和字号规范的 Flutter 文字主题。
   final TextTheme textTheme;
 
-  /// 当前终端使用的明确尺寸方案。
-  final HyperSizeScheme sizes;
+  /// 四类设备的全局尺寸配置；当前端由 [HyperTheme] 解析。
+  final HyperSizeThemeData sizes;
 
   /// 全局语义字号；数值明确且不参与倍率缩放。
   final HyperTypographyScheme typography;
@@ -185,6 +205,15 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局图标按钮主题。
   final HyperIconButtonThemeData iconButtonTheme;
 
+  /// 全局基础图标主题，不与图标按钮主题共用。
+  final HyperIconThemeData iconTheme;
+
+  /// 全局分隔线主题，不直接复用 Material DividerTheme。
+  final HyperDividerThemeData dividerTheme;
+
+  /// 全局基础进度指示器主题。
+  final HyperProgressIndicatorThemeData progressIndicatorTheme;
+
   /// 全局开关主题。
   final HyperSwitchThemeData switchTheme;
 
@@ -194,6 +223,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局单选控件主题。
   final HyperRadioThemeData radioTheme;
 
+  /// 全局基础列表项主题。
+  final HyperListTileThemeData listTileTheme;
+
+  /// 全局 HyperText 控件主题；基础字体和字号仍由 [textTheme] 提供。
+  final HyperTextThemeData textComponentTheme;
+
   /// 全局材质质量和默认材质。
   final HyperMaterialThemeData materialTheme;
 
@@ -201,10 +236,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperContrastThemeData contrastTheme;
 
   Brightness get brightness => colors.brightness;
-  BorderRadiusGeometry get borderRadius =>
-      BorderRadius.circular(sizes.controlRadius);
-  double get controlHeight => sizes.controlHeightMd;
-  EdgeInsetsGeometry get controlPadding => sizes.controlPadding;
 
   /// 兼容读取标准动画时长。
   Duration get animationDuration => motion.standardDuration;
@@ -266,7 +297,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   HyperThemeData copyWith({
     HyperColorScheme? colors,
     TextTheme? textTheme,
-    HyperSizeScheme? sizes,
+    HyperSizeThemeData? sizes,
     HyperTypographyScheme? typography,
     HyperMotionThemeData? motion,
     Duration? animationDuration,
@@ -274,9 +305,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperContainerThemeData? containerTheme,
     HyperButtonThemeData? buttonTheme,
     HyperIconButtonThemeData? iconButtonTheme,
+    HyperIconThemeData? iconTheme,
+    HyperDividerThemeData? dividerTheme,
+    HyperProgressIndicatorThemeData? progressIndicatorTheme,
     HyperSwitchThemeData? switchTheme,
     HyperCheckboxThemeData? checkboxTheme,
     HyperRadioThemeData? radioTheme,
+    HyperListTileThemeData? listTileTheme,
+    HyperTextThemeData? textComponentTheme,
     HyperMaterialThemeData? materialTheme,
     HyperContrastThemeData? contrastTheme,
   }) {
@@ -302,9 +338,15 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       containerTheme: containerTheme ?? this.containerTheme,
       buttonTheme: buttonTheme ?? this.buttonTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
+      iconTheme: iconTheme ?? this.iconTheme,
+      dividerTheme: dividerTheme ?? this.dividerTheme,
+      progressIndicatorTheme:
+          progressIndicatorTheme ?? this.progressIndicatorTheme,
       switchTheme: switchTheme ?? this.switchTheme,
       checkboxTheme: checkboxTheme ?? this.checkboxTheme,
       radioTheme: radioTheme ?? this.radioTheme,
+      listTileTheme: listTileTheme ?? this.listTileTheme,
+      textComponentTheme: textComponentTheme ?? this.textComponentTheme,
       materialTheme: materialTheme ?? this.materialTheme,
       contrastTheme: contrastTheme ?? this.contrastTheme,
     );
@@ -317,7 +359,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     return HyperThemeData(
       colors: HyperColorScheme.lerp(colors, other.colors, t),
       textTheme: TextTheme.lerp(textTheme, other.textTheme, t),
-      sizes: HyperSizeScheme.lerp(sizes, other.sizes, t),
+      sizes: HyperSizeThemeData.lerp(sizes, other.sizes, t),
       typography: HyperTypographyScheme.lerp(typography, other.typography, t),
       motion: HyperMotionThemeData.lerp(motion, other.motion, t),
       containerTheme: HyperContainerThemeData.lerp(
@@ -331,6 +373,17 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.iconButtonTheme,
         t,
       ),
+      iconTheme: HyperIconThemeData.lerp(iconTheme, other.iconTheme, t),
+      dividerTheme: HyperDividerThemeData.lerp(
+        dividerTheme,
+        other.dividerTheme,
+        t,
+      ),
+      progressIndicatorTheme: HyperProgressIndicatorThemeData.lerp(
+        progressIndicatorTheme,
+        other.progressIndicatorTheme,
+        t,
+      ),
       switchTheme: HyperSwitchThemeData.lerp(switchTheme, other.switchTheme, t),
       checkboxTheme: HyperCheckboxThemeData.lerp(
         checkboxTheme,
@@ -338,6 +391,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       radioTheme: HyperRadioThemeData.lerp(radioTheme, other.radioTheme, t),
+      listTileTheme: HyperListTileThemeData.lerp(
+        listTileTheme,
+        other.listTileTheme,
+        t,
+      ),
+      textComponentTheme: HyperTextThemeData.lerp(
+        textComponentTheme,
+        other.textComponentTheme,
+        t,
+      ),
       materialTheme: HyperMaterialThemeData.lerp(
         materialTheme,
         other.materialTheme,
@@ -363,9 +426,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.containerTheme == containerTheme &&
           other.buttonTheme == buttonTheme &&
           other.iconButtonTheme == iconButtonTheme &&
+          other.iconTheme == iconTheme &&
+          other.dividerTheme == dividerTheme &&
+          other.progressIndicatorTheme == progressIndicatorTheme &&
           other.switchTheme == switchTheme &&
           other.checkboxTheme == checkboxTheme &&
           other.radioTheme == radioTheme &&
+          other.listTileTheme == listTileTheme &&
+          other.textComponentTheme == textComponentTheme &&
           other.materialTheme == materialTheme &&
           other.contrastTheme == contrastTheme;
 
@@ -379,9 +447,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     containerTheme,
     buttonTheme,
     iconButtonTheme,
+    iconTheme,
+    dividerTheme,
+    progressIndicatorTheme,
     switchTheme,
     checkboxTheme,
     radioTheme,
+    listTileTheme,
+    textComponentTheme,
     materialTheme,
     contrastTheme,
   );

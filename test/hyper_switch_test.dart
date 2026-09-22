@@ -7,7 +7,10 @@ void main() {
   Widget app(Widget child, {HyperThemeData? theme}) => MaterialApp(
     home: HyperTheme(
       data:
-          theme ?? HyperThemeData.light(sizes: const HyperSizeScheme.desktop()),
+          theme ??
+          HyperThemeData.light(
+            sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.desktop()),
+          ),
       duration: Duration.zero,
       child: Center(child: child),
     ),
@@ -78,7 +81,9 @@ void main() {
     await tester.pumpWidget(
       app(
         HyperSwitch(value: true, onChanged: (_) {}),
-        theme: HyperThemeData.light(sizes: const HyperSizeScheme.phone()),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.phone()),
+        ),
       ),
     );
     final track = find.byWidgetPredicate(

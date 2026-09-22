@@ -23,7 +23,7 @@ class _HyperSwitchPageState extends State<HyperSwitchPage> {
           Text('HyperSwitch', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            '点击、键盘与拖动共用一套状态。当前 ${theme.sizes.deviceType.name} '
+            '点击、键盘与拖动共用一套状态。当前 ${HyperTheme.sizesOf(context).deviceType.name} '
             '使用独立尺寸；手机参考 MIUIX 并修正为偶数48×28，桌面采用舒适44×24。',
           ),
           const SizedBox(height: 24),

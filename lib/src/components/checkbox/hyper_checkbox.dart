@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_device_type.dart';
 import '../../interaction/hyper_pressable.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
 import 'hyper_checkbox_style.dart';
 import 'hyper_checkbox_theme.dart';
 
@@ -68,16 +67,12 @@ class HyperCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final metrics = switch (theme.sizes.deviceType) {
-      HyperDeviceType.phone => (size: 26.0, strokeWidth: 2.34),
-      HyperDeviceType.tablet => (size: 26.0, strokeWidth: 2.34),
-      HyperDeviceType.desktop => (size: 22.0, strokeWidth: 2.0),
-      HyperDeviceType.watch => (size: 26.0, strokeWidth: 2.34),
-    };
+    final sizes = HyperTheme.sizesOf(context);
+    final metrics = sizes.checkbox;
     final colors = theme.colors;
     final defaults = HyperCheckboxStyle(
       size: metrics.size,
-      minimumTapTargetSize: theme.sizes.minimumInteractiveDimension,
+      minimumTapTargetSize: sizes.minimumInteractiveDimension,
       activeColor: colors.primary,
       inactiveColor: colors.surfaceMuted,
       checkColor: colors.onPrimary,
@@ -85,7 +80,7 @@ class HyperCheckbox extends StatelessWidget {
       disabledCheckColor: colors.disabled,
       overlayColor: colors.stateLayer,
       border: BorderSide.none,
-      markStrokeWidth: metrics.strokeWidth,
+      markStrokeWidth: metrics.markStrokeWidth,
       pressScale: .85,
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -95,12 +90,7 @@ class HyperCheckbox extends StatelessWidget {
       borderRadius: BorderRadius.circular(
         variant == HyperCheckboxVariant.circle
             ? metrics.size / 2
-            : switch (theme.sizes.deviceType) {
-                HyperDeviceType.phone => 6,
-                HyperDeviceType.tablet => 6,
-                HyperDeviceType.desktop => 4,
-                HyperDeviceType.watch => 6,
-              },
+            : metrics.roundedRadius,
       ),
     );
     final resolved = defaults

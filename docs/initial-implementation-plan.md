@@ -270,7 +270,7 @@ class HyperContainer extends StatelessWidget {
 
 ### P0-5.5：`HyperSizeScheme`
 
-- 状态：数据类型、总主题接入、主题外层设备探测、四终端可交互 Example 和测试已完成，待用户评审。
+- 状态：数据类型、总主题接入、设备探测基础能力、四终端可交互 Example 和测试已完成；设备探测将按主题与尺寸架构统一收归 `HyperTheme` 协调。
 - 在开发下一个正式控件前实现，具体数值以 `size-specification.md` 为准。
 - 提供 phone、tablet、desktop、watch 四套离散尺寸，不使用倍率换算。
 - 将视觉高度与最小命中区域分开。
@@ -312,7 +312,7 @@ class HyperContainer extends StatelessWidget {
 ### P0-8：`HyperButtonThemeData` 与 `HyperButton`
 
 - 状态：`HyperButtonStyle`、主题、六种按钮变体、同步与自动异步回调、环形进度、图标文字、稳定尺寸 Demo 和基础测试已完成；线性与背景填充进度待补充。
-- 已按 MIUIX 对照修订设备默认值：手机 58×40、平板 64×44、桌面 52×36、手表 52×40；桌面32高度仅作为后续紧凑档位。已补齐显式按钮字体、焦点状态层、禁用容器/内容色和分终端状态透明度；详细规则见 `miuix-component-inventory.md` 的 Button 专项章节。
+- 已按 MIUIX 与真实手机页面对照修订设备默认值：手机 58×48、平板 64×44、桌面 52×36、手表 52×40；桌面32高度仅作为后续紧凑档位。已补齐显式按钮字体、焦点状态层、禁用容器/内容色和分终端状态透明度；详细规则见 `miuix-component-inventory.md` 的 Button 专项章节。
 - 普通和 `FutureOr<void>` 异步回调。
 - loading 时尺寸稳定。
 - `HyperButtonStyle` 统一承载主题公共样式和变体样式；实例样式属性与其字段保持同名、同类型、同语义。
@@ -362,6 +362,19 @@ class HyperContainer extends StatelessWidget {
 - 图表、数据网格和富文本编辑。
 - `HyperScaledBox` 等显式全局缩放工具。
 - 第三方状态管理、网络和平台插件集成。
+- 可视化主题编辑器；放在组件目录、强类型主题 API 和导出格式全部稳定之后。
+
+### 远期：可视化主题编辑器
+
+主题编辑器是独立的上层工具，不反向改变控件和主题的责任边界。远期目标包括：
+
+- 显式编辑颜色、排版、四端尺寸、动画和各组件主题。
+- 同时预览 phone、tablet、desktop 和 watch 的真实解析结果。
+- 导出强类型、可格式化、可继续手工维护的 Dart 主题文件。
+- 以默认 HyperOS 主题为基础，只记录和导出用户修改的差异。
+- 导入和导出必须经过明确的版本化 schema，不使用 `Map<String, dynamic>` 作为运行时主题 API。
+
+在主题结构和主要组件尚未冻结前，不实现编辑器 UI、导出器或持久化 schema。
 
 ## 九、每一步的 Demo 与评审
 

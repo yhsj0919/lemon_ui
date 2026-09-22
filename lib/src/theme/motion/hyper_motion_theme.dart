@@ -1,7 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
-/// 统一动画节奏档位。
+/// 全局统一动画节奏档位。
 enum HyperMotionSpeed { instant, fast, standard, emphasized }
 
 /// Lemon UI 的统一动画时长、曲线和弹簧参数。

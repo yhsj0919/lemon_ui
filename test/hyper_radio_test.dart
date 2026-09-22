@@ -6,7 +6,9 @@ import 'package:lemon_ui/lemon_ui.dart';
 void main() {
   Widget app(Widget child) => MaterialApp(
     home: HyperTheme(
-      data: HyperThemeData.light(sizes: const HyperSizeScheme.desktop()),
+      data: HyperThemeData.light(
+        sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.desktop()),
+      ),
       duration: Duration.zero,
       child: Center(child: child),
     ),

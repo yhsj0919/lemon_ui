@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_device_type.dart';
 import '../../interaction/hyper_pressable.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
 import 'hyper_switch_style.dart';
 import 'hyper_switch_theme.dart';
 
@@ -46,32 +45,14 @@ class _HyperSwitchState extends State<HyperSwitch> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final colors = theme.colors;
-    final metrics = switch (theme.sizes.deviceType) {
-      HyperDeviceType.watch => (
-        width: 44.0,
-        height: 26.0,
-        thumbSize: 22.0,
-        thumbInset: 2.0,
-      ),
-      HyperDeviceType.phone || HyperDeviceType.tablet => (
-        width: 48.0,
-        height: 28.0,
-        thumbSize: 20.0,
-        thumbInset: 4.0,
-      ),
-      HyperDeviceType.desktop => (
-        width: 44.0,
-        height: 24.0,
-        thumbSize: 18.0,
-        thumbInset: 4.0,
-      ),
-    };
+    final metrics = sizes.switchSize;
     final defaults = HyperSwitchStyle(
       width: metrics.width,
       height: metrics.height,
       thumbSize: metrics.thumbSize,
-      minimumTapTargetSize: theme.sizes.minimumInteractiveDimension,
+      minimumTapTargetSize: sizes.minimumInteractiveDimension,
       activeTrackColor: colors.primary,
       inactiveTrackColor: colors.surfaceMuted,
       disabledTrackColor: colors.surfaceMuted,

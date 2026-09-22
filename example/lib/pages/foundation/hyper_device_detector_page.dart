@@ -18,8 +18,8 @@ class _HyperDeviceDetectorPageState extends State<HyperDeviceDetectorPage> {
     return HyperDeviceDetector(
       deviceType: _override,
       builder: (context, deviceType, _) {
-        final sizes = HyperSizeScheme.forDevice(deviceType);
-        final theme = HyperThemeData.light(sizes: sizes);
+        final theme = HyperThemeData.light();
+        final sizes = theme.sizes.resolve(deviceType);
         return HyperTheme(
           data: theme,
           child: Builder(

@@ -2,6 +2,8 @@
 
 本文档用于规划 Lemon UI 的长期控件范围，方便按类别逐项设计、实现和验收。公开控件统一使用 `Hyper` 前缀，基础名称优先采用 Flutter 原生命名。
 
+控件的基础层、高级层和优先实现顺序见 [控件分层与实现优先级](component-layer-classification.md)。本目录只维护完整范围和完成状态，避免在两份文档中重复维护状态。
+
 目录同时考虑手机、平板、桌面和手表。设备专属组件只在相应平台或窗口形态下启用；通用组件保持同一套公开 API，通过各自主题和默认布局适配设备。
 
 ## 标记说明
@@ -56,7 +58,7 @@
 - [ ] `HyperAsyncState<T>`：idle、loading、success、error。
 - [ ] `HyperAsyncConcurrency`：异步并发策略。
 - [x] `HyperDeviceType`：phone、tablet、desktop、watch。
-- [x] `HyperDeviceDetector`：在主题外层自动探测设备类型，并允许显式覆盖或自定义解析。
+- [x] `HyperDeviceDetector`：提供离散设备类型探测能力，由 `HyperTheme` 统一协调，并允许显式覆盖或自定义解析。
 - [x] `HyperControlState`：hovered、pressed、secondaryPressed、tertiaryPressed、longPressed、focused、selected、disabled 等。
 - [ ] `HyperThemeInspector`：Debug 模式查看属性最终值及来源。
 
@@ -69,7 +71,7 @@
 - [ ] `HyperPanel`：页面或工具区域面板。
 - [ ] `HyperSection`：带标题、说明和内容的分区。
 - [ ] `HyperGroupBox`：带边界和标题的内容分组。
-- [ ] `HyperDivider`：水平或垂直分隔线。
+- [x] `HyperDivider`：支持横向、纵向、纯色、渐变、实线、虚线、点线、明确尺寸和独立主题。
 - [ ] `HyperVerticalDivider`：垂直分隔线便捷控件。
 - [ ] `HyperSpacer`：语义间距。
 - [ ] `HyperGap`：明确尺寸的间隔。
@@ -116,12 +118,12 @@
 
 ## 四、文字、图标与基础内容
 
-- [ ] `HyperText`：主题文本。
+- [x] `HyperText`：系统字体主题文本，支持十二级语义样式、控件主题、局部主题和实例覆盖。
 - [ ] `HyperSelectableText`：可选择文本。
 - [ ] `HyperRichText`：富文本。
 - [ ] `HyperMarkdown`：可选扩展包中的 Markdown 展示。
 - [ ] `HyperCodeBlock`：代码展示与复制。
-- [ ] `HyperIcon`：主题图标。
+- [x] `HyperIcon`：设备明确尺寸、状态样式、可变图标轴及全局/局部/实例主题覆盖。
 - [ ] `HyperIconLabel`：图标文字组合。
 - [ ] `HyperAvatar`：头像。
 - [ ] `HyperAvatarGroup`：头像组。
@@ -253,10 +255,12 @@
 ## 十一、列表、集合与内容单元
 
 - [ ] `HyperListView`：统一列表默认行为。
-- [ ] `HyperListTile`：标准列表项。
+- [x] `HyperListTile`：MIUIX 风格的首部、正文、尾部基础列表项，不附加业务语义。
+- [x] `HyperNavigationListTile`：进入下一级页面的列表项，统一提供描述区和 chevron。
+- [x] `HyperCheckboxListTile`：整行复选列表项，由行交互承载点击热区并对齐尾部可见外框。
+- [x] `HyperRadioListTile`：整行单选列表项，由行交互承载点击热区并对齐尾部圆环。
 - [ ] `HyperSettingsTile`：设置项。
 - [ ] `HyperActionTile`：操作列表项。
-- [ ] `HyperNavigationTile`：导航列表项。
 - [ ] `HyperUserTile`：用户信息项。
 - [ ] `HyperMediaTile`：媒体信息项。
 - [ ] `HyperExpandableTile`：可展开列表项。
@@ -365,10 +369,10 @@
 - [ ] `HyperNotificationCenter`：应用内通知列表。
 - [ ] `HyperAlert`：内联提示块。
 - [ ] `HyperLoadingOverlay`：区域或页面加载遮罩。
-- [ ] `HyperProgressIndicator`：统一进度入口。
-- [ ] `HyperLinearProgressIndicator`：线性进度。
+- [x] `HyperProgressIndicator`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
+- [x] `HyperLinearProgressIndicator`：支持确定/不确定进度、明确尺寸、圆角、语义、减少动画和三级主题覆盖。
 - [ ] `HyperWormProgressIndicator`：类似蚯蚓伸缩、移动的线性进度，支持确定和不确定进度。
-- [ ] `HyperCircularProgressIndicator`：圆形进度，提供确定进度与 `.infinite` 轨道点形态。
+- [~] `HyperCircularProgressIndicator`：确定/不确定进度、设备尺寸、端点、语义、减少动画和三级主题覆盖已完成；`.infinite` 轨道点形态待补充。
 - [ ] `HyperLoadingSpinner`：加载旋转器。
 - [ ] `HyperActivityIndicator`：活动指示器。
 - [ ] `HyperActivityRing`：活动圆环。

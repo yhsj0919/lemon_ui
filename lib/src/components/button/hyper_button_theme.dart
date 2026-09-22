@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../theme/hyper_theme.dart';
+import '../../theme/core/hyper_theme.dart';
 import 'hyper_button_style.dart';
 
 const _unchanged = Object();

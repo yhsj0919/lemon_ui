@@ -17,7 +17,7 @@ class _HyperIconButtonPageState extends State<HyperIconButtonPage> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final sizeDescription = switch (theme.sizes.deviceType) {
+    final sizeDescription = switch (HyperTheme.sizesOf(context).deviceType) {
       HyperDeviceType.phone => '手机：40×40，图标24',
       HyperDeviceType.tablet => '平板：44×44，图标24',
       HyperDeviceType.desktop => '桌面：36×36，图标18',

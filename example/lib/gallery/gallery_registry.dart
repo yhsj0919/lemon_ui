@@ -9,7 +9,12 @@ import '../pages/foundation/hyper_size_scheme_page.dart';
 import '../pages/foundation/hyper_state_value_page.dart';
 import '../pages/foundation/hyper_theme_page.dart';
 import '../pages/foundation/hyper_typography_scheme_page.dart';
+import '../pages/feedback/hyper_progress_indicator_page.dart';
 import '../pages/container/hyper_container_page.dart';
+import '../pages/content/hyper_text_page.dart';
+import '../pages/content/hyper_icon_page.dart';
+import '../pages/content/hyper_divider_page.dart';
+import '../pages/content/hyper_list_tile_page.dart';
 import '../pages/button/hyper_button_theme_page.dart';
 import '../pages/button/hyper_button_page.dart';
 import '../pages/button/hyper_icon_button_page.dart';
@@ -112,6 +117,39 @@ final List<GallerySection> gallerySections = [
     ],
   ),
   GallerySection(
+    title: '文字与内容',
+    items: [
+      GalleryItem(
+        id: 'hyper-text',
+        title: 'HyperText',
+        description: '系统字体、语义字号和三层样式覆盖。',
+        icon: Icons.title,
+        builder: (_) => const HyperTextPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-icon',
+        title: 'HyperIcon',
+        description: '设备尺寸、状态样式和可变图标轴。',
+        icon: Icons.insert_emoticon_outlined,
+        builder: (_) => const HyperIconPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-divider',
+        title: 'HyperDivider',
+        description: '横向、纵向、渐变、虚线和点线。',
+        icon: Icons.horizontal_rule,
+        builder: (_) => const HyperDividerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-list-tile',
+        title: 'HyperListTile',
+        description: 'MIUIX 风格首部、正文、尾部布局与整行交互。',
+        icon: Icons.view_agenda_outlined,
+        builder: (_) => const HyperListTilePage(),
+      ),
+    ],
+  ),
+  GallerySection(
     title: '交互基础',
     items: [
       GalleryItem(
@@ -146,6 +184,18 @@ final List<GallerySection> gallerySections = [
         description: '点击、拖动、设备尺寸与独立主题。',
         icon: Icons.toggle_on_outlined,
         builder: (_) => const HyperSwitchPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '反馈与状态',
+    items: [
+      GalleryItem(
+        id: 'hyper-progress-indicator',
+        title: 'HyperProgressIndicator',
+        description: '线性、圆形、确定进度与不确定进度。',
+        icon: Icons.data_usage,
+        builder: (_) => const HyperProgressIndicatorPage(),
       ),
     ],
   ),

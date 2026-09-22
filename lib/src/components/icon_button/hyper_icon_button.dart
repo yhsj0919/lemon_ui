@@ -4,13 +4,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_device_type.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
 import '../../interaction/hyper_pressable.dart';
-import '../../theme/hyper_contrast_theme.dart';
-import '../../theme/hyper_material_theme.dart';
-import '../../theme/hyper_theme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
+import '../../theme/core/hyper_theme.dart';
+import '../../theme/material/hyper_material_theme.dart';
+import '../progress/hyper_circular_progress_indicator.dart';
 import 'hyper_icon_button_style.dart';
 import 'hyper_icon_button_theme.dart';
 
@@ -23,6 +23,7 @@ class HyperIconButton extends StatefulWidget {
     this.tooltip,
     this.style,
     this.loading = false,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperIconButtonVariant.filled;
@@ -34,6 +35,7 @@ class HyperIconButton extends StatefulWidget {
     this.tooltip,
     this.style,
     this.loading = false,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperIconButtonVariant.tonal;
@@ -45,6 +47,7 @@ class HyperIconButton extends StatefulWidget {
     this.tooltip,
     this.style,
     this.loading = false,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperIconButtonVariant.outlined;
@@ -56,6 +59,7 @@ class HyperIconButton extends StatefulWidget {
     this.tooltip,
     this.style,
     this.loading = false,
+    this.loadingIndicator,
     this.onError,
     this.autofocus = false,
   }) : variant = HyperIconButtonVariant.ghost;
@@ -77,6 +81,11 @@ class HyperIconButton extends StatefulWidget {
 
   /// 外部控制的加载状态。
   final bool loading;
+
+  /// 自定义加载内容；未指定时使用默认圆形进度。
+  ///
+  /// 内容会被 [HyperIconButtonStyle.progressSize] 约束。
+  final Widget? loadingIndicator;
 
   /// 同步或异步操作失败时的错误回调。
   final void Function(Object error, StackTrace stackTrace)? onError;
@@ -121,36 +130,13 @@ class _HyperIconButtonState extends State<HyperIconButton> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final colors = theme.colors;
-    final metrics = switch (theme.sizes.deviceType) {
-      HyperDeviceType.phone => (
-        size: 40.0,
-        iconSize: 24.0,
-        progressSize: 18.0,
-        radius: 20.0,
-      ),
-      HyperDeviceType.tablet => (
-        size: 44.0,
-        iconSize: 24.0,
-        progressSize: 18.0,
-        radius: 22.0,
-      ),
-      HyperDeviceType.desktop => (
-        size: 36.0,
-        iconSize: 18.0,
-        progressSize: 16.0,
-        radius: 10.0,
-      ),
-      HyperDeviceType.watch => (
-        size: 40.0,
-        iconSize: 20.0,
-        progressSize: 18.0,
-        radius: 20.0,
-      ),
-    };
+    // 组件只消费主题已经解析好的当前设备规格。
+    final metrics = sizes.iconButton;
     final defaults = HyperIconButtonStyle(
       size: metrics.size,
-      minimumTapTargetSize: theme.sizes.minimumInteractiveDimension,
+      minimumTapTargetSize: sizes.minimumInteractiveDimension,
       iconSize: metrics.iconSize,
       progressSize: metrics.progressSize,
       borderRadius: BorderRadius.circular(metrics.radius),
@@ -245,10 +231,17 @@ class _HyperIconButtonState extends State<HyperIconButton> {
     final content = _loading
         ? SizedBox.square(
             dimension: style.progressSize,
-            child: CircularProgressIndicator(
-              strokeWidth: style.progressThickness ?? 2,
-              color: style.progressColor ?? foreground,
-            ),
+            child:
+                widget.loadingIndicator ??
+                HyperCircularProgressIndicator(
+                  size: style.progressSize,
+                  thickness: style.progressThickness ?? 2,
+                  color: style.progressColor ?? foreground,
+                  trackColor:
+                      style.progressTrackColor ??
+                      foreground.withValues(alpha: .24),
+                  excludeSemantics: true,
+                ),
           )
         : IconTheme(
             data: IconThemeData(

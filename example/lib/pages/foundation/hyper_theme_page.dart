@@ -25,6 +25,7 @@ class _HyperThemePageState extends State<HyperThemePage> {
       child: Builder(
         builder: (context) {
           final theme = HyperTheme.of(context);
+          final sizes = HyperTheme.sizesOf(context);
           return Material(
             key: const Key('theme-background'),
             color: theme.colors.background,
@@ -77,18 +78,23 @@ class _HyperThemePageState extends State<HyperThemePage> {
                 const SizedBox(height: 24),
                 _ThemePreview(
                   title: '全局默认值',
-                  description: '高度 48 · 圆角 16 · 内边距 20 / 12',
+                  description:
+                      '高度 ${sizes.controlHeightMd.toStringAsFixed(0)} · '
+                      '圆角 ${sizes.controlRadius.toStringAsFixed(0)}',
                   controlKey: const Key('global-control'),
                 ),
                 const SizedBox(height: 16),
                 HyperTheme(
                   data: theme.copyWith(
-                    sizes: theme.sizes.copyWith(
-                      controlHeightMd: 68,
-                      controlRadius: 28,
-                      controlPadding: const EdgeInsets.symmetric(
-                        horizontal: 28,
-                        vertical: 16,
+                    sizes: _replaceCurrentSizes(
+                      theme.sizes,
+                      sizes.copyWith(
+                        controlHeightMd: 68,
+                        controlRadius: 28,
+                        controlPadding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -107,6 +113,16 @@ class _HyperThemePageState extends State<HyperThemePage> {
   }
 }
 
+HyperSizeThemeData _replaceCurrentSizes(
+  HyperSizeThemeData source,
+  HyperSizeScheme current,
+) => switch (current.deviceType) {
+  HyperDeviceType.phone => source.copyWith(phone: current),
+  HyperDeviceType.tablet => source.copyWith(tablet: current),
+  HyperDeviceType.desktop => source.copyWith(desktop: current),
+  HyperDeviceType.watch => source.copyWith(watch: current),
+};
+
 class _ThemePreview extends StatelessWidget {
   const _ThemePreview({
     required this.title,
@@ -121,11 +137,12 @@ class _ThemePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colors.surface,
-        borderRadius: theme.borderRadius,
+        borderRadius: BorderRadius.circular(sizes.controlRadius),
         border: Border.all(color: theme.colors.outline),
       ),
       child: Column(
@@ -137,12 +154,12 @@ class _ThemePreview extends StatelessWidget {
           const SizedBox(height: 16),
           Container(
             key: controlKey,
-            height: theme.controlHeight,
-            padding: theme.controlPadding,
+            height: sizes.controlHeightMd,
+            padding: sizes.controlPadding,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.colors.primary,
-              borderRadius: theme.borderRadius,
+              borderRadius: BorderRadius.circular(sizes.controlRadius),
             ),
             child: Text(
               '按主题绘制的区域',

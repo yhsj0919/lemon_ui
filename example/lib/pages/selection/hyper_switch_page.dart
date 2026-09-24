@@ -18,7 +18,10 @@ class _HyperSwitchPageState extends State<HyperSwitchPage> {
     return ColoredBox(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('HyperSwitch', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

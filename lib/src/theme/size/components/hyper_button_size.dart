@@ -1,13 +1,19 @@
 import 'package:flutter/widgets.dart';
 
+/// 按钮的视觉尺寸档位；具体数值由当前设备的尺寸主题提供。
+enum HyperButtonSizeVariant { small, medium, large }
+
 /// 当前设备的 HyperButton 尺寸与输入方式规格。
 @immutable
 final class HyperButtonSize {
   const HyperButtonSize({
     required this.minimumSize,
+    required this.smallHeight,
+    required this.largeHeight,
     required this.padding,
+    required this.smallPadding,
+    required this.largePadding,
     required this.radius,
-    required this.fontSize,
     required this.iconSize,
     required this.iconSpacing,
     required this.progressSize,
@@ -17,9 +23,12 @@ final class HyperButtonSize {
   });
 
   final Size minimumSize;
+  final double smallHeight;
+  final double largeHeight;
   final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry smallPadding;
+  final EdgeInsetsGeometry largePadding;
   final double radius;
-  final double fontSize;
   final double iconSize;
   final double iconSpacing;
   final double progressSize;
@@ -27,11 +36,26 @@ final class HyperButtonSize {
   final double focusOverlayOpacity;
   final double pressOverlayOpacity;
 
+  double heightFor(HyperButtonSizeVariant size) => switch (size) {
+    HyperButtonSizeVariant.small => smallHeight,
+    HyperButtonSizeVariant.medium => minimumSize.height,
+    HyperButtonSizeVariant.large => largeHeight,
+  };
+
+  EdgeInsetsGeometry paddingFor(HyperButtonSizeVariant size) => switch (size) {
+    HyperButtonSizeVariant.small => smallPadding,
+    HyperButtonSizeVariant.medium => padding,
+    HyperButtonSizeVariant.large => largePadding,
+  };
+
   HyperButtonSize copyWith({
     Size? minimumSize,
+    double? smallHeight,
+    double? largeHeight,
     EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? smallPadding,
+    EdgeInsetsGeometry? largePadding,
     double? radius,
-    double? fontSize,
     double? iconSize,
     double? iconSpacing,
     double? progressSize,
@@ -40,9 +64,12 @@ final class HyperButtonSize {
     double? pressOverlayOpacity,
   }) => HyperButtonSize(
     minimumSize: minimumSize ?? this.minimumSize,
+    smallHeight: smallHeight ?? this.smallHeight,
+    largeHeight: largeHeight ?? this.largeHeight,
     padding: padding ?? this.padding,
+    smallPadding: smallPadding ?? this.smallPadding,
+    largePadding: largePadding ?? this.largePadding,
     radius: radius ?? this.radius,
-    fontSize: fontSize ?? this.fontSize,
     iconSize: iconSize ?? this.iconSize,
     iconSpacing: iconSpacing ?? this.iconSpacing,
     progressSize: progressSize ?? this.progressSize,
@@ -55,9 +82,12 @@ final class HyperButtonSize {
     double value(double x, double y) => x + (y - x) * t;
     return HyperButtonSize(
       minimumSize: Size.lerp(a.minimumSize, b.minimumSize, t)!,
+      smallHeight: value(a.smallHeight, b.smallHeight),
+      largeHeight: value(a.largeHeight, b.largeHeight),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t)!,
+      smallPadding: EdgeInsetsGeometry.lerp(a.smallPadding, b.smallPadding, t)!,
+      largePadding: EdgeInsetsGeometry.lerp(a.largePadding, b.largePadding, t)!,
       radius: value(a.radius, b.radius),
-      fontSize: value(a.fontSize, b.fontSize),
       iconSize: value(a.iconSize, b.iconSize),
       iconSpacing: value(a.iconSpacing, b.iconSpacing),
       progressSize: value(a.progressSize, b.progressSize),
@@ -72,9 +102,12 @@ final class HyperButtonSize {
       identical(this, other) ||
       other is HyperButtonSize &&
           other.minimumSize == minimumSize &&
+          other.smallHeight == smallHeight &&
+          other.largeHeight == largeHeight &&
           other.padding == padding &&
+          other.smallPadding == smallPadding &&
+          other.largePadding == largePadding &&
           other.radius == radius &&
-          other.fontSize == fontSize &&
           other.iconSize == iconSize &&
           other.iconSpacing == iconSpacing &&
           other.progressSize == progressSize &&
@@ -85,9 +118,12 @@ final class HyperButtonSize {
   @override
   int get hashCode => Object.hash(
     minimumSize,
+    smallHeight,
+    largeHeight,
     padding,
+    smallPadding,
+    largePadding,
     radius,
-    fontSize,
     iconSize,
     iconSpacing,
     progressSize,

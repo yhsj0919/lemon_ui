@@ -20,7 +20,10 @@ class _HyperMotionThemePageState extends State<HyperMotionThemePage> {
     return Material(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('统一动画', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 
@@ -37,7 +38,19 @@ class HyperTheme extends StatelessWidget {
 
   /// 获取最近的显式 Hyper 主题；不存在时从 Material 主题安全生成。
   static HyperThemeData of(BuildContext context) {
-    return maybeOf(context) ?? HyperThemeData.fromMaterial(Theme.of(context));
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<_HyperThemeScope>();
+    if (scope != null) return scope.data;
+    final data =
+        Theme.of(context).extension<HyperThemeData>() ??
+        HyperThemeData.fromMaterial(Theme.of(context));
+    final deviceType =
+        HyperDeviceDetector.maybeOf(context) ??
+        _fallbackDeviceType(defaultTargetPlatform);
+    return data.copyWith(
+      typography: data.typographyTheme.resolve(deviceType),
+      typographyTheme: data.typographyTheme,
+    );
   }
 
   /// 获取最近的显式主题或 Material ThemeExtension。
@@ -84,14 +97,26 @@ class HyperTheme extends StatelessWidget {
     final material = Theme.of(context);
 
     Widget buildScope(HyperThemeData value) {
+      final resolved = value.copyWith(
+        typography: value.typographyTheme.resolve(deviceType),
+        typographyTheme: value.typographyTheme,
+      );
       Widget result = _HyperThemeScope(
-        data: value,
+        data: resolved,
         sizes: value.sizes.resolve(deviceType),
         child: child,
       );
+      final scrollBehavior = ScrollConfiguration.of(context);
+      result = ScrollConfiguration(
+        // 只补充鼠标拖动，保留平台原有的触摸、触控板和滚动条策略。
+        behavior: scrollBehavior.copyWith(
+          dragDevices: {...scrollBehavior.dragDevices, PointerDeviceKind.mouse},
+        ),
+        child: result,
+      );
       if (applyToMaterial) {
         result = Theme(
-          data: value.toMaterialThemeData(material),
+          data: resolved.toMaterialThemeData(material),
           child: result,
         );
       }

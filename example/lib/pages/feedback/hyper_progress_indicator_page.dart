@@ -35,7 +35,10 @@ class _HyperProgressIndicatorPageState
           child: Material(
             color: HyperTheme.of(context).colors.background,
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.symmetric(
+                horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+                vertical: 24,
+              ),
               children: [
                 const HyperText(
                   'HyperProgressIndicator',

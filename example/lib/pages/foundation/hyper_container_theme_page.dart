@@ -35,9 +35,12 @@ class _HyperContainerThemePageState extends State<HyperContainerThemePage> {
       padding: const EdgeInsets.all(24),
     );
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.symmetric(
+        horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+        vertical: 24,
+      ),
       children: [
-        const Text('容器主题：逐项覆盖与清除', style: TextStyle(fontSize: 22)),
+        const HyperText('容器主题：逐项覆盖与清除', variant: HyperTextVariant.sectionTitle),
         const SizedBox(height: 16),
         Wrap(
           spacing: 24,

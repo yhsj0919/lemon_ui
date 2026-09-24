@@ -142,9 +142,14 @@ class _HyperIconButtonState extends State<HyperIconButton> {
       borderRadius: BorderRadius.circular(metrics.radius),
       progressThickness: 2,
     ).merge(_variantDefaults(context));
-    final style = defaults
-        .merge(HyperIconButtonTheme.of(context).resolve(widget.variant))
-        .merge(widget.style);
+    final themedStyle = HyperIconButtonTheme.of(context)
+        .resolve(widget.variant);
+    final style = defaults.merge(themedStyle).merge(widget.style);
+    final materialTheme = HyperMaterialTheme.of(context);
+    final material = materialTheme.resolveMaterial(material: style.material);
+    final explicitBackground = style.material == null
+        ? widget.style?.background ?? themedStyle.background
+        : null;
     final enabled = widget.onPressed != null && !_loading;
 
     Widget result = HyperPressable(
@@ -162,7 +167,8 @@ class _HyperIconButtonState extends State<HyperIconButton> {
             : 0.0;
         final foreground = HyperContrastTheme.of(context).resolve(
           foreground: style.foregroundColor ?? colors.onSurface,
-          background: style.material?.background ?? style.background,
+          background:
+              explicitBackground ?? material?.background ?? style.background,
           canvasColor: colors.background,
           mode: style.contrastMode,
         );
@@ -173,6 +179,8 @@ class _HyperIconButtonState extends State<HyperIconButton> {
           (style.overlayColor ?? colors.stateLayer).withValues(
             alpha: overlayAlpha,
           ),
+          material,
+          explicitBackground,
         );
         return ConstrainedBox(
           constraints: BoxConstraints(
@@ -217,13 +225,10 @@ class _HyperIconButtonState extends State<HyperIconButton> {
     HyperIconButtonStyle style,
     Color foreground,
     Color overlay,
+    HyperSurfaceMaterial? material,
+    HyperFill? explicitBackground,
   ) {
-    final materialTheme = HyperMaterialTheme.of(context);
-    final material = style.material?.resolve(
-      quality: materialTheme.quality ?? HyperMaterialQuality.standard,
-      reduceTransparency: materialTheme.reduceTransparency ?? false,
-    );
-    final fill = material?.background ?? style.background;
+    final fill = explicitBackground ?? material?.background ?? style.background;
     final radius = (style.borderRadius ?? BorderRadius.zero).resolve(
       Directionality.of(context),
     );
@@ -253,16 +258,30 @@ class _HyperIconButtonState extends State<HyperIconButton> {
             child: widget.icon,
           );
     final border = style.border ?? material?.border;
+    final glass = material?.usesBackdrop ?? false;
+    final shadows = style.boxShadow ?? material?.boxShadow;
+    Widget layeredContent = content;
+    if (!glass && material?.tint != null) {
+      layeredContent = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(child: ColoredBox(color: material!.tint!)),
+          ),
+          content,
+        ],
+      );
+    }
     Widget result = Container(
       width: style.size,
       height: style.size,
-      margin: style.margin,
+      margin: glass ? null : style.margin,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: fill?.color,
-        gradient: fill?.gradient,
+        color: glass ? null : fill?.color,
+        gradient: glass ? null : fill?.gradient,
         borderRadius: radius,
-        boxShadow: style.boxShadow ?? material?.boxShadow,
+        boxShadow: glass ? null : shadows,
       ),
       foregroundDecoration:
           overlay.a > 0 || (border != null && border != BorderSide.none)
@@ -274,20 +293,49 @@ class _HyperIconButtonState extends State<HyperIconButton> {
               borderRadius: radius,
             )
           : null,
-      child: content,
+      child: layeredContent,
     );
-    if (material?.usesBackdrop ?? false) {
+    if (glass) {
+      // 材质滤镜绘制背景，图标与加载内容保持在独立的清晰前景层。
       result = ClipRRect(
         borderRadius: radius,
-        clipBehavior: style.clipBehavior ?? Clip.antiAlias,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: material!.blurSigmaX,
-            sigmaY: material.blurSigmaY,
-          ),
-          child: result,
+        clipBehavior: style.clipBehavior == Clip.none
+            ? Clip.antiAlias
+            : style.clipBehavior ?? Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: material!.blurSigmaX,
+                  sigmaY: material.blurSigmaY,
+                ),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: fill?.color,
+                    gradient: fill?.gradient,
+                    borderRadius: radius,
+                  ),
+                  child: material.tint == null
+                      ? const SizedBox.expand()
+                      : ColoredBox(color: material.tint!),
+                ),
+              ),
+            ),
+            result,
+          ],
         ),
       );
+      if (shadows != null && shadows.isNotEmpty) {
+        result = DecoratedBox(
+          decoration: BoxDecoration(borderRadius: radius, boxShadow: shadows),
+          child: result,
+        );
+      }
+      if (style.margin != null) {
+        result = Padding(padding: style.margin!, child: result);
+      }
     }
     return result;
   }

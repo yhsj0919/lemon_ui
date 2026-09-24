@@ -62,18 +62,15 @@ class HyperMaterialSurface extends StatelessWidget {
     final hyperTheme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
     final materialTheme = HyperMaterialTheme.of(context);
-    final source =
-        material ??
-        materialTheme.material ??
+    final resolved =
+        materialTheme.resolveMaterial(
+          material: material,
+          quality: quality,
+          reduceTransparency: reduceTransparency,
+        ) ??
         HyperSurfaceMaterial.solid(
           background: HyperFill.color(hyperTheme.colors.surface),
         );
-    final resolved = source.resolve(
-      quality:
-          quality ?? materialTheme.quality ?? HyperMaterialQuality.standard,
-      reduceTransparency:
-          reduceTransparency ?? materialTheme.reduceTransparency ?? false,
-    );
     final radius = (borderRadius ?? BorderRadius.circular(sizes.controlRadius))
         .resolve(Directionality.of(context));
     final fill = resolved.background;

@@ -8,9 +8,16 @@ class HyperFillPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.symmetric(
+        horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+        vertical: 24,
+      ),
       children: const [
-        Text('填充', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+        HyperText(
+          '填充',
+          variant: HyperTextVariant.sectionTitle,
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         SizedBox(height: 8),
         Text('HyperFill 是首个实现的基础视觉类型。'),
         SizedBox(height: 20),

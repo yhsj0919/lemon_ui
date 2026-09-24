@@ -10,6 +10,7 @@ import '../../interaction/hyper_pressable.dart';
 import '../../theme/color/hyper_contrast_theme.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
+import '../../theme/size/components/hyper_button_size.dart';
 import '../progress/hyper_circular_progress_indicator.dart';
 import 'hyper_button_style.dart';
 import 'hyper_button_theme.dart';
@@ -25,12 +26,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.filled,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -42,12 +45,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.tonal,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -59,12 +64,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.outlined,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -76,12 +83,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.ghost,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -93,12 +102,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.text,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -110,12 +121,14 @@ class HyperButton extends StatefulWidget {
     this.label,
     this.icon,
     this.iconAlignment = HyperButtonIconAlignment.start,
+    this.size = HyperButtonSizeVariant.medium,
     this.style,
     this.loading = false,
     this.progress,
     this.loadingIndicator,
     this.onError,
     this.autofocus = false,
+    this.focusNode,
   }) : variant = HyperButtonVariant.gradient,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -138,6 +151,9 @@ class HyperButton extends StatefulWidget {
   /// 图标相对 [label] 的排列位置。
   final HyperButtonIconAlignment iconAlignment;
 
+  /// 视觉尺寸档位；由当前设备的尺寸主题解析。
+  final HyperButtonSizeVariant size;
+
   /// 当前实例的样式覆盖，优先级高于按钮主题。
   final HyperButtonStyle? style;
 
@@ -157,6 +173,9 @@ class HyperButton extends StatefulWidget {
 
   /// 首次显示时是否自动获取键盘焦点。
   final bool autofocus;
+
+  /// 按钮自身的焦点节点，由调用方创建和释放。
+  final FocusNode? focusNode;
 
   @override
   State<HyperButton> createState() => _HyperButtonState();
@@ -201,12 +220,15 @@ class _HyperButtonState extends State<HyperButton> {
     // 组件只消费主题已经解析好的当前设备规格，不再自行判断设备类型。
     final metrics = sizes.button;
     final defaults = HyperButtonStyle(
-      height: metrics.minimumSize.height,
-      minimumSize: metrics.minimumSize,
+      height: metrics.heightFor(widget.size),
+      minimumSize: Size(
+        metrics.minimumSize.width,
+        metrics.heightFor(widget.size),
+      ),
       minimumTapTargetSize: Size.square(sizes.minimumInteractiveDimension),
-      padding: metrics.padding,
+      padding: metrics.paddingFor(widget.size),
       borderRadius: BorderRadius.circular(metrics.radius),
-      textStyle: TextStyle(fontSize: metrics.fontSize),
+      textStyle: theme.textTheme.labelLarge,
       disabledForegroundColor: colors.disabled,
       iconSize: metrics.iconSize,
       iconSpacing: metrics.iconSpacing,
@@ -218,9 +240,13 @@ class _HyperButtonState extends State<HyperButton> {
       focusOverlayOpacity: metrics.focusOverlayOpacity,
       pressOverlayOpacity: metrics.pressOverlayOpacity,
     ).merge(_variantDefaults(context));
-    final style = defaults
-        .merge(HyperButtonTheme.of(context).resolve(widget.variant))
-        .merge(widget.style);
+    final themedStyle = HyperButtonTheme.of(context).resolve(widget.variant);
+    final style = defaults.merge(themedStyle).merge(widget.style);
+    final materialTheme = HyperMaterialTheme.of(context);
+    final material = materialTheme.resolveMaterial(material: style.material);
+    final explicitBackground = style.material == null
+        ? widget.style?.background ?? themedStyle.background
+        : null;
     final enabled = widget.onPressed != null && !_loading;
     // 加载期间只锁定交互，不切换为禁用配色，避免渐变按钮闪成纯色。
     final visuallyEnabled = widget.onPressed != null || _loading;
@@ -228,6 +254,7 @@ class _HyperButtonState extends State<HyperButton> {
     return HyperPressable(
       enabled: enabled,
       autofocus: widget.autofocus,
+      focusNode: widget.focusNode,
       onTap: enabled ? _invoke : null,
       semanticButton: true,
       builder: (context, states, _) {
@@ -247,9 +274,10 @@ class _HyperButtonState extends State<HyperButton> {
         final foregroundColor = HyperContrastTheme.of(context).resolve(
           foreground: baseForeground,
           background: visuallyEnabled
-              ? style.material?.background ?? style.background
+              ? explicitBackground ?? material?.background ?? style.background
               : style.disabledBackground ??
-                    style.material?.background ??
+                    explicitBackground ??
+                    material?.background ??
                     style.background,
           canvasColor: colors.background,
           mode: style.contrastMode,
@@ -261,6 +289,8 @@ class _HyperButtonState extends State<HyperButton> {
           content,
           overlay.withValues(alpha: overlayAlpha),
           visuallyEnabled,
+          material,
+          explicitBackground,
         );
         final tapSize = style.minimumTapTargetSize;
         if (tapSize == null) return visual;
@@ -347,7 +377,11 @@ class _HyperButtonState extends State<HyperButton> {
       style: (style.textStyle ?? const TextStyle()).copyWith(
         color: foregroundColor,
       ),
-      child: normal,
+      // 自由 child 中的图标也继承按钮前景色；显式 Icon.color 仍可覆盖。
+      child: IconTheme.merge(
+        data: IconThemeData(color: foregroundColor, size: style.iconSize),
+        child: normal,
+      ),
     );
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
@@ -404,23 +438,22 @@ class _HyperButtonState extends State<HyperButton> {
     Widget content,
     Color overlay,
     bool enabled,
+    HyperSurfaceMaterial? material,
+    HyperFill? explicitBackground,
   ) {
-    final materialTheme = HyperMaterialTheme.of(context);
-    final material = style.material?.resolve(
-      quality: materialTheme.quality ?? HyperMaterialQuality.standard,
-      reduceTransparency: materialTheme.reduceTransparency ?? false,
-    );
     final fill = !enabled && style.disabledBackground != null
         ? style.disabledBackground
-        : material?.background ?? style.background;
+        : explicitBackground ?? material?.background ?? style.background;
     final radius = (style.borderRadius ?? BorderRadius.zero).resolve(
       Directionality.of(context),
     );
+    final glass = material?.usesBackdrop ?? false;
+    final shadows = style.boxShadow ?? material?.boxShadow;
     final decoration = BoxDecoration(
-      color: fill?.color,
-      gradient: fill?.gradient,
+      color: glass ? null : fill?.color,
+      gradient: glass ? null : fill?.gradient,
       borderRadius: radius,
-      boxShadow: style.boxShadow ?? material?.boxShadow,
+      boxShadow: glass ? null : shadows,
     );
     final border = style.border ?? material?.border;
     final foregroundDecoration =
@@ -435,6 +468,25 @@ class _HyperButtonState extends State<HyperButton> {
         : null;
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    Widget layeredContent = Align(
+      alignment: style.alignment ?? Alignment.center,
+      widthFactor: 1,
+      heightFactor: 1,
+      // 对齐负责定位完整的“内边距 + 内容”组，内边距不参与按钮外框约束。
+      child: Padding(padding: style.padding ?? EdgeInsets.zero, child: content),
+    );
+    if (!glass && material?.tint != null) {
+      final tint = material!.tint!;
+      layeredContent = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(child: ColoredBox(color: tint)),
+          ),
+          layeredContent,
+        ],
+      );
+    }
     Widget result = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : style.animationDuration!,
       curve: style.animationCurve!,
@@ -446,32 +498,52 @@ class _HyperButtonState extends State<HyperButton> {
         maxWidth: style.maximumSize?.width ?? double.infinity,
         maxHeight: style.maximumSize?.height ?? double.infinity,
       ),
-      margin: style.margin,
+      margin: glass ? null : style.margin,
       decoration: decoration,
       foregroundDecoration: foregroundDecoration,
-      child: Align(
-        alignment: style.alignment ?? Alignment.center,
-        widthFactor: 1,
-        heightFactor: 1,
-        // 对齐负责定位完整的“内边距 + 内容”组，内边距不参与按钮外框约束。
-        child: Padding(
-          padding: style.padding ?? EdgeInsets.zero,
-          child: content,
-        ),
-      ),
+      child: layeredContent,
     );
-    if (material?.usesBackdrop ?? false) {
+    if (glass) {
+      // 滤镜只作用于材质背景；文字、图标和加载状态留在清晰前景层。
       result = ClipRRect(
         borderRadius: radius,
-        clipBehavior: style.clipBehavior ?? Clip.antiAlias,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: material!.blurSigmaX,
-            sigmaY: material.blurSigmaY,
-          ),
-          child: result,
+        clipBehavior: style.clipBehavior == Clip.none
+            ? Clip.antiAlias
+            : style.clipBehavior ?? Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: material!.blurSigmaX,
+                  sigmaY: material.blurSigmaY,
+                ),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: fill?.color,
+                    gradient: fill?.gradient,
+                    borderRadius: radius,
+                  ),
+                  child: material.tint == null
+                      ? const SizedBox.expand()
+                      : ColoredBox(color: material.tint!),
+                ),
+              ),
+            ),
+            result,
+          ],
         ),
       );
+      if (shadows != null && shadows.isNotEmpty) {
+        result = DecoratedBox(
+          decoration: BoxDecoration(borderRadius: radius, boxShadow: shadows),
+          child: result,
+        );
+      }
+      if (style.margin != null) {
+        result = Padding(padding: style.margin!, child: result);
+      }
     }
     return result;
   }

@@ -31,7 +31,10 @@ class _HyperColorSchemePageState extends State<HyperColorSchemePage> {
     return ColoredBox(
       color: scheme.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text(
             '语义颜色',
@@ -115,16 +118,17 @@ class _RealPagePreview extends StatelessWidget {
                 const SizedBox(height: 28),
                 Text(
                   '合并重复联系人',
-                  style: TextStyle(
-                    color: scheme.textPrimary,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: HyperTheme.of(context).textTheme.headlineLarge
+                      ?.copyWith(
+                        color: scheme.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
                 const SizedBox(height: 28),
                 Text(
                   '系统将帮助您查找与合并重复的联系人。',
-                  style: TextStyle(color: scheme.textSecondary, fontSize: 16),
+                  style: HyperTheme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: scheme.textSecondary),
                 ),
               ],
             ),
@@ -145,11 +149,11 @@ class _RealPagePreview extends StatelessWidget {
                 children: [
                   Text(
                     '退出合并',
-                    style: TextStyle(
-                      color: scheme.onSurfaceElevated,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: HyperTheme.of(context).textTheme.titleMedium
+                        ?.copyWith(
+                          color: scheme.onSurfaceElevated,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -206,7 +210,11 @@ class _PreviewAction extends StatelessWidget {
         color: background,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: Text(label, style: TextStyle(color: foreground, fontSize: 17)),
+      child: Text(
+        label,
+        style: HyperTheme.of(context).textTheme.labelLarge
+            ?.copyWith(color: foreground),
+      ),
     );
   }
 }

@@ -12,7 +12,8 @@ class HyperListTilePage extends StatefulWidget {
 class _HyperListTilePageState extends State<HyperListTilePage> {
   bool _switchValue = true;
   bool _checkboxValue = true;
-  String _selectedVpn = 'astral';
+  String _selectedLayout = 'standard';
+  String _selectedLogLevel = 'info';
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,10 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
     return Material(
       color: colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           const HyperText('HyperListTile', variant: HyperTextVariant.pageTitle),
           const SizedBox(height: 8),
@@ -85,14 +89,11 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
           const HyperText('尾部控件', variant: HyperTextVariant.sectionTitle),
           const SizedBox(height: 12),
           _TileCard(
-            child: HyperListTile(
+            child: HyperSwitchListTile(
+              value: _switchValue,
+              onChanged: (value) => setState(() => _switchValue = value),
               title: const HyperText('保持亮屏'),
               subtitle: const HyperText('充电时屏幕不会休眠'),
-              trailing: HyperSwitch(
-                value: _switchValue,
-                onChanged: (value) => setState(() => _switchValue = value),
-              ),
-              onTap: () => setState(() => _switchValue = !_switchValue),
             ),
           ),
           const SizedBox(height: 8),
@@ -109,21 +110,45 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
           const SizedBox(height: 12),
           _TileCard(
             child: HyperRadioListTile<String>(
-              value: 'astral',
-              groupValue: _selectedVpn,
-              onChanged: (value) => setState(() => _selectedVpn = value!),
-              leading: const HyperIcon(Icons.vpn_key_outlined),
-              title: const HyperText('astral'),
+              value: 'standard',
+              groupValue: _selectedLayout,
+              onChanged: (value) => setState(() => _selectedLayout = value!),
+              leading: const HyperIcon(Icons.view_agenda_outlined),
+              title: const HyperText('标准布局'),
             ),
           ),
           const SizedBox(height: 8),
           _TileCard(
             child: HyperRadioListTile<String>(
-              value: 'easytier',
-              groupValue: _selectedVpn,
-              onChanged: (value) => setState(() => _selectedVpn = value!),
-              leading: const HyperIcon(Icons.flutter_dash),
-              title: const HyperText('EasyTier Flutter Demo'),
+              value: 'compact',
+              groupValue: _selectedLayout,
+              onChanged: (value) => setState(() => _selectedLayout = value!),
+              leading: const HyperIcon(Icons.view_compact_outlined),
+              title: const HyperText('紧凑布局'),
+            ),
+          ),
+          const SizedBox(height: 28),
+          const HyperText('浮窗选项', variant: HyperTextVariant.sectionTitle),
+          const SizedBox(height: 12),
+          _TileCard(
+            child: HyperPopupListTile<String>(
+              title: const HyperText('启用蓝牙堆栈日志'),
+              subtitle: HyperText(switch (_selectedLogLevel) {
+                'detail' => '详细',
+                'debug' => '调试',
+                'info' => '信息',
+                'warning' => '警告',
+                _ => '错误',
+              }),
+              value: _selectedLogLevel,
+              options: const [
+                HyperDropdownOption(value: 'detail', label: '详细'),
+                HyperDropdownOption(value: 'debug', label: '调试'),
+                HyperDropdownOption(value: 'info', label: '信息'),
+                HyperDropdownOption(value: 'warning', label: '警告'),
+                HyperDropdownOption(value: 'error', label: '错误'),
+              ],
+              onChanged: (value) => setState(() => _selectedLogLevel = value),
             ),
           ),
           const SizedBox(height: 8),

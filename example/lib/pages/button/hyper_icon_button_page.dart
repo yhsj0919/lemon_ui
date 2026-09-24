@@ -17,16 +17,17 @@ class _HyperIconButtonPageState extends State<HyperIconButtonPage> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final sizeDescription = switch (HyperTheme.sizesOf(context).deviceType) {
-      HyperDeviceType.phone => '手机：40×40，图标24',
-      HyperDeviceType.tablet => '平板：44×44，图标24',
-      HyperDeviceType.desktop => '桌面：36×36，图标18',
-      HyperDeviceType.watch => '手表：40×40，图标20',
-    };
+    final metrics = HyperTheme.sizesOf(context).iconButton;
+    final sizeDescription =
+        '${metrics.size.toStringAsFixed(0)}×${metrics.size.toStringAsFixed(0)}，'
+        '图标 ${metrics.iconSize.toStringAsFixed(0)}';
     return ColoredBox(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text(
             'HyperIconButton',

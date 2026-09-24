@@ -165,10 +165,10 @@ void main() {
       (widget) =>
           widget is Container &&
           widget.decoration is BoxDecoration &&
-          widget.constraints?.maxWidth == 36,
+          widget.constraints?.maxWidth == 32,
     );
-    expect(tester.getSize(visual), const Size.square(36));
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.settings))).size, 18);
+    expect(tester.getSize(visual), const Size.square(32));
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.settings))).size, 16);
   });
 
   testWidgets('outlined 悬停使用统一中性遮罩而不是主题蓝', (tester) async {

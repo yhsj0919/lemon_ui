@@ -49,4 +49,37 @@ void main() {
     expect(textTheme.headlineMedium?.fontSize, typography.sectionTitle);
     expect(textTheme.bodySmall?.fontSize, typography.bodySmall);
   });
+
+  testWidgets('桌面字阶由主题按真实设备解析，手机规格不变', (tester) async {
+    final data = HyperThemeData.light();
+    late HyperThemeData resolved;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperDeviceDetector(
+          deviceType: HyperDeviceType.desktop,
+          builder: (context, _, _) => HyperTheme(
+            data: data,
+            duration: Duration.zero,
+            child: Builder(
+              builder: (context) {
+                resolved = HyperTheme.of(context);
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(resolved.typography.body, 14);
+    expect(resolved.textTheme.bodyMedium?.fontSize, 14);
+    expect(data.typographyTheme.phone.body, 16);
+
+    final changed = data.copyWith(
+      typographyTheme: data.typographyTheme.copyWith(
+        desktop: data.typographyTheme.desktop.copyWith(body: 16),
+      ),
+    );
+    expect(changed.typographyTheme.desktop.body, 16);
+    expect(changed.typographyTheme.phone.body, 16);
+  });
 }

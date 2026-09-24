@@ -7,6 +7,7 @@ void main() {
     const phone = HyperSizeScheme.phone();
     const tablet = HyperSizeScheme.tablet();
     const desktop = HyperSizeScheme.desktop();
+    expect(desktop.pageHorizontalPadding, 16);
     const watch = HyperSizeScheme.watch();
 
     expect(phone.controlHeightMd, 48);

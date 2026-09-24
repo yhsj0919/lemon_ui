@@ -96,9 +96,10 @@ void main() {
               onChanged: (_) {},
               title: const Text('Checkbox'),
             ),
-            HyperListTile(
+            HyperSwitchListTile(
+              value: true,
+              onChanged: (_) {},
               title: const Text('Switch'),
-              trailing: HyperSwitch(value: true, onChanged: (_) {}),
             ),
           ],
         ),
@@ -224,6 +225,47 @@ void main() {
     expect(value, isTrue);
   });
 
+  testWidgets('开关列表项保持双行高度、尾部边距并响应整行点击', (tester) async {
+    var value = false;
+    await tester.pumpWidget(
+      app(
+        HyperSwitchListTile(
+          value: value,
+          onChanged: (next) => value = next,
+          title: const Text('保持亮屏'),
+          subtitle: const Text('充电时屏幕不会休眠'),
+        ),
+      ),
+    );
+
+    final tileRect = tester.getRect(find.byType(HyperListTile));
+    final switchRect = tester.getRect(find.byType(HyperSwitch));
+    expect(tileRect.height, 68);
+    expect(tileRect.right - switchRect.right, 16);
+
+    await tester.tap(find.text('保持亮屏'));
+    expect(value, isTrue);
+  });
+
+  testWidgets('开关列表项保留尾部拖动交互', (tester) async {
+    var value = false;
+    await tester.pumpWidget(
+      app(
+        StatefulBuilder(
+          builder: (context, setState) => HyperSwitchListTile(
+            value: value,
+            onChanged: (next) => setState(() => value = next),
+            title: const Text('保持亮屏'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.drag(find.byType(HyperSwitch), const Offset(60, 0));
+    await tester.pump();
+    expect(value, isTrue);
+  });
+
   testWidgets('尾部描述文字和图标使用统一的次要视觉层级', (tester) async {
     await tester.pumpWidget(
       app(
@@ -319,10 +361,6 @@ void main() {
                 trailingIconSize: 22,
                 navigationSpacing: 6,
                 navigationIconSize: 24,
-                titleFontSize: 19,
-                subtitleFontSize: 15,
-                titleLineHeight: 1.2,
-                subtitleLineHeight: 1.3,
               ),
             ),
           ),

@@ -57,7 +57,10 @@ class _HyperStateValuePageState extends State<HyperStateValuePage> {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('控件状态解析', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
@@ -97,7 +100,8 @@ class _HyperStateValuePageState extends State<HyperStateValuePage> {
             child: Text(
               label,
               key: const Key('resolved-state-label'),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: HyperTheme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
           const SizedBox(height: 16),

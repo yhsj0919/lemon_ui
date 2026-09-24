@@ -1,15 +1,24 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
+import '../../foundation/hyper_surface_material.dart';
 import '../../components/button/hyper_button_theme.dart';
+import '../../components/app_bar/hyper_app_bar_theme.dart';
+import '../../components/card/hyper_card_theme.dart';
+import '../../components/card/hyper_titled_card_theme.dart';
 import '../../components/checkbox/hyper_checkbox_theme.dart';
 import '../../components/container/hyper_container_theme.dart';
 import '../../components/divider/hyper_divider_theme.dart';
+import '../../components/drawer/hyper_drawer_theme.dart';
+import '../../components/sidebar/hyper_sidebar_theme.dart';
 import '../../components/icon/hyper_icon_theme.dart';
 import '../../components/icon_button/hyper_icon_button_theme.dart';
 import '../../components/list_tile/hyper_list_tile_theme.dart';
+import '../../components/menu/hyper_menu_theme.dart';
+import '../../components/menu/hyper_dropdown_menu_theme.dart';
 import '../../components/progress/hyper_progress_indicator_theme.dart';
 import '../../components/radio/hyper_radio_theme.dart';
+import '../../components/scaffold/hyper_scaffold_theme.dart';
 import '../../components/switch/hyper_switch_theme.dart';
 import '../../components/text/hyper_text_theme.dart';
 import '../color/hyper_color_scheme.dart';
@@ -18,6 +27,7 @@ import '../material/hyper_material_theme.dart';
 import '../motion/hyper_motion_theme.dart';
 import '../size/hyper_size_theme_data.dart';
 import '../typography/hyper_typography_scheme.dart';
+import '../typography/hyper_typography_theme_data.dart';
 
 /// 返回当前平台原生 UI 字体，不依赖随 Flutter 或应用打包的字体文件。
 String _systemFontFamily() => switch (defaultTargetPlatform) {
@@ -50,8 +60,17 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     required this.textTheme,
     required this.sizes,
     this.typography = const HyperTypographyScheme(),
+    this.typographyTheme = const HyperTypographyThemeData(),
     required this.motion,
     required this.containerTheme,
+    this.scaffoldTheme = const HyperScaffoldThemeData(),
+    this.appBarTheme = const HyperAppBarThemeData(),
+    this.drawerTheme = const HyperDrawerThemeData(),
+    this.sidebarTheme = const HyperSidebarThemeData(),
+    this.menuTheme = const HyperMenuThemeData(),
+    this.dropdownMenuTheme = const HyperDropdownMenuThemeData(),
+    this.cardTheme = const HyperCardThemeData(),
+    this.titledCardTheme = const HyperTitledCardThemeData(),
     this.buttonTheme = const HyperButtonThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
     this.iconTheme = const HyperIconThemeData(),
@@ -62,29 +81,35 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.radioTheme = const HyperRadioThemeData(),
     this.listTileTheme = const HyperListTileThemeData(),
     this.textComponentTheme = const HyperTextThemeData(),
-    this.materialTheme = const HyperMaterialThemeData(),
+    this.materialTheme = const HyperMaterialThemeData(
+      quality: HyperMaterialQuality.advanced,
+    ),
     this.contrastTheme = const HyperContrastThemeData(),
   });
 
   factory HyperThemeData.light({
     Color seedColor = const Color(0xFF3482FF),
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
-    HyperTypographyScheme typography = const HyperTypographyScheme(),
+    HyperTypographyScheme? typography,
+    HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) => HyperThemeData.fromSeed(
     seedColor: seedColor,
     sizes: sizes,
     typography: typography,
+    typographyTheme: typographyTheme,
   );
 
   factory HyperThemeData.dark({
     Color seedColor = const Color(0xFF3482FF),
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
-    HyperTypographyScheme typography = const HyperTypographyScheme(),
+    HyperTypographyScheme? typography,
+    HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) => HyperThemeData.fromSeed(
     seedColor: seedColor,
     brightness: Brightness.dark,
     sizes: sizes,
     typography: typography,
+    typographyTheme: typographyTheme,
   );
 
   /// 从种子色和一套明确尺寸创建开箱即用的完整主题。
@@ -92,8 +117,13 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     required Color seedColor,
     Brightness brightness = Brightness.light,
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
-    HyperTypographyScheme typography = const HyperTypographyScheme(),
+    HyperTypographyScheme? typography,
+    HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) {
+    final resolvedTypography = typography ?? typographyTheme.phone;
+    final resolvedTypographyTheme = typography == null
+        ? typographyTheme
+        : HyperTypographyThemeData.uniform(typography);
     final colors = HyperColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,
@@ -106,11 +136,19 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     );
     return HyperThemeData(
       colors: colors,
-      textTheme: typography.applyTo(material.textTheme),
+      textTheme: resolvedTypography.applyTo(material.textTheme),
       sizes: sizes,
-      typography: typography,
+      typography: resolvedTypography,
+      typographyTheme: resolvedTypographyTheme,
       motion: const HyperMotionThemeData(),
       containerTheme: HyperContainerThemeData(),
+      scaffoldTheme: const HyperScaffoldThemeData(),
+      appBarTheme: const HyperAppBarThemeData(),
+      drawerTheme: const HyperDrawerThemeData(),
+      sidebarTheme: const HyperSidebarThemeData(),
+      menuTheme: const HyperMenuThemeData(),
+      cardTheme: const HyperCardThemeData(),
+      titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
       iconTheme: const HyperIconThemeData(),
@@ -121,7 +159,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       radioTheme: const HyperRadioThemeData(),
       listTileTheme: const HyperListTileThemeData(),
       textComponentTheme: const HyperTextThemeData(),
-      materialTheme: const HyperMaterialThemeData(),
+      materialTheme: const HyperMaterialThemeData(
+        quality: HyperMaterialQuality.advanced,
+      ),
       contrastTheme: const HyperContrastThemeData(),
     );
   }
@@ -130,8 +170,13 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   factory HyperThemeData.fromMaterial(
     ThemeData material, {
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
-    HyperTypographyScheme typography = const HyperTypographyScheme(),
+    HyperTypographyScheme? typography,
+    HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) {
+    final resolvedTypography = typography ?? typographyTheme.phone;
+    final resolvedTypographyTheme = typography == null
+        ? typographyTheme
+        : HyperTypographyThemeData.uniform(typography);
     final colorScheme = material.colorScheme;
     final colors =
         HyperColorScheme.fromSeed(
@@ -160,11 +205,19 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         );
     return HyperThemeData(
       colors: colors,
-      textTheme: typography.applyTo(material.textTheme),
+      textTheme: resolvedTypography.applyTo(material.textTheme),
       sizes: sizes,
-      typography: typography,
+      typography: resolvedTypography,
+      typographyTheme: resolvedTypographyTheme,
       motion: const HyperMotionThemeData(),
       containerTheme: HyperContainerThemeData(),
+      scaffoldTheme: const HyperScaffoldThemeData(),
+      appBarTheme: const HyperAppBarThemeData(),
+      drawerTheme: const HyperDrawerThemeData(),
+      sidebarTheme: const HyperSidebarThemeData(),
+      menuTheme: const HyperMenuThemeData(),
+      cardTheme: const HyperCardThemeData(),
+      titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
       iconTheme: const HyperIconThemeData(),
@@ -175,7 +228,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       radioTheme: const HyperRadioThemeData(),
       listTileTheme: const HyperListTileThemeData(),
       textComponentTheme: const HyperTextThemeData(),
-      materialTheme: const HyperMaterialThemeData(),
+      materialTheme: const HyperMaterialThemeData(
+        quality: HyperMaterialQuality.advanced,
+      ),
       contrastTheme: const HyperContrastThemeData(),
     );
   }
@@ -192,12 +247,39 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局语义字号；数值明确且不参与倍率缩放。
   final HyperTypographyScheme typography;
 
+  /// 四端字阶模板；[HyperTheme] 将当前端解析到 [typography]。
+  final HyperTypographyThemeData typographyTheme;
+
   /// 全局统一动画参数。
   /// 全局动画时长、曲线和弹簧参数。
   final HyperMotionThemeData motion;
 
   /// 全局容器主题。
   final HyperContainerThemeData containerTheme;
+
+  /// 页面框架的全局视觉主题。
+  final HyperScaffoldThemeData scaffoldTheme;
+
+  /// 固定与滚动顶部应用栏的全局主题。
+  final HyperAppBarThemeData appBarTheme;
+
+  /// 全局通用抽屉主题。
+  final HyperDrawerThemeData drawerTheme;
+
+  /// 全局树形侧栏主题。
+  final HyperSidebarThemeData sidebarTheme;
+
+  /// 全局弹出菜单主题。
+  final HyperMenuThemeData menuTheme;
+
+  /// 全局下拉选择器主题。
+  final HyperDropdownMenuThemeData dropdownMenuTheme;
+
+  /// 全局 Card 主题，与 Container 主题相互独立。
+  final HyperCardThemeData cardTheme;
+
+  /// 带标题卡片的标题行主题。
+  final HyperTitledCardThemeData titledCardTheme;
 
   /// 全局按钮主题。
   final HyperButtonThemeData buttonTheme;
@@ -299,10 +381,19 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     TextTheme? textTheme,
     HyperSizeThemeData? sizes,
     HyperTypographyScheme? typography,
+    HyperTypographyThemeData? typographyTheme,
     HyperMotionThemeData? motion,
     Duration? animationDuration,
     Curve? animationCurve,
     HyperContainerThemeData? containerTheme,
+    HyperScaffoldThemeData? scaffoldTheme,
+    HyperAppBarThemeData? appBarTheme,
+    HyperDrawerThemeData? drawerTheme,
+    HyperSidebarThemeData? sidebarTheme,
+    HyperMenuThemeData? menuTheme,
+    HyperDropdownMenuThemeData? dropdownMenuTheme,
+    HyperCardThemeData? cardTheme,
+    HyperTitledCardThemeData? titledCardTheme,
     HyperButtonThemeData? buttonTheme,
     HyperIconButtonThemeData? iconButtonTheme,
     HyperIconThemeData? iconTheme,
@@ -317,10 +408,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperContrastThemeData? contrastTheme,
   }) {
     var resolvedMotion = motion ?? this.motion;
-    final resolvedTypography = typography ?? this.typography;
+    final resolvedTypography =
+        typography ?? typographyTheme?.phone ?? this.typography;
+    final resolvedTypographyTheme =
+        typographyTheme ??
+        (typography == null
+            ? this.typographyTheme
+            : HyperTypographyThemeData.uniform(typography));
     final resolvedTextTheme =
         textTheme ??
-        (typography == null
+        (typography == null && typographyTheme == null
             ? this.textTheme
             : resolvedTypography.applyTo(this.textTheme));
     if (animationDuration != null || animationCurve != null) {
@@ -334,8 +431,17 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       textTheme: resolvedTextTheme,
       sizes: sizes ?? this.sizes,
       typography: resolvedTypography,
+      typographyTheme: resolvedTypographyTheme,
       motion: resolvedMotion,
       containerTheme: containerTheme ?? this.containerTheme,
+      scaffoldTheme: scaffoldTheme ?? this.scaffoldTheme,
+      appBarTheme: appBarTheme ?? this.appBarTheme,
+      drawerTheme: drawerTheme ?? this.drawerTheme,
+      sidebarTheme: sidebarTheme ?? this.sidebarTheme,
+      menuTheme: menuTheme ?? this.menuTheme,
+      dropdownMenuTheme: dropdownMenuTheme ?? this.dropdownMenuTheme,
+      cardTheme: cardTheme ?? this.cardTheme,
+      titledCardTheme: titledCardTheme ?? this.titledCardTheme,
       buttonTheme: buttonTheme ?? this.buttonTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
       iconTheme: iconTheme ?? this.iconTheme,
@@ -361,10 +467,39 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       textTheme: TextTheme.lerp(textTheme, other.textTheme, t),
       sizes: HyperSizeThemeData.lerp(sizes, other.sizes, t),
       typography: HyperTypographyScheme.lerp(typography, other.typography, t),
+      typographyTheme: HyperTypographyThemeData.lerp(
+        typographyTheme,
+        other.typographyTheme,
+        t,
+      ),
       motion: HyperMotionThemeData.lerp(motion, other.motion, t),
       containerTheme: HyperContainerThemeData.lerp(
         containerTheme,
         other.containerTheme,
+        t,
+      ),
+      scaffoldTheme: HyperScaffoldThemeData.lerp(
+        scaffoldTheme,
+        other.scaffoldTheme,
+        t,
+      ),
+      appBarTheme: HyperAppBarThemeData.lerp(appBarTheme, other.appBarTheme, t),
+      drawerTheme: HyperDrawerThemeData.lerp(drawerTheme, other.drawerTheme, t),
+      sidebarTheme: HyperSidebarThemeData.lerp(
+        sidebarTheme,
+        other.sidebarTheme,
+        t,
+      ),
+      menuTheme: HyperMenuThemeData.lerp(menuTheme, other.menuTheme, t),
+      dropdownMenuTheme: HyperDropdownMenuThemeData.lerp(
+        dropdownMenuTheme,
+        other.dropdownMenuTheme,
+        t,
+      ),
+      cardTheme: HyperCardThemeData.lerp(cardTheme, other.cardTheme, t),
+      titledCardTheme: HyperTitledCardThemeData.lerp(
+        titledCardTheme,
+        other.titledCardTheme,
         t,
       ),
       buttonTheme: HyperButtonThemeData.lerp(buttonTheme, other.buttonTheme, t),
@@ -422,8 +557,17 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.textTheme == textTheme &&
           other.sizes == sizes &&
           other.typography == typography &&
+          other.typographyTheme == typographyTheme &&
           other.motion == motion &&
           other.containerTheme == containerTheme &&
+          other.scaffoldTheme == scaffoldTheme &&
+          other.appBarTheme == appBarTheme &&
+          other.drawerTheme == drawerTheme &&
+          other.sidebarTheme == sidebarTheme &&
+          other.menuTheme == menuTheme &&
+          other.dropdownMenuTheme == dropdownMenuTheme &&
+          other.cardTheme == cardTheme &&
+          other.titledCardTheme == titledCardTheme &&
           other.buttonTheme == buttonTheme &&
           other.iconButtonTheme == iconButtonTheme &&
           other.iconTheme == iconTheme &&
@@ -438,13 +582,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.contrastTheme == contrastTheme;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     colors,
     textTheme,
     sizes,
     typography,
+    typographyTheme,
     motion,
     containerTheme,
+    scaffoldTheme,
+    appBarTheme,
+    drawerTheme,
+    sidebarTheme,
+    menuTheme,
+    dropdownMenuTheme,
+    cardTheme,
+    titledCardTheme,
     buttonTheme,
     iconButtonTheme,
     iconTheme,
@@ -457,7 +610,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     textComponentTheme,
     materialTheme,
     contrastTheme,
-  );
+  ]);
 }
 
 /// 用于显式动画和测试的 Hyper 主题补间。

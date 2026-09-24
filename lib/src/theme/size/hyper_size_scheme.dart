@@ -2,11 +2,19 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_device_type.dart';
 import 'components/hyper_button_size.dart';
+import 'components/hyper_app_bar_size.dart';
+import 'components/hyper_card_size.dart';
 import 'components/hyper_checkbox_size.dart';
 import 'components/hyper_divider_size.dart';
+import 'components/hyper_drawer_size.dart';
+import 'components/hyper_sidebar_size.dart';
 import 'components/hyper_icon_size.dart';
 import 'components/hyper_icon_button_size.dart';
 import 'components/hyper_list_tile_size.dart';
+import 'components/hyper_menu_size.dart';
+import 'components/hyper_dropdown_menu_size.dart';
+import 'components/hyper_popup_list_tile_size.dart';
+import 'components/hyper_tab_bar_size.dart';
 import 'components/hyper_progress_indicator_size.dart';
 import 'components/hyper_radio_size.dart';
 import 'components/hyper_switch_size.dart';
@@ -49,10 +57,19 @@ final class HyperSizeScheme {
     required this.controlRadius,
     required this.surfaceRadius,
     required this.overlayRadius,
+    required this.overlaySpacing,
     required this.controlPadding,
     required this.pageHorizontalPadding,
     required this.compactSectionSpacing,
     required this.sectionSpacing,
+    required this.card,
+    required this.appBar,
+    required this.drawer,
+    required this.sidebar,
+    required this.menu,
+    required this.dropdownMenu,
+    required this.popupListTile,
+    required this.tabBar,
     required this.listTile,
     required this.toolbarCompactHeight,
     required this.toolbarHeight,
@@ -81,6 +98,7 @@ final class HyperSizeScheme {
         controlRadius: 16,
         surfaceRadius: 20,
         overlayRadius: 28,
+        overlaySpacing: 4,
         controlPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 12,
@@ -88,6 +106,65 @@ final class HyperSizeScheme {
         pageHorizontalPadding: 16,
         compactSectionSpacing: 16,
         sectionSpacing: 24,
+        card: const HyperCardSize(
+          padding: EdgeInsets.zero,
+          radius: 16,
+          titlePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titleSpacing: 12,
+          outsideTitlePadding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          outsideTitleSpacing: 0,
+          actionSpacing: 8,
+        ),
+        appBar: const HyperAppBarSize(
+          collapsedHeight: 58,
+          mediumExpandedHeight: 80,
+          expandedHeight: 96,
+          titleHorizontalPadding: 26,
+        ),
+        drawer: const HyperDrawerSize(width: 304),
+        sidebar: const HyperSidebarSize(
+          width: 280,
+          collapsedWidth: 72,
+          itemHeight: 48,
+          iconSize: 24,
+          itemSpacing: 12,
+          rowGap: 4,
+          indent: 16,
+          sectionSpacing: 16,
+          horizontalPadding: 12,
+          popupWidth: 280,
+          itemRadius: 12,
+        ),
+        menu: const HyperMenuSize(
+          width: 280,
+          itemHeight: 48,
+          padding: 12,
+          groupSpacing: 16,
+          iconSize: 24,
+          iconSpacing: 12,
+          itemRadius: 12,
+          surfaceRadius: 16,
+        ),
+        dropdownMenu: const HyperDropdownMenuSize(
+          width: 280,
+          arrowSize: 24,
+          arrowSpacing: 12,
+        ),
+        popupListTile: const HyperPopupListTileSize(
+          minWidth: 200,
+          maxWidth: 288,
+          itemHorizontalPadding: 16,
+        ),
+        tabBar: const HyperTabBarSize(
+          height: 42,
+          separatedRadius: 12,
+          segmentedRadius: 8,
+          itemSpacing: 9,
+          underlineThickness: 2,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 56,
           compactMinHeight: 48,
@@ -101,10 +178,6 @@ final class HyperSizeScheme {
           trailingIconSize: 20,
           navigationSpacing: 4,
           navigationIconSize: 24,
-          titleFontSize: 17,
-          subtitleFontSize: 14,
-          titleLineHeight: 1.25,
-          subtitleLineHeight: 1.25,
         ),
         toolbarCompactHeight: 48,
         toolbarHeight: 56,
@@ -112,9 +185,12 @@ final class HyperSizeScheme {
         iconSize: 24,
         button: const HyperButtonSize(
           minimumSize: Size(58, 48),
+          smallHeight: 48,
+          largeHeight: 48,
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          smallPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          largePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           radius: 16,
-          fontSize: 16,
           iconSize: 24,
           iconSpacing: 8,
           progressSize: 18,
@@ -164,13 +240,73 @@ final class HyperSizeScheme {
         controlRadius: 16,
         surfaceRadius: 24,
         overlayRadius: 28,
+        overlaySpacing: 4,
         controlPadding: const EdgeInsets.symmetric(
           horizontal: 22,
           vertical: 14,
         ),
-        pageHorizontalPadding: 24,
+        pageHorizontalPadding: 16,
         compactSectionSpacing: 20,
         sectionSpacing: 32,
+        card: const HyperCardSize(
+          padding: EdgeInsets.zero,
+          radius: 20,
+          titlePadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          titleSpacing: 16,
+          outsideTitlePadding: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          outsideTitleSpacing: 0,
+          actionSpacing: 12,
+        ),
+        appBar: const HyperAppBarSize(
+          collapsedHeight: 64,
+          mediumExpandedHeight: 128,
+          expandedHeight: 160,
+          titleHorizontalPadding: 26,
+        ),
+        drawer: const HyperDrawerSize(width: 304),
+        sidebar: const HyperSidebarSize(
+          width: 280,
+          collapsedWidth: 72,
+          itemHeight: 48,
+          iconSize: 24,
+          itemSpacing: 12,
+          rowGap: 4,
+          indent: 16,
+          sectionSpacing: 16,
+          horizontalPadding: 12,
+          popupWidth: 280,
+          itemRadius: 12,
+        ),
+        menu: const HyperMenuSize(
+          width: 280,
+          itemHeight: 48,
+          padding: 12,
+          groupSpacing: 16,
+          iconSize: 24,
+          iconSpacing: 12,
+          itemRadius: 12,
+          surfaceRadius: 20,
+        ),
+        dropdownMenu: const HyperDropdownMenuSize(
+          width: 280,
+          arrowSize: 28,
+          arrowSpacing: 12,
+        ),
+        popupListTile: const HyperPopupListTileSize(
+          minWidth: 220,
+          maxWidth: 320,
+          itemHorizontalPadding: 16,
+        ),
+        tabBar: const HyperTabBarSize(
+          height: 44,
+          separatedRadius: 16,
+          segmentedRadius: 16,
+          itemSpacing: 10,
+          underlineThickness: 2,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 56,
           compactMinHeight: 48,
@@ -184,10 +320,6 @@ final class HyperSizeScheme {
           trailingIconSize: 20,
           navigationSpacing: 4,
           navigationIconSize: 24,
-          titleFontSize: 17,
-          subtitleFontSize: 14,
-          titleLineHeight: 1.25,
-          subtitleLineHeight: 1.25,
         ),
         toolbarCompactHeight: 52,
         toolbarHeight: 64,
@@ -195,9 +327,12 @@ final class HyperSizeScheme {
         iconSize: 28,
         button: const HyperButtonSize(
           minimumSize: Size(64, 44),
+          smallHeight: 44,
+          largeHeight: 44,
           padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          smallPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          largePadding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           radius: 16,
-          fontSize: 16,
           iconSize: 24,
           iconSpacing: 8,
           progressSize: 18,
@@ -247,13 +382,73 @@ final class HyperSizeScheme {
         controlRadius: 10,
         surfaceRadius: 14,
         overlayRadius: 18,
+        overlaySpacing: 4,
         controlPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 10,
         ),
-        pageHorizontalPadding: 24,
+        pageHorizontalPadding: 16,
         compactSectionSpacing: 20,
         sectionSpacing: 32,
+        card: const HyperCardSize(
+          padding: EdgeInsets.zero,
+          radius: 8,
+          titlePadding: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          titleSpacing: 12,
+          outsideTitlePadding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          outsideTitleSpacing: 0,
+          actionSpacing: 8,
+        ),
+        appBar: const HyperAppBarSize(
+          collapsedHeight: 48,
+          mediumExpandedHeight: 88,
+          expandedHeight: 120,
+          titleHorizontalPadding: 16,
+        ),
+        drawer: const HyperDrawerSize(width: 304),
+        sidebar: const HyperSidebarSize(
+          width: 180,
+          collapsedWidth: 64,
+          itemHeight: 32,
+          iconSize: 16,
+          itemSpacing: 12,
+          rowGap: 4,
+          indent: 16,
+          sectionSpacing: 12,
+          horizontalPadding: 8,
+          popupWidth: 256,
+          itemRadius: 6,
+        ),
+        menu: const HyperMenuSize(
+          width: 192,
+          itemHeight: 32,
+          padding: 8,
+          groupSpacing: 8,
+          iconSize: 16,
+          iconSpacing: 12,
+          itemRadius: 6,
+          surfaceRadius: 8,
+        ),
+        dropdownMenu: const HyperDropdownMenuSize(
+          width: 192,
+          arrowSize: 20,
+          arrowSpacing: 12,
+        ),
+        popupListTile: const HyperPopupListTileSize(
+          minWidth: 160,
+          maxWidth: 320,
+          itemHorizontalPadding: 16,
+        ),
+        tabBar: const HyperTabBarSize(
+          height: 36,
+          separatedRadius: 10,
+          segmentedRadius: 10,
+          itemSpacing: 8,
+          underlineThickness: 2,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 48,
           compactMinHeight: 40,
@@ -267,32 +462,31 @@ final class HyperSizeScheme {
           trailingIconSize: 18,
           navigationSpacing: 4,
           navigationIconSize: 20,
-          titleFontSize: 14,
-          subtitleFontSize: 12,
-          titleLineHeight: 1.25,
-          subtitleLineHeight: 1.25,
         ),
         toolbarCompactHeight: 40,
         toolbarHeight: 48,
         toolbarEmphasizedHeight: 56,
         iconSize: 20,
         button: const HyperButtonSize(
-          minimumSize: Size(52, 36),
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          radius: 10,
-          fontSize: 14,
-          iconSize: 18,
-          iconSpacing: 6,
+          minimumSize: Size(72, 32),
+          smallHeight: 24,
+          largeHeight: 40,
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          smallPadding: EdgeInsets.symmetric(horizontal: 12),
+          largePadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          radius: 6,
+          iconSize: 16,
+          iconSpacing: 4,
           progressSize: 16,
           hoverOverlayOpacity: .05,
           focusOverlayOpacity: .07,
           pressOverlayOpacity: .08,
         ),
         iconButton: const HyperIconButtonSize(
-          size: 36,
-          iconSize: 18,
+          size: 32,
+          iconSize: 16,
           progressSize: 16,
-          radius: 10,
+          radius: 6,
         ),
         checkbox: const HyperCheckboxSize(
           size: 22,
@@ -330,6 +524,7 @@ final class HyperSizeScheme {
         controlRadius: 20,
         surfaceRadius: 28,
         overlayRadius: 32,
+        overlaySpacing: 4,
         controlPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 10,
@@ -337,6 +532,65 @@ final class HyperSizeScheme {
         pageHorizontalPadding: 12,
         compactSectionSpacing: 8,
         sectionSpacing: 16,
+        card: const HyperCardSize(
+          padding: EdgeInsets.zero,
+          radius: 20,
+          titlePadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          titleSpacing: 8,
+          outsideTitlePadding: EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 6,
+          ),
+          outsideTitleSpacing: 0,
+          actionSpacing: 6,
+        ),
+        appBar: const HyperAppBarSize(
+          collapsedHeight: 48,
+          mediumExpandedHeight: 72,
+          expandedHeight: 96,
+          titleHorizontalPadding: 12,
+        ),
+        drawer: const HyperDrawerSize(width: 200),
+        sidebar: const HyperSidebarSize(
+          width: 200,
+          collapsedWidth: 56,
+          itemHeight: 48,
+          iconSize: 20,
+          itemSpacing: 8,
+          rowGap: 4,
+          indent: 12,
+          sectionSpacing: 8,
+          horizontalPadding: 4,
+          popupWidth: 200,
+          itemRadius: 10,
+        ),
+        menu: const HyperMenuSize(
+          width: 200,
+          itemHeight: 48,
+          padding: 4,
+          groupSpacing: 8,
+          iconSize: 20,
+          iconSpacing: 8,
+          itemRadius: 10,
+          surfaceRadius: 20,
+        ),
+        dropdownMenu: const HyperDropdownMenuSize(
+          width: 200,
+          arrowSize: 24,
+          arrowSpacing: 8,
+        ),
+        popupListTile: const HyperPopupListTileSize(
+          minWidth: 160,
+          maxWidth: 200,
+          itemHorizontalPadding: 16,
+        ),
+        tabBar: const HyperTabBarSize(
+          height: 40,
+          separatedRadius: 20,
+          segmentedRadius: 20,
+          itemSpacing: 8,
+          underlineThickness: 2,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 52,
           compactMinHeight: 48,
@@ -350,10 +604,6 @@ final class HyperSizeScheme {
           trailingIconSize: 18,
           navigationSpacing: 4,
           navigationIconSize: 20,
-          titleFontSize: 16,
-          subtitleFontSize: 13,
-          titleLineHeight: 1.25,
-          subtitleLineHeight: 1.25,
         ),
         toolbarCompactHeight: 40,
         toolbarHeight: 48,
@@ -361,9 +611,12 @@ final class HyperSizeScheme {
         iconSize: 24,
         button: const HyperButtonSize(
           minimumSize: Size(52, 40),
+          smallHeight: 40,
+          largeHeight: 40,
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          smallPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          largePadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           radius: 20,
-          fontSize: 16,
           iconSize: 20,
           iconSpacing: 6,
           progressSize: 18,
@@ -410,10 +663,19 @@ final class HyperSizeScheme {
   final double controlRadius;
   final double surfaceRadius;
   final double overlayRadius;
+  final double overlaySpacing;
   final EdgeInsetsGeometry controlPadding;
   final double pageHorizontalPadding;
   final double compactSectionSpacing;
   final double sectionSpacing;
+  final HyperCardSize card;
+  final HyperAppBarSize appBar;
+  final HyperDrawerSize drawer;
+  final HyperSidebarSize sidebar;
+  final HyperMenuSize menu;
+  final HyperDropdownMenuSize dropdownMenu;
+  final HyperPopupListTileSize popupListTile;
+  final HyperTabBarSize tabBar;
   final HyperListTileSize listTile;
   final double toolbarCompactHeight;
   final double toolbarHeight;
@@ -439,10 +701,19 @@ final class HyperSizeScheme {
     double? controlRadius,
     double? surfaceRadius,
     double? overlayRadius,
+    double? overlaySpacing,
     EdgeInsetsGeometry? controlPadding,
     double? pageHorizontalPadding,
     double? compactSectionSpacing,
     double? sectionSpacing,
+    HyperCardSize? card,
+    HyperAppBarSize? appBar,
+    HyperDrawerSize? drawer,
+    HyperSidebarSize? sidebar,
+    HyperMenuSize? menu,
+    HyperDropdownMenuSize? dropdownMenu,
+    HyperPopupListTileSize? popupListTile,
+    HyperTabBarSize? tabBar,
     HyperListTileSize? listTile,
     double? toolbarCompactHeight,
     double? toolbarHeight,
@@ -468,10 +739,19 @@ final class HyperSizeScheme {
     controlRadius: controlRadius ?? this.controlRadius,
     surfaceRadius: surfaceRadius ?? this.surfaceRadius,
     overlayRadius: overlayRadius ?? this.overlayRadius,
+    overlaySpacing: overlaySpacing ?? this.overlaySpacing,
     controlPadding: controlPadding ?? this.controlPadding,
     pageHorizontalPadding: pageHorizontalPadding ?? this.pageHorizontalPadding,
     compactSectionSpacing: compactSectionSpacing ?? this.compactSectionSpacing,
     sectionSpacing: sectionSpacing ?? this.sectionSpacing,
+    card: card ?? this.card,
+    appBar: appBar ?? this.appBar,
+    drawer: drawer ?? this.drawer,
+    sidebar: sidebar ?? this.sidebar,
+    menu: menu ?? this.menu,
+    dropdownMenu: dropdownMenu ?? this.dropdownMenu,
+    popupListTile: popupListTile ?? this.popupListTile,
+    tabBar: tabBar ?? this.tabBar,
     listTile: listTile ?? this.listTile,
     toolbarCompactHeight: toolbarCompactHeight ?? this.toolbarCompactHeight,
     toolbarHeight: toolbarHeight ?? this.toolbarHeight,
@@ -507,6 +787,7 @@ final class HyperSizeScheme {
       controlRadius: value(a.controlRadius, b.controlRadius),
       surfaceRadius: value(a.surfaceRadius, b.surfaceRadius),
       overlayRadius: value(a.overlayRadius, b.overlayRadius),
+      overlaySpacing: value(a.overlaySpacing, b.overlaySpacing),
       controlPadding: EdgeInsetsGeometry.lerp(
         a.controlPadding,
         b.controlPadding,
@@ -521,6 +802,22 @@ final class HyperSizeScheme {
         b.compactSectionSpacing,
       ),
       sectionSpacing: value(a.sectionSpacing, b.sectionSpacing),
+      card: HyperCardSize.lerp(a.card, b.card, t),
+      appBar: HyperAppBarSize.lerp(a.appBar, b.appBar, t),
+      drawer: HyperDrawerSize.lerp(a.drawer, b.drawer, t),
+      sidebar: HyperSidebarSize.lerp(a.sidebar, b.sidebar, t),
+      menu: HyperMenuSize.lerp(a.menu, b.menu, t),
+      dropdownMenu: HyperDropdownMenuSize.lerp(
+        a.dropdownMenu,
+        b.dropdownMenu,
+        t,
+      ),
+      popupListTile: HyperPopupListTileSize.lerp(
+        a.popupListTile,
+        b.popupListTile,
+        t,
+      ),
+      tabBar: HyperTabBarSize.lerp(a.tabBar, b.tabBar, t),
       listTile: HyperListTileSize.lerp(a.listTile, b.listTile, t),
       toolbarCompactHeight: value(
         a.toolbarCompactHeight,
@@ -561,10 +858,19 @@ final class HyperSizeScheme {
           other.controlRadius == controlRadius &&
           other.surfaceRadius == surfaceRadius &&
           other.overlayRadius == overlayRadius &&
+          other.overlaySpacing == overlaySpacing &&
           other.controlPadding == controlPadding &&
           other.pageHorizontalPadding == pageHorizontalPadding &&
           other.compactSectionSpacing == compactSectionSpacing &&
           other.sectionSpacing == sectionSpacing &&
+          other.card == card &&
+          other.appBar == appBar &&
+          other.drawer == drawer &&
+          other.sidebar == sidebar &&
+          other.menu == menu &&
+          other.dropdownMenu == dropdownMenu &&
+          other.popupListTile == popupListTile &&
+          other.tabBar == tabBar &&
           other.listTile == listTile &&
           other.toolbarCompactHeight == toolbarCompactHeight &&
           other.toolbarHeight == toolbarHeight &&
@@ -591,10 +897,19 @@ final class HyperSizeScheme {
     controlRadius,
     surfaceRadius,
     overlayRadius,
+    overlaySpacing,
     controlPadding,
     pageHorizontalPadding,
     compactSectionSpacing,
     sectionSpacing,
+    card,
+    appBar,
+    drawer,
+    sidebar,
+    menu,
+    dropdownMenu,
+    popupListTile,
+    tabBar,
     listTile,
     toolbarCompactHeight,
     toolbarHeight,

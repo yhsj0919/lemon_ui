@@ -25,6 +25,9 @@ void main() {
     ]) {
       expect(find.text(text), findsOneWidget);
     }
+    for (final size in HyperButtonSizeVariant.values) {
+      expect(find.byKey(Key('button-size-${size.name}')), findsOneWidget);
+    }
     await tester.tap(find.text('异步渐变'));
     await tester.pump();
     int runningProgressCount() => tester

@@ -26,7 +26,10 @@ class _HyperPressablePageState extends State<HyperPressablePage> {
     return Material(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('统一交互入口', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

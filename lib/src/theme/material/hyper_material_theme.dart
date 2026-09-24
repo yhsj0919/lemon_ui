@@ -23,6 +23,16 @@ final class HyperMaterialThemeData {
   /// 子树默认使用的表面材质；null 表示继承。
   final HyperSurfaceMaterial? material;
 
+  /// 统一选择实例或主题材质，并应用质量与减少透明度策略。
+  HyperSurfaceMaterial? resolveMaterial({
+    HyperSurfaceMaterial? material,
+    HyperMaterialQuality? quality,
+    bool? reduceTransparency,
+  }) => (material ?? this.material)?.resolve(
+    quality: quality ?? this.quality ?? HyperMaterialQuality.standard,
+    reduceTransparency: reduceTransparency ?? this.reduceTransparency ?? false,
+  );
+
   HyperMaterialThemeData copyWith({
     Object? quality = _unchanged,
     Object? reduceTransparency = _unchanged,

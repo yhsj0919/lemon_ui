@@ -30,7 +30,10 @@ class _HyperTypographySchemePageState extends State<HyperTypographySchemePage> {
           return ColoredBox(
             color: colors.background,
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.symmetric(
+                horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+                vertical: 24,
+              ),
               children: [
                 Text('字号规范', style: text.headlineSmall),
                 const SizedBox(height: 8),

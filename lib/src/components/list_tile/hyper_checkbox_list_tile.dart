@@ -49,7 +49,10 @@ class HyperCheckboxListTile extends StatelessWidget {
     final interactive = enabled && onChanged != null;
     final checkboxSize = HyperTheme.sizesOf(context).checkbox.size;
     final resolvedCheckboxStyle = HyperCheckboxStyle(
-      minimumTapTargetSize: checkboxSize,
+      minimumTapTargetSize:
+          checkboxStyle?.minimumTapTargetSize ??
+          checkboxStyle?.size ??
+          checkboxSize,
     ).merge(checkboxStyle);
     final checkbox = switch (variant) {
       HyperCheckboxVariant.circle => HyperCheckbox.circle(

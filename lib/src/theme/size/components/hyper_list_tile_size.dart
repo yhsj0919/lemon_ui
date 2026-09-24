@@ -16,10 +16,6 @@ final class HyperListTileSize {
     required this.trailingIconSize,
     required this.navigationSpacing,
     required this.navigationIconSize,
-    required this.titleFontSize,
-    required this.subtitleFontSize,
-    required this.titleLineHeight,
-    required this.subtitleLineHeight,
   });
 
   final double minHeight;
@@ -36,10 +32,6 @@ final class HyperListTileSize {
   /// 导航描述与箭头的间距，以及导航箭头尺寸。
   final double navigationSpacing;
   final double navigationIconSize;
-  final double titleFontSize;
-  final double subtitleFontSize;
-  final double titleLineHeight;
-  final double subtitleLineHeight;
 
   HyperListTileSize copyWith({
     double? minHeight,
@@ -54,10 +46,6 @@ final class HyperListTileSize {
     double? trailingIconSize,
     double? navigationSpacing,
     double? navigationIconSize,
-    double? titleFontSize,
-    double? subtitleFontSize,
-    double? titleLineHeight,
-    double? subtitleLineHeight,
   }) => HyperListTileSize(
     minHeight: minHeight ?? this.minHeight,
     compactMinHeight: compactMinHeight ?? this.compactMinHeight,
@@ -72,10 +60,6 @@ final class HyperListTileSize {
     trailingIconSize: trailingIconSize ?? this.trailingIconSize,
     navigationSpacing: navigationSpacing ?? this.navigationSpacing,
     navigationIconSize: navigationIconSize ?? this.navigationIconSize,
-    titleFontSize: titleFontSize ?? this.titleFontSize,
-    subtitleFontSize: subtitleFontSize ?? this.subtitleFontSize,
-    titleLineHeight: titleLineHeight ?? this.titleLineHeight,
-    subtitleLineHeight: subtitleLineHeight ?? this.subtitleLineHeight,
   );
 
   static HyperListTileSize lerp(
@@ -109,14 +93,6 @@ final class HyperListTileSize {
     navigationIconSize:
         a.navigationIconSize +
         (b.navigationIconSize - a.navigationIconSize) * t,
-    titleFontSize: a.titleFontSize + (b.titleFontSize - a.titleFontSize) * t,
-    subtitleFontSize:
-        a.subtitleFontSize + (b.subtitleFontSize - a.subtitleFontSize) * t,
-    titleLineHeight:
-        a.titleLineHeight + (b.titleLineHeight - a.titleLineHeight) * t,
-    subtitleLineHeight:
-        a.subtitleLineHeight +
-        (b.subtitleLineHeight - a.subtitleLineHeight) * t,
   );
 
   @override
@@ -133,11 +109,7 @@ final class HyperListTileSize {
       other.trailingSpacing == trailingSpacing &&
       other.trailingIconSize == trailingIconSize &&
       other.navigationSpacing == navigationSpacing &&
-      other.navigationIconSize == navigationIconSize &&
-      other.titleFontSize == titleFontSize &&
-      other.subtitleFontSize == subtitleFontSize &&
-      other.titleLineHeight == titleLineHeight &&
-      other.subtitleLineHeight == subtitleLineHeight;
+      other.navigationIconSize == navigationIconSize;
 
   @override
   int get hashCode => Object.hash(
@@ -153,9 +125,5 @@ final class HyperListTileSize {
     trailingIconSize,
     navigationSpacing,
     navigationIconSize,
-    titleFontSize,
-    subtitleFontSize,
-    titleLineHeight,
-    subtitleLineHeight,
   );
 }

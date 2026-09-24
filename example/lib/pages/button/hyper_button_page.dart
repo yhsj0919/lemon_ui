@@ -50,17 +50,19 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
       ),
     ];
     final theme = HyperTheme.of(context);
-    final buttonSizeDescription = switch (HyperTheme.sizesOf(context)
-        .deviceType) {
-      HyperDeviceType.phone => '手机：最小 58×48，字号 16，图标 24',
-      HyperDeviceType.tablet => '平板：最小 64×44，字号 16，图标 24',
-      HyperDeviceType.desktop => '桌面：最小 52×36，字号 14，图标 18',
-      HyperDeviceType.watch => '手表：最小 52×40，字号 16，图标 20',
-    };
+    final metrics = HyperTheme.sizesOf(context).button;
+    final buttonSizeDescription =
+        '最小 ${metrics.minimumSize.width.toStringAsFixed(0)}×'
+        '${metrics.minimumSize.height.toStringAsFixed(0)}，'
+        '字号 ${theme.typography.control.toStringAsFixed(0)}，'
+        '图标 ${metrics.iconSize.toStringAsFixed(0)}';
     return Material(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('HyperButton', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
@@ -69,6 +71,26 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
           Text('当前设备规格：$buttonSizeDescription'),
           const SizedBox(height: 20),
           Wrap(spacing: 12, runSpacing: 12, children: buttons),
+          const SizedBox(height: 20),
+          Text('尺寸档位', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final size in HyperButtonSizeVariant.values)
+                HyperButton.filled(
+                  key: Key('button-size-${size.name}'),
+                  size: size,
+                  onPressed: () => _record('尺寸 ${size.name}'),
+                  child: Text(switch (size) {
+                    HyperButtonSizeVariant.small => '小',
+                    HyperButtonSizeVariant.medium => '中',
+                    HyperButtonSizeVariant.large => '大',
+                  }),
+                ),
+            ],
+          ),
           const SizedBox(height: 20),
           Text('最近事件：$_event', key: const Key('hyper-button-event')),
           const SizedBox(height: 20),

@@ -52,8 +52,10 @@ class HyperRadioListTile<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final interactive = enabled && onChanged != null;
     final radioSize = HyperTheme.sizesOf(context).radio.size;
-    final resolvedRadioStyle = HyperRadioStyle(minimumTapTargetSize: radioSize)
-        .merge(radioStyle);
+    final resolvedRadioStyle = HyperRadioStyle(
+      minimumTapTargetSize:
+          radioStyle?.minimumTapTargetSize ?? radioStyle?.size ?? radioSize,
+    ).merge(radioStyle);
     final radio = switch (variant) {
       HyperRadioVariant.checkmark => HyperRadio<T>.checkmark(
         value: value,

@@ -58,4 +58,76 @@ void main() {
     expect(find.byType(BackdropFilter), findsNothing);
     expect(find.text('普通内容'), findsOneWidget);
   });
+
+  testWidgets('统一材质配方同时用于表面、Card 和两种按钮', (tester) async {
+    const recipe = HyperSurfaceMaterial.frostedGlass(
+      background: HyperFill.color(Color(0x70FFFFFF)),
+      tint: Color(0x123366FF),
+      border: BorderSide(color: Color(0x88FFFFFF)),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light().copyWith(
+            materialTheme: const HyperMaterialThemeData(
+              quality: HyperMaterialQuality.advanced,
+              material: recipe,
+            ),
+          ),
+          duration: Duration.zero,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const HyperMaterialSurface(
+                  width: 120,
+                  height: 48,
+                  child: Text('表面'),
+                ),
+                const HyperCard(width: 120, height: 48, child: Text('卡片')),
+                HyperButton.filled(onPressed: () {}, child: const Text('按钮')),
+                HyperIconButton.filled(
+                  icon: const Icon(Icons.star),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    for (final type in [
+      HyperMaterialSurface,
+      HyperCard,
+      HyperButton,
+      HyperIconButton,
+    ]) {
+      final consumer = find.byType(type);
+      expect(
+        find.descendant(of: consumer, matching: find.byType(BackdropFilter)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: consumer,
+          matching: find.byWidgetPredicate(
+            (widget) => widget is ColoredBox && widget.color == recipe.tint,
+          ),
+        ),
+        findsOneWidget,
+      );
+    }
+    for (final foreground in [
+      find.text('表面'),
+      find.text('卡片'),
+      find.text('按钮'),
+      find.byIcon(Icons.star),
+    ]) {
+      expect(
+        find.ancestor(of: foreground, matching: find.byType(BackdropFilter)),
+        findsNothing,
+      );
+    }
+  });
 }

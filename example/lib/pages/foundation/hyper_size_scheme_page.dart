@@ -63,7 +63,7 @@ class _HyperSizeSchemePageState extends State<HyperSizeSchemePage> {
                 spacing: 12,
                 runSpacing: 12,
                 children: [
-                  _ValueCard(label: '默认高度', value: sizes.controlHeightMd),
+                  _ValueCard(label: '通用 md 高度', value: sizes.controlHeightMd),
                   _ValueCard(label: '控件圆角', value: sizes.controlRadius),
                   _ValueCard(
                     label: '最小命中区',
@@ -75,7 +75,9 @@ class _HyperSizeSchemePageState extends State<HyperSizeSchemePage> {
                 ],
               ),
               SizedBox(height: sizes.sectionSpacing),
-              Text('控件高度档位', style: Theme.of(context).textTheme.titleMedium),
+              Text('通用高度参考', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 4),
+              const Text('用于没有专属规格的控件；按钮等组件使用各自的尺寸。'),
               const SizedBox(height: 12),
               for (final item in <(String, double)>[
                 ('xs', sizes.controlHeightXs),
@@ -84,7 +86,7 @@ class _HyperSizeSchemePageState extends State<HyperSizeSchemePage> {
                 ('lg', sizes.controlHeightLg),
                 ('xl', sizes.controlHeightXl),
               ]) ...[
-                _HeightBar(label: item.$1, height: item.$2),
+                _HeightMeasure(label: item.$1, height: item.$2),
                 const SizedBox(height: 8),
               ],
               const SizedBox(height: 16),
@@ -152,8 +154,8 @@ class _ValueCard extends StatelessWidget {
   }
 }
 
-class _HeightBar extends StatelessWidget {
-  const _HeightBar({required this.label, required this.height});
+class _HeightMeasure extends StatelessWidget {
+  const _HeightMeasure({required this.label, required this.height});
 
   final String label;
   final double height;
@@ -161,25 +163,35 @@ class _HeightBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final sizes = HyperTheme.sizesOf(context);
     return Row(
       children: [
         SizedBox(width: 28, child: Text(label)),
         const SizedBox(width: 8),
-        Container(
+        // 刻度线的高度对应主题数值，仅展示测量，不模拟可点击控件。
+        SizedBox(
           key: ValueKey('height-$label'),
-          width: 180,
+          width: 20,
           height: height,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: theme.colors.primary,
-            borderRadius: BorderRadius.circular(sizes.controlRadius),
-          ),
-          child: Text(
-            height.toStringAsFixed(0),
-            style: TextStyle(color: theme.colors.onPrimary),
+          child: Column(
+            children: [
+              Container(
+                width: 12,
+                height: 1,
+                color: theme.colors.textSecondary,
+              ),
+              Expanded(
+                child: Container(width: 1, color: theme.colors.textSecondary),
+              ),
+              Container(
+                width: 12,
+                height: 1,
+                color: theme.colors.textSecondary,
+              ),
+            ],
           ),
         ),
+        const SizedBox(width: 12),
+        Text('${height.toStringAsFixed(0)} dp'),
       ],
     );
   }

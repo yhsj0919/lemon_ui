@@ -6,6 +6,11 @@
 
 目录同时考虑手机、平板、桌面和手表。设备专属组件只在相应平台或窗口形态下启用；通用组件保持同一套公开 API，通过各自主题和默认布局适配设备。
 
+Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织。公共收录基础能力、
+容器、内容、交互、选择、反馈和按钮；手机／平板收录页面框架与抽屉导航；
+桌面收录侧边导航、操作与提示。这里的归类用于查找 Demo，不限制组件可运行的设备，
+也不改变四端主题尺寸的解析。手表专属示例出现后再增设手表分组。
+
 ## 标记说明
 
 - `[ ]`：尚未实现。
@@ -67,9 +72,9 @@
 - [x] `HyperContainer`：尺寸、约束、内外边距、对齐、背景、渐变、边框、圆角和阴影。
 - [x] `HyperMaterialSurface`：按材质质量绘制普通、半透明或可降级玻璃表面。
 - [ ] `HyperSurface`：具有语义层级的基础表面。
-- [ ] `HyperCard`：内容卡片。
+- [x] `HyperCard`：独立主题的基础内容卡片，支持自由内容、整卡交互和统一表面材质。
+- [x] `HyperTitledCard`：带标题与右侧自由 action 的卡片组合，支持标题在内、在外两种布局和任意内容。
 - [ ] `HyperPanel`：页面或工具区域面板。
-- [ ] `HyperSection`：带标题、说明和内容的分区。
 - [ ] `HyperGroupBox`：带边界和标题的内容分组。
 - [x] `HyperDivider`：支持横向、纵向、纯色、渐变、实线、虚线、点线、明确尺寸和独立主题。
 - [ ] `HyperVerticalDivider`：垂直分隔线便捷控件。
@@ -90,7 +95,7 @@
 
 ## 三、布局与响应式
 
-- [ ] `HyperScaffold`：页面基本结构。
+- [x] `HyperScaffold`：页面基本结构，承载顶栏、主体、抽屉与底部区域，并通过主题解析页面背景。
 - [ ] `HyperAdaptiveScaffold`：按窗口选择手机、平板、桌面和手表布局。
 - [ ] `HyperResponsiveBuilder`：按可用空间构建布局。
 - [ ] `HyperBreakpointBuilder`：按断点构建布局。
@@ -147,7 +152,7 @@
 - [ ] `HyperExtendedFloatingActionButton`：扩展浮动按钮。
 - [ ] `HyperCloseButton`：关闭按钮。
 - [ ] `HyperBackButton`：返回按钮。
-- [ ] `HyperMenuButton`：打开菜单的按钮。
+- [~] `HyperMenuButton`：打开操作菜单的 Hyper 按钮组合；运行验证待补齐。
 - [ ] `HyperDropdownButton`：下拉操作按钮。
 - [ ] `HyperSplitButton`：主操作和菜单组合按钮。
 - [ ] `HyperToggleButton`：可切换按钮。
@@ -259,6 +264,7 @@
 - [x] `HyperNavigationListTile`：进入下一级页面的列表项，统一提供描述区和 chevron。
 - [x] `HyperCheckboxListTile`：整行复选列表项，由行交互承载点击热区并对齐尾部可见外框。
 - [x] `HyperRadioListTile`：整行单选列表项，由行交互承载点击热区并对齐尾部圆环。
+- [x] `HyperSwitchListTile`：整行开关列表项，保留尾部拖动并统一行高和可见边界。
 - [ ] `HyperSettingsTile`：设置项。
 - [ ] `HyperActionTile`：操作列表项。
 - [ ] `HyperUserTile`：用户信息项。
@@ -271,7 +277,7 @@
 - [ ] `HyperInfiniteList`：无限滚动列表。
 - [ ] `HyperRefreshIndicator`：下拉刷新。
 - [ ] `HyperPullToRefresh`：完整刷新容器。
-- [ ] `HyperSliverAppBar`：滚动标题栏。
+- [x] `HyperSliverAppBar`：可直接用于 CustomScrollView 的滚动标题栏。
 - [ ] `HyperSliverList`：主题化 Sliver 列表。
 - [ ] `HyperSliverGrid`：主题化 Sliver 网格。
 - [ ] `HyperStickyHeader`：吸顶分组标题。
@@ -301,16 +307,16 @@
 
 ## 十三、导航
 
-- [ ] `HyperAppBar`：顶部应用栏，提供 `.large` 与 `.small` 等明确变体。
+- [x] `HyperAppBar`：普通、`.medium` 和 `.large` 顶栏；展开变体在 HyperScaffold 中可直接配普通列表收起。
 - [ ] `HyperNavigationBar`：底部导航栏，提供普通与 `.floating` 形态。
 - [ ] `HyperNavigationDestination`：普通与浮动底部导航共用的目标项。
 - [ ] `HyperNavigationRail`：侧边导航轨道，支持折叠与展开布局。
 - [ ] `HyperNavigationRailDestination`：侧边导航轨道目标项。
 - [ ] `HyperNavigationDrawer`：导航抽屉。
-- [ ] `HyperDrawer`：通用抽屉。
-- [ ] `HyperSidebar`：桌面和平板侧栏。
-- [ ] `HyperTabBar`：标签栏，提供 `.standard` 与 `.contour` 形态。
-- [ ] `HyperTabBarView`：标签内容。
+- [x] `HyperDrawer`：可放任意内容的通用抽屉，沿用 Scaffold 的开合与遮罩。
+- [x] `HyperSidebar`：分组与树形侧栏，支持折叠悬停子菜单、角标、头尾、自定义项和受控展开。
+- [x] `HyperTabBar`：默认共享底槽的 `.segmented`，另有独立圆角标签的 `.separated` 和普通下划线的 `.underline` 形态。
+- [x] `HyperTabBarView`：与标签栏共享控制器的标签内容。
 - [ ] `HyperSegmentedNavigation`：分段导航。
 - [ ] `HyperBreadcrumb`：面包屑。
 - [ ] `HyperPagination`：页码导航。
@@ -327,13 +333,14 @@
 - [ ] `HyperOverlayPresentation`：显式选择应用内 overlay 或窗口级呈现；窗口模式随多窗口阶段实现。
 - [ ] `HyperOverlayController<T>`：一次悬浮层的控制器。
 - [ ] `HyperOverlayAnchor`：锚定浮层目标。
-- [ ] `HyperTooltip`：工具提示，提供 `.plain` 与 `.rich` 形态。
-- [ ] `HyperMenu`：菜单。
+- [~] `HyperTooltip`：简短文字提示已接入悬停、焦点、长按、延迟和锚定浮层；富内容形态待设计。
+- [~] `HyperMenu`：分组与多级操作菜单，已接入选中、禁用、键盘导航、主题尺寸与浮层组合；运行验证待补齐。
 - [ ] `HyperCascadingMenu`：桌面悬浮子菜单与移动端层级变换共用数据模型的级联菜单。
-- [ ] `HyperMenuItem`：菜单项。
+- [~] `HyperMenuItem`：带图标、尾部内容和子菜单的操作项；运行验证待补齐。
 - [ ] `HyperMenuBar`：桌面菜单栏。
-- [ ] `HyperContextMenu`：右键或长按菜单。
-- [ ] `HyperDropdownMenu<T>`：下拉菜单。
+- [~] `HyperContextMenu`：右键或触摸长按在触发位置打开菜单，也支持菜单键与 Shift+F10；运行验证待补齐。
+- [~] `HyperDropdownMenu<T>`：受控单选、禁用选项和键盘导航已实现；运行验证待补齐。
+- [~] `HyperPopupListTile<T>`：整行打开锚定模态选项列表，复用菜单与列表项主题；运行验证待补齐。
 - [ ] `HyperPopup`：通用弹出层。
 - [ ] `HyperPopover`：带锚点的内容浮层。
 - [ ] `HyperCommandPalette`：命令面板。
@@ -719,7 +726,7 @@
 
 ### 锚定浮层与桌面交互
 
-- [ ] `HyperAnchoredOverlay`：点击、悬停、焦点或受控触发的通用锚定浮层。
+- [x] `HyperAnchoredOverlay`：点击、悬停或受控触发的通用锚定浮层，支持跟随锚点、避让边缘与关闭交互。
 - [ ] `HyperPointerTooltip`：跟随鼠标并自动避让窗口边缘的 Tooltip。
 - [ ] `HyperInstantTooltip`：无默认等待时间的即时提示。
 - [ ] `HyperMovableDialog`：可拖动和可选调整大小的桌面对话框。

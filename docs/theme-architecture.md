@@ -2,6 +2,8 @@
 
 本文冻结 Lemon UI 的主题、设备适配和组件默认值架构。新增组件、主题重构、Demo 和测试均须遵守本文；主题类随组件增加而变大是集中式强类型设计系统的预期成本，不再作为拆散主题的理由。
 
+默认视觉值的来源和缺少直接参考时的推导方法见 [HyperOS 风格设计基准](hyperos-design-baseline.md)。手机端参考 HyperOS；desktop 端尺寸和样式以小米 HIUI 为主要参考；平板和手表制定独立规格。第三方实现与项目暂定值不得标成官方规范。
+
 ## 一、总体目标
 
 Lemon UI 提供一套完整可用的 HyperOS 默认主题。使用者可以保持业务组件代码不变，仅通过 `copyWith` 覆盖与默认主题不同的部分，快速替换整套颜色、材质、排版或多端尺寸。
@@ -26,6 +28,10 @@ HyperTheme(
 )
 ```
 
+`HyperTheme` 在作用域内统一为滚动控件增加鼠标拖动输入，并保留平台已有的
+触摸、触控板、滚轮和滚动条策略。Demo 不再逐页重复配置鼠标拖动；需要不同
+交互的子树仍可通过局部 `ScrollConfiguration` 覆盖。
+
 设备类型最终由主题作用域统一协调。Windows、Linux 和 macOS 固定为 desktop；
 只有 Android 和 iOS 在启动时区分 phone、tablet 或 watch。测试、预览和特殊设备可以显式指定：
 
@@ -46,13 +52,106 @@ HyperTheme(
 `HyperThemeData` 集中持有以下强类型主题：
 
 - `colors`：语义颜色。
-- `typography`：字体族、语义字号、字重、行高和字间距。
+- `typography`：当前端已解析的语义字号与列表行高；字体族、字重和其他文字样式由 `textTheme` 承载。
+- `typographyTheme`：手机、平板、桌面和手表四套强类型字阶；当前端由 `HyperTheme` 解析到 `typography` 与 `textTheme`。组件布局尺寸不保存字号。
 - `sizes`：手机、平板、桌面和手表的全部尺寸方案。
 - `motion`：动画时长和曲线。
-- `materialTheme`：材质质量和透明度策略。
+- `materialTheme`：统一表面材质配方、渲染质量和透明度策略。
 - 各组件 `ThemeData`：组件视觉、变体和状态配方。
 
 视觉、尺寸和排版相互独立。替换颜色不得改变尺寸，替换尺寸不得改变颜色；设备相关字号由统一排版主题解析，不得写在组件实现中。
+
+### 统一材质契约
+
+`HyperSurfaceMaterial` 是跨组件共用的完整配方。使用材质的控件按实例材质、
+组件主题材质、`materialTheme.material` 的顺序选择来源，再由统一质量和减少透明度
+策略解析。组件只绘制解析结果，不因引用位置改写背景、色调、模糊、边框、阴影或降级
+配方；控件形状、内容布局和交互状态仍由各自组件负责。显式设置的组件背景可覆盖全局
+材质背景。玻璃材质的滤镜只绘制背景，前景内容保持在独立的清晰图层。
+内置 Hyper 主题默认采用 `advanced` 材质质量；应用可通过强类型
+`materialTheme.copyWith(quality: HyperMaterialQuality.standard)` 切换到降级配方，
+或设置 `reduceTransparency` 关闭透明与模糊。
+
+`HyperAnchoredOverlay` 负责锚点定位、边缘避让、开合交互与进出场动画，不绘制表面。
+`HyperTabBar` 与 `HyperTabBarView` 共用 Flutter `TabController`。默认 `.segmented` 形态共用浅灰底槽，选中项为白色块；`.separated` 形态的每个标签各自绘制圆角表面，标签之间保留间距，选中项为白色、未选中项为浅灰；`.underline` 形态采用普通下划线指示。三种形态在 Demo 中独立展示，共用当前端标签栏高度；手机端为 42dp。独立标签的 12dp 圆角和 9dp 间距参照 [MIUIX `TabRow` 候选值](https://compose-miuix-ui.github.io/miuix/components/tabrow)，底槽圆角暂取 8dp；下划线粗细沿用 Flutter 的 2dp 基准。四端尺寸由 `HyperSizeScheme.tabBar` 分别管理，字号读取 `typography.control`。悬停与按压不叠加深色覆盖层，点击不产生水波纹；选中块或指示线的切换作为状态反馈。
+菜单、提示等消费者通过自己的主题选择视觉和材质，不能由浮层底座改写材质配方。
+内置菜单、侧栏子菜单和 Tooltip 的浮层表面默认使用统一的高级玻璃材质配方；
+实例或组件主题的完整材质、全局 `materialTheme.material` 以及显式背景优先于此默认配方。
+材质质量与减少透明度策略仍由 `HyperMaterialThemeData.resolveMaterial` 统一处理。
+最简单的使用方式是传入 `anchor` 与 `overlayBuilder`；默认点击锚点开合，
+`overlayBuilder` 获得关闭回调。侧栏子菜单可指定 `trigger: HyperOverlayTrigger.hover`
+与 `placement: HyperOverlayPlacement.sideEnd`。需要由父级统一管理多个菜单时，
+传入 `isOpen` 和 `onOpenChanged`；外部点击、Escape 和返回键仍走同一关闭请求。
+基础浮层直接使用最近的 Flutter `Overlay`，页面无需额外安装宿主。
+需要把已有按钮或其他自带点击行为的控件作为锚点时，使用
+`HyperAnchoredOverlay.builder(anchorBuilder: (context, toggle, isOpen) => ..., overlayBuilder: ...)`；
+锚点调用 `toggle`，内容仍可自由组合列表、网格、卡片或其他 Widget。
+`placement` 提供 `topStart`、`bottomStart`/`bottomEnd`、`sideStart`/`sideEnd`；
+`spacing` 默认取当前端 `HyperSizeScheme.overlaySpacing`，目前为 4 逻辑像素，使用方可以覆盖；
+空间不足时自动翻转并限制在可见区域，不要求内容使用特定表面组件。
+默认进出场使用淡入缩放，也可选 `HyperOverlayTransition.fade`；内置过渡的时长和曲线读取
+全局 `motion.fastDuration`、`motion.fastCurve`，并遵守 `MediaQuery.disableAnimations`。
+需要完全不同的效果时传入 `transitionBuilder(context, animation, child)` 替换内置过渡；
+动画进度为 0 至 1，使用端可自行选择曲线，底座仍负责开合时长和浮层生命周期。
+关闭请求立即停止浮层交互，退场动画结束后再从 `Overlay` 移除。
+
+`HyperSidebar` 的分组、树形项、角标和自定义行通过 `HyperSidebarGroup`、
+`HyperSidebarItem` 组合。展开项的标题与可选描述复用 `HyperListTile` 的文字规格。
+选中 ID 由页面传入，展开 ID 可由组件管理或由页面受控管理；
+父级是否跟随子项选中由 `selectParentWhenChildSelected` 控制，默认关闭。折叠时有子项的菜单行
+使用 `HyperAnchoredOverlay` 显示悬停子菜单，浮层的表面和阴影由其中的 `HyperCard`
+及其主题控制。普通卡片表面由侧栏提供默认浮层阴影；全局材质或 Card 主题显式提供
+阴影时沿用原配方，侧栏主题可通过 `popupCardStyle` 覆盖。头尾保持固定，中间列表独立滚动；宽度和行规格来自四端
+`HyperSidebarSize`，视觉与选中样式按全局、局部、实例 `HyperSidebarStyle` 解析。
+侧栏宽度与内容淡隐切换使用全局标准动画节奏，树形子项的展开收起与箭头旋转使用全局快速节奏；
+两者都遵守系统减少动画设置。`HyperSidebarStyle` 提供 `widthTransitionBuilder`、
+`contentTransitionBuilder` 和 `childrenTransitionBuilder`，可由全局、局部主题或实例逐项替换
+默认过渡。宽度 builder 接收当前宽度并负责约束侧栏内容；内容 builder 接收 0 至 1 的
+可见度；子项 builder 接收 0 至 1 的开合动画，并负责内容出现、消失时的布局过渡。
+折叠态浮窗的进出场可通过 `popupTransitionBuilder` 替换，仍由 `HyperAnchoredOverlay`
+管理开合与浮层生命周期。
+
+`HyperMenu` 负责弹出菜单的分组、多级操作项、选中与禁用状态。子项通过
+`HyperMenuItem.children` 声明，父项悬停或点击展开子菜单；鼠标经过更深层级时
+保持已展开的祖先菜单，切换同级项目或点击菜单外才收起对应层级。
+方向键上下移动时同步移动真实焦点，右键进入子菜单、左键返回父项并恢复焦点；
+Tab 遵循可用菜单项的焦点遍历，Home、End、Enter 和空格键作用于当前层。子菜单的定位、边缘翻转与开合
+继续由 `HyperAnchoredOverlay` 负责，过渡可通过 `submenuTransitionBuilder` 替换。
+纯鼠标悬停展开子菜单时不抢夺键盘焦点；已展开后改用方向键仍可进入该层。
+菜单表面由 `HyperCard` 绘制，完整材质及显式阴影遵守 Card 与全局材质配方；普通表面提供默认
+浮层阴影。菜单外框与菜单项圆角分别由四端 `HyperMenuSize.surfaceRadius` 和
+`itemRadius` 管理，不随按钮圆角联动。其余菜单尺寸同样来自四端 `HyperMenuSize`，全局 `menuTheme`、局部
+`HyperMenuTheme` 与实例 `HyperMenuStyle` 逐项覆盖。菜单项文字取当前端统一字阶，
+不另存设备字号。
+
+`HyperMenuButton` 组合 Hyper 按钮、锚定浮层和菜单，统一处理按钮开合与选择后关闭。
+`HyperContextMenu` 包裹任意内容，右键或触摸长按时将指针或触点在目标内的局部坐标交给
+`HyperAnchoredOverlay.anchorPosition` 定位；菜单键或 Shift+F10 则从目标下方打开。
+这些入口共用 `HyperMenu` 的分组、多级项、主题样式和键盘导航。点击菜单外或按
+Escape 关闭，子菜单仍共享同一点击区域。
+
+`HyperTooltip` 复用锚定浮层的定位、边缘避让和 Motion 动画，表面由 `HyperCard`
+绘制并参与统一材质解析。鼠标悬停延迟显示，键盘焦点进入或触摸长按立即显示；
+长按松开后按 `showDuration` 延迟收起。内容只提供说明，不接收点击。可通过 `placement`、
+`waitDuration`、`exitDuration` 和 `transitionBuilder` 调整行为与过渡。
+
+`HyperDropdownMenu<T>` 是受控单选入口：调用方传入 `value` 和 `onChanged`，
+禁用选项不可触发选择。锚点复用 `HyperButton` 的尺寸与样式，弹出的选项复用
+`HyperMenu` 的焦点导航、主题和浮层材质；方向键可从锚点打开，选择或按 Escape
+关闭后将焦点返回按钮自身。`HyperButton.focusNode` 支持这种组合场景，节点由调用方释放。
+锚点宽度、箭头尺寸和间距来自四端 `HyperDropdownMenuSize`；前景、箭头和选中底色
+由全局 `dropdownMenuTheme`、局部 `HyperDropdownMenuTheme` 与实例
+`HyperDropdownMenuStyle` 逐层覆盖。显式 `buttonStyle` 和 `menuStyle` 最后覆盖各自底层控件。
+
+`HyperPopupListTile<T>` 将 `HyperListTile` 与锚定模态选项列表组合。整行显示
+当前值和上下双箭头，打开时使用语义遮罩；弹窗以尾部上下箭头图标为锚点，并在上下空间不足时翻转、限制在安全区域。弹窗复用 `HyperMenu` 的焦点、禁用和选中
+状态。弹窗选项行高默认取当前端 `HyperListTileSize.minHeight`，紧凑行取
+`compactMinHeight`，`menuStyle.itemHeight` 可显式覆盖。宽度按选项文字和图标测量，
+由四端 `HyperPopupListTileSize` 限制最小和最大值，实例可覆盖边界或指定固定宽度。
+弹窗表面内边距与选项文字内边距独立；选项左右内边距由四端 `HyperPopupListTileSize.itemHorizontalPadding` 管理，默认均为 16 逻辑像素，可通过 `menuStyle.padding` 显式覆盖。默认选中和悬停背景铺满整行，外框负责裁剪圆角。
+默认过渡从靠近列表项的弹窗角开始缩放、淡入并按打开方向逐步揭示，退场反向收起；
+缩放取全局 Motion 弹簧，时长与淡入曲线取全局 Motion，减少动画时直接显示。
+`transitionBuilder` 可替换默认过渡。选择后关闭并将焦点返回列表项。
 
 ## 四、集中式多端尺寸
 
@@ -74,6 +173,11 @@ HyperSizeThemeData
 
 ```text
 HyperSizeScheme
+├─ appBar: HyperAppBarSize
+├─ drawer: HyperDrawerSize
+├─ sidebar: HyperSidebarSize
+├─ menu: HyperMenuSize
+├─ dropdownMenu: HyperDropdownMenuSize
 ├─ button: HyperButtonSize
 ├─ iconButton: HyperIconButtonSize
 ├─ progressIndicator: HyperProgressIndicatorSize
@@ -84,6 +188,12 @@ HyperSizeScheme
 ```
 
 组件尺寸值对象必须不可变，并实现 `copyWith`、值相等和需要时的 `lerp`。设备规格使用明确值，不通过手机尺寸乘倍率生成其他平台尺寸。
+
+确定组件默认值时，先查 Flutter 的约束与交互标准，再按[设计基准](hyperos-design-baseline.md)
+核实适用的 HyperOS 官方资料、目标设备和第三方 MIUIX 候选值，最后按 Lemon UI
+的主题职责选值。截图用于检查最终视觉关系；设备逻辑尺寸、显示缩放或像素密度
+未确认时，不从截图物理像素差推算组件的 dp 或字号。参考来源与最终取值不同时，
+在尺寸规格中记录原因。
 
 ### 组件实现边界
 
@@ -174,6 +284,12 @@ HyperButton.filled(
 不得使用 `Map<String, dynamic>`、字符串键或万能组件样式代替明确类型。保留自动补全、编译期检查、重构能力和值语义。
 
 ## 八、组件实现规则
+
+组件行为和公开接口稳定后，应主动把需要跨页面统一调整的可配置项收归强类型主题模板：
+设备尺寸写入四端 `HyperSizeScheme`，视觉与排版写入对应组件 `ThemeData`；局部主题和
+实例 `Style` 只覆盖显式提供的字段。新增配置时同步维护 `copyWith`、插值、值相等、
+Demo 和主题覆盖测试。父布局能直接控制的外边距等组合属性不因“可配置”而重复加入
+组件主题。
 
 - 组件以 Flutter 原生 Widget 自由组合为优先；只有基础组件无法准确表达时才局部自绘。
 - `HyperText` 等包装控件保持轻量，只负责语义样式、主题接入和参数转发，不承担额外布局或视觉偏移。

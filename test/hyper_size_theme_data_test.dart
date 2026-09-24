@@ -36,6 +36,19 @@ void main() {
     expect(changed.phone.button, sizes.phone.button);
   });
 
+  test('桌面按钮三档尺寸可通过主题独立覆盖', () {
+    const base = HyperSizeScheme.desktop();
+    final changed = base.button.copyWith(smallHeight: 26, largeHeight: 42);
+
+    expect(base.button.heightFor(HyperButtonSizeVariant.small), 24);
+    expect(base.button.heightFor(HyperButtonSizeVariant.medium), 32);
+    expect(base.button.heightFor(HyperButtonSizeVariant.large), 40);
+    expect(changed.heightFor(HyperButtonSizeVariant.small), 26);
+    expect(changed.heightFor(HyperButtonSizeVariant.medium), 32);
+    expect(changed.heightFor(HyperButtonSizeVariant.large), 42);
+    expect(changed.padding, base.button.padding);
+  });
+
   test('图标按钮尺寸可独立覆盖', () {
     const sizes = HyperSizeThemeData();
     final changed = sizes.copyWith(
@@ -85,10 +98,6 @@ void main() {
           trailingIconSize: 22,
           navigationSpacing: 5,
           navigationIconSize: 26,
-          titleFontSize: 18,
-          subtitleFontSize: 15,
-          titleLineHeight: 1.2,
-          subtitleLineHeight: 1.3,
         ),
       ),
     );
@@ -108,10 +117,6 @@ void main() {
     expect(listTile.trailingIconSize, 22);
     expect(listTile.navigationSpacing, 5);
     expect(listTile.navigationIconSize, 26);
-    expect(listTile.titleFontSize, 18);
-    expect(listTile.subtitleFontSize, 15);
-    expect(listTile.titleLineHeight, 1.2);
-    expect(listTile.subtitleLineHeight, 1.3);
     expect(changed.tablet, sizes.tablet);
     expect(changed.desktop, sizes.desktop);
     expect(changed.watch, sizes.watch);

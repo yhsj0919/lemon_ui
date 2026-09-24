@@ -72,7 +72,10 @@ class _HyperMaterialSurfacePageState extends State<HyperMaterialSurfacePage> {
     return Material(
       color: theme.colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('表面材质', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

@@ -33,20 +33,21 @@ void main() {
       scrollable: find.byType(Scrollable),
     );
     expect(find.byType(HyperSwitch), findsOneWidget);
+    expect(find.byType(HyperSwitchListTile), findsOneWidget);
     expect(find.byType(HyperCheckbox), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('EasyTier Flutter Demo'),
+      find.text('紧凑布局'),
       300,
       scrollable: find.byType(Scrollable),
     );
     expect(find.byType(HyperRadio<String>), findsNWidgets(2));
-    await tester.tap(find.text('EasyTier Flutter Demo'));
+    await tester.tap(find.text('紧凑布局'));
     await tester.pump();
     expect(
       tester
           .widgetList<HyperRadio<String>>(find.byType(HyperRadio<String>))
-          .every((radio) => radio.groupValue == 'easytier'),
+          .every((radio) => radio.groupValue == 'compact'),
       isTrue,
     );
 

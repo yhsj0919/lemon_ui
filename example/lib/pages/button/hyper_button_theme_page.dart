@@ -70,7 +70,10 @@ class _HyperButtonThemePageState extends State<HyperButtonThemePage> {
     return Material(
       color: colors.background,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+          vertical: 24,
+        ),
         children: [
           Text('按钮样式与主题', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

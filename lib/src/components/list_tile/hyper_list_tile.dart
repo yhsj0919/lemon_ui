@@ -60,12 +60,12 @@ class HyperListTile extends StatelessWidget {
       disabledColor: theme.colors.disabled,
       overlayColor: theme.colors.stateLayer,
       titleStyle: theme.textTheme.titleMedium?.copyWith(
-        fontSize: metrics.titleFontSize,
-        height: metrics.titleLineHeight,
+        fontSize: theme.typography.listTitle,
+        height: theme.typography.listTitleLineHeight,
       ),
       subtitleStyle: theme.textTheme.bodySmall?.copyWith(
-        fontSize: metrics.subtitleFontSize,
-        height: metrics.subtitleLineHeight,
+        fontSize: theme.typography.listSubtitle,
+        height: theme.typography.listSubtitleLineHeight,
       ),
       padding: switch (density) {
         HyperListTileDensity.standard => metrics.padding,

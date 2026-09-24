@@ -10,7 +10,12 @@ import '../pages/foundation/hyper_state_value_page.dart';
 import '../pages/foundation/hyper_theme_page.dart';
 import '../pages/foundation/hyper_typography_scheme_page.dart';
 import '../pages/feedback/hyper_progress_indicator_page.dart';
+import '../pages/framework/hyper_app_bar_page.dart';
+import '../pages/framework/hyper_drawer_page.dart';
+import '../pages/framework/hyper_sidebar_page.dart';
+import '../pages/framework/hyper_tab_bar_page.dart';
 import '../pages/container/hyper_container_page.dart';
+import '../pages/container/hyper_card_page.dart';
 import '../pages/content/hyper_text_page.dart';
 import '../pages/content/hyper_icon_page.dart';
 import '../pages/content/hyper_divider_page.dart';
@@ -19,10 +24,14 @@ import '../pages/button/hyper_button_theme_page.dart';
 import '../pages/button/hyper_button_page.dart';
 import '../pages/button/hyper_icon_button_page.dart';
 import '../pages/interaction/hyper_pressable_page.dart';
+import '../pages/interaction/hyper_anchored_overlay_page.dart';
+import '../pages/interaction/hyper_menu_page.dart';
+import '../pages/interaction/hyper_tooltip_page.dart';
 import '../pages/surface/hyper_material_surface_page.dart';
 import '../pages/selection/hyper_switch_page.dart';
 import '../pages/selection/hyper_checkbox_page.dart';
 import '../pages/selection/hyper_radio_page.dart';
+import '../pages/selection/hyper_dropdown_menu_page.dart';
 import 'gallery_item.dart';
 
 /// Example 中所有演示页的唯一注册入口。
@@ -98,6 +107,33 @@ final List<GallerySection> gallerySections = [
     ],
   ),
   GallerySection(
+    title: '页面框架',
+    audience: GalleryAudience.mobile,
+    items: [
+      GalleryItem(
+        id: 'hyper-app-bar',
+        title: 'HyperAppBar',
+        description: '普通与滚动展开顶栏、统一玻璃材质。',
+        icon: Icons.web_asset_outlined,
+        ownsAppBar: true,
+        builder: (_) => const HyperAppBarPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '抽屉导航',
+    audience: GalleryAudience.mobile,
+    items: [
+      GalleryItem(
+        id: 'hyper-drawer',
+        title: 'HyperDrawer',
+        description: '可放任意内容的起始侧与结束侧抽屉。',
+        icon: Icons.view_sidebar_outlined,
+        builder: (_) => const HyperDrawerPage(),
+      ),
+    ],
+  ),
+  GallerySection(
     title: '容器与表面',
     items: [
       GalleryItem(
@@ -106,6 +142,13 @@ final List<GallerySection> gallerySections = [
         description: '轻量容器、主题优先级与精确尺寸。',
         icon: Icons.rounded_corner,
         builder: (_) => const HyperContainerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-card',
+        title: 'HyperCard',
+        description: '独立主题、设备圆角、自由内容和整卡交互。',
+        icon: Icons.view_agenda_outlined,
+        builder: (_) => const HyperCardPage(),
       ),
       GalleryItem(
         id: 'hyper-material-surface',
@@ -153,6 +196,13 @@ final List<GallerySection> gallerySections = [
     title: '交互基础',
     items: [
       GalleryItem(
+        id: 'hyper-anchored-overlay',
+        title: 'HyperAnchoredOverlay',
+        description: '点击或悬停打开锚定浮层，自动跟随并避让边缘。',
+        icon: Icons.layers_outlined,
+        builder: (_) => const HyperAnchoredOverlayPage(),
+      ),
+      GalleryItem(
         id: 'hyper-pressable',
         title: 'HyperPressable',
         description: '单击、双击、长按、右键、焦点与统一状态。',
@@ -164,6 +214,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '选择控件',
     items: [
+      GalleryItem(
+        id: 'hyper-dropdown-menu',
+        title: 'HyperDropdownMenu',
+        description: '单选、禁用选项、键盘操作与受控值。',
+        icon: Icons.arrow_drop_down_circle_outlined,
+        builder: (_) => const HyperDropdownMenuPage(),
+      ),
       GalleryItem(
         id: 'hyper-checkbox',
         title: 'HyperCheckbox',
@@ -222,6 +279,51 @@ final List<GallerySection> gallerySections = [
         description: '四种变体、异步进度、Tooltip 与材质。',
         icon: Icons.radio_button_checked,
         builder: (_) => const HyperIconButtonPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '侧边导航',
+    audience: GalleryAudience.desktop,
+    items: [
+      GalleryItem(
+        id: 'hyper-sidebar',
+        title: 'HyperSidebar',
+        description: '分组、树形、折叠与悬停子菜单。',
+        icon: Icons.view_sidebar_outlined,
+        builder: (_) => const HyperSidebarPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '标签导航',
+    items: [
+      GalleryItem(
+        id: 'hyper-tab-bar',
+        title: 'HyperTabBar',
+        description: '底槽、独立圆角与下划线标签。',
+        icon: Icons.tab_outlined,
+        builder: (_) => const HyperTabBarPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '操作与提示',
+    audience: GalleryAudience.desktop,
+    items: [
+      GalleryItem(
+        id: 'hyper-menu',
+        title: 'HyperMenu',
+        description: '分组操作、选择状态与键盘导航。',
+        icon: Icons.menu_open_outlined,
+        builder: (_) => const HyperMenuPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-tooltip',
+        title: 'HyperTooltip',
+        description: '悬停与焦点提示，支持延迟、避让和替换动画。',
+        icon: Icons.info_outline,
+        builder: (_) => const HyperTooltipPage(),
       ),
     ],
   ),

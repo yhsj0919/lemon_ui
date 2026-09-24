@@ -262,6 +262,9 @@ void main() {
         HyperButton.filled(onPressed: () {}, child: const Text('桌面')),
         theme: HyperThemeData.light(
           sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.desktop()),
+          typographyTheme: const HyperTypographyThemeData(
+            tablet: HyperTypographyScheme.desktop(),
+          ),
         ),
       ),
     );
@@ -270,16 +273,16 @@ void main() {
         (widget) => widget is Container && widget.decoration is BoxDecoration,
       ),
     );
-    expect(visual.constraints?.minWidth, 52);
-    expect(visual.constraints?.minHeight, 36);
+    expect(visual.constraints?.minWidth, 72);
+    expect(visual.constraints?.minHeight, 32);
     expect(visual.padding, isNull);
     expect(
-      buttonPadding(const EdgeInsets.symmetric(horizontal: 14, vertical: 8)),
+      buttonPadding(const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
       findsOneWidget,
     );
     expect(
       (visual.decoration! as BoxDecoration).borderRadius,
-      BorderRadius.circular(10),
+      BorderRadius.circular(6),
     );
     final text = tester.widget<DefaultTextStyle>(
       find
@@ -290,6 +293,51 @@ void main() {
           .first,
     );
     expect(text.style.fontSize, 14);
+  });
+
+  testWidgets('桌面按钮按主题解析小中大档位，实例样式仍可覆盖', (tester) async {
+    await tester.pumpWidget(
+      app(
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            HyperButton.filled(
+              size: HyperButtonSizeVariant.small,
+              onPressed: () {},
+              child: const Text('小'),
+            ),
+            HyperButton.filled(onPressed: () {}, child: const Text('中')),
+            HyperButton.filled(
+              size: HyperButtonSizeVariant.large,
+              onPressed: () {},
+              child: const Text('大'),
+            ),
+            HyperButton.filled(
+              size: HyperButtonSizeVariant.small,
+              onPressed: () {},
+              style: HyperButtonStyle(
+                height: 36,
+                minimumSize: const Size(72, 36),
+              ),
+              child: const Text('覆盖'),
+            ),
+          ],
+        ),
+        theme: HyperThemeData.light(
+          sizes: const HyperSizeThemeData(tablet: HyperSizeScheme.desktop()),
+        ),
+      ),
+    );
+
+    final visuals = tester
+        .widgetList<AnimatedContainer>(buttonVisual())
+        .toList();
+    expect(visuals.map((visual) => visual.constraints?.minHeight), [
+      24,
+      32,
+      40,
+      36,
+    ]);
   });
 
   testWidgets('按钮消费主题中覆盖的组件尺寸', (tester) async {

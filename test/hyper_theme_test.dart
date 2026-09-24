@@ -1,10 +1,48 @@
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('HyperTheme 为所有列表启用鼠标拖动并保留原有指针', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(400, 500));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late Set<PointerDeviceKind> dragDevices;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: Scaffold(
+            body: Builder(
+              builder: (context) {
+                dragDevices = ScrollConfiguration.of(context).dragDevices;
+                return ListView.builder(
+                  itemCount: 30,
+                  itemBuilder: (_, index) =>
+                      SizedBox(height: 60, child: Text('项目 $index')),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(dragDevices, contains(PointerDeviceKind.mouse));
+    expect(dragDevices, contains(PointerDeviceKind.touch));
+    final scroll = tester.state<ScrollableState>(find.byType(Scrollable));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('项目 1')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.moveBy(const Offset(0, -180));
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(scroll.position.pixels, greaterThan(0));
+  });
+
   test('Windows 默认使用系统中文 UI 字体', () {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);

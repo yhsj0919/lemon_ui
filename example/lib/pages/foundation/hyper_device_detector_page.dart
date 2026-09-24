@@ -26,7 +26,10 @@ class _HyperDeviceDetectorPageState extends State<HyperDeviceDetectorPage> {
             builder: (context) => Material(
               color: theme.colors.background,
               child: ListView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.symmetric(
+                  horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
+                  vertical: 24,
+                ),
                 children: [
                   Text(
                     '设备自动探测',

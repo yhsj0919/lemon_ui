@@ -4,7 +4,7 @@
 
 所有阶段同时遵守 [自定义契约](customization-contract.md)：不得使用公开第三方别名、不得按子控件类型特判布局，并且每个控件都要提供可检查的自定义入口和布局契约。
 
-涉及材质、形状、按钮、导航、设置项和悬浮层时参考 [Miuix 参考审查](miuix-reference-review.md) 与 [MIUIX 控件清单、合并关系与手机规格](miuix-component-inventory.md)。手机规格优先采用经源码确认的 MIUIX 值；实现方式仍服从 Flutter 与本项目主题原则。
+涉及材质、形状、按钮、导航、设置项和悬浮层时，先遵守 [HyperOS 风格设计基准](hyperos-design-baseline.md)的来源分级，再参考 [Miuix 参考审查](miuix-reference-review.md) 与 [MIUIX 控件清单、合并关系与手机规格](miuix-component-inventory.md)。MIUIX 源码值属于第三方候选；实现方式仍服从 Flutter 与本项目主题原则。
 
 ## 一、公共属性的基本原则
 

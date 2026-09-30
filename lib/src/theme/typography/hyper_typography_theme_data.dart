@@ -8,7 +8,7 @@ import 'hyper_typography_scheme.dart';
 final class HyperTypographyThemeData {
   const HyperTypographyThemeData({
     this.phone = const HyperTypographyScheme(),
-    this.tablet = const HyperTypographyScheme(),
+    this.tablet = const HyperTypographyScheme(breadcrumb: 14),
     this.desktop = const HyperTypographyScheme.desktop(),
     this.watch = const HyperTypographyScheme.watch(),
   });

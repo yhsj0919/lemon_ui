@@ -10,7 +10,7 @@ import '../../interaction/hyper_pressable.dart';
 import '../../theme/color/hyper_contrast_theme.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
-import '../progress/hyper_circular_progress_indicator.dart';
+import '../progress/hyper_circular_progress.dart';
 import 'hyper_icon_button_style.dart';
 import 'hyper_icon_button_theme.dart';
 
@@ -238,7 +238,7 @@ class _HyperIconButtonState extends State<HyperIconButton> {
             dimension: style.progressSize,
             child:
                 widget.loadingIndicator ??
-                HyperCircularProgressIndicator(
+                HyperCircularProgress(
                   size: style.progressSize,
                   thickness: style.progressThickness ?? 2,
                   color: style.progressColor ?? foreground,

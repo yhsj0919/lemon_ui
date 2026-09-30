@@ -69,7 +69,7 @@ void main() {
     final changed = sizes.copyWith(
       desktop: sizes.desktop.copyWith(
         switchSize: sizes.desktop.switchSize.copyWith(width: 50),
-        progressIndicator: sizes.desktop.progressIndicator.copyWith(
+        progress: sizes.desktop.progress.copyWith(
           circularSize: 28,
         ),
       ),
@@ -77,7 +77,7 @@ void main() {
 
     expect(changed.desktop.switchSize.width, 50);
     expect(changed.desktop.switchSize.height, sizes.desktop.switchSize.height);
-    expect(changed.desktop.progressIndicator.circularSize, 28);
+    expect(changed.desktop.progress.circularSize, 28);
     expect(changed.phone, sizes.phone);
   });
 

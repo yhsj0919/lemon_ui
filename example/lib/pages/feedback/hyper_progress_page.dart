@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 /// 展示基础进度控件的确定、不确定、主题和减少动画状态。
-class HyperProgressIndicatorPage extends StatefulWidget {
-  const HyperProgressIndicatorPage({super.key});
+class HyperProgressPage extends StatefulWidget {
+  const HyperProgressPage({super.key});
 
   @override
-  State<HyperProgressIndicatorPage> createState() =>
-      _HyperProgressIndicatorPageState();
+  State<HyperProgressPage> createState() => _HyperProgressPageState();
 }
 
-class _HyperProgressIndicatorPageState
-    extends State<HyperProgressIndicatorPage> {
+class _HyperProgressPageState extends State<HyperProgressPage> {
   double _value = .35;
   bool _disableAnimations = false;
 
@@ -19,10 +17,8 @@ class _HyperProgressIndicatorPageState
   Widget build(BuildContext context) {
     final parent = HyperTheme.of(context);
     final themed = parent.copyWith(
-      progressIndicatorTheme: HyperProgressIndicatorThemeData(
-        style: HyperProgressIndicatorStyle(
-          trackColor: parent.colors.surfaceMuted,
-        ),
+      progressTheme: HyperProgressThemeData(
+        style: HyperProgressStyle(trackColor: parent.colors.surfaceMuted),
       ),
     );
 
@@ -41,7 +37,7 @@ class _HyperProgressIndicatorPageState
               ),
               children: [
                 const HyperText(
-                  'HyperProgressIndicator',
+                  'HyperProgress',
                   variant: HyperTextVariant.pageTitle,
                 ),
                 const SizedBox(height: 8),
@@ -60,7 +56,7 @@ class _HyperProgressIndicatorPageState
                 const SizedBox(height: 28),
                 const HyperText('确定进度', variant: HyperTextVariant.sectionTitle),
                 const SizedBox(height: 16),
-                HyperProgressIndicator.linear(
+                HyperProgress.linear(
                   value: _value,
                   semanticsLabel: '下载进度',
                   semanticsValue: '${(_value * 100).round()}%',
@@ -68,7 +64,7 @@ class _HyperProgressIndicatorPageState
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    HyperProgressIndicator.circular(
+                    HyperProgress.circular(
                       value: _value,
                       size: 48,
                       thickness: 4,
@@ -97,21 +93,54 @@ class _HyperProgressIndicatorPageState
                 ),
                 const SizedBox(height: 32),
                 const HyperText(
+                  '宽条与 Slider 对照',
+                  variant: HyperTextVariant.sectionTitle,
+                ),
+                const SizedBox(height: 16),
+                HyperProgress.linear(
+                  value: _value,
+                  variant: HyperProgressVariant.wide,
+                  semanticsLabel: '宽条进度',
+                ),
+                const SizedBox(height: 16),
+                HyperSlider(
+                  value: _value,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                const SizedBox(height: 16),
+                const HyperProgress.linear(
+                  variant: HyperProgressVariant.wide,
+                  semanticsLabel: '宽条加载中',
+                ),
+                const SizedBox(height: 16),
+                HyperProgressTheme(
+                  data: HyperProgressThemeData(
+                    linearStyle: HyperProgressStyle(
+                      variant: HyperProgressVariant.wide,
+                      color: parent.colors.primary,
+                      radius: 6,
+                      fillRadius: 6,
+                    ),
+                  ),
+                  child: HyperProgress.linear(value: _value),
+                ),
+                const SizedBox(height: 32),
+                const HyperText(
                   '不确定进度',
                   variant: HyperTextVariant.sectionTitle,
                 ),
                 const SizedBox(height: 16),
-                const HyperLinearProgressIndicator(semanticsLabel: '正在加载'),
+                const HyperLinearProgress(semanticsLabel: '正在加载'),
                 const SizedBox(height: 20),
                 const Row(
                   children: [
-                    HyperCircularProgressIndicator(),
+                    HyperCircularProgress(),
                     SizedBox(width: 20),
-                    HyperCircularProgressIndicator(size: 40, thickness: 4),
+                    HyperCircularProgress(size: 40, thickness: 4),
                     SizedBox(width: 20),
-                    HyperInfiniteProgressIndicator(semanticsLabel: '无限等待进度'),
+                    HyperInfiniteProgress(semanticsLabel: '无限等待进度'),
                     SizedBox(width: 20),
-                    HyperInfiniteProgressIndicator(
+                    HyperInfiniteProgress(
                       size: 40,
                       thickness: 3,
                       orbitingDotSize: 4,
@@ -131,7 +160,7 @@ class _HyperProgressIndicatorPageState
                   children: [
                     const Column(
                       children: [
-                        HyperCircularProgressIndicator(),
+                        HyperCircularProgress(),
                         SizedBox(height: 8),
                         HyperText('普通圆环'),
                       ],
@@ -156,17 +185,15 @@ class _HyperProgressIndicatorPageState
                   variant: HyperTextVariant.sectionTitle,
                 ),
                 const SizedBox(height: 16),
-                HyperProgressIndicatorTheme(
-                  data: const HyperProgressIndicatorThemeData(
-                    style: HyperProgressIndicatorStyle(
-                      color: Color(0xFFFF9500),
-                    ),
+                HyperProgressTheme(
+                  data: const HyperProgressThemeData(
+                    style: HyperProgressStyle(color: Color(0xFFFF9500)),
                   ),
                   child: Column(
                     children: [
-                      HyperLinearProgressIndicator(value: _value),
+                      HyperLinearProgress(value: _value),
                       const SizedBox(height: 20),
-                      HyperCircularProgressIndicator(
+                      HyperCircularProgress(
                         value: _value,
                         color: parent.colors.primary,
                         size: 36,

@@ -11,6 +11,9 @@ final class HyperDividerThemeData {
   /// 所有 HyperDivider 共用的样式。
   final HyperDividerStyle style;
 
+  HyperDividerThemeData copyWith({HyperDividerStyle? style}) =>
+      HyperDividerThemeData(style: style ?? this.style);
+
   /// 合并一层主题覆盖。
   HyperDividerThemeData merge(HyperDividerThemeData? other) {
     if (other == null) return this;

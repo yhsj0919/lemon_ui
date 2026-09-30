@@ -24,17 +24,17 @@ void main() {
         const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HyperProgressIndicator.linear(value: .4),
-            HyperProgressIndicator.circular(value: .6),
-            HyperProgressIndicator.infinite(),
+            HyperProgress.linear(value: .4),
+            HyperProgress.circular(value: .6),
+            HyperProgress.infinite(),
           ],
         ),
       ),
     );
 
-    expect(find.byType(HyperLinearProgressIndicator), findsOneWidget);
-    expect(find.byType(HyperCircularProgressIndicator), findsOneWidget);
-    expect(find.byType(HyperInfiniteProgressIndicator), findsOneWidget);
+    expect(find.byType(HyperLinearProgress), findsOneWidget);
+    expect(find.byType(HyperCircularProgress), findsOneWidget);
+    expect(find.byType(HyperInfiniteProgress), findsOneWidget);
   });
 
   testWidgets('无限进度使用 MIUIX 默认规格并支持实例覆盖', (tester) async {
@@ -43,8 +43,8 @@ void main() {
         const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HyperInfiniteProgressIndicator(),
-            HyperInfiniteProgressIndicator(
+            HyperInfiniteProgress(),
+            HyperInfiniteProgress(
               color: Colors.orange,
               size: 40,
               thickness: 3,
@@ -55,7 +55,7 @@ void main() {
       ),
     );
 
-    final indicators = find.byType(HyperInfiniteProgressIndicator);
+    final indicators = find.byType(HyperInfiniteProgress);
     expect(tester.getSize(indicators.at(0)), const Size.square(20));
     expect(tester.getSize(indicators.at(1)), const Size.square(40));
     expect(
@@ -66,7 +66,7 @@ void main() {
 
   testWidgets('无限进度遵守正常动画和减少动画设置', (tester) async {
     await tester.pumpWidget(
-      app(const HyperInfiniteProgressIndicator(), disableAnimations: false),
+      app(const HyperInfiniteProgress(), disableAnimations: false),
     );
     final animated = tester.widget<RotationTransition>(
       find.byType(RotationTransition),
@@ -75,7 +75,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     expect(animated.turns.value, isNot(before));
 
-    await tester.pumpWidget(app(const HyperInfiniteProgressIndicator()));
+    await tester.pumpWidget(app(const HyperInfiniteProgress()));
     final reduced = tester.widget<RotationTransition>(
       find.byType(RotationTransition),
     );
@@ -90,8 +90,8 @@ void main() {
         const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HyperLinearProgressIndicator(value: 2),
-            HyperCircularProgressIndicator(value: -1),
+            HyperLinearProgress(value: 2),
+            HyperCircularProgress(value: -1),
           ],
         ),
       ),
@@ -115,17 +115,17 @@ void main() {
 
   testWidgets('实例样式优先于局部和全局主题', (tester) async {
     final theme = HyperThemeData.light().copyWith(
-      progressIndicatorTheme: const HyperProgressIndicatorThemeData(
-        style: HyperProgressIndicatorStyle(color: Colors.red),
+      progressTheme: const HyperProgressThemeData(
+        style: HyperProgressStyle(color: Colors.red),
       ),
     );
     await tester.pumpWidget(
       app(
-        const HyperProgressIndicatorTheme(
-          data: HyperProgressIndicatorThemeData(
-            style: HyperProgressIndicatorStyle(color: Colors.green),
+        const HyperProgressTheme(
+          data: HyperProgressThemeData(
+            style: HyperProgressStyle(color: Colors.green),
           ),
-          child: HyperCircularProgressIndicator(
+          child: HyperCircularProgress(
             value: .5,
             color: Colors.blue,
             size: 40,
@@ -142,7 +142,7 @@ void main() {
     expect(indicator.color, Colors.blue);
     expect(indicator.strokeWidth, 4);
     expect(
-      tester.getSize(find.byType(HyperCircularProgressIndicator)),
+      tester.getSize(find.byType(HyperCircularProgress)),
       const Size.square(40),
     );
   });
@@ -159,9 +159,9 @@ void main() {
           const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              HyperLinearProgressIndicator(value: .5),
-              HyperCircularProgressIndicator(value: .5),
-              HyperInfiniteProgressIndicator(),
+              HyperLinearProgress(value: .5),
+              HyperCircularProgress(value: .5),
+              HyperInfiniteProgress(),
             ],
           ),
           theme: HyperThemeData.light(
@@ -175,11 +175,11 @@ void main() {
         ),
       );
       expect(
-        tester.getSize(find.byType(HyperLinearProgressIndicator)).height,
+        tester.getSize(find.byType(HyperLinearProgress)).height,
         entry.$2,
       );
       expect(
-        tester.getSize(find.byType(HyperCircularProgressIndicator)),
+        tester.getSize(find.byType(HyperCircularProgress)),
         Size.square(entry.$3),
       );
       expect(
@@ -191,7 +191,7 @@ void main() {
         entry.$4,
       );
       expect(
-        tester.getSize(find.byType(HyperInfiniteProgressIndicator)),
+        tester.getSize(find.byType(HyperInfiniteProgress)),
         Size.square(entry.$5),
       );
     }
@@ -200,7 +200,7 @@ void main() {
   testWidgets('线性进度尺寸颜色可覆盖且默认圆角跟随厚度', (tester) async {
     await tester.pumpWidget(
       app(
-        const HyperLinearProgressIndicator(
+        const HyperLinearProgress(
           value: .5,
           length: 180,
           thickness: 10,
@@ -214,7 +214,7 @@ void main() {
       find.byType(LinearProgressIndicator),
     );
     expect(
-      tester.getSize(find.byType(HyperLinearProgressIndicator)),
+      tester.getSize(find.byType(HyperLinearProgress)),
       const Size(180, 10),
     );
     expect(indicator.color, Colors.orange);
@@ -229,8 +229,8 @@ void main() {
         const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HyperLinearProgressIndicator(),
-            HyperCircularProgressIndicator(),
+            HyperLinearProgress(),
+            HyperCircularProgress(),
           ],
         ),
       ),

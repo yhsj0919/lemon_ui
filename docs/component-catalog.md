@@ -11,6 +11,12 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 桌面收录侧边导航、操作与提示。这里的归类用于查找 Demo，不限制组件可运行的设备，
 也不改变四端主题尺寸的解析。手表专属示例出现后再增设手表分组。
 
+## 近期实施顺序
+
+1. `HyperTag`：先做轻量内容标签，明确普通、强调和禁用状态；文字、背景、边框、圆角及四端尺寸由主题配置。它与可点击、可选择的 `HyperChip` 分工。
+2. `HyperWidgetGroup`：通用混合组件容器，接受任意 Widget 子项，可组合按钮、图标、文字等；负责排列、间距、对齐和可选的分隔/外层视觉，不接管子项的点击、焦点及内部样式。先完成通用组合，再由 `HyperButtonGroup` 等专用组件复用。
+3. `HyperAvatar`、`HyperAvatarGroup`：头像及头像组，在线状态和计数角标复用现有 `HyperBadgeAnchor`。
+
 ## 标记说明
 
 - `[ ]`：尚未实现。
@@ -35,6 +41,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperTextTheme`：字体和文本层级。
 - [x] `HyperSizeScheme`：明确数值的尺寸预设，不使用倍率缩放。
 - [x] `HyperMotionThemeData`：动画时长、曲线和弹簧。
+- [x] `HyperElasticOverscrollController`、`HyperElasticOverscrollTransform`、`HyperElasticOverscrollRegion`：拖动控件越界阻力、回弹及快捷包装。
 - [x] `HyperMaterialQuality`：明确选择 standard 或 advanced 材质质量，不进行隐式设备降级。
 - [x] `HyperSurfaceMaterial`：solid、translucent、frostedGlass 和 softLightGlass 表面材质配方。
 - [x] `HyperMaterialThemeData`：全局材质默认值、玻璃参数和普通材质降级策略。
@@ -76,21 +83,22 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [x] `HyperTitledCard`：带标题与右侧自由 action 的卡片组合，支持标题在内、在外两种布局和任意内容。
 - [ ] `HyperPanel`：页面或工具区域面板。
 - [ ] `HyperGroupBox`：带边界和标题的内容分组。
-- [x] `HyperDivider`：支持横向、纵向、纯色、渐变、实线、虚线、点线、明确尺寸和独立主题。
-- [ ] `HyperVerticalDivider`：垂直分隔线便捷控件。
+- [x] `HyperDivider`：支持横向、纵向、文字/图标内容、起点/居中/终点对齐、纯色、渐变、实线、虚线、点线、明确尺寸和独立主题。
+- [x] 垂直分隔线入口：统一使用 `HyperDivider.vertical`。
 - [ ] `HyperSpacer`：语义间距。
 - [ ] `HyperGap`：明确尺寸的间隔。
 - [ ] `HyperClip`：按 `HyperShape` 统一裁切，支持常规形状、参数化几何图形和任意异形路径。
 - [ ] `HyperAspectRatio`：比例容器。
 - [ ] `HyperConstrainedBox`：主题友好的约束容器。
 - [ ] `HyperSafeArea`：设备安全区域。
+- [~] `HyperWidgetGroup`：可混合按钮、图标、文字等任意子项的通用组合容器；支持横向/纵向、固定宽度与比例子项、统一高度、空白或线条分隔及外层边框圆角；`connected` 连续模式由组绘制外框，组内 `HyperButton` 去掉自身边框、圆角和阴影；子项圆角可统一设置或逐项设置左右侧，保留子项交互；待视觉核对。
 - [ ] `HyperBlur`：使用统一材质性能规则的可降级背景模糊。
 - [ ] `HyperGlass`：基于 `HyperSurfaceMaterial` 的玻璃表面便捷控件，不建立第二套玻璃主题。
 - [ ] `HyperGradientBorder`：渐变边框。
 - [ ] `HyperDashedBorder`：虚线边框。
 - [ ] `HyperHighlight`：高光和状态覆盖层。
-- [ ] `HyperBadge`：角标、数量和状态标记。
-- [ ] `HyperBadgeAnchor`：按明确偏移将角标定位到目标控件，不持有角标视觉主题。
+- [x] `HyperBadge`：点、数量、短文本和自定义内容徽标。
+- [x] `HyperBadgeAnchor`：九宫格位置与偏移定位，接受任意 Widget 作为徽标，不持有徽标视觉主题。
 - [ ] `HyperBannerBadge`：角落横幅标记。
 
 ## 三、布局与响应式
@@ -130,16 +138,16 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperCodeBlock`：代码展示与复制。
 - [x] `HyperIcon`：设备明确尺寸、状态样式、可变图标轴及全局/局部/实例主题覆盖。
 - [ ] `HyperIconLabel`：图标文字组合。
-- [ ] `HyperAvatar`：头像。
-- [ ] `HyperAvatarGroup`：头像组。
-- [ ] `HyperInitialsAvatar`：文字头像。
+- [~] `HyperAvatar`：图片、文字、图标与自定义内容，失败回退、四端尺寸与主题覆盖；待视觉核对。
+- [~] `HyperAvatarGroup`：横向/纵向堆叠、无重叠排列、圆形五角、中心环绕、四/九宫格、圆形/方形紧凑拼图、自定义布局、整体尺寸自适应与自定义数量溢出；待视觉核对。
+- [x] `HyperInitialsAvatar`：由 HyperAvatar 的 text 参数提供文字内容，不重复建组件。
 - [ ] `HyperNetworkImage`：网络图片状态封装。
 - [ ] `HyperPlaceholder`：内容占位。
 - [ ] `HyperLabel`：字段或内容标签。
 - [ ] `HyperCaption`：辅助说明文字。
 - [ ] `HyperLink`：文本链接。
 - [ ] `HyperKbd`：键盘按键提示。
-- [ ] `HyperTag`：标签。
+- [~] `HyperTag`：普通、强调、禁用静态标签，支持可选图标及全局、局部、实例视觉配置；默认值待目标设备视觉核对。
 - [ ] `HyperStatusIndicator`：在线、忙碌、错误等状态点。
 
 ## 五、按钮与操作
@@ -159,7 +167,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperButtonBar`：按钮排列。
 - [ ] `HyperButtonGroup`：关联按钮组。
 - [ ] `HyperSegmentedButton`：分段按钮。
-- [ ] `HyperActionChip`：轻量操作标签。
+- [x] 操作 Chip：由 `HyperChip.action` 提供轻量点击标签。
 - [ ] `HyperFloatingToolbar`：浮动工具按钮组。
 - [ ] `HyperCopyButton`：复制内容按钮。
 - [ ] `HyperAsyncButton`：不单独建立；由 `HyperButton` 的统一回调模式覆盖。
@@ -173,10 +181,10 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperRadioListTile<T>`：带说明的单选项。
 - [x] `HyperSwitch`：开关，已实现点击、键盘、实时拖动、禁用、减少动画、MIUIX 比例与滑块交互放大，并支持全局/局部/实例配置轨道和滑块的颜色、圆角、尺寸、偏移及动画。
 - [ ] `HyperSwitchListTile`：带说明的开关项。
-- [ ] `HyperChip`：通用 Chip。
-- [ ] `HyperChoiceChip`：单选 Chip。
-- [ ] `HyperFilterChip`：筛选 Chip。
-- [ ] `HyperInputChip`：可删除输入 Chip。
+- [x] `HyperChip`：受控交互标签，支持图标、头像、独立删除、禁用和三级主题。
+- [x] 单选 Chip：由 `HyperChip.choice` 提供，父级管理互斥关系。
+- [x] 筛选 Chip：由 `HyperChip.filter` 提供，父级管理多选集合。
+- [x] 输入 Chip：由 `HyperChip.input` 提供可删除标签，删除与选择独立。
 - [ ] `HyperToggleGroup<T>`：多项切换组。
 - [ ] `HyperSelectionTile<T>`：通用选择项。
 - [ ] `HyperColorPicker`：颜色选择器。
@@ -187,10 +195,11 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 七、数值、范围与调节
 
-- [ ] `HyperSlider`：单值滑块。
-- [ ] `HyperRangeSlider`：范围滑块。
+- [x] `HyperSlider`：单值滑块。
+- [x] `HyperRangeSlider`：范围滑块。
 - [ ] `HyperProgressSlider`：可拖动进度条。
-- [ ] `HyperVerticalSlider`：垂直滑块。
+- [x] `HyperVerticalSlider`：垂直滑块。
+- [x] `HyperCapsuleSlider`：整块填充的竖向胶囊滑块，支持上下图标操作。
 - [ ] `HyperStepper`：步进调节。
 - [ ] `HyperCounter`：加减计数器。
 - [ ] `HyperNumberPicker`：数字选择器。
@@ -301,7 +310,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperSparkline`：迷你趋势线。
 - [ ] `HyperGauge`：仪表盘。
 - [ ] `HyperAsyncView<T>`：异步数据状态切换。
-- [ ] `HyperEmptyState`：空状态。
+- [x] `HyperEmptyState`：默认图标、自定义插图、标题、说明、附加内容和可换行操作区；四端尺寸、三级主题覆盖及内容过渡，Demo 包含无数据、搜索无结果和失败场景。
 - [ ] `HyperErrorView`：错误状态。
 - [ ] `HyperResult`：成功、失败和结果页面。
 
@@ -318,7 +327,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [x] `HyperTabBar`：默认共享底槽的 `.segmented`，另有独立圆角标签的 `.separated` 和普通下划线的 `.underline` 形态。
 - [x] `HyperTabBarView`：与标签栏共享控制器的标签内容。
 - [ ] `HyperSegmentedNavigation`：分段导航。
-- [ ] `HyperBreadcrumb`：面包屑。
+- [x] `HyperBreadcrumb`：胶囊路径导航，节点点击、独立高亮与横向滚动。
 - [ ] `HyperPagination`：页码导航。
 - [ ] `HyperPageIndicator`：页面指示器。
 - [ ] `HyperStepperNavigation`：步骤导航。
@@ -376,16 +385,16 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperNotificationCenter`：应用内通知列表。
 - [ ] `HyperAlert`：内联提示块。
 - [ ] `HyperLoadingOverlay`：区域或页面加载遮罩。
-- [x] `HyperProgressIndicator`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
-- [x] `HyperLinearProgressIndicator`：支持确定/不确定进度、明确尺寸、圆角、语义、减少动画和三级主题覆盖。
+- [x] `HyperProgress`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
+- [x] `HyperLinearProgress`：支持确定/不确定进度、明确尺寸、圆角、语义、减少动画和三级主题覆盖。
 - [ ] `HyperWormProgressIndicator`：类似蚯蚓伸缩、移动的线性进度，支持确定和不确定进度。
-- [~] `HyperCircularProgressIndicator`：确定/不确定进度、设备尺寸、端点、语义、减少动画和三级主题覆盖已完成；`.infinite` 轨道点形态待补充。
+- [~] `HyperCircularProgress`：确定/不确定进度、设备尺寸、端点、语义、减少动画和三级主题覆盖已完成；`.infinite` 轨道点形态待补充。
 - [ ] `HyperLoadingSpinner`：加载旋转器。
 - [ ] `HyperActivityIndicator`：活动指示器。
 - [ ] `HyperActivityRing`：活动圆环。
 - [ ] `HyperProgressRing`：环形进度。
 - [ ] `HyperCountdown`：倒计时显示。
-- [ ] `HyperSkeleton`：骨架占位。
+- [x] `HyperSkeleton`：文本行、圆形、圆角矩形占位，微光、呼吸与静态效果；支持内容淡入、减少动画及三级主题覆盖，列表与卡片由父布局组合。
 - [ ] `HyperShimmer`：闪烁加载效果。
 - [ ] `HyperRetry`：错误与重试组合。
 - [ ] `HyperConnectionStatus`：网络连接状态。
@@ -401,7 +410,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperAudioPlayer`：音频播放界面。
 - [ ] `HyperMediaController`：播放控制条。
 - [ ] `HyperPlaybackButton`：播放和暂停按钮。
-- [ ] `HyperVolumeSlider`：音量滑块。
+- [x] `HyperCapsuleSlider`：胶囊滑块。
 - [ ] `HyperBrightnessSlider`：亮度滑块。
 - [ ] `HyperSeekBar`：播放进度定位。
 - [ ] `HyperWaveform`：音频波形。
@@ -597,7 +606,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperArcRangeSlider`：圆弧范围滑块。
 - [ ] `HyperCircularSlider`：完整圆环滑块。
 - [ ] `HyperArcProgressIndicator`：圆弧进度。
-- [ ] `HyperCircularProgressIndicator`：完整圆环进度。
+- [ ] `HyperCircularProgress`：完整圆环进度。
 - [ ] `HyperSegmentedRing`：分段圆环状态。
 - [ ] `HyperActivityRings`：多层活动圆环。
 - [ ] `HyperArcGauge`：圆弧仪表。
@@ -838,3 +847,9 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - Example 中包含可运行、可直观看到效果的 Demo，以及全部关键状态和主题覆盖对照。
 - Widget 测试、主题测试和必要的 Golden 测试通过。
 - API 文档和迁移说明完整。
+
+### HyperSegmentedButton
+
+受控分段按钮，支持单选、多选、可清空、图标、禁用项、横向/纵向与等分宽度。
+复用 WidgetGroup 的连接布局与基础按钮尺寸，通过 segmentedButtonTheme 和
+HyperSegmentedButtonStyle 配置整体与选中视觉；页面导航继续使用 HyperTab。

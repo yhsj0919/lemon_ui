@@ -11,7 +11,8 @@ import '../../theme/color/hyper_contrast_theme.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
 import '../../theme/size/components/hyper_button_size.dart';
-import '../progress/hyper_circular_progress_indicator.dart';
+import '../progress/hyper_circular_progress.dart';
+import '../widget_group/hyper_widget_group_scope.dart';
 import 'hyper_button_style.dart';
 import 'hyper_button_theme.dart';
 
@@ -241,7 +242,27 @@ class _HyperButtonState extends State<HyperButton> {
       pressOverlayOpacity: metrics.pressOverlayOpacity,
     ).merge(_variantDefaults(context));
     final themedStyle = HyperButtonTheme.of(context).resolve(widget.variant);
-    final style = defaults.merge(themedStyle).merge(widget.style);
+    final groupScope = HyperWidgetGroupScope.maybeOf(context);
+    final groupConnected = groupScope?.connected ?? false;
+    final style = defaults
+        .merge(themedStyle)
+        .merge(widget.style)
+        .merge(
+          groupConnected
+              ? HyperButtonStyle(
+                  border: BorderSide.none,
+                  borderRadius: BorderRadius.zero,
+                  boxShadow: const [],
+                  margin: EdgeInsets.zero,
+                  minimumTapTargetSize: Size.zero,
+                  height: groupScope?.itemHeight,
+                  width: groupScope?.fillWidth == true ? double.infinity : null,
+                  minimumSize: groupScope?.itemHeight == null
+                      ? null
+                      : Size(0, groupScope!.itemHeight!),
+                )
+              : null,
+        );
     final materialTheme = HyperMaterialTheme.of(context);
     final material = materialTheme.resolveMaterial(material: style.material);
     final explicitBackground = style.material == null
@@ -412,7 +433,7 @@ class _HyperButtonState extends State<HyperButton> {
                     dimension: style.progressSize,
                     child:
                         widget.loadingIndicator ??
-                        HyperCircularProgressIndicator(
+                        HyperCircularProgress(
                           value: widget.progress,
                           size: style.progressSize,
                           thickness: style.progressThickness ?? 2,

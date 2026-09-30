@@ -8,6 +8,7 @@ import 'hyper_divider_theme.dart';
 class HyperDivider extends StatelessWidget {
   const HyperDivider({
     super.key,
+    this.child,
     this.style,
     this.color,
     this.gradient,
@@ -24,6 +25,7 @@ class HyperDivider extends StatelessWidget {
   /// 创建垂直分隔线。
   const HyperDivider.vertical({
     super.key,
+    this.child,
     this.style,
     this.color,
     this.gradient,
@@ -39,6 +41,9 @@ class HyperDivider extends StatelessWidget {
 
   /// 当前实例的样式，优先级高于全局和局部主题。
   final HyperDividerStyle? style;
+
+  /// 文字、图标或任意自定义内容。
+  final Widget? child;
 
   /// 分隔线方向。
   final Axis axis;
@@ -87,6 +92,14 @@ class HyperDivider extends StatelessWidget {
       pattern: HyperDividerPattern.solid,
       dashLength: metrics.dashLength,
       gap: metrics.gap,
+      contentGap: metrics.contentGap,
+      edgeExtent: metrics.edgeExtent,
+      iconSize: metrics.iconSize,
+      iconColor: theme.colors.textSecondary,
+      textStyle: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colors.textSecondary,
+      ),
+      contentAlignment: HyperDividerContentAlignment.center,
     );
     final resolved = defaults
         .merge(HyperDividerTheme.of(context).style)
@@ -96,33 +109,104 @@ class HyperDivider extends StatelessWidget {
     final resolvedIndent = indent ?? resolved.indent!;
     final resolvedEndIndent = endIndent ?? resolved.endIndent!;
 
-    final painter = _HyperDividerPainter(
-      axis: axis,
-      color: color ?? resolved.color!,
-      gradient: gradient ?? resolved.gradient,
+    final target = resolved.copyWith(
       thickness: resolvedThickness,
-      radius: radius ?? resolved.radius!,
-      pattern: pattern ?? resolved.pattern!,
-      dashLength: dashLength ?? resolved.dashLength!,
-      gap: gap ?? resolved.gap!,
+      length: resolvedLength,
+      indent: resolvedIndent,
+      endIndent: resolvedEndIndent,
+      color: color,
+      gradient: gradient,
+      radius: radius,
+      pattern: pattern,
+      dashLength: dashLength,
+      gap: gap,
     );
-    final line = CustomPaint(
-      painter: painter,
-      size: axis == Axis.horizontal
-          ? Size(resolvedLength ?? double.infinity, resolvedThickness)
-          : Size(resolvedThickness, resolvedLength ?? double.infinity),
+    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    return TweenAnimationBuilder<HyperDividerStyle>(
+      tween: _DividerTween(end: target),
+      duration: reduce
+          ? Duration.zero
+          : target.duration ?? theme.motion.fastDuration,
+      curve: target.curve ?? theme.motion.fastCurve,
+      builder: (context, current, _) => _layout(context, current),
     );
+  }
 
+  Widget _layout(BuildContext context, HyperDividerStyle current) {
+    Widget line([double? extent]) => ExcludeSemantics(
+      child: CustomPaint(
+        painter: _HyperDividerPainter(
+          axis: axis,
+          color: current.color!,
+          gradient: current.gradient,
+          thickness: current.thickness!,
+          radius: current.radius!,
+          pattern: current.pattern!,
+          dashLength: current.dashLength!,
+          gap: current.gap!,
+        ),
+        size: axis == Axis.horizontal
+            ? Size(extent ?? double.infinity, current.thickness!)
+            : Size(current.thickness!, extent ?? double.infinity),
+      ),
+    );
+    Widget result;
+    if (child == null) {
+      result = line(current.length);
+    } else {
+      final content = Flexible(
+        child: DefaultTextStyle(
+          style: current.textStyle ?? const TextStyle(),
+          child: IconTheme(
+            data: IconThemeData(
+              size: current.iconSize,
+              color: current.iconColor,
+            ),
+            child: child!,
+          ),
+        ),
+      );
+      Widget gap() => axis == Axis.horizontal
+          ? SizedBox(width: current.contentGap)
+          : SizedBox(height: current.contentGap);
+      final position = current.contentAlignment!;
+      result = SizedBox(
+        width: axis == Axis.horizontal ? current.length : null,
+        height: axis == Axis.vertical ? current.length : null,
+        child: Flex(
+          direction: axis,
+          children: [
+            if (position == HyperDividerContentAlignment.start)
+              line(current.edgeExtent)
+            else
+              Expanded(child: line()),
+            gap(),
+            content,
+            gap(),
+            if (position == HyperDividerContentAlignment.end)
+              line(current.edgeExtent)
+            else
+              Expanded(child: line()),
+          ],
+        ),
+      );
+    }
     return Padding(
       padding: axis == Axis.horizontal
           ? EdgeInsetsDirectional.only(
-              start: resolvedIndent,
-              end: resolvedEndIndent,
+              start: current.indent!,
+              end: current.endIndent!,
             )
-          : EdgeInsets.only(top: resolvedIndent, bottom: resolvedEndIndent),
-      child: line,
+          : EdgeInsets.only(top: current.indent!, bottom: current.endIndent!),
+      child: result,
     );
   }
+}
+
+class _DividerTween extends Tween<HyperDividerStyle> {
+  _DividerTween({required HyperDividerStyle end}) : super(end: end);
+  @override
+  HyperDividerStyle lerp(double t) => HyperDividerStyle.lerp(begin!, end!, t);
 }
 
 class _HyperDividerPainter extends CustomPainter {
@@ -148,7 +232,10 @@ class _HyperDividerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (!size.isFinite || size.isEmpty || thickness <= 0) return;
     final rect = Offset.zero & size;
+    canvas.save();
+    canvas.clipRect(rect);
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill
@@ -157,6 +244,7 @@ class _HyperDividerPainter extends CustomPainter {
 
     if (pattern == HyperDividerPattern.solid) {
       _drawSegment(canvas, paint, 0, extent);
+      canvas.restore();
       return;
     }
 
@@ -165,7 +253,11 @@ class _HyperDividerPainter extends CustomPainter {
         : dashLength;
     final step =
         (pattern == HyperDividerPattern.dotted ? thickness : dashLength) + gap;
-    for (var start = 0.0; start <= extent; start += step) {
+    for (
+      var start = 0.0;
+      start <= extent;
+      start += step > 0 ? step : extent + 1
+    ) {
       _drawSegment(
         canvas,
         paint,
@@ -173,6 +265,7 @@ class _HyperDividerPainter extends CustomPainter {
         (start + segmentLength).clamp(0, extent),
       );
     }
+    canvas.restore();
   }
 
   void _drawSegment(Canvas canvas, Paint paint, double start, double end) {

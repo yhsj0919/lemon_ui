@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
-import 'hyper_progress_indicator_style.dart';
-import 'hyper_progress_indicator_theme.dart';
+import 'hyper_progress_style.dart';
+import 'hyper_progress_theme.dart';
 
 /// MIUIX 风格的圆环加轨道圆点无限进度指示器。
-class HyperInfiniteProgressIndicator extends StatefulWidget {
-  const HyperInfiniteProgressIndicator({
+class HyperInfiniteProgress extends StatefulWidget {
+  const HyperInfiniteProgress({
     super.key,
     this.style,
     this.color,
@@ -19,7 +19,7 @@ class HyperInfiniteProgressIndicator extends StatefulWidget {
     this.excludeSemantics = false,
   });
 
-  final HyperProgressIndicatorStyle? style;
+  final HyperProgressStyle? style;
   final Color? color;
   final double? size;
   final double? thickness;
@@ -32,21 +32,19 @@ class HyperInfiniteProgressIndicator extends StatefulWidget {
   final bool excludeSemantics;
 
   @override
-  State<HyperInfiniteProgressIndicator> createState() =>
-      _HyperInfiniteProgressIndicatorState();
+  State<HyperInfiniteProgress> createState() => _HyperInfiniteProgressState();
 }
 
-class _HyperInfiniteProgressIndicatorState
-    extends State<HyperInfiniteProgressIndicator>
+class _HyperInfiniteProgressState extends State<HyperInfiniteProgress>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(vsync: this);
 
-  HyperProgressIndicatorStyle _resolveStyle() {
+  HyperProgressStyle _resolveStyle() {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
-    final progressTheme = HyperProgressIndicatorTheme.of(context);
-    final metrics = sizes.progressIndicator;
-    return HyperProgressIndicatorStyle(
+    final progressTheme = HyperProgressTheme.of(context);
+    final metrics = sizes.progress;
+    return HyperProgressStyle(
           color: theme.colors.textTertiary,
           size: metrics.infiniteSize,
           thickness: 2,
@@ -79,7 +77,7 @@ class _HyperInfiniteProgressIndicatorState
   }
 
   @override
-  void didUpdateWidget(HyperInfiniteProgressIndicator oldWidget) {
+  void didUpdateWidget(HyperInfiniteProgress oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncAnimation();
   }

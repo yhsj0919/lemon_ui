@@ -1,8 +1,18 @@
+import '../../components/segmented_button/hyper_segmented_button_theme.dart';
+import '../../components/chip/hyper_chip_theme.dart';
+import '../../components/empty_state/hyper_empty_state_theme.dart';
+import '../../components/skeleton/hyper_skeleton_theme.dart';
+import '../../components/avatar/hyper_avatar_theme.dart';
+
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_surface_material.dart';
 import '../../components/button/hyper_button_theme.dart';
+import '../../components/badge/hyper_badge_theme.dart';
+import '../../components/tag/hyper_tag_theme.dart';
+import '../../components/widget_group/hyper_widget_group_theme.dart';
+import '../../components/breadcrumb/hyper_breadcrumb_theme.dart';
 import '../../components/app_bar/hyper_app_bar_theme.dart';
 import '../../components/card/hyper_card_theme.dart';
 import '../../components/card/hyper_titled_card_theme.dart';
@@ -16,10 +26,11 @@ import '../../components/icon_button/hyper_icon_button_theme.dart';
 import '../../components/list_tile/hyper_list_tile_theme.dart';
 import '../../components/menu/hyper_menu_theme.dart';
 import '../../components/menu/hyper_dropdown_menu_theme.dart';
-import '../../components/progress/hyper_progress_indicator_theme.dart';
+import '../../components/progress/hyper_progress_theme.dart';
 import '../../components/radio/hyper_radio_theme.dart';
 import '../../components/scaffold/hyper_scaffold_theme.dart';
 import '../../components/switch/hyper_switch_theme.dart';
+import '../../components/slider/hyper_slider_theme.dart';
 import '../../components/text/hyper_text_theme.dart';
 import '../color/hyper_color_scheme.dart';
 import '../color/hyper_contrast_theme.dart';
@@ -69,14 +80,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.sidebarTheme = const HyperSidebarThemeData(),
     this.menuTheme = const HyperMenuThemeData(),
     this.dropdownMenuTheme = const HyperDropdownMenuThemeData(),
+    this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
     this.cardTheme = const HyperCardThemeData(),
     this.titledCardTheme = const HyperTitledCardThemeData(),
     this.buttonTheme = const HyperButtonThemeData(),
+    this.badgeTheme = const HyperBadgeThemeData(),
+    this.tagTheme = const HyperTagThemeData(),
+    this.avatarTheme = const HyperAvatarThemeData(),
+    this.skeletonTheme = const HyperSkeletonThemeData(),
+    this.emptyStateTheme = const HyperEmptyStateThemeData(),
+    this.segmentedButtonTheme = const HyperSegmentedButtonThemeData(),
+    this.chipTheme = const HyperChipThemeData(),
+    this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
     this.iconTheme = const HyperIconThemeData(),
     this.dividerTheme = const HyperDividerThemeData(),
-    this.progressIndicatorTheme = const HyperProgressIndicatorThemeData(),
+    this.progressTheme = const HyperProgressThemeData(),
     this.switchTheme = const HyperSwitchThemeData(),
+    this.sliderTheme = const HyperSliderThemeData(),
     this.checkboxTheme = const HyperCheckboxThemeData(),
     this.radioTheme = const HyperRadioThemeData(),
     this.listTileTheme = const HyperListTileThemeData(),
@@ -150,11 +171,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       cardTheme: const HyperCardThemeData(),
       titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
+      badgeTheme: const HyperBadgeThemeData(),
+      tagTheme: const HyperTagThemeData(),
+      avatarTheme: const HyperAvatarThemeData(),
+      widgetGroupTheme: const HyperWidgetGroupThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
       iconTheme: const HyperIconThemeData(),
       dividerTheme: const HyperDividerThemeData(),
-      progressIndicatorTheme: const HyperProgressIndicatorThemeData(),
+      progressTheme: const HyperProgressThemeData(),
       switchTheme: const HyperSwitchThemeData(),
+      sliderTheme: const HyperSliderThemeData(),
       checkboxTheme: const HyperCheckboxThemeData(),
       radioTheme: const HyperRadioThemeData(),
       listTileTheme: const HyperListTileThemeData(),
@@ -219,11 +245,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       cardTheme: const HyperCardThemeData(),
       titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
+      badgeTheme: const HyperBadgeThemeData(),
+      tagTheme: const HyperTagThemeData(),
+      avatarTheme: const HyperAvatarThemeData(),
+      widgetGroupTheme: const HyperWidgetGroupThemeData(),
       iconButtonTheme: const HyperIconButtonThemeData(),
       iconTheme: const HyperIconThemeData(),
       dividerTheme: const HyperDividerThemeData(),
-      progressIndicatorTheme: const HyperProgressIndicatorThemeData(),
+      progressTheme: const HyperProgressThemeData(),
       switchTheme: const HyperSwitchThemeData(),
+      sliderTheme: const HyperSliderThemeData(),
       checkboxTheme: const HyperCheckboxThemeData(),
       radioTheme: const HyperRadioThemeData(),
       listTileTheme: const HyperListTileThemeData(),
@@ -275,6 +306,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局下拉选择器主题。
   final HyperDropdownMenuThemeData dropdownMenuTheme;
 
+  /// 全局面包屑视觉主题。
+  final HyperBreadcrumbThemeData breadcrumbTheme;
+
   /// 全局 Card 主题，与 Container 主题相互独立。
   final HyperCardThemeData cardTheme;
 
@@ -283,6 +317,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   /// 全局按钮主题。
   final HyperButtonThemeData buttonTheme;
+
+  /// 全局徽标主题。
+  final HyperBadgeThemeData badgeTheme;
+  final HyperTagThemeData tagTheme;
+  final HyperAvatarThemeData avatarTheme;
+  final HyperSkeletonThemeData skeletonTheme;
+  final HyperEmptyStateThemeData emptyStateTheme;
+  final HyperSegmentedButtonThemeData segmentedButtonTheme;
+  final HyperChipThemeData chipTheme;
+  final HyperWidgetGroupThemeData widgetGroupTheme;
 
   /// 全局图标按钮主题。
   final HyperIconButtonThemeData iconButtonTheme;
@@ -294,10 +338,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperDividerThemeData dividerTheme;
 
   /// 全局基础进度指示器主题。
-  final HyperProgressIndicatorThemeData progressIndicatorTheme;
+  final HyperProgressThemeData progressTheme;
 
   /// 全局开关主题。
   final HyperSwitchThemeData switchTheme;
+  final HyperSliderThemeData sliderTheme;
 
   /// 全局复选框主题。
   final HyperCheckboxThemeData checkboxTheme;
@@ -392,14 +437,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperSidebarThemeData? sidebarTheme,
     HyperMenuThemeData? menuTheme,
     HyperDropdownMenuThemeData? dropdownMenuTheme,
+    HyperBreadcrumbThemeData? breadcrumbTheme,
     HyperCardThemeData? cardTheme,
     HyperTitledCardThemeData? titledCardTheme,
     HyperButtonThemeData? buttonTheme,
+    HyperBadgeThemeData? badgeTheme,
+    HyperTagThemeData? tagTheme,
+    HyperAvatarThemeData? avatarTheme,
+    HyperSkeletonThemeData? skeletonTheme,
+    HyperEmptyStateThemeData? emptyStateTheme,
+    HyperSegmentedButtonThemeData? segmentedButtonTheme,
+    HyperChipThemeData? chipTheme,
+    HyperWidgetGroupThemeData? widgetGroupTheme,
     HyperIconButtonThemeData? iconButtonTheme,
     HyperIconThemeData? iconTheme,
     HyperDividerThemeData? dividerTheme,
-    HyperProgressIndicatorThemeData? progressIndicatorTheme,
+    HyperProgressThemeData? progressTheme,
     HyperSwitchThemeData? switchTheme,
+    HyperSliderThemeData? sliderTheme,
     HyperCheckboxThemeData? checkboxTheme,
     HyperRadioThemeData? radioTheme,
     HyperListTileThemeData? listTileTheme,
@@ -440,15 +495,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       sidebarTheme: sidebarTheme ?? this.sidebarTheme,
       menuTheme: menuTheme ?? this.menuTheme,
       dropdownMenuTheme: dropdownMenuTheme ?? this.dropdownMenuTheme,
+      breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
       cardTheme: cardTheme ?? this.cardTheme,
       titledCardTheme: titledCardTheme ?? this.titledCardTheme,
       buttonTheme: buttonTheme ?? this.buttonTheme,
+      badgeTheme: badgeTheme ?? this.badgeTheme,
+      tagTheme: tagTheme ?? this.tagTheme,
+      avatarTheme: avatarTheme ?? this.avatarTheme,
+      skeletonTheme: skeletonTheme ?? this.skeletonTheme,
+      emptyStateTheme: emptyStateTheme ?? this.emptyStateTheme,
+      segmentedButtonTheme: segmentedButtonTheme ?? this.segmentedButtonTheme,
+      chipTheme: chipTheme ?? this.chipTheme,
+      widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
       iconTheme: iconTheme ?? this.iconTheme,
       dividerTheme: dividerTheme ?? this.dividerTheme,
-      progressIndicatorTheme:
-          progressIndicatorTheme ?? this.progressIndicatorTheme,
+      progressTheme: progressTheme ?? this.progressTheme,
       switchTheme: switchTheme ?? this.switchTheme,
+      sliderTheme: sliderTheme ?? this.sliderTheme,
       checkboxTheme: checkboxTheme ?? this.checkboxTheme,
       radioTheme: radioTheme ?? this.radioTheme,
       listTileTheme: listTileTheme ?? this.listTileTheme,
@@ -496,6 +560,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.dropdownMenuTheme,
         t,
       ),
+      breadcrumbTheme: HyperBreadcrumbThemeData.lerp(
+        breadcrumbTheme,
+        other.breadcrumbTheme,
+        t,
+      ),
       cardTheme: HyperCardThemeData.lerp(cardTheme, other.cardTheme, t),
       titledCardTheme: HyperTitledCardThemeData.lerp(
         titledCardTheme,
@@ -503,6 +572,30 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       buttonTheme: HyperButtonThemeData.lerp(buttonTheme, other.buttonTheme, t),
+      badgeTheme: HyperBadgeThemeData.lerp(badgeTheme, other.badgeTheme, t),
+      tagTheme: HyperTagThemeData.lerp(tagTheme, other.tagTheme, t),
+      avatarTheme: HyperAvatarThemeData.lerp(avatarTheme, other.avatarTheme, t),
+      segmentedButtonTheme: HyperSegmentedButtonThemeData.lerp(
+        segmentedButtonTheme,
+        other.segmentedButtonTheme,
+        t,
+      ),
+      chipTheme: HyperChipThemeData.lerp(chipTheme, other.chipTheme, t),
+      emptyStateTheme: HyperEmptyStateThemeData.lerp(
+        emptyStateTheme,
+        other.emptyStateTheme,
+        t,
+      ),
+      skeletonTheme: HyperSkeletonThemeData.lerp(
+        skeletonTheme,
+        other.skeletonTheme,
+        t,
+      ),
+      widgetGroupTheme: HyperWidgetGroupThemeData.lerp(
+        widgetGroupTheme,
+        other.widgetGroupTheme,
+        t,
+      ),
       iconButtonTheme: HyperIconButtonThemeData.lerp(
         iconButtonTheme,
         other.iconButtonTheme,
@@ -514,12 +607,13 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.dividerTheme,
         t,
       ),
-      progressIndicatorTheme: HyperProgressIndicatorThemeData.lerp(
-        progressIndicatorTheme,
-        other.progressIndicatorTheme,
+      progressTheme: HyperProgressThemeData.lerp(
+        progressTheme,
+        other.progressTheme,
         t,
       ),
       switchTheme: HyperSwitchThemeData.lerp(switchTheme, other.switchTheme, t),
+      sliderTheme: HyperSliderThemeData.lerp(sliderTheme, other.sliderTheme, t),
       checkboxTheme: HyperCheckboxThemeData.lerp(
         checkboxTheme,
         other.checkboxTheme,
@@ -566,14 +660,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.sidebarTheme == sidebarTheme &&
           other.menuTheme == menuTheme &&
           other.dropdownMenuTheme == dropdownMenuTheme &&
+          other.breadcrumbTheme == breadcrumbTheme &&
           other.cardTheme == cardTheme &&
           other.titledCardTheme == titledCardTheme &&
           other.buttonTheme == buttonTheme &&
+          other.badgeTheme == badgeTheme &&
+          other.skeletonTheme == skeletonTheme &&
+          other.emptyStateTheme == emptyStateTheme &&
+          other.segmentedButtonTheme == segmentedButtonTheme &&
+          other.chipTheme == chipTheme &&
+          other.avatarTheme == avatarTheme &&
+          other.tagTheme == tagTheme &&
+          other.widgetGroupTheme == widgetGroupTheme &&
           other.iconButtonTheme == iconButtonTheme &&
           other.iconTheme == iconTheme &&
           other.dividerTheme == dividerTheme &&
-          other.progressIndicatorTheme == progressIndicatorTheme &&
+          other.progressTheme == progressTheme &&
           other.switchTheme == switchTheme &&
+          other.sliderTheme == sliderTheme &&
           other.checkboxTheme == checkboxTheme &&
           other.radioTheme == radioTheme &&
           other.listTileTheme == listTileTheme &&
@@ -596,14 +700,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     sidebarTheme,
     menuTheme,
     dropdownMenuTheme,
+    breadcrumbTheme,
     cardTheme,
     titledCardTheme,
     buttonTheme,
+    badgeTheme,
+    skeletonTheme,
+    emptyStateTheme,
+    segmentedButtonTheme,
+    chipTheme,
+    avatarTheme,
+    tagTheme,
+    widgetGroupTheme,
     iconButtonTheme,
     iconTheme,
     dividerTheme,
-    progressIndicatorTheme,
+    progressTheme,
     switchTheme,
+    sliderTheme,
     checkboxTheme,
     radioTheme,
     listTileTheme,

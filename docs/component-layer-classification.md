@@ -35,7 +35,7 @@
 - `HyperHoverRegion`、`HyperFocusRing`、`HyperShortcutScope`：桌面专项与交互辅助共用。
 - `HyperDragRegion`：普通拖动区域与窗口拖动语义通过明确参数或专用适配层区分。
 - `HyperMasterDetail`、`HyperNavigationSplitView`：通用大屏布局与平板专项共用。
-- `HyperCircularSlider`、`HyperCircularProgressIndicator`：通用版本提供基础能力，手表只提供尺寸和交互适配。
+- `HyperCircularSlider`、`HyperCircularProgress`：通用版本提供基础能力，手表只提供尺寸和交互适配。
 - `HyperWindowSwitcher`：桌面单窗口阶段只提供界面，多窗口阶段再接入真实窗口模型。
 - `HyperChartLegend` 作为正式图表图例；原 `HyperLegend` 不再单独实现。
 - `HyperDescriptions` 作为正式描述列表；原 `HyperDescriptionList` 作为兼容命名候选，不重复实现。
@@ -51,7 +51,7 @@
 - 材质与装饰：`HyperFill`、`HyperBorder`、`HyperShadow`、`HyperMaterialQuality`、`HyperSurfaceMaterial`、`HyperMaterialThemeData`、`HyperMaterialTheme`。
 - 状态与设备：`HyperControlState`、`HyperStateValue<T>`、`HyperAsyncState<T>`、`HyperAsyncConcurrency`、`HyperDeviceType`、`HyperDeviceDetector`。
 - 交互与辅助：`HyperPressable`、`HyperGestureRegion`、`HyperHoverRegion`、`HyperFocusScope`、`HyperFocusRing`、`HyperAccessibleTapTarget`、`HyperSemantics`。
-- 当前已完成的视觉核心：`HyperContainer`、`HyperMaterialSurface`、`HyperText`、`HyperIcon`、`HyperDivider`、`HyperProgressIndicator`、`HyperLinearProgressIndicator`、`HyperCircularProgressIndicator`、`HyperButton`、`HyperIconButton`、`HyperCheckbox`、`HyperRadio<T>`、`HyperSwitch`。
+- 当前已完成的视觉核心：`HyperContainer`、`HyperMaterialSurface`、`HyperText`、`HyperIcon`、`HyperDivider`、`HyperProgress`、`HyperLinearProgress`、`HyperCircularProgress`、`HyperButton`、`HyperIconButton`、`HyperCheckbox`、`HyperRadio<T>`、`HyperSwitch`。
 
 ### B1：文字、图标、表面与轻量布局
 
@@ -60,19 +60,19 @@
 - 内容：`HyperText`、`HyperSelectableText`、`HyperRichText`、`HyperIcon`、`HyperIconLabel`、`HyperLabel`、`HyperCaption`、`HyperLink`、`HyperKbd`、`HyperTag`、`HyperStatusIndicator`、`HyperAvatar`、`HyperAvatarGroup`、`HyperInitialsAvatar`、`HyperPlaceholder`。
 - 表面：`HyperSurface`、`HyperCard`、`HyperPanel`、`HyperSection`、`HyperGroupBox`、`HyperDivider`、`HyperVerticalDivider`、`HyperBadge`、`HyperBadgeAnchor`。
 - 间距与约束：`HyperSpacer`、`HyperGap`、`HyperAspectRatio`、`HyperConstrainedBox`、`HyperSafeArea`。
-- 常用布局：`HyperRow`、`HyperColumn`、`HyperWrap`、`HyperStack`、`HyperGrid`、`HyperScrollable`、`HyperScrollbar`。
+- 常用布局：`HyperRow`、`HyperColumn`、`HyperWrap`、`HyperStack`、`HyperGrid`、`HyperWidgetGroup`、`HyperScrollable`、`HyperScrollbar`。
 - 响应式构建：`HyperResponsiveBuilder`、`HyperBreakpointBuilder`、`HyperOrientationBuilder`、`HyperDeviceBuilder`。
 
 ### B2：基础操作、选择与调节
 
 - 按钮：`HyperCloseButton`、`HyperBackButton`、`HyperToggleButton`、`HyperButtonBar`、`HyperButtonGroup`、`HyperSegmentedButton`、`HyperActionChip`、`HyperCopyButton`。
 - 选择组合：`HyperCheckboxListTile`、`HyperRadioGroup<T>`、`HyperRadioListTile<T>`、`HyperSwitchListTile`、`HyperChip`、`HyperChoiceChip`、`HyperFilterChip`、`HyperInputChip`、`HyperToggleGroup<T>`、`HyperSelectionTile<T>`。
-- 基础数值调节：`HyperSlider`、`HyperRangeSlider`、`HyperVerticalSlider`、`HyperStepper`、`HyperCounter`、`HyperLevelIndicator`。
+- 基础数值调节：`HyperSlider`、`HyperRangeSlider`、`HyperVerticalSlider`、`HyperCapsuleSlider`、`HyperStepper`、`HyperCounter`、`HyperLevelIndicator`。
 - 常用状态切换：`HyperFavoriteButton`、`HyperLikeButton`、`HyperRating`。
 
 ### B3：进度、提示与页面状态
 
-- 进度：`HyperProgressIndicator`、`HyperLinearProgressIndicator`、`HyperWormProgressIndicator`、`HyperCircularProgressIndicator`、`HyperLoadingSpinner`、`HyperActivityIndicator`、`HyperActivityRing`、`HyperProgressRing`。
+- 进度：`HyperProgress`、`HyperLinearProgress`、`HyperWormProgressIndicator`、`HyperCircularProgress`、`HyperLoadingSpinner`、`HyperActivityIndicator`、`HyperActivityRing`、`HyperProgressRing`。
 - 页面状态：`HyperAsyncView<T>`、`HyperEmptyState`、`HyperErrorView`、`HyperResult`、`HyperRetry`。
 - 轻量反馈：`HyperAlert`、`HyperBanner`、`HyperLoadingOverlay`、`HyperSkeleton`、`HyperShimmer`、`HyperCountdown`、`HyperConnectionStatus`、`HyperOfflineBanner`。
 - 基础状态展示：`HyperTimeline`、`HyperStepIndicator`、`HyperMetric`、`HyperStatCard`、`HyperDotIndicator`、`HyperTracker`。
@@ -151,7 +151,7 @@
 ### A6：媒体、文件与系统控制
 
 - 图片：`HyperNetworkImage`、`HyperImage`、`HyperImageViewer`、`HyperGallery`、`HyperCarousel`、`HyperThumbnail`。
-- 音视频：`HyperVideoPlayer`、`HyperAudioPlayer`、`HyperMediaController`、`HyperPlaybackButton`、`HyperVolumeSlider`、`HyperBrightnessSlider`、`HyperSeekBar`、`HyperWaveform`。
+- 音视频：`HyperVideoPlayer`、`HyperAudioPlayer`、`HyperMediaController`、`HyperPlaybackButton`、`HyperBrightnessSlider`、`HyperSeekBar`、`HyperWaveform`。
 - 文件：`HyperFileTile`、`HyperFilePickerField`、`HyperDropZone`、`HyperUpload`、`HyperDownload`。
 - 系统界面：`HyperQuickSettingsTile`、`HyperControlCenter`、`HyperDeviceControl`、`HyperConnectivityTile`、`HyperBluetoothTile`、`HyperWifiTile`、`HyperAirplaneModeTile`、`HyperBatteryIndicator`、`HyperSignalIndicator`、`HyperVolumeControl`、`HyperBrightnessControl`、`HyperMediaSession`、`HyperDeviceCard`、`HyperPermissionPrompt`、`HyperBiometricPrompt`。
 
@@ -179,7 +179,7 @@
 接下来只从基础层选择新控件，顺序如下：
 
 1. `HyperText`、`HyperIcon`、`HyperDivider`、`HyperSurface`。
-2. `HyperProgressIndicator`、`HyperLinearProgressIndicator`、`HyperCircularProgressIndicator`、`HyperWormProgressIndicator`。
+2. `HyperProgress`、`HyperLinearProgress`、`HyperCircularProgress`、`HyperWormProgressIndicator`。
 3. `HyperSlider`、`HyperRangeSlider`、`HyperStepper`。
 4. `HyperTextField`、`HyperTextArea`、`HyperFormField<T>`、`HyperForm`。
 5. `HyperListTile`、三个选择类 ListTile、`HyperItem`、`HyperSection`。

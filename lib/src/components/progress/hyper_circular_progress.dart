@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
-import 'hyper_progress_indicator_style.dart';
-import 'hyper_progress_indicator_theme.dart';
+import 'hyper_progress_style.dart';
+import 'hyper_progress_theme.dart';
 
 /// 使用 Hyper 语义色和 MIUIX 默认规格的圆形进度指示器。
-class HyperCircularProgressIndicator extends StatelessWidget {
-  const HyperCircularProgressIndicator({
+class HyperCircularProgress extends StatelessWidget {
+  const HyperCircularProgress({
     super.key,
     this.value,
     this.style,
@@ -24,7 +24,7 @@ class HyperCircularProgressIndicator extends StatelessWidget {
 
   /// 确定进度；null 表示不确定进度。
   final double? value;
-  final HyperProgressIndicatorStyle? style;
+  final HyperProgressStyle? style;
   final Color? color;
   final Color? trackColor;
   final double? size;
@@ -40,10 +40,10 @@ class HyperCircularProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
-    final progressTheme = HyperProgressIndicatorTheme.of(context);
-    final metrics = sizes.progressIndicator;
+    final progressTheme = HyperProgressTheme.of(context);
+    final metrics = sizes.progress;
     final resolved =
-        HyperProgressIndicatorStyle(
+        HyperProgressStyle(
               color: theme.colors.primary,
               trackColor: theme.colors.surfaceMuted,
               thickness: metrics.circularThickness,

@@ -16,6 +16,7 @@ final class HyperTypographyScheme {
     this.bodyLarge = 18,
     this.body = 16,
     this.bodySmall = 14,
+    this.breadcrumb = 12,
     this.control = 16,
     this.listTitle = 17,
     this.listSubtitle = 14,
@@ -37,6 +38,7 @@ final class HyperTypographyScheme {
       bodyLarge = 16,
       body = 14,
       bodySmall = 12,
+      breadcrumb = 12,
       control = 14,
       listTitle = 14,
       listSubtitle = 12,
@@ -57,6 +59,7 @@ final class HyperTypographyScheme {
       bodyLarge = 18,
       body = 16,
       bodySmall = 14,
+      breadcrumb = 14,
       control = 16,
       listTitle = 16,
       listSubtitle = 13,
@@ -93,6 +96,9 @@ final class HyperTypographyScheme {
   /// 辅助正文字号。
   final double bodySmall;
 
+  /// 路径导航的节点字号。
+  final double breadcrumb;
+
   /// 按钮和输入控件字号。
   final double control;
 
@@ -127,6 +133,7 @@ final class HyperTypographyScheme {
     double? bodyLarge,
     double? body,
     double? bodySmall,
+    double? breadcrumb,
     double? control,
     double? listTitle,
     double? listSubtitle,
@@ -145,6 +152,7 @@ final class HyperTypographyScheme {
     bodyLarge: bodyLarge ?? this.bodyLarge,
     body: body ?? this.body,
     bodySmall: bodySmall ?? this.bodySmall,
+    breadcrumb: breadcrumb ?? this.breadcrumb,
     control: control ?? this.control,
     listTitle: listTitle ?? this.listTitle,
     listSubtitle: listSubtitle ?? this.listSubtitle,
@@ -193,6 +201,7 @@ final class HyperTypographyScheme {
       bodyLarge: value(a.bodyLarge, b.bodyLarge),
       body: value(a.body, b.body),
       bodySmall: value(a.bodySmall, b.bodySmall),
+      breadcrumb: value(a.breadcrumb, b.breadcrumb),
       control: value(a.control, b.control),
       listTitle: value(a.listTitle, b.listTitle),
       listSubtitle: value(a.listSubtitle, b.listSubtitle),
@@ -220,6 +229,7 @@ final class HyperTypographyScheme {
           other.bodyLarge == bodyLarge &&
           other.body == body &&
           other.bodySmall == bodySmall &&
+          other.breadcrumb == breadcrumb &&
           other.control == control &&
           other.listTitle == listTitle &&
           other.listSubtitle == listSubtitle &&
@@ -240,6 +250,7 @@ final class HyperTypographyScheme {
     bodyLarge,
     body,
     bodySmall,
+    breadcrumb,
     control,
     listTitle,
     listSubtitle,

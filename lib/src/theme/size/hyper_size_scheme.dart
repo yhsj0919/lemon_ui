@@ -1,7 +1,15 @@
+import 'components/hyper_chip_size.dart';
+import 'components/hyper_empty_state_size.dart';
+import 'components/hyper_skeleton_size.dart';
+import 'components/hyper_avatar_size.dart';
+
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_device_type.dart';
 import 'components/hyper_button_size.dart';
+import 'components/hyper_badge_size.dart';
+import 'components/hyper_tag_size.dart';
+import 'components/hyper_widget_group_size.dart';
 import 'components/hyper_app_bar_size.dart';
 import 'components/hyper_card_size.dart';
 import 'components/hyper_checkbox_size.dart';
@@ -15,9 +23,11 @@ import 'components/hyper_menu_size.dart';
 import 'components/hyper_dropdown_menu_size.dart';
 import 'components/hyper_popup_list_tile_size.dart';
 import 'components/hyper_tab_bar_size.dart';
-import 'components/hyper_progress_indicator_size.dart';
+import 'components/hyper_breadcrumb_size.dart';
+import 'components/hyper_progress_size.dart';
 import 'components/hyper_radio_size.dart';
 import 'components/hyper_switch_size.dart';
+import 'components/hyper_slider_size.dart';
 
 /// 一套明确、无倍率换算的终端尺寸配置。
 @immutable
@@ -70,19 +80,28 @@ final class HyperSizeScheme {
     required this.dropdownMenu,
     required this.popupListTile,
     required this.tabBar,
+    required this.breadcrumb,
     required this.listTile,
     required this.toolbarCompactHeight,
     required this.toolbarHeight,
     required this.toolbarEmphasizedHeight,
     required this.iconSize,
     required this.button,
+    required this.badge,
+    required this.tag,
+    required this.avatar,
+    required this.skeleton,
+    required this.emptyState,
+    required this.chip,
+    required this.widgetGroup,
     required this.iconButton,
     required this.checkbox,
     required this.radio,
     required this.switchSize,
+    required this.slider,
     required this.divider,
     required this.icon,
-    required this.progressIndicator,
+    required this.progress,
   });
 
   /// 手机尺寸方案。
@@ -165,6 +184,13 @@ final class HyperSizeScheme {
           itemSpacing: 9,
           underlineThickness: 2,
         ),
+        breadcrumb: const HyperBreadcrumbSize(
+          itemHeight: 30,
+          itemHorizontalPadding: 10,
+          itemMaxWidth: 160,
+          separatorSize: 20,
+          separatorSpacing: 4,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 56,
           compactMinHeight: 48,
@@ -198,6 +224,66 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        badge: const HyperBadgeSize(
+          dotSize: 6,
+          dotRadius: 3,
+          contentHeight: 16,
+          textSize: 11,
+          contentRadius: 8,
+          horizontalPadding: 4,
+        ),
+        chip: const HyperChipSize(
+          height: 32,
+          horizontalPadding: 12,
+          radius: 8,
+          iconSize: 18,
+          iconSpacing: 6,
+          avatarSize: 24,
+          deleteIconSize: 16,
+          deleteTargetWidth: 32,
+        ),
+        emptyState: const HyperEmptyStateSize(
+          iconSize: 48,
+          illustrationSize: 80,
+          maxWidth: 320,
+          contentSpacing: 16,
+          titleSpacing: 8,
+          actionSpacing: 12,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(16),
+        ),
+        skeleton: const HyperSkeletonSize(
+          lineHeight: 14,
+          lineWidth: 160,
+          circleSize: 40,
+          blockWidth: 160,
+          blockHeight: 96,
+          radius: 8,
+        ),
+        avatar: const HyperAvatarSize(
+          small: 32,
+          medium: 40,
+          large: 56,
+          radius: 10,
+          iconSize: 20,
+          overlap: 10,
+          spacing: 6,
+          ringWidth: 2,
+        ),
+        tag: const HyperTagSize(
+          height: 24,
+          horizontalPadding: 8,
+          radius: 6,
+          iconSize: 14,
+          iconSpacing: 4,
+        ),
+        widgetGroup: const HyperWidgetGroupSize(
+          spacing: 8,
+          separatorExtent: 20,
+          separatorThickness: 1,
+          radius: 8,
+          innerRadius: 6,
+        ),
         iconButton: const HyperIconButtonSize(
           size: 40,
           iconSize: 24,
@@ -216,12 +302,32 @@ final class HyperSizeScheme {
           thumbSize: 20,
           thumbInset: 4,
         ),
-        divider: const HyperDividerSize(thickness: 1, dashLength: 6, gap: 4),
+        slider: const HyperSliderSize(
+          trackHeight: 28,
+          thumbRadius: 14,
+          stepPointRadius: 3.855,
+          thinTrackHeight: 4,
+          thinThumbRadius: 10,
+          capsuleWidth: 64,
+          capsuleCornerRadius: 26,
+          capsuleIconSize: 24,
+          capsuleIconInset: 12,
+          capsuleOverscrollExtent: 10,
+        ),
+        divider: const HyperDividerSize(
+          thickness: 1,
+          dashLength: 6,
+          gap: 4,
+          contentGap: 8,
+          edgeExtent: 16,
+          iconSize: 18,
+        ),
         icon: const HyperIconSize(size: 24),
-        progressIndicator: const HyperProgressIndicatorSize(
+        progress: const HyperProgressSize(
           circularSize: 30,
           circularThickness: 4,
           linearThickness: 6,
+          wideLinearThickness: 28,
           infiniteSize: 20,
           infiniteDotRadius: 2,
         ),
@@ -307,6 +413,13 @@ final class HyperSizeScheme {
           itemSpacing: 10,
           underlineThickness: 2,
         ),
+        breadcrumb: const HyperBreadcrumbSize(
+          itemHeight: 34,
+          itemHorizontalPadding: 12,
+          itemMaxWidth: 200,
+          separatorSize: 20,
+          separatorSpacing: 6,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 56,
           compactMinHeight: 48,
@@ -340,6 +453,66 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        badge: const HyperBadgeSize(
+          dotSize: 6,
+          dotRadius: 3,
+          contentHeight: 18,
+          textSize: 12,
+          contentRadius: 9,
+          horizontalPadding: 5,
+        ),
+        chip: const HyperChipSize(
+          height: 36,
+          horizontalPadding: 14,
+          radius: 10,
+          iconSize: 20,
+          iconSpacing: 8,
+          avatarSize: 28,
+          deleteIconSize: 18,
+          deleteTargetWidth: 36,
+        ),
+        emptyState: const HyperEmptyStateSize(
+          iconSize: 56,
+          illustrationSize: 96,
+          maxWidth: 400,
+          contentSpacing: 20,
+          titleSpacing: 8,
+          actionSpacing: 12,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(20),
+        ),
+        skeleton: const HyperSkeletonSize(
+          lineHeight: 16,
+          lineWidth: 180,
+          circleSize: 44,
+          blockWidth: 180,
+          blockHeight: 108,
+          radius: 8,
+        ),
+        avatar: const HyperAvatarSize(
+          small: 32,
+          medium: 44,
+          large: 64,
+          radius: 12,
+          iconSize: 24,
+          overlap: 12,
+          spacing: 6,
+          ringWidth: 2,
+        ),
+        tag: const HyperTagSize(
+          height: 26,
+          horizontalPadding: 9,
+          radius: 6,
+          iconSize: 14,
+          iconSpacing: 4,
+        ),
+        widgetGroup: const HyperWidgetGroupSize(
+          spacing: 8,
+          separatorExtent: 20,
+          separatorThickness: 1,
+          radius: 8,
+          innerRadius: 6,
+        ),
         iconButton: const HyperIconButtonSize(
           size: 44,
           iconSize: 24,
@@ -358,12 +531,32 @@ final class HyperSizeScheme {
           thumbSize: 20,
           thumbInset: 4,
         ),
-        divider: const HyperDividerSize(thickness: 1, dashLength: 6, gap: 4),
+        slider: const HyperSliderSize(
+          trackHeight: 28,
+          thumbRadius: 14,
+          stepPointRadius: 3.855,
+          thinTrackHeight: 4,
+          thinThumbRadius: 10,
+          capsuleWidth: 68,
+          capsuleCornerRadius: 28,
+          capsuleIconSize: 26,
+          capsuleIconInset: 12,
+          capsuleOverscrollExtent: 10,
+        ),
+        divider: const HyperDividerSize(
+          thickness: 1,
+          dashLength: 6,
+          gap: 4,
+          contentGap: 8,
+          edgeExtent: 16,
+          iconSize: 18,
+        ),
         icon: const HyperIconSize(size: 24),
-        progressIndicator: const HyperProgressIndicatorSize(
+        progress: const HyperProgressSize(
           circularSize: 30,
           circularThickness: 4,
           linearThickness: 6,
+          wideLinearThickness: 28,
           infiniteSize: 20,
           infiniteDotRadius: 2,
         ),
@@ -449,6 +642,13 @@ final class HyperSizeScheme {
           itemSpacing: 8,
           underlineThickness: 2,
         ),
+        breadcrumb: const HyperBreadcrumbSize(
+          itemHeight: 26,
+          itemHorizontalPadding: 10,
+          itemMaxWidth: 180,
+          separatorSize: 16,
+          separatorSpacing: 4,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 48,
           compactMinHeight: 40,
@@ -482,6 +682,66 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .07,
           pressOverlayOpacity: .08,
         ),
+        badge: const HyperBadgeSize(
+          dotSize: 6,
+          dotRadius: 3,
+          contentHeight: 16,
+          textSize: 11,
+          contentRadius: 8,
+          horizontalPadding: 4,
+        ),
+        chip: const HyperChipSize(
+          height: 28,
+          horizontalPadding: 10,
+          radius: 6,
+          iconSize: 16,
+          iconSpacing: 6,
+          avatarSize: 20,
+          deleteIconSize: 14,
+          deleteTargetWidth: 28,
+        ),
+        emptyState: const HyperEmptyStateSize(
+          iconSize: 40,
+          illustrationSize: 72,
+          maxWidth: 360,
+          contentSpacing: 16,
+          titleSpacing: 6,
+          actionSpacing: 8,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(16),
+        ),
+        skeleton: const HyperSkeletonSize(
+          lineHeight: 12,
+          lineWidth: 160,
+          circleSize: 32,
+          blockWidth: 160,
+          blockHeight: 96,
+          radius: 6,
+        ),
+        avatar: const HyperAvatarSize(
+          small: 24,
+          medium: 32,
+          large: 40,
+          radius: 6,
+          iconSize: 16,
+          overlap: 8,
+          spacing: 4,
+          ringWidth: 2,
+        ),
+        tag: const HyperTagSize(
+          height: 22,
+          horizontalPadding: 8,
+          radius: 4,
+          iconSize: 12,
+          iconSpacing: 4,
+        ),
+        widgetGroup: const HyperWidgetGroupSize(
+          spacing: 6,
+          separatorExtent: 16,
+          separatorThickness: 1,
+          radius: 6,
+          innerRadius: 4,
+        ),
         iconButton: const HyperIconButtonSize(
           size: 32,
           iconSize: 16,
@@ -500,12 +760,32 @@ final class HyperSizeScheme {
           thumbSize: 18,
           thumbInset: 4,
         ),
-        divider: const HyperDividerSize(thickness: 1, dashLength: 4, gap: 4),
+        slider: const HyperSliderSize(
+          trackHeight: 24,
+          thumbRadius: 12,
+          stepPointRadius: 3,
+          thinTrackHeight: 4,
+          thinThumbRadius: 9,
+          capsuleWidth: 56,
+          capsuleCornerRadius: 22,
+          capsuleIconSize: 20,
+          capsuleIconInset: 10,
+          capsuleOverscrollExtent: 8,
+        ),
+        divider: const HyperDividerSize(
+          thickness: 1,
+          dashLength: 4,
+          gap: 4,
+          contentGap: 8,
+          edgeExtent: 16,
+          iconSize: 16,
+        ),
         icon: const HyperIconSize(size: 18),
-        progressIndicator: const HyperProgressIndicatorSize(
+        progress: const HyperProgressSize(
           circularSize: 24,
           circularThickness: 3,
           linearThickness: 4,
+          wideLinearThickness: 24,
           infiniteSize: 16,
           infiniteDotRadius: 1.5,
         ),
@@ -591,6 +871,13 @@ final class HyperSizeScheme {
           itemSpacing: 8,
           underlineThickness: 2,
         ),
+        breadcrumb: const HyperBreadcrumbSize(
+          itemHeight: 30,
+          itemHorizontalPadding: 10,
+          itemMaxWidth: 100,
+          separatorSize: 16,
+          separatorSpacing: 4,
+        ),
         listTile: const HyperListTileSize(
           minHeight: 52,
           compactMinHeight: 48,
@@ -624,6 +911,66 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        badge: const HyperBadgeSize(
+          dotSize: 5,
+          dotRadius: 2.5,
+          contentHeight: 14,
+          textSize: 10,
+          contentRadius: 7,
+          horizontalPadding: 3,
+        ),
+        chip: const HyperChipSize(
+          height: 32,
+          horizontalPadding: 10,
+          radius: 8,
+          iconSize: 18,
+          iconSpacing: 6,
+          avatarSize: 24,
+          deleteIconSize: 16,
+          deleteTargetWidth: 32,
+        ),
+        emptyState: const HyperEmptyStateSize(
+          iconSize: 32,
+          illustrationSize: 48,
+          maxWidth: 180,
+          contentSpacing: 12,
+          titleSpacing: 4,
+          actionSpacing: 6,
+          actionRunSpacing: 6,
+          padding: EdgeInsets.all(8),
+        ),
+        skeleton: const HyperSkeletonSize(
+          lineHeight: 12,
+          lineWidth: 120,
+          circleSize: 36,
+          blockWidth: 120,
+          blockHeight: 72,
+          radius: 6,
+        ),
+        avatar: const HyperAvatarSize(
+          small: 28,
+          medium: 36,
+          large: 44,
+          radius: 8,
+          iconSize: 18,
+          overlap: 8,
+          spacing: 4,
+          ringWidth: 2,
+        ),
+        tag: const HyperTagSize(
+          height: 20,
+          horizontalPadding: 6,
+          radius: 4,
+          iconSize: 12,
+          iconSpacing: 3,
+        ),
+        widgetGroup: const HyperWidgetGroupSize(
+          spacing: 4,
+          separatorExtent: 14,
+          separatorThickness: 1,
+          radius: 6,
+          innerRadius: 4,
+        ),
         iconButton: const HyperIconButtonSize(
           size: 40,
           iconSize: 20,
@@ -642,12 +989,32 @@ final class HyperSizeScheme {
           thumbSize: 22,
           thumbInset: 2,
         ),
-        divider: const HyperDividerSize(thickness: 2, dashLength: 6, gap: 4),
+        slider: const HyperSliderSize(
+          trackHeight: 26,
+          thumbRadius: 13,
+          stepPointRadius: 3.5,
+          thinTrackHeight: 4,
+          thinThumbRadius: 9,
+          capsuleWidth: 48,
+          capsuleCornerRadius: 20,
+          capsuleIconSize: 20,
+          capsuleIconInset: 8,
+          capsuleOverscrollExtent: 6,
+        ),
+        divider: const HyperDividerSize(
+          thickness: 2,
+          dashLength: 6,
+          gap: 4,
+          contentGap: 6,
+          edgeExtent: 12,
+          iconSize: 16,
+        ),
         icon: const HyperIconSize(size: 20),
-        progressIndicator: const HyperProgressIndicatorSize(
+        progress: const HyperProgressSize(
           circularSize: 24,
           circularThickness: 3,
           linearThickness: 6,
+          wideLinearThickness: 26,
           infiniteSize: 20,
           infiniteDotRadius: 2,
         ),
@@ -676,19 +1043,28 @@ final class HyperSizeScheme {
   final HyperDropdownMenuSize dropdownMenu;
   final HyperPopupListTileSize popupListTile;
   final HyperTabBarSize tabBar;
+  final HyperBreadcrumbSize breadcrumb;
   final HyperListTileSize listTile;
   final double toolbarCompactHeight;
   final double toolbarHeight;
   final double toolbarEmphasizedHeight;
   final double iconSize;
   final HyperButtonSize button;
+  final HyperBadgeSize badge;
+  final HyperTagSize tag;
+  final HyperAvatarSize avatar;
+  final HyperSkeletonSize skeleton;
+  final HyperEmptyStateSize emptyState;
+  final HyperChipSize chip;
+  final HyperWidgetGroupSize widgetGroup;
   final HyperIconButtonSize iconButton;
   final HyperCheckboxSize checkbox;
   final HyperRadioSize radio;
   final HyperSwitchSize switchSize;
+  final HyperSliderSize slider;
   final HyperDividerSize divider;
   final HyperIconSize icon;
-  final HyperProgressIndicatorSize progressIndicator;
+  final HyperProgressSize progress;
 
   HyperSizeScheme copyWith({
     HyperDeviceType? deviceType,
@@ -714,19 +1090,28 @@ final class HyperSizeScheme {
     HyperDropdownMenuSize? dropdownMenu,
     HyperPopupListTileSize? popupListTile,
     HyperTabBarSize? tabBar,
+    HyperBreadcrumbSize? breadcrumb,
     HyperListTileSize? listTile,
     double? toolbarCompactHeight,
     double? toolbarHeight,
     double? toolbarEmphasizedHeight,
     double? iconSize,
     HyperButtonSize? button,
+    HyperBadgeSize? badge,
+    HyperTagSize? tag,
+    HyperAvatarSize? avatar,
+    HyperSkeletonSize? skeleton,
+    HyperEmptyStateSize? emptyState,
+    HyperChipSize? chip,
+    HyperWidgetGroupSize? widgetGroup,
     HyperIconButtonSize? iconButton,
     HyperCheckboxSize? checkbox,
     HyperRadioSize? radio,
     HyperSwitchSize? switchSize,
+    HyperSliderSize? slider,
     HyperDividerSize? divider,
     HyperIconSize? icon,
-    HyperProgressIndicatorSize? progressIndicator,
+    HyperProgressSize? progress,
   }) => HyperSizeScheme(
     deviceType: deviceType ?? this.deviceType,
     controlHeightXs: controlHeightXs ?? this.controlHeightXs,
@@ -752,6 +1137,7 @@ final class HyperSizeScheme {
     dropdownMenu: dropdownMenu ?? this.dropdownMenu,
     popupListTile: popupListTile ?? this.popupListTile,
     tabBar: tabBar ?? this.tabBar,
+    breadcrumb: breadcrumb ?? this.breadcrumb,
     listTile: listTile ?? this.listTile,
     toolbarCompactHeight: toolbarCompactHeight ?? this.toolbarCompactHeight,
     toolbarHeight: toolbarHeight ?? this.toolbarHeight,
@@ -759,13 +1145,21 @@ final class HyperSizeScheme {
         toolbarEmphasizedHeight ?? this.toolbarEmphasizedHeight,
     iconSize: iconSize ?? this.iconSize,
     button: button ?? this.button,
+    badge: badge ?? this.badge,
+    tag: tag ?? this.tag,
+    avatar: avatar ?? this.avatar,
+    skeleton: skeleton ?? this.skeleton,
+    emptyState: emptyState ?? this.emptyState,
+    chip: chip ?? this.chip,
+    widgetGroup: widgetGroup ?? this.widgetGroup,
     iconButton: iconButton ?? this.iconButton,
     checkbox: checkbox ?? this.checkbox,
     radio: radio ?? this.radio,
     switchSize: switchSize ?? this.switchSize,
+    slider: slider ?? this.slider,
     divider: divider ?? this.divider,
     icon: icon ?? this.icon,
-    progressIndicator: progressIndicator ?? this.progressIndicator,
+    progress: progress ?? this.progress,
   );
 
   /// 在两套明确尺寸之间插值，仅用于主题切换动画。
@@ -818,6 +1212,7 @@ final class HyperSizeScheme {
         t,
       ),
       tabBar: HyperTabBarSize.lerp(a.tabBar, b.tabBar, t),
+      breadcrumb: HyperBreadcrumbSize.lerp(a.breadcrumb, b.breadcrumb, t),
       listTile: HyperListTileSize.lerp(a.listTile, b.listTile, t),
       toolbarCompactHeight: value(
         a.toolbarCompactHeight,
@@ -830,17 +1225,21 @@ final class HyperSizeScheme {
       ),
       iconSize: value(a.iconSize, b.iconSize),
       button: HyperButtonSize.lerp(a.button, b.button, t),
+      badge: HyperBadgeSize.lerp(a.badge, b.badge, t),
+      tag: HyperTagSize.lerp(a.tag, b.tag, t),
+      avatar: HyperAvatarSize.lerp(a.avatar, b.avatar, t),
+      skeleton: HyperSkeletonSize.lerp(a.skeleton, b.skeleton, t),
+      emptyState: HyperEmptyStateSize.lerp(a.emptyState, b.emptyState, t),
+      chip: HyperChipSize.lerp(a.chip, b.chip, t),
+      widgetGroup: HyperWidgetGroupSize.lerp(a.widgetGroup, b.widgetGroup, t),
       iconButton: HyperIconButtonSize.lerp(a.iconButton, b.iconButton, t),
       checkbox: HyperCheckboxSize.lerp(a.checkbox, b.checkbox, t),
       radio: HyperRadioSize.lerp(a.radio, b.radio, t),
       switchSize: HyperSwitchSize.lerp(a.switchSize, b.switchSize, t),
+      slider: HyperSliderSize.lerp(a.slider, b.slider, t),
       divider: HyperDividerSize.lerp(a.divider, b.divider, t),
       icon: HyperIconSize.lerp(a.icon, b.icon, t),
-      progressIndicator: HyperProgressIndicatorSize.lerp(
-        a.progressIndicator,
-        b.progressIndicator,
-        t,
-      ),
+      progress: HyperProgressSize.lerp(a.progress, b.progress, t),
     );
   }
 
@@ -871,19 +1270,28 @@ final class HyperSizeScheme {
           other.dropdownMenu == dropdownMenu &&
           other.popupListTile == popupListTile &&
           other.tabBar == tabBar &&
+          other.breadcrumb == breadcrumb &&
           other.listTile == listTile &&
           other.toolbarCompactHeight == toolbarCompactHeight &&
           other.toolbarHeight == toolbarHeight &&
           other.toolbarEmphasizedHeight == toolbarEmphasizedHeight &&
           other.iconSize == iconSize &&
           other.button == button &&
+          other.badge == badge &&
+          other.tag == tag &&
+          other.avatar == avatar &&
+          other.skeleton == skeleton &&
+          other.emptyState == emptyState &&
+          other.chip == chip &&
+          other.widgetGroup == widgetGroup &&
           other.iconButton == iconButton &&
           other.checkbox == checkbox &&
           other.radio == radio &&
           other.switchSize == switchSize &&
+          other.slider == slider &&
           other.divider == divider &&
           other.icon == icon &&
-          other.progressIndicator == progressIndicator;
+          other.progress == progress;
 
   @override
   int get hashCode => Object.hashAll([
@@ -910,18 +1318,27 @@ final class HyperSizeScheme {
     dropdownMenu,
     popupListTile,
     tabBar,
+    breadcrumb,
     listTile,
     toolbarCompactHeight,
     toolbarHeight,
     toolbarEmphasizedHeight,
     iconSize,
     button,
+    badge,
+    tag,
+    avatar,
+    skeleton,
+    emptyState,
+    chip,
+    widgetGroup,
     iconButton,
     checkbox,
     radio,
     switchSize,
+    slider,
     divider,
     icon,
-    progressIndicator,
+    progress,
   ]);
 }

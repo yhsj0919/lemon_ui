@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'hyper_circular_progress_indicator.dart';
-import 'hyper_infinite_progress_indicator.dart';
-import 'hyper_linear_progress_indicator.dart';
-import 'hyper_progress_indicator_style.dart';
+import 'hyper_circular_progress.dart';
+import 'hyper_infinite_progress.dart';
+import 'hyper_linear_progress.dart';
+import 'hyper_progress_style.dart';
 
 /// 线性和圆形进度指示器的统一便捷入口。
-class HyperProgressIndicator extends StatelessWidget {
-  const HyperProgressIndicator.linear({
+class HyperProgress extends StatelessWidget {
+  const HyperProgress.linear({
     super.key,
     this.value,
     this.style,
@@ -16,6 +16,8 @@ class HyperProgressIndicator extends StatelessWidget {
     this.thickness,
     this.size,
     this.radius,
+    this.fillRadius,
+    this.variant,
     this.animationDuration,
     this.animationCurve,
     this.semanticsLabel,
@@ -26,7 +28,7 @@ class HyperProgressIndicator extends StatelessWidget {
        orbitingDotSize = null,
        strokeCap = null;
 
-  const HyperProgressIndicator.circular({
+  const HyperProgress.circular({
     super.key,
     this.value,
     this.style,
@@ -43,9 +45,11 @@ class HyperProgressIndicator extends StatelessWidget {
   }) : circular = true,
        infinite = false,
        orbitingDotSize = null,
-       radius = null;
+       radius = null,
+       fillRadius = null,
+       variant = null;
 
-  const HyperProgressIndicator.infinite({
+  const HyperProgress.infinite({
     super.key,
     this.style,
     this.color,
@@ -61,18 +65,22 @@ class HyperProgressIndicator extends StatelessWidget {
        value = null,
        trackColor = null,
        radius = null,
+       fillRadius = null,
        strokeCap = null,
-       animationCurve = null;
+       animationCurve = null,
+       variant = null;
 
   final bool circular;
   final bool infinite;
   final double? value;
-  final HyperProgressIndicatorStyle? style;
+  final HyperProgressStyle? style;
   final Color? color;
   final Color? trackColor;
   final double? thickness;
   final double? size;
   final double? radius;
+  final double? fillRadius;
+  final HyperProgressVariant? variant;
   final StrokeCap? strokeCap;
   final double? orbitingDotSize;
   final Duration? animationDuration;
@@ -84,7 +92,7 @@ class HyperProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (infinite) {
-      return HyperInfiniteProgressIndicator(
+      return HyperInfiniteProgress(
         style: style,
         color: color,
         size: size,
@@ -97,7 +105,7 @@ class HyperProgressIndicator extends StatelessWidget {
       );
     }
     if (circular) {
-      return HyperCircularProgressIndicator(
+      return HyperCircularProgress(
         value: value,
         style: style,
         color: color,
@@ -112,7 +120,8 @@ class HyperProgressIndicator extends StatelessWidget {
         excludeSemantics: excludeSemantics,
       );
     }
-    return HyperLinearProgressIndicator(
+    return HyperLinearProgress(
+      variant: variant,
       value: value,
       style: style,
       color: color,
@@ -120,6 +129,7 @@ class HyperProgressIndicator extends StatelessWidget {
       length: size,
       thickness: thickness,
       radius: radius,
+      fillRadius: fillRadius,
       animationDuration: animationDuration,
       animationCurve: animationCurve,
       semanticsLabel: semanticsLabel,

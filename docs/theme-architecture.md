@@ -6,6 +6,57 @@
 
 ## 一、总体目标
 
+`HyperChip.action / choice / filter / input` 共用受控 `HyperChip`；`onPressed`
+与 `onSelected` 互斥，`selected` 由调用方持有，单选互斥与多选集合归父级。
+`onDeleted` 只调用删除回调，不改变选中态、不自行隐藏控件；删除按钮有独立
+点击区域和键盘焦点。主体无回调时不增加无效焦点，删除入口仍可单独使用。
+`icon` 与 `avatar` 互斥；选中对勾可关闭、替换或通过主题配置。
+交互复用 `HyperPressable`，支持鼠标、触摸、Enter/Space 激活、禁用和焦点，
+不创建水波纹。背景、文字、图标、头像禁用透明度和对勾使用 Motion fast 过渡；
+减少动画时关闭过渡，`transitionBuilder` 可替换对勾切换效果。
+全局 `chipTheme`、局部 `HyperChipTheme`、实例 `HyperChipStyle` 覆盖背景填充、
+前景、状态层、边框、阴影、字体、圆角、尺寸、图标和动效。主题状态按普通、
+选中、悬停、焦点、按下、禁用顺序逐字段叠加，实例最后覆盖。
+四端默认值由 `HyperSizeScheme.chip` 管理，文字复用 labelMedium；可见高度
+与最小交互区域分开，最小区域复用同端 minimumInteractiveDimension。
+默认视觉为 D 级项目推导（基于同端按钮、Tag 与图标密度），暂无同场景官方
+Chip 逻辑尺寸或目标截图的直接验证。
+
+`HyperEmptyState` 只展示空内容，不管理网络、加载、重试或业务状态。默认中性图标
+与“暂无内容”标题；`illustration` 优先于图标，`showIllustration: false` 可隐藏装饰；
+`titleWidget`、`descriptionWidget` 可替换默认文本，`content` 放置额外内容，
+`actions` 接受现有按钮等 Widget 并自动换行。外层最大内容宽度只约束当前组件，
+父布局仍决定可用区域。装饰插图不创建重复朗读条目，文字与操作保持原有语义。
+全局 `emptyStateTheme`、局部 `HyperEmptyStateTheme`、实例 `HyperEmptyStateStyle`
+管理图标、颜色、排版、对齐、间距、背景填充、边框、圆角、阴影和过渡。
+四端尺寸集中在 `HyperSizeScheme.emptyState`；文字复用当前端 titleMedium 与
+bodySmall，背景默认无填充，容器可由使用方组合。内容变化使用 Motion 标准
+过渡，系统减少动画时关闭；`transitionBuilder` 可替换插图和文字的切换效果。
+无同场景可核实的官方尺寸参数，默认视觉按 D 级项目语义规格推导，待设备对照。
+
+`HyperSkeleton` 提供矩形、`.text` 和 `.circle` 占位；全局 `skeletonTheme`、
+局部 `HyperSkeletonTheme` 和实例 `HyperSkeletonStyle` 管理颜色、圆角、边框、
+阴影、尺寸、循环时长、曲线、微光宽度和倾角、呼吸最低透明度、内容切换动效。
+`effectBuilder` 可替换可见动画，`transitionBuilder` 可替换加载完成过渡。
+`HyperSkeletonEffect.shimmer / pulse / none` 分别为微光、呼吸与静态；系统减少
+动画、关闭 TickerMode、停止加载或零循环时长会停止循环。默认循环周期为全局
+Motion emphasizedDuration 的 4 倍，内容过渡采用 fastDuration（项目推导）。
+`.text` 在有限宽度内铺满，非有限宽度回退到当前端 lineWidth；矩形和圆形采用
+对应四端默认尺寸。内容由父布局组合，不自动测量业务子树；`loading: false`
+时显示传入 child，无 child 则隐藏占位。默认不为装饰形状创建朗读条目，可显式
+设置 semanticsLabel。当前视觉未得到同场景 HyperOS 官方参数验证，按 D 级
+项目语义规格推导；HiUI 5.0 官方发布说明已列出 Skeleton，但未获取其可核实
+尺寸源码：[HiUI 5.0 发布说明](https://github.com/XiaoMi/hiui/issues/3553)。
+
+进度统一使用 `HyperProgress.linear / circular / infinite`；全局入口为
+`progressTheme`，局部主题为 `HyperProgressTheme`，实例为 `HyperProgressStyle`，
+四端尺寸由 `HyperSizeScheme.progress` 管理。线性 `.thin` 保留细轨道，`.wide`
+使用与同端 Slider 一致的宽胶囊轨道。宽条高度、颜色、长度、圆角和过渡均可覆盖。
+`radius` 控制完整轨道外轮廓，`fillRadius` 独立控制填充端（默认轨道高度的一半，0 为直边）；
+确定进度采用固定尺寸的圆角形状平移后裁剪，避免低进度挤压圆角。
+Slider 默认取消 Flutter 自动添加的横向留白，显式 `SliderThemeData.padding`
+仍可覆盖；单值和范围滑块的绘制与拖动映射遵守同一留白策略。
+
 Lemon UI 提供一套完整可用的 HyperOS 默认主题。使用者可以保持业务组件代码不变，仅通过 `copyWith` 覆盖与默认主题不同的部分，快速替换整套颜色、材质、排版或多端尺寸。
 
 ```text
@@ -16,6 +67,11 @@ HyperOS 内置默认主题
 ```
 
 后一级只覆盖明确提供的字段，其余字段继续继承前一级。
+
+组件自身绘制的可见元素及交互状态原则上均可配置：背景和材质、边框、阴影、
+颜色、字体、圆角、间距、图标等由强类型主题提供默认值，再由局部主题和实例
+`Style` 覆盖。优先复用语义颜色、字阶、材质和尺寸方案；使用方传入的内容及父布局
+负责的外部布局不属于组件主题职责。
 
 ## 二、统一主题入口
 
@@ -74,6 +130,20 @@ HyperTheme(
 
 `HyperAnchoredOverlay` 负责锚点定位、边缘避让、开合交互与进出场动画，不绘制表面。
 `HyperTabBar` 与 `HyperTabBarView` 共用 Flutter `TabController`。默认 `.segmented` 形态共用浅灰底槽，选中项为白色块；`.separated` 形态的每个标签各自绘制圆角表面，标签之间保留间距，选中项为白色、未选中项为浅灰；`.underline` 形态采用普通下划线指示。三种形态在 Demo 中独立展示，共用当前端标签栏高度；手机端为 42dp。独立标签的 12dp 圆角和 9dp 间距参照 [MIUIX `TabRow` 候选值](https://compose-miuix-ui.github.io/miuix/components/tabrow)，底槽圆角暂取 8dp；下划线粗细沿用 Flutter 的 2dp 基准。四端尺寸由 `HyperSizeScheme.tabBar` 分别管理，字号读取 `typography.control`。悬停与按压不叠加深色覆盖层，点击不产生水波纹；选中块或指示线的切换作为状态反馈。
+`HyperBreadcrumb` 展示胶囊形路径节点和箭头分隔符，路径节点通过索引回调导航；高亮索引独立于路径列表，默认末级。长路径横向滚动并自动显示高亮项，单项文字超出最大宽度时省略。尺寸由四端 `HyperSizeScheme.breadcrumb` 管理，字号由四端 `typography.breadcrumb` 管理；普通、高亮和禁用胶囊背景及文字样式通过全局 `breadcrumbTheme`、局部 `HyperBreadcrumbTheme` 和实例 `style` 显式覆盖。单项 `enabled: false` 会禁用点击并使用禁用前景和背景。手机端原型参考 [MIUIX BreadcrumbBar](https://compose-miuix-ui.github.io/miuix/components/breadcrumbbar) 的胶囊高 32dp、左右内边距 10dp、最大宽 160dp；经目标截图对照，手机端胶囊高调整为 30 逻辑像素、字号 12、分隔符两侧间距 4 逻辑像素。按各端已有密度微调后的平板、桌面、手表胶囊高分别为 34、26、30，分隔符两侧间距分别为 6、4、4 逻辑像素；这三端属于项目推导，待设备对照。
+
+`HyperBadge` 提供点、数量、短文本和自定义内容；徽标默认配色参考 MIUIX 主题的错误色：浅色 `#E94634`、深色 `#F12522`，文字均为白色；这些颜色由 `HyperBadgeThemeData` 的亮暗默认颜色和实例样式覆盖，不改变全局错误色。数字可限制上限并显示 `99+`。点尺寸、内容高度、圆角、内边距和文字字号由四端 `HyperSizeScheme.badge` 管理。颜色、边框、阴影、文字样式及默认过渡通过全局 `badgeTheme`、局部 `HyperBadgeTheme` 与实例 `HyperBadgeStyle` 覆盖。`HyperBadgeAnchor` 接受任意 Widget 作为徽标，支持左上、上中、右上、左中、正中、右中、左下、下中、右下九宫格位置及物理坐标偏移；`alignment` 可额外指定方向感知的对齐方式；位置与偏移变化使用全局 Motion 过渡，时长和曲线可在实例替换。定位层不规定徽标视觉。手机端点尺寸与内容高度参考 [MIUIX Badge](https://compose-miuix-ui.github.io/miuix/components/badge) 候选实现，其他设备端待视觉核对。
+`HyperTag` 是静态分类或状态标签，普通、强调和禁用状态通过全局 `tagTheme`、局部 `HyperTagTheme` 与实例 `HyperTagStyle` 逐字段覆盖；背景、前景、边框、阴影、字体、圆角、尺寸、图标及动画均可配置。四端默认尺寸由 `HyperSizeScheme.tag` 管理，文字读取当前端 `labelMedium` 字阶；状态过渡取全局 Motion 并遵守减少动画设置。Tag 无点击或选择语义，交互标签留给 Chip。默认视觉是项目暂定值，尚无可核实的同场景 MIUIX/HIUI 直接规格。
+`HyperWidgetGroup` 排列任意 Widget，可横向或纵向使用；间距和可选分隔尺寸来自四端 `HyperSizeScheme.widgetGroup`，外层背景、边框、圆角、阴影、内边距及分隔视觉由 `widgetGroupTheme`、局部 `HyperWidgetGroupTheme` 和实例 `HyperWidgetGroupStyle` 逐字段覆盖。默认不绘制外层背景或边框，不改变子项点击、焦点或内部样式。组自身的视觉与间距变化使用全局 Motion 并遵守减少动画设置；自定义分隔内容由使用方控制其动画。默认尺寸是按项目同端紧凑布局语义推导的暂定值。
+`HyperWidgetGroupItem` 为单项指定宽度或主轴 `flex` 比例；组样式的 `width` 提供明确总宽度，`itemHeight` 为子项统一高度。比例子项需要有限的主轴约束，横向放在水平滚动容器内时应明确设置组宽。`showSeparators: false` 保留空白间距，启用后使用主题线条分隔；`separatorBuilder` 可完全替换分隔内容。
+`HyperSlider`、`HyperRangeSlider` 和 `HyperVerticalSlider` 共用四端 `HyperSizeScheme.slider` 与 `sliderTheme`；默认 `HyperSliderVariant.capsule` 使用厚胶囊轨道，`HyperSliderVariant.thin` 使用普通细轨道，两种尺寸都由四端方案解析。局部 `HyperSliderTheme` 和实例 `HyperSliderStyle` 可覆盖轨道、拇指、交互层、数值提示及禁用状态。手机端默认采用用户提供的 HyperOS 音量页截图的厚胶囊轨道、蓝色填充和白色圆心；[MIUIX Slider 源码](https://github.com/compose-miuix-ui/miuix/blob/main/miuix-ui/src/commonMain/kotlin/top/yukonga/miuix/kmp/basic/Slider.kt)中的 28dp 默认高度、胶囊轨道与 0.72 倍半径的圆心作为候选实现参考。单值滑块的拖动、键盘和语义交互沿用 Flutter Slider；范围滑块保留 Flutter 的键盘与语义交互，并在指针拖动中允许两端重合、越过时交换起止角色。垂直版默认从底向顶递增，可显式反转。未做同设备截图复核前不将视觉值视为精确还原。
+轨道默认使选中段与未选中段等高；默认悬停状态层透明。鼠标进入整个滑块区域时只让灰色未选中轨道轻微加深，默认目标色可由 `HyperSliderStyle.hoverInactiveTrackColor` 覆盖。指针按下时白色圆心采用与 `HyperSwitch` 相同的默认交互缩放值 1.127，由 `pressedThumbScale` 覆盖，也可替换拇指形状；悬停不会放大拇指。两种过渡取全局 Motion 的快速时长与曲线，系统要求减少动画时不放大。使用方仍可通过 `overlayColor` 和形状字段指定其他交互效果。
+`divisions` 指定均匀步进，默认吸附；设置 `showDivisionPoints: true` 显示刻度点，设置 `snapToDivisions: false` 则只保留刻度点并连续取值。刻度点中心沿拇指可移动区间排列，整组裁剪在胶囊轨道内；手机端刻度点半径 3.855 逻辑像素取自 MIUIX 候选值。未选中刻度的低对比度颜色按当前轨道色与语义状态层推导，并非 MIUIX 原色；颜色和半径可通过 `HyperSliderStyle` 覆盖。
+`HyperCapsuleSlider` 是整块填充的竖向胶囊样式，可用于音量、亮度等连续数值；顶部和底部接受任意图标 Widget，各自的点击回调与轨道拖动相互独立。单击轨道不改变数值，拖动从当前值连续变化。拖到最上端或最下端后继续外滑，整块胶囊会以较强阻力轻微偏移并缩放，松手以全局 Motion 弹簧的质量、0.65 倍刚度和 1.5 倍阻尼快速归位；组件弹簧参数可完整替换，系统减少动画时关闭此效果。宽度、图标尺寸、内边距与最大偏移量来自四端 `HyperSizeScheme.slider`，颜色、边框、圆角、偏移量、最大缩放与弹簧参数通过全局或局部 `HyperSliderTheme` 及实例 `HyperSliderStyle` 覆盖。默认深灰底与白色填充根据用户提供的局部截图建立候选值，截图缺少设备逻辑尺寸，尚未做同条件精确对照。
+
+胶囊滑块图标默认根据所在位置的填充色检查对比度；低于 3:1 时自动改用黑色或白色。`capsuleAutoIconContrast` 可以关闭该行为，显式设置的顶部或底部图标颜色始终优先。`capsuleTopIconTurns` 和 `capsuleBottomIconTurns` 可让图标按滑块进度旋转，填充和图标共用同一条进度动画。
+
+越界反馈由 `HyperElasticOverscrollController` 管理阻力映射和弹簧回弹，`HyperElasticOverscrollTransform` 绘制水平或竖直方向的位移。已有拖动控件可直接包在 `HyperElasticOverscrollRegion` 中，并传入方向和最大位移；通用包装默认不缩放轨道，需要缩放时显式设置 `maxScale`。包装层监听指针，不修改子控件的进度与手势。需要自定义拖动映射的控件（如 `HyperCapsuleSlider`）直接调用控制器的 `pull` 和 `release`。包装层和胶囊滑块默认使用同一套较快的回弹；重手感由越界拖动的阻力映射提供，回弹弹簧仍可单独替换；系统减少动画时关闭越界效果。
 菜单、提示等消费者通过自己的主题选择视觉和材质，不能由浮层底座改写材质配方。
 内置菜单、侧栏子菜单和 Tooltip 的浮层表面默认使用统一的高级玻璃材质配方；
 实例或组件主题的完整材质、全局 `materialTheme.material` 以及显式背景优先于此默认配方。
@@ -180,8 +250,9 @@ HyperSizeScheme
 ├─ dropdownMenu: HyperDropdownMenuSize
 ├─ button: HyperButtonSize
 ├─ iconButton: HyperIconButtonSize
-├─ progressIndicator: HyperProgressIndicatorSize
+├─ progress: HyperProgressSize
 ├─ switchSize: HyperSwitchSize
+├─ slider: HyperSliderSize
 ├─ checkbox: HyperCheckboxSize
 ├─ radio: HyperRadioSize
 └─ 后续组件尺寸
@@ -327,3 +398,49 @@ Demo 和主题覆盖测试。父布局能直接控制的外边距等组合属性
 5. 全局主题管理多端规格，局部主题只覆盖当前环境。
 6. 组件只消费解析结果并实现自身行为。
 7. 主题类随组件增加而变大是可接受且可预测的成本。
+
+HyperAvatar 与 HyperAvatarGroup 共用 avatarTheme、局部 HyperAvatarTheme 与实例 HyperAvatarStyle；四端小/中/大尺寸由 HyperSizeScheme.avatar 管理。文字取 labelLarge 字阶，图片加载中与失败时回退到自定义内容、文字或图标。头像组提供 horizontal 重叠排列、row 无重叠排列、vertical 纵向堆叠、circle5 五角环绕、centered 中心环绕、grid4/9 宫格、mosaic 紧凑拼图与 custom 自定义布局，数量上限包含溢出位置，+N 可自定义；布局位置与尺寸变化取 Motion 主题，遵守减少动画设置。在线状态与计数使用 HyperBadgeAnchor 组合。
+
+头像组通过 groupSize 或主题 HyperAvatarStyle.groupSize 指定整体宽高，布局保持比例并居中容纳；内部头像、字体、图标、描边和间距跟随可用空间缩放。mosaicShape 支持圆形与圆角方形拼图，mosaicColumns 指定拼图列数。自定义 layoutBuilder 返回 HyperAvatarGroupGeometry，声明参考画布与正方形 slots；组件验证位置处于画布内，并按整体尺寸缩放。头像组无重叠排列间距由四端 avatar.spacing 管理（phone/tablet 6，desktop/watch 4 逻辑像素，项目暂定）。
+
+HyperAvatarGroupLayout.blended 与 HyperBlendedAvatar 提供可选的抽象群组标识。优先使用显式 colors/blendColors，否则对每个图片头像首帧进行 32×32 色彩采样，按量化像素频率估算主色，忽略透明像素；未加载或失败时使用头像背景作为回退色。仅在图片来源变化时重建采样，离开组件后移除 ImageStream 监听并释放采样资源。该算法取统计主色，不能保证与人工判断的视觉主色相同。所有成员颜色形成首尾连续的 SweepGradient；blendRotation 与 blendGradient 可通过头像主题和实例替换。混色聚合全部成员，不使用 maxVisible 和 +N；中心可传入自定义内容。宫格与拼图输入未满时保留未占用位置，空列表不绘制头像。Demo 展示五色混合、图片取色及未满宫格。
+
+混色默认通过 blendSoftness=0.45 向当前主题 surface 色柔化，以减少高饱和色的视觉重量；0 保留原主色，blendTintColor 可替换柔化色，显式 blendGradient 可完整替换配方。HyperAvatarGroupLayout.windmill / HyperAvatarStyle.blendVariant.windmill 使用圆角方底上的彩色花瓣风车：每个主色生成一片贝塞尔曲线花瓣，独立渐变和亮边形成旋转叠放效果，默认柔化比例为 0，保留主色；smooth 仍为 0.45。blendPadding、blendPetalBorder、blendRotation 与 blendGradient 可配置花瓣视觉，外层背景与圆角由已有主题字段管理，blendShapeBorder 可替换外框形状。配方与叶片路径为项目设计，并非已核实的 HyperOS 官方规格。Demo 保留原色、柔和与风车三种对照。风车的立体渐变使用同色相亮暗变化，默认不向白色或表面色混合。
+
+风车花瓣内端停在圆心外侧，自然围出透明空洞。每瓣减去下一瓣的重叠区域以实现首尾循环搭接，不对圆心做裁剪、覆盖或清除。每瓣具有独立渐变、高光边缘与位于自身内部的搭接阴影；blendPetalShadowColor/Blur 可覆盖阴影，blendPetalBorder 可覆盖亮边。五瓣和七瓣的离屏像素验证确认圆心透明且花瓣区域可见。
+
+## 分段按钮
+
+`HyperSegmentedButton<T>` 接受 `HyperSegment<T>` 列表与受控 `selected` 集合。
+默认单选且不可清空；`multiSelectionEnabled`、`emptySelectionAllowed` 分别控制
+多选和清空。禁用项和整体禁用不发出回调；新集合不可修改，调用方负责更新状态。
+值必须唯一，选中值必须存在于列表。选中语义与单选互斥语义附着在各按钮上，
+鼠标、键盘、焦点和禁用交互复用 HyperButton/HyperPressable。
+
+全局 `segmentedButtonTheme`、局部 `HyperSegmentedButtonTheme`、实例
+`HyperSegmentedButtonStyle` 逐字段覆盖。`group` 复用 HyperWidgetGroupStyle，
+`button`、`selectedButton` 复用 HyperButtonStyle；连接布局接管边框、圆角和阴影，
+不允许内部按钮重新绘制接缝外框。背景填充、材质、字体、图标、状态层、动效、
+分隔线与外框沿用已有强类型视觉接口。动画与减少动画策略由复用组件处理。
+
+四端尺寸直接读取 `HyperSizeScheme.button` 与 `widgetGroup`，不增加重复设备常量。
+默认基础高度与同端按钮一致；横向支持内容宽度、指定项宽度/比例和 expanded 等分，
+纵向按内容收紧。默认选中背景 surfaceMuted，前景 textPrimary，采用中性色；
+需要品牌强调时可通过 selectedButton 覆盖背景与前景。
+本组件暂未取得同场景官方逻辑尺寸或截图验证，视觉为 D 级同端语义推导；
+参考入口为 https://github.com/XiaoMi/hiui 。Demo 位于选择控件。
+
+## 带内容的分隔线
+
+HyperDivider / HyperDivider.vertical 的 child 接受文字、图标或自定义组件。
+HyperDividerStyle.contentAlignment 为 start / center / end；start/end 在横向遵守 RTL，
+纵向对应顶部/底部。contentGap 为内容两侧间距，edgeExtent 为非居中模式的短线长度。
+文字、图标大小和颜色支持全局 dividerTheme、局部主题和实例 Style；copyWith、
+merge、lerp、值相等均覆盖内容字段。线条与文字样式使用全局 Motion fast 连续过渡，
+系统减少动画时关闭。线条装饰不朗读，child 保留原有语义和交互。
+
+带内容时主轴需要有限约束，或者显式 length；外部留白由父布局负责。
+四端 contentGap/edgeExtent/iconSize 为 D 级同端紧凑间距和图标语义推导：
+phone/tablet 8/16/18，desktop 8/16/16，watch 6/12/16（Flutter 逻辑像素），
+未完成同设备截图对照。原有粗细、虚线和点线尺寸保持不变。
+绘制裁剪到分隔线边界，避免末端圆点越界；零步长不会产生无限绘制循环。

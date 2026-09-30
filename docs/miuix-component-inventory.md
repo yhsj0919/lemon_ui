@@ -68,10 +68,10 @@
 | `TextField` | `HyperTextField`、`HyperTextFormField`、`HyperTextArea` | 已覆盖；单行/多行共享编辑核心 |
 | `SearchBar`、`InputField` | `HyperSearchBar`、`HyperSearchField` | 已覆盖；InputField 为内部插槽 |
 | `SnackbarHost`、`Snackbar` | `HyperSnackbarHost`、`HyperSnackbar` | **补充 Host**；内容与队列/呈现职责分离 |
-| `LinearProgressIndicator` | `HyperLinearProgressIndicator` | 已覆盖 |
-| `CircularProgressIndicator` | `HyperCircularProgressIndicator` | 已覆盖 |
-| `InfiniteProgressIndicator` | `HyperCircularProgressIndicator.infinite` | **补充变体**；不建立重复顶层控件 |
-| MIUIX 线性不确定动画 | `HyperLinearProgressIndicator.indeterminate`、`HyperWormProgressIndicator` | 合并；普通不确定与蚯蚓强调样式分开 |
+| `LinearProgressIndicator` | `HyperLinearProgress` | 已覆盖 |
+| `CircularProgressIndicator` | `HyperCircularProgress` | 已覆盖 |
+| `InfiniteProgressIndicator` | `HyperCircularProgress.infinite` | **补充变体**；不建立重复顶层控件 |
+| MIUIX 线性不确定动画 | `HyperLinearProgress.indeterminate`、`HyperWormProgressIndicator` | 合并；普通不确定与蚯蚓强调样式分开 |
 | `PullToRefresh` | `HyperPullToRefresh`、`HyperRefreshIndicator` | 已覆盖 |
 
 ### 导航、页面和滚动
@@ -230,7 +230,7 @@ MIUIX 源码候选规格是最小 58×40、圆角 16、水平内边距 16、垂�
 - `HyperCascadingMenu`。
 - `HyperOverlayPresentation`：overlay、window；窗口模式在多窗口阶段正式实现。
 - `HyperNavigationBar.floating`。
-- `HyperCircularProgressIndicator.infinite`。
+- `HyperCircularProgress.infinite`。
 - `HyperTooltip.plain` 与 `.rich`。
 - `HyperAppBar.large` 与 `.small`。
 - `HyperTabBar.standard` 与 `.contour`。

@@ -2,15 +2,19 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+enum HyperProgressVariant { thin, wide }
+
 /// 进度指示器可由主题和实例共同配置的视觉属性。
 @immutable
-final class HyperProgressIndicatorStyle {
-  const HyperProgressIndicatorStyle({
+final class HyperProgressStyle {
+  const HyperProgressStyle({
+    this.variant,
     this.color,
     this.trackColor,
     this.thickness,
     this.size,
     this.radius,
+    this.fillRadius,
     this.strokeCap,
     this.orbitingDotSize,
     this.animationDuration,
@@ -19,6 +23,7 @@ final class HyperProgressIndicatorStyle {
 
   /// 已完成部分的颜色。
   final Color? color;
+  final HyperProgressVariant? variant;
 
   /// 未完成轨道的颜色。
   final Color? trackColor;
@@ -32,6 +37,9 @@ final class HyperProgressIndicatorStyle {
   /// 线性轨道圆角，不跟随全局控件圆角。
   final double? radius;
 
+  /// 线性填充端圆角，默认轨道高度的一半；0 为直边，与外轨道圆角独立。
+  final double? fillRadius;
+
   /// 圆形进度线段的端点样式。
   final StrokeCap? strokeCap;
 
@@ -44,15 +52,45 @@ final class HyperProgressIndicatorStyle {
   /// 确定进度发生变化时的动画曲线。
   final Curve? animationCurve;
 
+  HyperProgressStyle copyWith({
+    HyperProgressVariant? variant,
+    Color? color,
+    Color? trackColor,
+    double? thickness,
+    double? size,
+    double? radius,
+    double? fillRadius,
+    StrokeCap? strokeCap,
+    double? orbitingDotSize,
+    Duration? animationDuration,
+    Curve? animationCurve,
+  }) => merge(
+    HyperProgressStyle(
+      variant: variant,
+      color: color,
+      trackColor: trackColor,
+      thickness: thickness,
+      size: size,
+      radius: radius,
+      fillRadius: fillRadius,
+      strokeCap: strokeCap,
+      orbitingDotSize: orbitingDotSize,
+      animationDuration: animationDuration,
+      animationCurve: animationCurve,
+    ),
+  );
+
   /// 用 [other] 中明确提供的属性覆盖当前样式。
-  HyperProgressIndicatorStyle merge(HyperProgressIndicatorStyle? other) {
+  HyperProgressStyle merge(HyperProgressStyle? other) {
     if (other == null) return this;
-    return HyperProgressIndicatorStyle(
+    return HyperProgressStyle(
+      variant: other.variant ?? variant,
       color: other.color ?? color,
       trackColor: other.trackColor ?? trackColor,
       thickness: other.thickness ?? thickness,
       size: other.size ?? size,
       radius: other.radius ?? radius,
+      fillRadius: other.fillRadius ?? fillRadius,
       strokeCap: other.strokeCap ?? strokeCap,
       orbitingDotSize: other.orbitingDotSize ?? orbitingDotSize,
       animationDuration: other.animationDuration ?? animationDuration,
@@ -61,16 +99,18 @@ final class HyperProgressIndicatorStyle {
   }
 
   /// 在两套进度样式之间插值。
-  static HyperProgressIndicatorStyle lerp(
-    HyperProgressIndicatorStyle a,
-    HyperProgressIndicatorStyle b,
+  static HyperProgressStyle lerp(
+    HyperProgressStyle a,
+    HyperProgressStyle b,
     double t,
-  ) => HyperProgressIndicatorStyle(
+  ) => HyperProgressStyle(
+    variant: t < .5 ? a.variant : b.variant,
     color: Color.lerp(a.color, b.color, t),
     trackColor: Color.lerp(a.trackColor, b.trackColor, t),
     thickness: _lerpDouble(a.thickness, b.thickness, t),
     size: _lerpDouble(a.size, b.size, t),
     radius: _lerpDouble(a.radius, b.radius, t),
+    fillRadius: _lerpDouble(a.fillRadius, b.fillRadius, t),
     strokeCap: t < .5 ? a.strokeCap : b.strokeCap,
     orbitingDotSize: _lerpDouble(a.orbitingDotSize, b.orbitingDotSize, t),
     animationDuration: _lerpDuration(
@@ -98,12 +138,14 @@ final class HyperProgressIndicatorStyle {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HyperProgressIndicatorStyle &&
+      other is HyperProgressStyle &&
           other.color == color &&
+          other.variant == variant &&
           other.trackColor == trackColor &&
           other.thickness == thickness &&
           other.size == size &&
           other.radius == radius &&
+          other.fillRadius == fillRadius &&
           other.strokeCap == strokeCap &&
           other.orbitingDotSize == orbitingDotSize &&
           other.animationDuration == animationDuration &&
@@ -111,11 +153,13 @@ final class HyperProgressIndicatorStyle {
 
   @override
   int get hashCode => Object.hash(
+    variant,
     color,
     trackColor,
     thickness,
     size,
     radius,
+    fillRadius,
     strokeCap,
     orbitingDotSize,
     animationDuration,

@@ -1,3 +1,6 @@
+import '../pages/selection/hyper_segmented_button_page.dart';
+import '../pages/content/hyper_avatar_page.dart';
+
 import 'package:flutter/material.dart';
 
 import '../pages/foundation/hyper_color_scheme_page.dart';
@@ -9,14 +12,20 @@ import '../pages/foundation/hyper_size_scheme_page.dart';
 import '../pages/foundation/hyper_state_value_page.dart';
 import '../pages/foundation/hyper_theme_page.dart';
 import '../pages/foundation/hyper_typography_scheme_page.dart';
-import '../pages/feedback/hyper_progress_indicator_page.dart';
+import '../pages/feedback/hyper_progress_page.dart';
+import '../pages/feedback/hyper_skeleton_page.dart';
+import '../pages/feedback/hyper_empty_state_page.dart';
 import '../pages/framework/hyper_app_bar_page.dart';
 import '../pages/framework/hyper_drawer_page.dart';
 import '../pages/framework/hyper_sidebar_page.dart';
 import '../pages/framework/hyper_tab_bar_page.dart';
+import '../pages/framework/hyper_breadcrumb_page.dart';
 import '../pages/container/hyper_container_page.dart';
 import '../pages/container/hyper_card_page.dart';
+import '../pages/container/hyper_widget_group_page.dart';
 import '../pages/content/hyper_text_page.dart';
+import '../pages/content/hyper_badge_page.dart';
+import '../pages/content/hyper_tag_page.dart';
 import '../pages/content/hyper_icon_page.dart';
 import '../pages/content/hyper_divider_page.dart';
 import '../pages/content/hyper_list_tile_page.dart';
@@ -29,6 +38,8 @@ import '../pages/interaction/hyper_menu_page.dart';
 import '../pages/interaction/hyper_tooltip_page.dart';
 import '../pages/surface/hyper_material_surface_page.dart';
 import '../pages/selection/hyper_switch_page.dart';
+import '../pages/selection/hyper_slider_page.dart';
+import '../pages/selection/hyper_chip_page.dart';
 import '../pages/selection/hyper_checkbox_page.dart';
 import '../pages/selection/hyper_radio_page.dart';
 import '../pages/selection/hyper_dropdown_menu_page.dart';
@@ -151,6 +162,13 @@ final List<GallerySection> gallerySections = [
         builder: (_) => const HyperCardPage(),
       ),
       GalleryItem(
+        id: 'hyper-widget-group',
+        title: 'HyperWidgetGroup',
+        description: '混合控件排列、分隔与可配置的外层视觉。',
+        icon: Icons.view_week_outlined,
+        builder: (_) => const HyperWidgetGroupPage(),
+      ),
+      GalleryItem(
         id: 'hyper-material-surface',
         title: 'HyperMaterialSurface',
         description: '普通、半透明、毛玻璃、柔光玻璃及明确降级。',
@@ -175,6 +193,27 @@ final List<GallerySection> gallerySections = [
         description: '设备尺寸、状态样式和可变图标轴。',
         icon: Icons.insert_emoticon_outlined,
         builder: (_) => const HyperIconPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-badge',
+        title: 'HyperBadge',
+        description: '点、数量、短文本徽标和独立锚点定位。',
+        icon: Icons.notification_important_outlined,
+        builder: (_) => const HyperBadgePage(),
+      ),
+      GalleryItem(
+        id: 'hyper-avatar',
+        title: 'HyperAvatar',
+        description: '头像、横向堆叠、圆形五角与宫格头像组。',
+        icon: Icons.account_circle_outlined,
+        builder: (_) => const HyperAvatarPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-tag',
+        title: 'HyperTag',
+        description: '普通、强调与禁用的静态内容标签。',
+        icon: Icons.label_outline,
+        builder: (_) => const HyperTagPage(),
       ),
       GalleryItem(
         id: 'hyper-divider',
@@ -242,17 +281,52 @@ final List<GallerySection> gallerySections = [
         icon: Icons.toggle_on_outlined,
         builder: (_) => const HyperSwitchPage(),
       ),
+      GalleryItem(
+        id: 'hyper-slider',
+        title: 'HyperSlider',
+        description: '单值、范围和垂直滑块；共享四端尺寸与主题。',
+        icon: Icons.tune,
+        builder: (_) => const HyperSliderPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-segmented-button',
+        title: 'HyperSegmentedButton',
+        description: '单选、多选、图标和连接布局。',
+        icon: Icons.view_week_outlined,
+        builder: (_) => const HyperSegmentedButtonPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-chip',
+        title: 'HyperChip',
+        description: '操作、单选、多选、头像和独立删除。',
+        icon: Icons.label_outline,
+        builder: (_) => const HyperChipPage(),
+      ),
     ],
   ),
   GallerySection(
     title: '反馈与状态',
     items: [
       GalleryItem(
+        id: 'hyper-empty-state',
+        title: 'HyperEmptyState',
+        description: '暂无数据、搜索无结果、加载失败及自定义内容。',
+        icon: Icons.inbox_outlined,
+        builder: (_) => const HyperEmptyStatePage(),
+      ),
+      GalleryItem(
+        id: 'hyper-skeleton',
+        title: 'HyperSkeleton',
+        description: '基础形状、微光、呼吸及加载内容过渡。',
+        icon: Icons.view_agenda_outlined,
+        builder: (_) => const HyperSkeletonPage(),
+      ),
+      GalleryItem(
         id: 'hyper-progress-indicator',
-        title: 'HyperProgressIndicator',
+        title: 'HyperProgress',
         description: '线性、圆形、确定进度与不确定进度。',
         icon: Icons.data_usage,
-        builder: (_) => const HyperProgressIndicatorPage(),
+        builder: (_) => const HyperProgressPage(),
       ),
     ],
   ),
@@ -304,6 +378,13 @@ final List<GallerySection> gallerySections = [
         description: '底槽、独立圆角与下划线标签。',
         icon: Icons.tab_outlined,
         builder: (_) => const HyperTabBarPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-breadcrumb',
+        title: 'HyperBreadcrumb',
+        description: '胶囊路径、节点点击和长路径滚动。',
+        icon: Icons.chevron_right,
+        builder: (_) => const HyperBreadcrumbPage(),
       ),
     ],
   ),

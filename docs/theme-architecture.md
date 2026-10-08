@@ -1,5 +1,65 @@
 # Lemon UI 主题与尺寸架构
 
+## LoadingOverlay（2026-10-03）
+
+全局 loadingOverlayTheme、局部 HyperLoadingOverlayTheme 和实例 Style 逐字段合并，
+中央内容宽度、留白、圆角和间距由四端 sizes.loadingOverlay 管理。
+默认指示器复用 HyperCircularProgress 与进度主题，不另存一套设备进度尺寸。
+统一材质质量和降级从 HyperMaterialTheme 继承，显式 Style 可局部覆盖。
+纯计时模型只负责 showDelay 与 minimumVisibleDuration；组件管理遮罩显隐及 child 的交互隔离，
+父级管理任务、取消、导航、外部布局与区域外交互。计时与动画相互独立，减少动画不缩短业务保留时间。
+
+## Alert / Banner（2026-10-03）
+
+alertTheme / bannerTheme 及 sizes.alert / sizes.banner 独立存储，
+局部通过 HyperAlertTheme / HyperBannerTheme 覆盖，不读取对方主题。
+HyperNoticeStyle 仅共用字段结构，支持通用与四种状态覆盖，实例 Style 最后应用。
+共用内部 HyperNoticeBody 的内容、图标、操作与显隐布局；状态和关闭由父级控制。
+材质默认继承 HyperMaterialTheme，渲染与降级复用 HyperMaterialSurface。
+显示、隐藏、颜色与布局变化使用 Motion 和系统减少动画策略，显隐过渡可替换。
+Banner 不创建浮层或自动吸顶；定位、宽度和外边距由父级管理。
+
+## 统一高级材质策略（2026-10-03）
+
+所有高级材质功能统一由 HyperThemeData.materialTheme / HyperMaterialTheme 管理质量、
+默认配方与减少透明度策略；组件不得拥有独立默认的高级材质开关或降级规则。
+支持材质的组件默认继承统一策略，允许通过局部主题或实例的显式字段覆盖，以局部开启或替换配方。
+材质渲染和降级统一交给 HyperMaterialSurface / HyperMaterialThemeData.resolveMaterial。
+浮层需要保留调用处的材质上下文。Toast / Snackbar 的 show 函数捕获配方、质量和透明度策略，
+组件 ThemeData / Style 字段只是可选覆盖，不成为另一套系统级策略。
+
+## Toast / Snackbar（2026-10-01）
+
+toastTheme 与 snackbarTheme 独立；HyperToastTheme / HyperSnackbarTheme 局部合并，
+共用强类型 HyperMessageStyle 的字段结构而不读取对方主题。四端尺寸分别存储于 sizes.toast / sizes.snackbar。
+showHyperToast / showHyperSnackbar 捕获调用位置的视觉解析结果；直接 Controller.show 使用宿主主题。
+HyperSnackbarHost 通过 OverlayPortal 保留宿主继承上下文，负责显示位置、安全区、键盘避让、计时和连续过渡。
+Controller 管理 queue、stack、stackQueue 的名额、FIFO 等待、淘汰、取消与关闭完成，不接触 Navigator、计时或动画。
+Toast 默认实时堆叠，Snackbar 默认串行；两个类型各自占用名额，避免操作提示阻塞轻提示。
+宿主只有一条呈现路径，每项独立持有动画与计时；没有为旧串行模式保留单条专用补丁。
+不保存静态窗口宿主；移除宿主清理请求，外部控制器保留创建方的销毁职责。
+表面共用内部无主题布局，操作主题仅包装 action 子树。
+
+## BottomSheet（2026-10-01）
+
+HyperBottomSheet 的表面和内容与模态路由分开；showHyperBottomSheet 复用 Flutter ModalBottomSheetRoute 的拖动关闭、遮罩和焦点职责。
+全局 bottomSheetTheme、局部 HyperBottomSheetTheme、打开函数 Style 与实例 Style 逐字段合并；不继承 Dialog 组件主题。
+Sheet 与 Dialog 只复用内部 HyperModalContent 的无主题布局：标题、正文滚动、固定操作区和按钮子树主题。
+四端最大宽度、上方圆角、正文留白、间距、关闭图标及拖动条几何集中在 HyperSizeScheme.bottomSheet。
+显式 height/maxHeight 接受父约束，文字不按高度缩放；高度固定时正文填满剩余空间，footer 保留在底部。
+动画用强类型 AnimationStyle 配置进出时长和曲线，默认从 Motion 推导，merge 保留未覆盖的内部字段；减少动画优先。
+拖动条由 Sheet 绘制且可替换，不叠加 Material 默认拖动条或默认表面。表单与多档高度吸附不属于当前面板职责。
+
+## Dialog（2026-10-01）
+
+HyperDialog 管理标题、滚动正文、操作区和表面；showHyperDialog 管理模态路由、遮罩、焦点循环与返回结果。
+全局 dialogTheme、局部 HyperDialogTheme 与实例 HyperDialogStyle 按显式字段合并，路由捕获调用处的 InheritedTheme。
+操作区 buttonTheme 只覆盖操作区子树，不改变正文或全局按钮主题。任意 actions Widget 保留自身交互职责。
+四端最大宽度、圆角、内外留白、标题与按钮间距及关闭图标尺寸集中在 HyperSizeScheme.dialog；窗口仅约束可用空间。
+表面背景、材质、边框、阴影、文字、位置、按钮与路由过渡均为强类型配置，具有 copyWith、merge、lerp 和值相等。
+默认过渡取 Motion fast，减少动画时关闭；路由 transitionBuilder 可替换默认淡入与轻微缩放。
+后期表单弹窗只组合 Dialog 和 Form，Dialog 不持有校验或提交状态。
+
 本文冻结 Lemon UI 的主题、设备适配和组件默认值架构。新增组件、主题重构、Demo 和测试均须遵守本文；主题类随组件增加而变大是集中式强类型设计系统的预期成本，不再作为拆散主题的理由。
 
 默认视觉值的来源和缺少直接参考时的推导方法见 [HyperOS 风格设计基准](hyperos-design-baseline.md)。手机端参考 HyperOS；desktop 端尺寸和样式以小米 HIUI 为主要参考；平板和手表制定独立规格。第三方实现与项目暂定值不得标成官方规范。
@@ -444,3 +504,72 @@ merge、lerp、值相等均覆盖内容字段。线条与文字样式使用全�
 phone/tablet 8/16/18，desktop 8/16/16，watch 6/12/16（Flutter 逻辑像素），
 未完成同设备截图对照。原有粗细、虚线和点线尺寸保持不变。
 绘制裁剪到分隔线边界，避免末端圆点越界；零步长不会产生无限绘制循环。
+
+## 文本输入与尾部错误
+
+HyperTextField 复用原生 TextField，不接管输入法、光标、选择区和格式化职责。
+controller 与 initialValue 互斥；内部创建的 controller/focusNode 由组件释放，
+外部传入的由应用释放。readOnly 不提供清空操作，enabled 禁用编辑和尾部操作。
+校验由应用提供 errorText，不是 FormField；不自动执行网络验证。
+
+错误不传入 InputDecoration.errorText，不插入底部辅助行；计数也放在尾部。
+reserveErrorSpace 默认不预留错误图标位，可显式设为 true 预留；清空和密码操作有固定独立区域。
+详情浮层保持稳定元素位置，错误消失先关闭浮层；尾部宽度平滑展开/收起，
+图标以轻微缩放和淡入淡出切换，固定纵向占位，不因错误切换增加行高。
+保留最后一条详情仅用于浮层退出动画，不保留业务校验结果。
+错误文本与 invalid 语义传给屏幕阅读器，尾部错误操作支持鼠标悬停、点击和键盘激活。
+
+全局 textFieldTheme、局部 HyperTextFieldTheme、实例 HyperTextFieldStyle 覆盖显式字段。
+状态为普通→hovered→focused→error→disabled，实例最后覆盖。
+背景填充/材质、边框、阴影、排版、尺寸、图标、光标、计数与错误浮层均强类型配置。
+错误浮层表面复用 HyperCardStyle，errorBuilder 完全替换内容；
+transitionBuilder 替换图标过渡，errorTransitionBuilder 替换浮层进出场。
+动效沿用全局 Motion fast 并遵守减少动画。
+
+四端规格由 HyperSizeScheme.textField 管理；默认最小可见高度按同端基础控件推导。
+手机/平板未获取同场景 HyperOS 官方逻辑尺寸，HiUI Input 官方页面与源码入口本次未能读取，
+因此数值记录为 D 级项目语义推导，不称为官方规范；需要设备对照。
+默认错误状态不改变高度配置；大字号、多行、自定义内容和状态尺寸覆盖仍遵守正常布局。
+用法见 usage/input.md。
+
+## Notification 通知卡片
+
+`HyperNotificationThemeData` 独立管理通用、已读、未读及交互状态样式；`HyperNotificationStyle` 提供强类型复制、合并、插值和值相等。尺寸集中于四端 `HyperSizeScheme.notification`。通用样式之后依次覆盖阅读状态、悬停、焦点、按压、禁用，实例覆盖最后应用。
+
+卡片仅负责呈现与交互回调，日期格式化、数据、已读状态、显示状态和通知列表由上层管理。默认继承统一材质配方、质量及透明度策略，渲染复用 HyperMaterialSurface；不建立组件独立材质开关。状态动效来自 Motion，显隐过渡可替换。
+
+## NotificationCenter（2026-10-04）
+
+notificationCenterTheme 与 sizes.notificationCenter 独立强类型存储，支持 copyWith、合并、插值和值相等。中心只绘制标题、计数、组标题和布局，不自建表面；notificationTheme 子主题管理卡片，emptyStateStyle 管理空状态，buttonTheme 管理中心生成的操作。材质继承统一基础设施。
+
+父级持有 entries 和业务操作，中心仅发出单条/批量回调。Snapshot 固定输入列表、校验 id 唯一性并按首次出现组别排列，不做日期推断或异步数据存储。默认有限高度内使用惰性 ListView；shrinkWrap 嵌入布局仅用于少量内容。默认空状态过渡继承 Motion，可通过 transitionBuilder 替换。
+
+## Collapsible / Accordion（2026-10-05）
+
+collapsibleTheme / accordionTheme 与 sizes.collapsible / sizes.accordion 独立强类型存储。面板解析通用、展开/收起、禁用后，再合并实例 Style；组只管理展开规则、项间距和可选分隔线，itemTheme 管理子面板视觉。两者不读取 Card 主题。
+
+父级持有 expanded / expandedIds，纯 HyperAccordionSelection 验证唯一 id、互斥模式和有效展开集合。内容生命周期底座负责连续反向动画、完全关闭后的卸载或保留、收起时即时交互隔离。动画使用 Motion 与减少动画策略，公开 transitionBuilder 可替换内容视觉；横向内容的宽度约束由调用方负责。
+
+表面继承统一材质配方、质量及减少透明度配置，渲染降级复用 HyperMaterialSurface，不自建默认材质开关。
+
+## Pagination（2026-10-05）
+
+paginationTheme 与 sizes.pagination 独立强类型存储，支持复制、合并、插值和值相等。分页主题只管理自身间距、导航图标和文案，以及普通、选中、导航按钮的 HyperButtonStyle；按钮状态、焦点、键盘、材质与动画复用按钮职责，不自建交互或材质路径。当前页禁用重复请求并保留明确选中配方。
+
+HyperPaginationModel 负责输入合法性、页码窗口与省略号；组件仅发出 onPageChanged，调用方负责数据加载和页数变化后的当前页修正。Wrap 适应可用宽度，不改变设备分类。数据为空使用 currentPage 0，非空页码从 1 起始。
+
+## StepIndicator / StepperNavigation（2026-10-05）
+
+stepIndicatorTheme / stepperNavigationTheme 与 sizes.stepIndicator / sizes.stepperNavigation 各自独立存储。HyperStepStyle、HyperStepSize 共用字段结构，公共 Body 只接收已选主题解析函数与当前尺寸，不自行判断设备类别或读取另一组件主题。
+
+纯 HyperStepModel 校验索引与 id，推导 pending/current/completed，并支持显式 error 和 disabled 状态。页面负责实际导航、流程校验与提交；Indicator 仅呈现，Navigation 仅发出请求。主题通用字段、状态字段、实例字段、单项字段依次合并。
+
+统一材质策略管理节点配方、质量及减少透明度；节点渲染复用 HyperMaterialSurface。公共底座管理节点、连接线、文字及符号过渡，交互复用 HyperPressable，动画与减少动画取统一 Motion。
+
+## Timeline（2026-10-06）
+
+timelineTheme / sizes.timeline 独立强类型存储。全局、局部、实例和单项样式逐字段覆盖；状态主题只提供语义外观，不持有日期或业务状态。HyperTimelineModel 固定输入列表、验证唯一 id、处理展示反转与整组对侧列预留。
+
+时间线与步骤组件是不同的数据职责和布局语义，不读取 stepIndicatorTheme；仅复用统一文字、材质与 Motion 基础设施。轨道宽度统一由当前解析后最大节点尺寸决定，以保持混合节点和对侧内容时连接线连续。父级提供有限宽度及外部滚动；反转不做日期排序。
+
+默认圆点继承统一材质配方、质量与减少透明度，复用 HyperMaterialSurface。自定义节点由调用方负责自身视觉，时间线仅提供槽位与图标主题。

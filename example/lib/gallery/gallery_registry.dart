@@ -1,3 +1,15 @@
+import '../pages/content/hyper_timeline_page.dart';
+import '../pages/framework/hyper_steps_page.dart';
+import '../pages/framework/hyper_pagination_page.dart';
+import '../pages/container/hyper_collapsible_page.dart';
+import '../pages/feedback/hyper_notification_center_page.dart';
+import '../pages/feedback/hyper_notification_page.dart';
+import '../pages/selection/hyper_text_field_page.dart';
+import '../pages/feedback/hyper_dialog_page.dart';
+import '../pages/feedback/hyper_bottom_sheet_page.dart';
+import '../pages/feedback/hyper_message_page.dart';
+import '../pages/feedback/hyper_notice_page.dart';
+import '../pages/feedback/hyper_loading_overlay_page.dart';
 import '../pages/selection/hyper_segmented_button_page.dart';
 import '../pages/content/hyper_avatar_page.dart';
 
@@ -155,6 +167,13 @@ final List<GallerySection> gallerySections = [
         builder: (_) => const HyperContainerPage(),
       ),
       GalleryItem(
+        id: 'hyper-collapsible',
+        title: 'HyperCollapsible / Accordion',
+        description: '折叠区域、互斥与多项展开。',
+        icon: Icons.unfold_more,
+        builder: (_) => const HyperCollapsiblePage(),
+      ),
+      GalleryItem(
         id: 'hyper-card',
         title: 'HyperCard',
         description: '独立主题、设备圆角、自由内容和整卡交互。',
@@ -180,6 +199,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '文字与内容',
     items: [
+      GalleryItem(
+        id: 'hyper-timeline',
+        title: 'HyperTimeline',
+        description: '时间记录、交错布局与自定义节点。',
+        icon: Icons.timeline,
+        builder: (_) => const HyperTimelinePage(),
+      ),
       GalleryItem(
         id: 'hyper-text',
         title: 'HyperText',
@@ -251,6 +277,18 @@ final List<GallerySection> gallerySections = [
     ],
   ),
   GallerySection(
+    title: '输入控件',
+    items: [
+      GalleryItem(
+        id: 'hyper-text-field',
+        title: 'HyperTextField',
+        description: '单行、多行、密码和尾部错误提示。',
+        icon: Icons.edit_outlined,
+        builder: (_) => const HyperTextFieldPage(),
+      ),
+    ],
+  ),
+  GallerySection(
     title: '选择控件',
     items: [
       GalleryItem(
@@ -307,6 +345,55 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '反馈与状态',
     items: [
+      GalleryItem(
+        id: 'hyper-notification-center',
+        title: 'HyperNotificationCenter',
+        description: '受控通知列表、分组和批量操作。',
+        icon: Icons.notifications_active_outlined,
+        builder: (_) => const HyperNotificationCenterPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-notification',
+        title: 'HyperNotification',
+        description: '通知卡片、已读状态与独立操作。',
+        icon: Icons.notifications_outlined,
+        builder: (_) => const HyperNotificationPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-loading-overlay',
+        title: 'HyperLoadingOverlay',
+        description: '区域和整页加载、延迟显示、点击拦截与取消。',
+        icon: Icons.hourglass_empty,
+        builder: (_) => const HyperLoadingOverlayPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-notice',
+        title: 'HyperAlert / HyperBanner',
+        description: '四种状态、内联提示、页面横幅、操作与关闭。',
+        icon: Icons.info_outline,
+        builder: (_) => const HyperNoticePage(),
+      ),
+      GalleryItem(
+        id: 'hyper-bottom-sheet',
+        title: 'HyperBottomSheet',
+        description: '高度、拖动关闭、边框圆角、正文滚动与固定操作区。',
+        icon: Icons.vertical_align_bottom,
+        builder: (_) => const HyperBottomSheetPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-message',
+        title: 'HyperToast / HyperSnackbar',
+        description: '轻提示、操作提示、队列、位置和主题覆盖。',
+        icon: Icons.notifications_none,
+        builder: (_) => const HyperMessagePage(),
+      ),
+      GalleryItem(
+        id: 'hyper-dialog',
+        title: 'HyperDialog',
+        description: '位置、边框、圆角、按钮排列和自由内容。',
+        icon: Icons.web_asset_outlined,
+        builder: (_) => const HyperDialogPage(),
+      ),
       GalleryItem(
         id: 'hyper-empty-state',
         title: 'HyperEmptyState',
@@ -378,6 +465,20 @@ final List<GallerySection> gallerySections = [
         description: '底槽、独立圆角与下划线标签。',
         icon: Icons.tab_outlined,
         builder: (_) => const HyperTabBarPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-steps',
+        title: 'HyperStepIndicator / StepperNavigation',
+        description: '步骤状态、横纵布局和受控导航。',
+        icon: Icons.format_list_numbered,
+        builder: (_) => const HyperStepsPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-pagination',
+        title: 'HyperPagination',
+        description: '受控页码、省略号与首尾导航。',
+        icon: Icons.more_horiz,
+        builder: (_) => const HyperPaginationPage(),
       ),
       GalleryItem(
         id: 'hyper-breadcrumb',

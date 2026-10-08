@@ -172,15 +172,7 @@ class HyperAvatarGroup extends StatelessWidget {
             ? Offset(0, i * step)
             : Offset(i * step, 0);
       }
-      // 将计算位置限制在画布内；几何校验保留浮点运算容差。
-      slots.add(
-        Rect.fromLTWH(
-          position.dx.clamp(0.0, canvas.width - tile),
-          position.dy.clamp(0.0, canvas.height - tile),
-          tile,
-          tile,
-        ),
-      );
+      slots.add(Rect.fromLTWH(position.dx, position.dy, tile, tile));
     }
     if (overflow && circular && count > 1) {
       // 将溢出项与右下方向的环绕位置交换，中心头像保持原位。

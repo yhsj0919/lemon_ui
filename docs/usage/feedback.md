@@ -2,6 +2,12 @@
 
 [返回目录](README.md)
 
+对话框见 [HyperDialog 使用说明](dialog.md)。
+底部面板见 [HyperBottomSheet 使用说明](bottom-sheet.md)。
+轻提示与操作提示见 [Toast / Snackbar 使用说明](messages.md)。
+内联提示和页面横幅见 [Alert / Banner 使用说明](notices.md)。
+区域和整页加载见 [HyperLoadingOverlay 使用说明](loading-overlay.md)。
+
 ## HyperMenu 菜单内容
 
 ~~~dart
@@ -186,3 +192,11 @@ content 添加任意内容，actions 自动换行。父级决定可用范围。
 全局 emptyStateTheme、局部 HyperEmptyStateTheme、实例 HyperEmptyStateStyle。
 [源码](../../lib/src/components/empty_state/hyper_empty_state.dart) ·
 [Demo](../../example/lib/pages/feedback/hyper_empty_state_page.dart)。
+
+## 通知卡片
+
+参见[通知卡片使用文档](notification.md)，支持受控已读与显示状态、独立操作和统一材质。
+
+## 通知中心
+
+参见[通知中心使用文档](notification-center.md)。默认有限高度内滚动，也可嵌入外部列表。

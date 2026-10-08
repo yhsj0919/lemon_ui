@@ -171,27 +171,23 @@ class HyperWidgetGroup extends StatelessWidget {
     final child = wrapped?.child ?? item;
     final width = wrapped?.width;
     final radius = wrapped?.borderRadius ?? itemBorderRadius;
+    final scopedChild = HyperWidgetGroupScope(
+      connected: connected,
+      itemHeight: itemHeight,
+      fillWidth: width != null || wrapped?.flex != null,
+      child: child,
+    );
     final content = SizedBox(
       width: width,
       height: itemHeight,
       child: radius == null
-          ? HyperWidgetGroupScope(
-              connected: connected,
-              itemHeight: itemHeight,
-              fillWidth: width != null || wrapped?.flex != null,
-              child: child,
-            )
+          ? scopedChild
           : AnimatedContainer(
               duration: duration,
               curve: curve,
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(borderRadius: radius),
-              child: HyperWidgetGroupScope(
-                connected: connected,
-                itemHeight: itemHeight,
-                fillWidth: width != null || wrapped?.flex != null,
-                child: child,
-              ),
+              child: scopedChild,
             ),
     );
     final flex = wrapped?.flex;

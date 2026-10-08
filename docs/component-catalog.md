@@ -13,9 +13,9 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 近期实施顺序
 
-1. `HyperTag`：先做轻量内容标签，明确普通、强调和禁用状态；文字、背景、边框、圆角及四端尺寸由主题配置。它与可点击、可选择的 `HyperChip` 分工。
-2. `HyperWidgetGroup`：通用混合组件容器，接受任意 Widget 子项，可组合按钮、图标、文字等；负责排列、间距、对齐和可选的分隔/外层视觉，不接管子项的点击、焦点及内部样式。先完成通用组合，再由 `HyperButtonGroup` 等专用组件复用。
-3. `HyperAvatar`、`HyperAvatarGroup`：头像及头像组，在线状态和计数角标复用现有 `HyperBadgeAnchor`。
+进度同步（2026-10-01）：Tag、WidgetGroup、Avatar / AvatarGroup、Progress、Skeleton、EmptyState、Chip、SegmentedButton、Divider 和独立 TextField 已完成当前实现与使用文档。
+
+Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档，Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。表单、字段校验、提交状态和表单弹窗留到最后，见“当前推进顺序”。
 
 ## 标记说明
 
@@ -38,7 +38,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [x] `HyperColorScheme`：语义颜色体系。
 - [x] `HyperContrastThemeData`：standard、adaptive 和 inverted 全局前景反色策略。
 - [x] `HyperContrastTheme`：局部子树反色策略覆盖。
-- [ ] `HyperTextTheme`：字体和文本层级。
+- [x] `HyperTextTheme`：文本组件局部主题；字体层级由 Typography 主题统一管理。
 - [x] `HyperSizeScheme`：明确数值的尺寸预设，不使用倍率缩放。
 - [x] `HyperMotionThemeData`：动画时长、曲线和弹簧。
 - [x] `HyperElasticOverscrollController`、`HyperElasticOverscrollTransform`、`HyperElasticOverscrollRegion`：拖动控件越界阻力、回弹及快捷包装。
@@ -213,7 +213,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 八、文本输入与编辑
 
-- [ ] `HyperTextField`：单行文本输入。
+- [x] `HyperTextField`：单行、多行、密码、清空、字数限制及尾部错误提示；支持独立主题与四端规格。
 - [ ] `HyperTextFormField`：表单文本字段。
 - [ ] `HyperTextArea`：多行文本输入。
 - [ ] `HyperSearchField`：搜索输入。
@@ -301,8 +301,8 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperTreeTable<T>`：树形表格。
 - [ ] `HyperKeyValueTable`：键值信息表。
 - [ ] `HyperDescriptionList`：描述列表。
-- [ ] `HyperTimeline`：时间线。
-- [ ] `HyperStepIndicator`：步骤状态展示。
+- [x] `HyperTimeline`：时间线。
+- [x] `HyperStepIndicator`：步骤状态展示。
 - [ ] `HyperMetric`：指标卡。
 - [ ] `HyperStatCard`：统计卡片。
 - [ ] `HyperChartContainer`：图表承载和状态框架。
@@ -328,9 +328,9 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [x] `HyperTabBarView`：与标签栏共享控制器的标签内容。
 - [ ] `HyperSegmentedNavigation`：分段导航。
 - [x] `HyperBreadcrumb`：胶囊路径导航，节点点击、独立高亮与横向滚动。
-- [ ] `HyperPagination`：页码导航。
+- [x] `HyperPagination`：页码导航。
 - [ ] `HyperPageIndicator`：页面指示器。
-- [ ] `HyperStepperNavigation`：步骤导航。
+- [x] `HyperStepperNavigation`：步骤导航。
 - [ ] `HyperBottomAppBar`：底部应用栏。
 - [ ] `HyperNavigationSplitView`：侧栏与内容区域。
 - [ ] `HyperRouteTransition`：统一路由转场。
@@ -354,8 +354,8 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperPopover`：带锚点的内容浮层。
 - [ ] `HyperCommandPalette`：命令面板。
 - [ ] `HyperActionSheet`：移动端操作面板。
-- [ ] `HyperBottomSheet`：底部面板。
-- [ ] `HyperModalBottomSheet`：模态底部面板。
+- [x] `HyperBottomSheet`：独立主题的底部面板，支持明确高度、上限、表面、拖动条、正文滚动和固定操作区；未做设备或 Widget 运行验证。
+- [x] 模态底部面板入口：统一使用 `showHyperBottomSheet`，复用原生拖动关闭与路由；不重复创建 `HyperModalBottomSheet`。
 - [ ] `HyperSideSheet`：侧边面板。
 - [ ] `HyperDatePickerDialog`：日期选择浮层。
 - [ ] `HyperTimePickerDialog`：时间选择浮层。
@@ -363,7 +363,7 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 十五、对话框与模态界面
 
-- [ ] `HyperDialog`：标准对话框。
+- [x] `HyperDialog`、`showHyperDialog`：自由内容对话框，支持位置、边框、圆角、按钮排列和主题、正文滚动、返回结果及可替换路由过渡；未做设备或 Widget 运行验证。
 - [ ] `HyperAlertDialog`：警告对话框。
 - [ ] `HyperConfirmDialog`：确认对话框。
 - [ ] `HyperInputDialog`：输入对话框。
@@ -377,14 +377,14 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 十六、提示、反馈与状态
 
-- [ ] `HyperToast`：短暂轻提示。
-- [ ] `HyperSnackbar`：带操作的底部提示。
-- [ ] `HyperSnackbarHost`：管理 Snackbar 队列、呈现位置和生命周期。
-- [ ] `HyperBanner`：页面内横幅提示。
-- [ ] `HyperNotification`：通知卡片。
-- [ ] `HyperNotificationCenter`：应用内通知列表。
-- [ ] `HyperAlert`：内联提示块。
-- [ ] `HyperLoadingOverlay`：区域或页面加载遮罩。
+- [x] `HyperToast`：短暂轻提示。
+- [x] `HyperSnackbar`：带操作的底部提示。
+- [x] `HyperSnackbarHost`：管理 Snackbar 队列、呈现位置和生命周期。
+- [x] `HyperBanner`：页面内横幅提示。
+- [x] `HyperNotification`：通知卡片。
+- [x] `HyperNotificationCenter`：应用内通知列表。
+- [x] `HyperAlert`：内联提示块。
+- [x] `HyperLoadingOverlay`：区域或页面加载遮罩。
 - [x] `HyperProgress`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
 - [x] `HyperLinearProgress`：支持确定/不确定进度、明确尺寸、圆角、语义、减少动画和三级主题覆盖。
 - [ ] `HyperWormProgressIndicator`：类似蚯蚓伸缩、移动的线性进度，支持确定和不确定进度。
@@ -692,8 +692,8 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ### 披露与展开
 
-- [ ] `HyperAccordion`：互斥或多项展开的内容组。
-- [ ] `HyperCollapsible`：单个可折叠区域，支持纵向和横向。
+- [x] `HyperAccordion`：互斥或多项展开的内容组。
+- [x] `HyperCollapsible`：单个可折叠区域，支持纵向和横向。
 - [ ] `HyperCollapsibleTrigger`：折叠触发区域。
 - [ ] `HyperCollapsibleContent`：折叠内容区域。
 - [ ] `HyperHoverCard`：桌面悬停或焦点触发的信息卡。
@@ -782,6 +782,14 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - 不让多个 Hyper 控件通过共享公开组件主题产生视觉耦合。
 - 不复制其组件源码；只参考组件范围、交互场景和测试经验。
 ## 建议实现顺序
+
+### 当前推进顺序（2026-10-01）
+
+- Dialog、BottomSheet、Toast / Snackbar 及队列宿主当前实现、主题、Demo 和使用文档已完成；Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。
+- 表单体系统一放到最后：`HyperForm`、`HyperTextFormField`、字段校验、异步校验与提交状态。
+- 表单弹窗后期基于 `HyperDialog` 的自由正文和操作区组合，复用位置、边框、圆角与按钮主题；不在 Dialog 内实现校验或提交状态。
+- 已有 `HyperTextField` 保持独立输入能力；暂不扩展表单封装。
+- 下方阶段为原始分类参考；当前开发顺序以本节为准，每次只推进确认的一项。
 
 ### 阶段 0：基础协议
 

@@ -1,5 +1,101 @@
 # Lemon UI 尺寸规范（第一版）
 
+## LoadingOverlay 暂定四端规格（2026-10-03）
+
+查询 [HIUI Loading](https://xiaomi.github.io/hiui/components/loading/) 未取得可核实参数，
+手机端暂无同状态官方尺寸或目标截图。以下为 D 级同端语义推导，单位 Flutter 逻辑像素。
+中央表面圆角取同端 Card，宽度上限复用同端 Dialog 内容上限，留白与间距从现有面板/内联提示规格推导。
+
+| 设备 | contentRadius | contentPadding | maxContentWidth | spacing |
+| --- | --- | --- | --- | --- |
+| phone | 16 | 16 | 320 | 8 |
+| tablet | 20 | 20 | 400 | 12 |
+| desktop | 8 | 12 | 360 | 8 |
+| watch | 20 | 12 | 180 | 6 |
+
+遮罩默认直角，中央表面默认无填充；加载指示器复用 Progress 四端尺寸。
+遮罩颜色为 surface 的 80% 填充，是项目暂定视觉值，可由主题背景或统一材质覆盖。
+等待显示取 Motion.fastDuration，最短保留取 Motion.standardDuration，进出场取 Motion.fast。
+没有固定遮罩宽高，覆盖 child 区域；尚未进行设备或截图对照。
+
+## Alert / Banner 暂定四端规格（2026-10-03）
+
+查询 [HIUI Alert](https://xiaomi.github.io/hiui/components/alert/) 和官方仓库的样式入口，
+本次未取得可核实规格；手机端暂无同状态官方逻辑尺寸或目标截图。
+下表为 D 级项目推导，单位 Flutter 逻辑像素：Alert 圆角取同端 Card 的 surfaceRadius，
+Banner 默认直角以支持页面边缘横幅；图标与正文留白从同端 Sheet、Toast 的已存规格推导。
+关闭按钮使用同端常规控件尺寸候选，触控下限仍取 minimumInteractiveDimension。
+
+| 设备 | Alert / Banner radius | padding 水平/垂直 | icon / closeIcon | closeButton | spacing | titleSpacing | actionSpacing / run |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| phone | 16 / 0 | 16 / 12 | 20 / 20 | 40 | 8 | 4 | 8 / 8 |
+| tablet | 20 / 0 | 20 / 14 | 22 / 22 | 44 | 12 | 4 | 12 / 12 |
+| desktop | 8 / 0 | 12 / 8 | 16 / 16 | 32 | 8 | 4 | 8 / 8 |
+| watch | 20 / 0 | 12 / 8 | 18 / 18 | 36 | 6 | 4 | 6 / 6 |
+
+Alert 背景为语义状态色以 8% 覆盖 surface 的项目暂定配方；Banner 使用 surfaceMuted。
+前景与图标分别复用统一文字色和四种语义状态色，不自建色板；标题 titleSmall、正文 bodyMedium。
+默认不增加边框或阴影，无固定宽高。视觉值可由强类型主题覆盖，尚未做设备截图对照。
+
+## Toast / Snackbar 暂定四端规格（2026-10-01）
+
+查询 [HIUI Message](https://xiaomi.github.io/hiui/components/message/) 未读取到可核实视觉参数；
+[小米提示框 API](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2209)属于小游戏 API，
+没有可迁移到本组件的字号、圆角或间距规格。以下为 D 级同端语义推导，不是小米官方值。
+Toast 与 Snackbar 独立存储配方：最大宽度取同端 Dialog 原有内容上限，
+圆角取同端 overlayRadius，图标与间距取同端 Sheet/按钮规格；单位为 Flutter 逻辑像素。
+2026-10-03 根据用户反馈收紧 Toast 的垂直留白：手机、平板、桌面采用 spaceMd（8），
+手表采用 spaceSm（6），保留水平留白和字体。此项为项目视觉调校，未做截图对照。
+
+| 设备 | maxWidth | radius | Toast padding 水平/垂直 | Snackbar padding | iconSize | spacing |
+| --- | --- | --- | --- | --- | --- | --- |
+| phone | 320 | 28 | 16 / 8 | 16 | 20 | 8 |
+| tablet | 400 | 28 | 20 / 8 | 20 | 22 | 12 |
+| desktop | 360 | 18 | 16 / 8 | 16 | 16 | 8 |
+| watch | 180 | 32 | 12 / 6 | 12 | 18 | 6 |
+
+默认文字复用当前端 bodyMedium，表面/前景使用 surfaceElevated、textPrimary、textSecondary；
+默认不增加边框和阴影。进入偏移为自身高度 0.15，进出时长/曲线取 Motion standard/fast。
+Toast 默认停留 3 秒、Snackbar 4 秒为项目暂定行为值；均可覆盖。尚未做运行或截图对照。
+
+## BottomSheet 暂定四端规格（2026-10-01）
+
+[小米大屏 UX 指南](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2041)建议中、大屏弹窗与面板限制宽度并居中呈现。
+此原则可直接参考，但本次没有取得手机及 HIUI 对应控件的官方数值。除桌面最大宽度外，以下尺寸为 D 级同端语义推导，单位 Flutter 逻辑像素，未做截图对照。
+桌面最大宽度按用户要求对齐 [Material 3 BottomSheet](https://api.flutter.dev/flutter/material/BottomSheet/constraints.html) 的 640dp；窗口较窄时由父约束收窄。其余端的最大宽度及各端圆角、正文留白、标题和按钮间距与同端 Dialog 规格对齐；默认仅使用上方圆角。
+
+| 设备 | maxWidth | radius | padding | titleSpacing | actionSpacing / run | closeIconSize | dragHandlePadding 垂直 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| phone | 320 | 28 | 16 | 16 | 12 / 8 | 20 | 8 |
+| tablet | 400 | 28 | 20 | 20 | 12 / 8 | 22 | 8 |
+| desktop | 640 | 18 | 16 | 16 | 8 / 8 | 16 | 8 |
+| watch | 180 | 32 | 12 | 8 | 6 / 6 | 18 | 6 |
+
+四端拖动条暂统一为 32×4、圆角 2，参考当前 Flutter SDK 的 BottomSheet 默认拖动条 Size(32, 4)，属于 Flutter 候选而非小米规范。
+全部值独立存储于 HyperSizeScheme.bottomSheet，不通过读取 Dialog 组件尺寸建立运行时耦合。
+高度默认随内容和窗口约束变化；height/maxHeight 由实例或主题显式设置，不采用设备倍率。
+默认遮罩复用当前项目浮层配方（黑色 40%），默认进出场取 Motion standard/fast；均为可覆盖的 D 级默认值。
+
+## Dialog 暂定四端规格（2026-10-01）
+
+本次查询 [HIUI Modal](https://xiaomi.github.io/hiui/components/modal/) 与源码未读取到可核实参数，
+手机官方入口为 [大屏 UX 标准](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2040)，仅检索到弹层不应横向铺满大屏的原则，正文抓取失败。
+以下全部为 D 级项目推导，单位 Flutter 逻辑像素，未进行同设备、同状态渲染对照。
+最大宽度复用同端 EmptyState 的内容上限，圆角取同端 overlayRadius，内边距取同端页面/紧凑留白；
+标题间距取 compactSectionSpacing 或内容间距，按钮间距取同端 EmptyState，关闭图标取同端紧凑操作规格。
+
+| 设备 | maxWidth | radius | padding | insetPadding | titleSpacing | actionSpacing / run | closeIconSize |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| phone | 320 | 28 | 16 | 16 | 16 | 12 / 8 | 20 |
+| tablet | 400 | 28 | 20 | 16 | 20 | 12 / 8 | 22 |
+| desktop | 360 | 18 | 16 | 16 | 16 | 8 / 8 | 16 |
+| watch | 180 | 32 | 12 | 12 | 8 | 6 / 6 | 18 |
+
+这些数值集中在 HyperSizeScheme.dialog，局部主题与实例仅覆盖当前解析结果。
+高度随正文增长但受可用窗口和键盘范围约束；长正文滚动，横向按钮允许换行。
+遮罩暂定黑色 40% 透明度，属于 D 级内部浮层配方；barrierColor 可覆盖。
+后续需以适用的官方尺寸或用户目标截图与逻辑设备参数复核，不能将这张表称为小米官方规范。
+
 ## Chip 暂定四端规格
 
 单位为逻辑像素，来源级别 D：同端按钮、Tag 与图标规格推导，待设备对照。
@@ -438,3 +534,115 @@ WidgetGroup 是通用混排布局，默认无背景与边框；四端间距与�
 无独立尺寸常量：四端直接复用 HyperSizeScheme.button.minimumSize 与
 widgetGroup 的圆角、分隔线规格。实例 group.itemHeight 可统一覆盖可见项高度。
 默认值为 D 级项目语义推导，未完成设备同状态渲染对照。
+
+### HyperTextField
+
+以下为 D 级项目推导，单位 Flutter 逻辑像素，无同状态设备对照；
+最小高度沿用同端基础按钮/控件密度，尾部区域按紧凑操作区域推导。
+原生文字与系统缩放需要更多空间时可增加实际高度，不裁剪无障碍字阶。
+
+| 设备 | minimumHeight | 水平/垂直 padding | radius | iconSize | actionWidth | labelGap | errorMaxWidth |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| phone | 48 | 16/12 | 16 | 20 | 40 | 8 | 320 |
+| tablet | 52 | 16/14 | 16 | 22 | 44 | 8 | 400 |
+| desktop | 32 | 12/6 | 6 | 16 | 28 | 6 | 360 |
+| watch | 48 | 12/12 | 16 | 18 | 36 | 6 | 180 |
+
+数值集中在 HyperSizeScheme.textField；局部/实例 Style 只覆盖当前解析结果。
+错误和焦点默认只改颜色，不改高度、padding 或尾部区域尺寸。
+参考入口（本次未读取到可核实参数）：https://xiaomi.github.io/hiui/components/input/ 。
+
+## Notification（2026-10-04）
+
+来源等级 D：本次 HIUI Notification 文档访问未成功，也没有目标设备截图或直接单位规格；以下为同端既有 Card、IconButton、Notice 与语义主题推导，待设备及视觉验证，不声称精确还原官方通知。
+
+| 逻辑尺寸 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 圆角（同端 Card） | 16 | 20 | 8 | 20 |
+| 内边距 | 16 | 20 | 12 | 12 |
+| 图标 | 20 | 22 | 16 | 18 |
+| 未读圆点 | 6 | 6 | 6 | 6 |
+| 关闭图标 | 20 | 22 | 16 | 18 |
+| 关闭按钮可见尺寸（同端 IconButton） | 40 | 44 | 32 | 40 |
+| 内容间距 | 8 | 12 | 8 | 6 |
+| 标题间距 | 4 | 4 | 4 | 4 |
+| 操作间距 / 换行间距 | 8 / 8 | 12 / 12 | 8 / 8 | 6 / 6 |
+
+数值单位为 Flutter 逻辑像素。关闭入口触达下限继承全局 minimumInteractiveDimension，不等同可见按钮尺寸。未读点 6 为既有紧凑间距候选，仍待视觉验证。
+
+背景 surfaceElevated；标题 titleSmall，已读 textSecondary、未读 textPrimary；正文 bodyMedium/textSecondary；时间 bodySmall/textTertiary；图标与未读点 primary。状态色层继承 stateLayer，悬停/焦点 .06、按压 .10、禁用整体透明度 .38 为同端既有控件候选。没有默认悬停阴影。宽度由父布局约束，高度随内容变化；不提供设备内部分支。
+
+## NotificationCenter（2026-10-04）
+
+来源 D：官方 HIUI Notification 文档本次仍不可访问，无直接手机目标截图或通知中心单位规格。内边距与项间距复用同端 Notification 候选，组间距复用同端内边距角色，不从物理像素或跨端倍率推导。
+
+| Flutter 逻辑像素 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 内边距 | 16 | 20 | 12 | 12 |
+| 项间距 | 8 | 12 | 8 | 6 |
+| 组间距 / 标题区间距 | 16 | 20 | 12 | 12 |
+
+标题使用 titleMedium/textPrimary；组标题及计数使用 bodySmall/textSecondary；操作复用统一按钮；卡片和空状态分别复用已有主题。中心没有固定默认宽高，也不额外绘制背景。以上待设备及视觉对照验证。
+
+## Collapsible / Accordion（2026-10-05）
+
+来源 D：官方 HIUI Collapse 文档本次不可访问；没有本组件的 HyperOS 手机直接规格或目标截图。默认值分别从同端既有 Card 圆角、controlHeightMd、Notification 图标和间距角色推导，仍待设备和视觉验证。
+
+| Flutter 逻辑像素 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 面板圆角 | 16 | 20 | 8 | 20 |
+| 标题水平内边距 | 16 | 20 | 12 | 12 |
+| 标题垂直内边距 | 8 | 8 | 8 | 6 |
+| 标题最小高度 | 48 | 52 | 44 | 48 |
+| 内容左右 / 底部内边距 | 16 | 20 | 12 | 12 |
+| 内容顶部内边距 | 0 | 0 | 0 | 0 |
+| 指示图标 | 20 | 22 | 16 | 18 |
+| 图文 / 组项间距 | 8 | 12 | 8 | 6 |
+| 可选分隔线厚度 | 1 | 1 | 1 | 1 |
+
+标题最小高度继承本端标准控件，不限制多行文字增高。标题使用 titleSmall/textPrimary，图标 textSecondary，背景 surfaceElevated，状态色层 stateLayer；悬停/焦点 .06、按压 .10、禁用 .38 为同端既有语义控件候选。默认组不绘制分隔线；启用时使用 outline。展开动画为 Motion standard 候选，不是官方时长。不存在跨端倍率换算。
+
+## Pagination（2026-10-05）
+
+来源 D：本次官方 HIUI Pagination 文档不可访问，缺少目标手机截图与本组件直接官方逻辑尺寸。高度引用同端 controlHeightSm，圆角引用同端 controlRadius，图标与间距引用相邻语义控件；四端各自定义，尚待设备与视觉对照。
+
+| Flutter 逻辑像素 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 可见高度 / 最小宽度 | 40 | 44 | 36 | 40 |
+| 圆角 | 16 | 16 | 10 | 20 |
+| 水平内边距 | 8 | 12 | 8 | 6 |
+| 导航图标 | 20 | 22 | 16 | 18 |
+| 项间距 / 换行间距 | 8 | 12 | 8 | 6 |
+
+按钮触达下限来自 minimumInteractiveDimension，与可见高度区分。数字与省略号使用 bodyMedium，普通文字 textPrimary、不可用导航 textTertiary、省略号 textSecondary；当前页 primary/onPrimary。普通背景为空，当前页保留选中填充，即使没有重复切页动作。状态色层、统一材质与 Motion 复用 HyperButton；默认没有分页单独的阴影或动画开关。
+
+## StepIndicator / StepperNavigation（2026-10-05）
+
+来源 D：本次官方 HIUI Steps 文档不可访问，无直接 HyperOS 手机规格或目标截图。节点可见尺寸引用同端 controlHeightXs，图标引用相邻 Notification；间距、文字和状态色引用同端语义主题。两组件分别保存相同初始规格，可独立覆盖，待设备与视觉验证。
+
+| Flutter 逻辑像素 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 节点尺寸 | 32 | 36 | 28 | 32 |
+| 图标 | 20 | 22 | 16 | 18 |
+| 连接线厚度 | 1 | 1 | 1 | 1 |
+| 图文 / 节点到线间距 | 8 | 12 | 8 | 6 |
+| 标题与描述间距 | 4 | 4 | 4 | 4 |
+| 纵向条目底部间距 | 16 | 20 | 12 | 12 |
+| 导航交互区域圆角 | 16 | 16 | 10 | 20 |
+
+默认节点为圆形；导航最小触达高度引用 minimumInteractiveDimension，不直接放大可见节点。标题/序号使用 bodyMedium，描述使用 bodySmall。当前节点 primary/onPrimary，错误节点 error/onError，完成符号 primary；其他节点 surfaceMuted/textTertiary。完成节点之后的线为 primary，其余 outline。默认状态层透明度 .06/.06/.10、Motion fast 为项目既有候选，不标为官方数值。
+
+## Timeline（2026-10-06）
+
+来源 D：官方 HIUI Timeline 文档本次不可访问，没有目标手机截图或直接单位规格。默认圆点使用同端紧凑间距角色（phone/tablet/watch 为既有 spaceLg 12，desktop 为 spaceMd 8），自定义图标槽位引用同端 Notification 图标；其余布局留白来自同端相邻记录组件。不是从截图物理像素或跨端倍率推导，待设备与视觉验证。
+
+| Flutter 逻辑像素 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| 默认圆点 | 12 | 12 | 8 | 12 |
+| 自定义图标默认槽位 | 20 | 22 | 16 | 18 |
+| 线条厚度 | 1 | 1 | 1 | 1 |
+| 轨道与正文间距 | 8 | 12 | 8 | 6 |
+| 条目底部间距 | 16 | 20 | 12 | 12 |
+| 文字段落间距 | 4 | 4 | 4 | 4 |
+
+标题 bodyMedium/textPrimary，时间 bodySmall/textTertiary，正文 bodySmall/textSecondary。正常/禁用节点 textTertiary，活动 primary，成功 success，警告 warning，错误 error；连接线默认 outline。每项无固定高度，节点位于条目顶部；轨道按解析后最大节点宽度保留。颜色和尺寸过渡沿用 Motion fast 候选。

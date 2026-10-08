@@ -372,9 +372,16 @@ class HyperAvatarWindmillPainter extends CustomPainter {
       for (var i = 0; i < count; i++)
         petal.transform(Matrix4.rotationZ(i * 2 * math.pi / count).storage),
     ];
+    final opacity = petalOpacity.clamp(0.0, 1.0);
+    final foldX = .10 * math.cos(petalRotation) - .53 * math.sin(petalRotation);
+    final foldY =
+        -.65 + .10 * math.sin(petalRotation) + .53 * math.cos(petalRotation);
+    final foldColor = shadowColor ?? Colors.black.withValues(alpha: .30);
+    final foldRadius = radius * .48 + math.max(0, shadowBlur ?? radius * .045);
     // 每片被下一片压住，最后一片也被第一片压住，形成循环搭接。
     // 中心空洞来自花瓣内端的位置，绘制过程中不裁洞、不覆盖圆心。
     for (var i = 0; i < count; i++) {
+      final angle = i * 2 * math.pi / count;
       final next = petals[(i + 1) % count];
       final visible = Path.combine(PathOperation.difference, petals[i], next);
       final color = colors[i % colors.length];
@@ -392,20 +399,19 @@ class HyperAvatarWindmillPainter extends CustomPainter {
             end: Alignment.bottomRight,
             colors: [color, rich, color, dark],
             stops: const [0, .28, .55, 1],
-            transform: GradientRotation(i * 2 * math.pi / count),
+            transform: GradientRotation(angle),
           );
       canvas.drawPath(visible, Paint()..shader = fill.createShader(bounds));
       canvas.save();
       canvas.clipPath(visible);
       // 只在真实搭接处透出下层色彩，连续渐变模拟磨砂后的柔和叠色。
-      final previousIndex = (i + count - 1) % count;
-      final overlap = Path.combine(
-        PathOperation.intersect,
-        visible,
-        petals[previousIndex],
-      );
-      final opacity = petalOpacity.clamp(0.0, 1.0);
       if (opacity < 1) {
+        final previousIndex = (i + count - 1) % count;
+        final overlap = Path.combine(
+          PathOperation.intersect,
+          visible,
+          petals[previousIndex],
+        );
         final underneath = colors[previousIndex % colors.length];
         final transmitted = Color.alphaBlend(
           color.withValues(alpha: opacity),
@@ -420,27 +426,21 @@ class HyperAvatarWindmillPainter extends CustomPainter {
               end: Alignment.bottomCenter,
               colors: [color, transmitted, transmitted],
               stops: const [0, .55, 1],
-              transform: GradientRotation(i * 2 * math.pi / count),
+              transform: GradientRotation(angle),
             ).createShader(bounds),
         );
       }
       // 尖端附近的搭接内阴影向大头逐渐消退，形成弯折感。
-      final angle = i * 2 * math.pi / count;
-      final foldX =
-          .10 * math.cos(petalRotation) - .53 * math.sin(petalRotation);
-      final foldY =
-          -.65 + .10 * math.sin(petalRotation) + .53 * math.cos(petalRotation);
       final foldCenter = Offset(
         radius * (foldX * math.cos(angle) - foldY * math.sin(angle)),
         radius * (foldX * math.sin(angle) + foldY * math.cos(angle)),
       );
-      final foldColor = shadowColor ?? Colors.black.withValues(alpha: .30);
       canvas.drawPath(
         visible,
         Paint()
           ..shader = ui.Gradient.radial(
             foldCenter,
-            radius * .48 + math.max(0, shadowBlur ?? radius * .045),
+            foldRadius,
             [foldColor, foldColor.withValues(alpha: 0)],
             const [0, 1],
           ),
@@ -457,7 +457,7 @@ class HyperAvatarWindmillPainter extends CustomPainter {
                 border.color,
                 border.color.withValues(alpha: border.color.a * .25),
               ],
-              transform: GradientRotation(i * 2 * math.pi / count),
+              transform: GradientRotation(angle),
             ).createShader(bounds),
         );
       }

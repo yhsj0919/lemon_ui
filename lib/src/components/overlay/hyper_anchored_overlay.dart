@@ -219,7 +219,17 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
           _setOpen(!_open);
         }, _open) ??
         widget.anchor!;
-    if (widget.trigger == HyperOverlayTrigger.tap) {
+    if (widget.trigger == HyperOverlayTrigger.hover) {
+      anchor = MouseRegion(
+        onEnter: (_) {
+          _hoverCloseTimer?.cancel();
+          _setOpen(true);
+        },
+        onExit: (_) => _scheduleHoverClose(),
+        child: anchor,
+      );
+    }
+    if (widget.trigger != HyperOverlayTrigger.manual) {
       anchor = Semantics(
         button: true,
         child: GestureDetector(
@@ -229,25 +239,6 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
             _setOpen(!_open);
           },
           child: anchor,
-        ),
-      );
-    } else if (widget.trigger == HyperOverlayTrigger.hover) {
-      anchor = Semantics(
-        button: true,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            _focusNode.requestFocus();
-            _setOpen(!_open);
-          },
-          child: MouseRegion(
-            onEnter: (_) {
-              _hoverCloseTimer?.cancel();
-              _setOpen(true);
-            },
-            onExit: (_) => _scheduleHoverClose(),
-            child: anchor,
-          ),
         ),
       );
     }

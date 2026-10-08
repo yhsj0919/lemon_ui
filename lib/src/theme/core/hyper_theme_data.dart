@@ -1,3 +1,19 @@
+import '../../components/timeline/hyper_timeline_theme.dart';
+import '../../components/steps/hyper_stepper_navigation_theme.dart';
+import '../../components/steps/hyper_step_indicator_theme.dart';
+import '../../components/pagination/hyper_pagination_theme.dart';
+import '../../components/collapsible/hyper_accordion_theme.dart';
+import '../../components/collapsible/hyper_collapsible_theme.dart';
+import '../../components/notification/hyper_notification_center_theme.dart';
+import '../../components/notification/hyper_notification_theme.dart';
+import '../../components/loading_overlay/hyper_loading_overlay_theme.dart';
+import '../../components/notice/hyper_alert_theme.dart';
+import '../../components/notice/hyper_banner_theme.dart';
+import '../../components/message/hyper_toast_theme.dart';
+import '../../components/message/hyper_snackbar_theme.dart';
+import '../../components/text_field/hyper_text_field_theme.dart';
+import '../../components/dialog/hyper_dialog_theme.dart';
+import '../../components/bottom_sheet/hyper_bottom_sheet_theme.dart';
 import '../../components/segmented_button/hyper_segmented_button_theme.dart';
 import '../../components/chip/hyper_chip_theme.dart';
 import '../../components/empty_state/hyper_empty_state_theme.dart';
@@ -90,6 +106,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.skeletonTheme = const HyperSkeletonThemeData(),
     this.emptyStateTheme = const HyperEmptyStateThemeData(),
     this.segmentedButtonTheme = const HyperSegmentedButtonThemeData(),
+    this.textFieldTheme = const HyperTextFieldThemeData(),
+    this.dialogTheme = const HyperDialogThemeData(),
+    this.toastTheme = const HyperToastThemeData(),
+    this.snackbarTheme = const HyperSnackbarThemeData(),
+    this.loadingOverlayTheme = const HyperLoadingOverlayThemeData(),
+    this.notificationCenterTheme = const HyperNotificationCenterThemeData(),
+    this.collapsibleTheme = const HyperCollapsibleThemeData(),
+    this.accordionTheme = const HyperAccordionThemeData(),
+    this.paginationTheme = const HyperPaginationThemeData(),
+    this.stepIndicatorTheme = const HyperStepIndicatorThemeData(),
+    this.stepperNavigationTheme = const HyperStepperNavigationThemeData(),
+    this.timelineTheme = const HyperTimelineThemeData(),
+    this.notificationTheme = const HyperNotificationThemeData(),
+    this.alertTheme = const HyperAlertThemeData(),
+    this.bannerTheme = const HyperBannerThemeData(),
+    this.bottomSheetTheme = const HyperBottomSheetThemeData(),
     this.chipTheme = const HyperChipThemeData(),
     this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
@@ -325,6 +357,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperSkeletonThemeData skeletonTheme;
   final HyperEmptyStateThemeData emptyStateTheme;
   final HyperSegmentedButtonThemeData segmentedButtonTheme;
+  final HyperTextFieldThemeData textFieldTheme;
+  final HyperDialogThemeData dialogTheme;
+  final HyperToastThemeData toastTheme;
+  final HyperSnackbarThemeData snackbarTheme;
+  final HyperLoadingOverlayThemeData loadingOverlayTheme;
+  final HyperNotificationCenterThemeData notificationCenterTheme;
+  final HyperCollapsibleThemeData collapsibleTheme;
+  final HyperAccordionThemeData accordionTheme;
+  final HyperPaginationThemeData paginationTheme;
+  final HyperStepIndicatorThemeData stepIndicatorTheme;
+  final HyperStepperNavigationThemeData stepperNavigationTheme;
+  final HyperTimelineThemeData timelineTheme;
+  final HyperNotificationThemeData notificationTheme;
+  final HyperAlertThemeData alertTheme;
+  final HyperBannerThemeData bannerTheme;
+  final HyperBottomSheetThemeData bottomSheetTheme;
   final HyperChipThemeData chipTheme;
   final HyperWidgetGroupThemeData widgetGroupTheme;
 
@@ -363,12 +411,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperContrastThemeData contrastTheme;
 
   Brightness get brightness => colors.brightness;
-
-  /// 兼容读取标准动画时长。
-  Duration get animationDuration => motion.standardDuration;
-
-  /// 兼容读取标准动画曲线。
-  Curve get animationCurve => motion.standardCurve;
 
   ThemeData toMaterialThemeData([ThemeData? base]) {
     final material = base ?? ThemeData(brightness: brightness);
@@ -428,8 +470,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperTypographyScheme? typography,
     HyperTypographyThemeData? typographyTheme,
     HyperMotionThemeData? motion,
-    Duration? animationDuration,
-    Curve? animationCurve,
     HyperContainerThemeData? containerTheme,
     HyperScaffoldThemeData? scaffoldTheme,
     HyperAppBarThemeData? appBarTheme,
@@ -447,6 +487,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperSkeletonThemeData? skeletonTheme,
     HyperEmptyStateThemeData? emptyStateTheme,
     HyperSegmentedButtonThemeData? segmentedButtonTheme,
+    HyperTextFieldThemeData? textFieldTheme,
+    HyperDialogThemeData? dialogTheme,
+    HyperToastThemeData? toastTheme,
+    HyperSnackbarThemeData? snackbarTheme,
+    HyperLoadingOverlayThemeData? loadingOverlayTheme,
+    HyperNotificationCenterThemeData? notificationCenterTheme,
+    HyperCollapsibleThemeData? collapsibleTheme,
+    HyperAccordionThemeData? accordionTheme,
+    HyperPaginationThemeData? paginationTheme,
+    HyperStepIndicatorThemeData? stepIndicatorTheme,
+    HyperStepperNavigationThemeData? stepperNavigationTheme,
+    HyperTimelineThemeData? timelineTheme,
+    HyperNotificationThemeData? notificationTheme,
+    HyperAlertThemeData? alertTheme,
+    HyperBannerThemeData? bannerTheme,
+    HyperBottomSheetThemeData? bottomSheetTheme,
     HyperChipThemeData? chipTheme,
     HyperWidgetGroupThemeData? widgetGroupTheme,
     HyperIconButtonThemeData? iconButtonTheme,
@@ -462,7 +518,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperMaterialThemeData? materialTheme,
     HyperContrastThemeData? contrastTheme,
   }) {
-    var resolvedMotion = motion ?? this.motion;
     final resolvedTypography =
         typography ?? typographyTheme?.phone ?? this.typography;
     final resolvedTypographyTheme =
@@ -475,19 +530,13 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         (typography == null && typographyTheme == null
             ? this.textTheme
             : resolvedTypography.applyTo(this.textTheme));
-    if (animationDuration != null || animationCurve != null) {
-      resolvedMotion = resolvedMotion.copyWith(
-        standardDuration: animationDuration,
-        standardCurve: animationCurve,
-      );
-    }
     return HyperThemeData(
       colors: colors ?? this.colors,
       textTheme: resolvedTextTheme,
       sizes: sizes ?? this.sizes,
       typography: resolvedTypography,
       typographyTheme: resolvedTypographyTheme,
-      motion: resolvedMotion,
+      motion: motion ?? this.motion,
       containerTheme: containerTheme ?? this.containerTheme,
       scaffoldTheme: scaffoldTheme ?? this.scaffoldTheme,
       appBarTheme: appBarTheme ?? this.appBarTheme,
@@ -505,6 +554,24 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       skeletonTheme: skeletonTheme ?? this.skeletonTheme,
       emptyStateTheme: emptyStateTheme ?? this.emptyStateTheme,
       segmentedButtonTheme: segmentedButtonTheme ?? this.segmentedButtonTheme,
+      textFieldTheme: textFieldTheme ?? this.textFieldTheme,
+      dialogTheme: dialogTheme ?? this.dialogTheme,
+      toastTheme: toastTheme ?? this.toastTheme,
+      snackbarTheme: snackbarTheme ?? this.snackbarTheme,
+      loadingOverlayTheme: loadingOverlayTheme ?? this.loadingOverlayTheme,
+      notificationCenterTheme:
+          notificationCenterTheme ?? this.notificationCenterTheme,
+      collapsibleTheme: collapsibleTheme ?? this.collapsibleTheme,
+      accordionTheme: accordionTheme ?? this.accordionTheme,
+      paginationTheme: paginationTheme ?? this.paginationTheme,
+      stepIndicatorTheme: stepIndicatorTheme ?? this.stepIndicatorTheme,
+      stepperNavigationTheme:
+          stepperNavigationTheme ?? this.stepperNavigationTheme,
+      timelineTheme: timelineTheme ?? this.timelineTheme,
+      notificationTheme: notificationTheme ?? this.notificationTheme,
+      alertTheme: alertTheme ?? this.alertTheme,
+      bannerTheme: bannerTheme ?? this.bannerTheme,
+      bottomSheetTheme: bottomSheetTheme ?? this.bottomSheetTheme,
       chipTheme: chipTheme ?? this.chipTheme,
       widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
@@ -549,6 +616,65 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       ),
       appBarTheme: HyperAppBarThemeData.lerp(appBarTheme, other.appBarTheme, t),
       drawerTheme: HyperDrawerThemeData.lerp(drawerTheme, other.drawerTheme, t),
+      dialogTheme: HyperDialogThemeData.lerp(dialogTheme, other.dialogTheme, t),
+      toastTheme: HyperToastThemeData.lerp(toastTheme, other.toastTheme, t),
+      snackbarTheme: HyperSnackbarThemeData.lerp(
+        snackbarTheme,
+        other.snackbarTheme,
+        t,
+      ),
+      loadingOverlayTheme: HyperLoadingOverlayThemeData.lerp(
+        loadingOverlayTheme,
+        other.loadingOverlayTheme,
+        t,
+      ),
+      notificationCenterTheme: HyperNotificationCenterThemeData.lerp(
+        notificationCenterTheme,
+        other.notificationCenterTheme,
+        t,
+      ),
+      collapsibleTheme: HyperCollapsibleThemeData.lerp(
+        collapsibleTheme,
+        other.collapsibleTheme,
+        t,
+      ),
+      accordionTheme: HyperAccordionThemeData.lerp(
+        accordionTheme,
+        other.accordionTheme,
+        t,
+      ),
+      paginationTheme: HyperPaginationThemeData.lerp(
+        paginationTheme,
+        other.paginationTheme,
+        t,
+      ),
+      stepIndicatorTheme: HyperStepIndicatorThemeData.lerp(
+        stepIndicatorTheme,
+        other.stepIndicatorTheme,
+        t,
+      ),
+      stepperNavigationTheme: HyperStepperNavigationThemeData.lerp(
+        stepperNavigationTheme,
+        other.stepperNavigationTheme,
+        t,
+      ),
+      timelineTheme: HyperTimelineThemeData.lerp(
+        timelineTheme,
+        other.timelineTheme,
+        t,
+      ),
+      notificationTheme: HyperNotificationThemeData.lerp(
+        notificationTheme,
+        other.notificationTheme,
+        t,
+      ),
+      alertTheme: HyperAlertThemeData.lerp(alertTheme, other.alertTheme, t),
+      bannerTheme: HyperBannerThemeData.lerp(bannerTheme, other.bannerTheme, t),
+      bottomSheetTheme: HyperBottomSheetThemeData.lerp(
+        bottomSheetTheme,
+        other.bottomSheetTheme,
+        t,
+      ),
       sidebarTheme: HyperSidebarThemeData.lerp(
         sidebarTheme,
         other.sidebarTheme,
@@ -578,6 +704,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       segmentedButtonTheme: HyperSegmentedButtonThemeData.lerp(
         segmentedButtonTheme,
         other.segmentedButtonTheme,
+        t,
+      ),
+      textFieldTheme: HyperTextFieldThemeData.lerp(
+        textFieldTheme,
+        other.textFieldTheme,
         t,
       ),
       chipTheme: HyperChipThemeData.lerp(chipTheme, other.chipTheme, t),
@@ -668,6 +799,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.skeletonTheme == skeletonTheme &&
           other.emptyStateTheme == emptyStateTheme &&
           other.segmentedButtonTheme == segmentedButtonTheme &&
+          other.textFieldTheme == textFieldTheme &&
+          other.dialogTheme == dialogTheme &&
+          other.toastTheme == toastTheme &&
+          other.snackbarTheme == snackbarTheme &&
+          other.loadingOverlayTheme == loadingOverlayTheme &&
+          other.notificationCenterTheme == notificationCenterTheme &&
+          other.collapsibleTheme == collapsibleTheme &&
+          other.accordionTheme == accordionTheme &&
+          other.paginationTheme == paginationTheme &&
+          other.stepIndicatorTheme == stepIndicatorTheme &&
+          other.stepperNavigationTheme == stepperNavigationTheme &&
+          other.timelineTheme == timelineTheme &&
+          other.notificationTheme == notificationTheme &&
+          other.alertTheme == alertTheme &&
+          other.bannerTheme == bannerTheme &&
+          other.bottomSheetTheme == bottomSheetTheme &&
           other.chipTheme == chipTheme &&
           other.avatarTheme == avatarTheme &&
           other.tagTheme == tagTheme &&
@@ -708,6 +855,22 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     skeletonTheme,
     emptyStateTheme,
     segmentedButtonTheme,
+    textFieldTheme,
+    dialogTheme,
+    toastTheme,
+    snackbarTheme,
+    loadingOverlayTheme,
+    notificationCenterTheme,
+    collapsibleTheme,
+    accordionTheme,
+    paginationTheme,
+    stepIndicatorTheme,
+    stepperNavigationTheme,
+    timelineTheme,
+    notificationTheme,
+    alertTheme,
+    bannerTheme,
+    bottomSheetTheme,
     chipTheme,
     avatarTheme,
     tagTheme,

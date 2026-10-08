@@ -2,6 +2,15 @@
 
 本文档冻结第一阶段需要实现的公共属性、基础类型和开发顺序。目标是从最简单的能力开始，每完成一步便停下来评审，再继续下一步，不批量铺开控件。
 
+## 当前完成进度（2026-10-01）
+
+- 基础主题、设备与尺寸、按钮、卡片、框架导航和锚定浮层已实现。
+- Tab、Breadcrumb、Slider（单值、范围、垂直、胶囊）、Badge、Tag、WidgetGroup、Avatar / AvatarGroup、Progress、Skeleton、EmptyState、Chip、SegmentedButton 和 Divider 已完成当前实现与使用文档。
+- 独立 TextField 已完成单行、多行、密码、计数、尾部错误提示及高度、圆角、边框配置。
+- Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档；Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。
+- Form、字段校验、异步提交与表单弹窗统一延后。表单弹窗复用 Dialog 的布局和视觉能力。
+- 下方 P0 阶段保留为最初计划参考，当前顺序以本节和组件目录为准。尚未做设备截图对照的组件不视为已完成精确视觉还原。
+
 所有阶段同时遵守 [自定义契约](customization-contract.md)：不得使用公开第三方别名、不得按子控件类型特判布局，并且每个控件都要提供可检查的自定义入口和布局契约。
 
 涉及材质、形状、按钮、导航、设置项和悬浮层时，先遵守 [HyperOS 风格设计基准](hyperos-design-baseline.md)的来源分级，再参考 [Miuix 参考审查](miuix-reference-review.md) 与 [MIUIX 控件清单、合并关系与手机规格](miuix-component-inventory.md)。MIUIX 源码值属于第三方候选；实现方式仍服从 Flutter 与本项目主题原则。
@@ -353,6 +362,9 @@ class HyperContainer extends StatelessWidget {
 
 - 复用 Flutter 文本编辑能力。
 - 验证焦点、错误、异步校验和表单尺寸稳定性。
+
+当前进度：独立 `HyperTextField` 已实现。按 2026-10-01 的推进安排，先做其他通用控件，
+表单封装、字段校验、异步校验与提交状态统一延后；具体顺序见组件目录的“当前推进顺序”。
 
 ## 八、第一阶段暂不实现
 

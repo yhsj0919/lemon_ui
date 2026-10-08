@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperEmptyStatePage extends StatefulWidget {
   const HyperEmptyStatePage({super.key});
   @override
@@ -16,17 +18,8 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
-    Widget section(String title, Widget content) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperCard(child: content),
-        ],
-      ),
-    );
+    Widget section(String title, Widget content) =>
+        DemoSection(title: title, child: content);
     return ListView(
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [

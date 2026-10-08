@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperSegmentedButtonPage extends StatefulWidget {
   const HyperSegmentedButtonPage({super.key});
   @override
@@ -12,17 +14,8 @@ class _PageState extends State<HyperSegmentedButtonPage> {
   @override
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context);
-    Widget section(String title, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          child,
-        ],
-      ),
-    );
+    Widget section(String title, Widget child) =>
+        DemoSection(title: title, child: child);
     final views = [
       const HyperSegment(
         value: '列表',

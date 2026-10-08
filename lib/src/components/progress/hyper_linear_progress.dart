@@ -137,7 +137,12 @@ class _ProgressFillPainter extends CustomPainter {
   final TextDirection direction;
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = trackColor);
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..isAntiAlias = true
+        ..color = trackColor,
+    );
     if (value <= 0) return;
     final width = size.width * value;
     // 保持完整轨道的尺寸，平移其末端到进度位置；外层只裁出填充区。
@@ -149,7 +154,9 @@ class _ProgressFillPainter extends CustomPainter {
         rect,
         Radius.circular(radius.clamp(0.0, size.height / 2)),
       ),
-      Paint()..color = color,
+      Paint()
+        ..isAntiAlias = true
+        ..color = color,
     );
   }
 

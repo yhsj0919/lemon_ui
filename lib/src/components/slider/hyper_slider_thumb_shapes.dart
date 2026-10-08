@@ -116,10 +116,18 @@ void _paintThumb(
   Color outline,
   Color fill,
 ) {
-  canvas.drawCircle(center, radius, Paint()..color = outline);
+  canvas.drawCircle(
+    center,
+    radius,
+    Paint()
+      ..isAntiAlias = true
+      ..color = outline,
+  );
   canvas.drawCircle(
     center,
     ((radius - outlineWidth) * innerScale).clamp(0.0, radius),
-    Paint()..color = fill,
+    Paint()
+      ..isAntiAlias = true
+      ..color = fill,
   );
 }

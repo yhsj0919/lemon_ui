@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 可视化比较四类终端的明确尺寸方案。
 class HyperSizeSchemePage extends StatefulWidget {
   const HyperSizeSchemePage({super.key});
@@ -34,83 +36,103 @@ class _HyperSizeSchemePageState extends State<HyperSizeSchemePage> {
               const SizedBox(height: 8),
               const Text('四套方案使用明确数值，切换终端不会应用倍率缩放。'),
               const SizedBox(height: 20),
-              SegmentedButton<HyperDeviceType>(
-                segments: const [
-                  ButtonSegment(
-                    value: HyperDeviceType.phone,
-                    label: Text('手机'),
-                  ),
-                  ButtonSegment(
-                    value: HyperDeviceType.tablet,
-                    label: Text('平板'),
-                  ),
-                  ButtonSegment(
-                    value: HyperDeviceType.desktop,
-                    label: Text('桌面'),
-                  ),
-                  ButtonSegment(
-                    value: HyperDeviceType.watch,
-                    label: Text('手表'),
-                  ),
-                ],
-                selected: {_deviceType},
-                onSelectionChanged: (value) {
-                  setState(() => _deviceType = value.single);
-                },
-              ),
-              SizedBox(height: sizes.sectionSpacing),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _ValueCard(label: '通用 md 高度', value: sizes.controlHeightMd),
-                  _ValueCard(label: '控件圆角', value: sizes.controlRadius),
-                  _ValueCard(
-                    label: '最小命中区',
-                    value: sizes.minimumInteractiveDimension,
-                  ),
-                  _ValueCard(label: '页面边距', value: sizes.pageHorizontalPadding),
-                  _ValueCard(label: '默认图标', value: sizes.iconSize),
-                  _ValueCard(label: '工具栏', value: sizes.toolbarHeight),
-                ],
-              ),
-              SizedBox(height: sizes.sectionSpacing),
-              Text('通用高度参考', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 4),
-              const Text('用于没有专属规格的控件；按钮等组件使用各自的尺寸。'),
-              const SizedBox(height: 12),
-              for (final item in <(String, double)>[
-                ('xs', sizes.controlHeightXs),
-                ('sm', sizes.controlHeightSm),
-                ('md', sizes.controlHeightMd),
-                ('lg', sizes.controlHeightLg),
-                ('xl', sizes.controlHeightXl),
-              ]) ...[
-                _HeightMeasure(label: item.$1, height: item.$2),
-                const SizedBox(height: 8),
-              ],
-              const SizedBox(height: 16),
-              Text('视觉尺寸与命中区域', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 12),
-              Center(
-                child: Container(
-                  key: const Key('hit-target-preview'),
-                  width: sizes.minimumInteractiveDimension,
-                  height: sizes.minimumInteractiveDimension,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.colors.outline),
-                    borderRadius: BorderRadius.circular(sizes.controlRadius),
-                  ),
-                  child: Container(
-                    key: const Key('visual-control-preview'),
-                    width: sizes.iconSize,
-                    height: sizes.iconSize,
-                    decoration: BoxDecoration(
-                      color: theme.colors.primary,
-                      shape: BoxShape.circle,
+              DemoSection(
+                title: '基础用法',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HyperSegmentedButton<HyperDeviceType>(
+                      segments: const [
+                        HyperSegment(value: HyperDeviceType.phone, label: '手机'),
+                        HyperSegment(
+                          value: HyperDeviceType.tablet,
+                          label: '平板',
+                        ),
+                        HyperSegment(
+                          value: HyperDeviceType.desktop,
+                          label: '桌面',
+                        ),
+                        HyperSegment(value: HyperDeviceType.watch, label: '手表'),
+                      ],
+                      selected: {_deviceType},
+                      onSelectionChanged: (value) {
+                        setState(() => _deviceType = value.single);
+                      },
                     ),
-                  ),
+                    SizedBox(height: sizes.sectionSpacing),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        _ValueCard(
+                          label: '通用 md 高度',
+                          value: sizes.controlHeightMd,
+                        ),
+                        _ValueCard(label: '控件圆角', value: sizes.controlRadius),
+                        _ValueCard(
+                          label: '最小命中区',
+                          value: sizes.minimumInteractiveDimension,
+                        ),
+                        _ValueCard(
+                          label: '页面边距',
+                          value: sizes.pageHorizontalPadding,
+                        ),
+                        _ValueCard(label: '默认图标', value: sizes.iconSize),
+                        _ValueCard(label: '工具栏', value: sizes.toolbarHeight),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              DemoSection(
+                title: '通用高度参考',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('用于没有专属规格的控件；按钮等组件使用各自的尺寸。'),
+                    const SizedBox(height: 12),
+                    for (final item in <(String, double)>[
+                      ('xs', sizes.controlHeightXs),
+                      ('sm', sizes.controlHeightSm),
+                      ('md', sizes.controlHeightMd),
+                      ('lg', sizes.controlHeightLg),
+                      ('xl', sizes.controlHeightXl),
+                    ]) ...[
+                      _HeightMeasure(label: item.$1, height: item.$2),
+                      const SizedBox(height: 8),
+                    ],
+                  ],
+                ),
+              ),
+              DemoSection(
+                title: '视觉尺寸与命中区域',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        key: const Key('hit-target-preview'),
+                        width: sizes.minimumInteractiveDimension,
+                        height: sizes.minimumInteractiveDimension,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: theme.colors.outline),
+                          borderRadius: BorderRadius.circular(
+                            sizes.controlRadius,
+                          ),
+                        ),
+                        child: Container(
+                          key: const Key('visual-control-preview'),
+                          width: sizes.iconSize,
+                          height: sizes.iconSize,
+                          decoration: BoxDecoration(
+                            color: theme.colors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -130,13 +152,10 @@ class _ValueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final sizes = HyperTheme.sizesOf(context);
-    return Container(
+    return HyperCard(
       width: 132,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: theme.colors.surface,
-        borderRadius: BorderRadius.circular(sizes.surfaceRadius),
+      style: HyperCardStyle(
+        padding: EdgeInsets.all(HyperSizeScheme.spaceXl),
         border: Border.all(color: theme.colors.outline),
       ),
       child: Column(

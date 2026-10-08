@@ -395,6 +395,11 @@ class _HyperButtonState extends State<HyperButton> {
       );
     }
     normal = DefaultTextStyle.merge(
+      textHeightBehavior: const TextHeightBehavior(
+        leadingDistribution: TextLeadingDistribution.even,
+        applyHeightToFirstAscent: false,
+        applyHeightToLastDescent: false,
+      ),
       style: (style.textStyle ?? const TextStyle()).copyWith(
         color: foregroundColor,
       ),

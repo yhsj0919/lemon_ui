@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 三种标签变体分别演示，选择状态互不干扰。
 class HyperTabBarPage extends StatelessWidget {
   const HyperTabBarPage({super.key});
@@ -16,13 +18,11 @@ class HyperTabBarPage extends StatelessWidget {
           variant: HyperTabBarVariant.segmented,
           labels: ['隐私', '安全'],
         ),
-        SizedBox(height: sizes.sectionSpacing),
         const _TabExample(
           title: '独立圆角标签',
           variant: HyperTabBarVariant.separated,
           labels: ['声音', '触感'],
         ),
-        SizedBox(height: sizes.sectionSpacing),
         const _TabExample(
           title: '下划线标签',
           variant: HyperTabBarVariant.underline,
@@ -49,25 +49,26 @@ class _TabExample extends StatelessWidget {
     final sizes = HyperTheme.sizesOf(context);
     return DefaultTabController(
       length: labels.length,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperTabBar(
-            variant: variant,
-            tabs: [for (final label in labels) HyperTab(text: label)],
-          ),
-          SizedBox(
-            height: sizes.controlHeightMd * 2,
-            child: HyperTabBarView(
-              children: [
-                for (final label in labels)
-                  Center(child: HyperText('$label内容')),
-              ],
+      child: DemoSection(
+        title: title,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HyperTabBar(
+              variant: variant,
+              tabs: [for (final label in labels) HyperTab(text: label)],
             ),
-          ),
-        ],
+            SizedBox(
+              height: sizes.controlHeightMd * 2,
+              child: HyperTabBarView(
+                children: [
+                  for (final label in labels)
+                    Center(child: HyperText('$label内容')),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

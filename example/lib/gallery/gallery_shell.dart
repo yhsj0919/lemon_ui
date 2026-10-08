@@ -39,9 +39,34 @@ class _GalleryShellState extends State<GalleryShell> {
       builder: (context, constraints) {
         final showSidebar = constraints.maxWidth >= _sidebarBreakpoint;
 
-        final page = KeyedSubtree(
+        final page = NestedScrollView(
           key: ValueKey(selectedItem.id),
-          child: selectedItem.builder(context),
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            HyperSliverAppBar(
+              title: Text(selectedItem.title),
+              leading: showSidebar ? null : const _OpenMenuButton(),
+              automaticallyImplyLeading: false,
+              style: const HyperAppBarStyle(centerTitle: false),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(
+                  HyperTheme.sizesOf(context).pageHorizontalPadding,
+                ),
+                child: HyperText(
+                  selectedItem.description,
+                  style: TextStyle(
+                    color: HyperTheme.of(context).colors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          body: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context)
+                .copyWith(scrollbars: false),
+            child: selectedItem.builder(context),
+          ),
         );
         if (showSidebar) {
           return HyperScaffold(
@@ -56,23 +81,7 @@ class _GalleryShellState extends State<GalleryShell> {
                       width: HyperTheme.sizesOf(context).drawer.width,
                     ),
                   ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        if (!selectedItem.ownsAppBar)
-                          SizedBox(
-                            height: HyperTheme.sizesOf(context)
-                                .appBar
-                                .collapsedHeight,
-                            child: HyperAppBar(
-                              title: Text(selectedItem.title),
-                              style: const HyperAppBarStyle(centerTitle: false),
-                            ),
-                          ),
-                        Expanded(child: page),
-                      ],
-                    ),
-                  ),
+                  Expanded(child: page),
                 ],
               ),
             ),
@@ -80,12 +89,6 @@ class _GalleryShellState extends State<GalleryShell> {
         }
 
         return HyperScaffold(
-          appBar: selectedItem.ownsAppBar
-              ? null
-              : HyperAppBar(
-                  title: Text(selectedItem.title),
-                  leading: const _OpenMenuButton(),
-                ),
           drawer: HyperDrawer(
             child: SafeArea(
               child: _GalleryMenu(
@@ -97,7 +100,7 @@ class _GalleryShellState extends State<GalleryShell> {
               ),
             ),
           ),
-          body: page,
+          body: SafeArea(child: page),
         );
       },
     );

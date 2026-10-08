@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 在按钮本体实现前，先展示按钮公共样式、六种变体和局部主题覆盖。
 class HyperButtonThemePage extends StatefulWidget {
   const HyperButtonThemePage({super.key});
@@ -79,17 +81,26 @@ class _HyperButtonThemePageState extends State<HyperButtonThemePage> {
           const SizedBox(height: 8),
           const Text('同一个样式类型同时服务公共属性、变体属性和局部主题。当前预览仅展示视觉，不包含按钮行为。'),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              const Expanded(child: Text('启用局部 outlined 覆盖')),
-              HyperSwitch(
-                value: _useLocalTheme,
-                onChanged: (value) => setState(() => _useLocalTheme = value),
-              ),
-            ],
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(child: Text('启用局部 outlined 覆盖')),
+                    HyperSwitch(
+                      value: _useLocalTheme,
+                      onChanged: (value) =>
+                          setState(() => _useLocalTheme = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                content,
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          content,
         ],
       ),
     );

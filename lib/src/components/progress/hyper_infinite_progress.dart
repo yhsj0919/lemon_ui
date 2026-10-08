@@ -132,6 +132,7 @@ class _HyperInfiniteProgressPainter extends CustomPainter {
     final center = size.center(Offset.zero);
     final radius = (size.shortestSide - thickness) / 2;
     final ringPaint = Paint()
+      ..isAntiAlias = true
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = thickness
@@ -140,7 +141,13 @@ class _HyperInfiniteProgressPainter extends CustomPainter {
 
     final orbitRadius = radius - 2 * dotRadius;
     final dotCenter = center + Offset(orbitRadius, 0);
-    canvas.drawCircle(dotCenter, dotRadius, Paint()..color = color);
+    canvas.drawCircle(
+      dotCenter,
+      dotRadius,
+      Paint()
+        ..isAntiAlias = true
+        ..color = color,
+    );
   }
 
   @override

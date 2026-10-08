@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperDialogPage extends StatefulWidget {
   const HyperDialogPage({super.key});
   @override
@@ -85,17 +87,8 @@ class _HyperDialogPageState extends State<HyperDialogPage> {
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context);
     final theme = HyperTheme.of(context);
-    Widget section(String title, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          child,
-        ],
-      ),
-    );
+    Widget section(String title, Widget child) =>
+        DemoSection(title: title, child: child);
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(disableAnimations: _reduced),
       child: Builder(

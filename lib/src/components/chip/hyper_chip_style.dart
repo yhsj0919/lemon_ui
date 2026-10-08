@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 
+/// 选中对勾位于文字前，或叠加在头像中心。
+enum HyperChipCheckmarkPlacement { leading, avatarOverlay, avatarReplacement }
+
 @immutable
 final class HyperChipStyle {
   const HyperChipStyle({
@@ -24,6 +27,11 @@ final class HyperChipStyle {
     this.deleteTargetWidth,
     this.minimumTapTargetSize,
     this.checkmarkIcon,
+    this.checkmarkPlacement,
+    this.checkmarkColor,
+    this.selectedAvatarShape,
+    this.selectedAvatarColor,
+    this.checkmarkScale,
     this.deleteIcon,
     this.showCheckmark,
     this.textStyle,
@@ -48,6 +56,11 @@ final class HyperChipStyle {
   final double? deleteTargetWidth;
   final double? minimumTapTargetSize;
   final IconData? checkmarkIcon;
+  final HyperChipCheckmarkPlacement? checkmarkPlacement;
+  final Color? checkmarkColor;
+  final ShapeBorder? selectedAvatarShape;
+  final Color? selectedAvatarColor;
+  final double? checkmarkScale;
   final IconData? deleteIcon;
   final bool? showCheckmark;
   final TextStyle? textStyle;
@@ -72,6 +85,11 @@ final class HyperChipStyle {
     double? deleteTargetWidth,
     double? minimumTapTargetSize,
     IconData? checkmarkIcon,
+    HyperChipCheckmarkPlacement? checkmarkPlacement,
+    Color? checkmarkColor,
+    ShapeBorder? selectedAvatarShape,
+    Color? selectedAvatarColor,
+    double? checkmarkScale,
     IconData? deleteIcon,
     bool? showCheckmark,
     TextStyle? textStyle,
@@ -97,6 +115,11 @@ final class HyperChipStyle {
       deleteTargetWidth: deleteTargetWidth,
       minimumTapTargetSize: minimumTapTargetSize,
       checkmarkIcon: checkmarkIcon,
+      checkmarkPlacement: checkmarkPlacement,
+      checkmarkColor: checkmarkColor,
+      selectedAvatarShape: selectedAvatarShape,
+      selectedAvatarColor: selectedAvatarColor,
+      checkmarkScale: checkmarkScale,
       deleteIcon: deleteIcon,
       showCheckmark: showCheckmark,
       textStyle: textStyle,
@@ -126,6 +149,11 @@ final class HyperChipStyle {
           minimumTapTargetSize:
               other.minimumTapTargetSize ?? minimumTapTargetSize,
           checkmarkIcon: other.checkmarkIcon ?? checkmarkIcon,
+          checkmarkPlacement: other.checkmarkPlacement ?? checkmarkPlacement,
+          checkmarkColor: other.checkmarkColor ?? checkmarkColor,
+          selectedAvatarShape: other.selectedAvatarShape ?? selectedAvatarShape,
+          selectedAvatarColor: other.selectedAvatarColor ?? selectedAvatarColor,
+          checkmarkScale: other.checkmarkScale ?? checkmarkScale,
           deleteIcon: other.deleteIcon ?? deleteIcon,
           showCheckmark: other.showCheckmark ?? showCheckmark,
           textStyle: other.textStyle ?? textStyle,
@@ -183,6 +211,23 @@ final class HyperChipStyle {
               ? (t < .5 ? a.minimumTapTargetSize : b.minimumTapTargetSize)
               : lerpDouble(a.minimumTapTargetSize, b.minimumTapTargetSize, t),
           checkmarkIcon: t < .5 ? a.checkmarkIcon : b.checkmarkIcon,
+          checkmarkPlacement: t < .5
+              ? a.checkmarkPlacement
+              : b.checkmarkPlacement,
+          checkmarkColor: Color.lerp(a.checkmarkColor, b.checkmarkColor, t),
+          selectedAvatarShape: ShapeBorder.lerp(
+            a.selectedAvatarShape,
+            b.selectedAvatarShape,
+            t,
+          ),
+          selectedAvatarColor: Color.lerp(
+            a.selectedAvatarColor,
+            b.selectedAvatarColor,
+            t,
+          ),
+          checkmarkScale: a.checkmarkScale == null || b.checkmarkScale == null
+              ? (t < .5 ? a.checkmarkScale : b.checkmarkScale)
+              : lerpDouble(a.checkmarkScale, b.checkmarkScale, t),
           deleteIcon: t < .5 ? a.deleteIcon : b.deleteIcon,
           showCheckmark: t < .5 ? a.showCheckmark : b.showCheckmark,
           textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
@@ -221,6 +266,11 @@ final class HyperChipStyle {
       other.deleteTargetWidth == deleteTargetWidth &&
       other.minimumTapTargetSize == minimumTapTargetSize &&
       other.checkmarkIcon == checkmarkIcon &&
+      other.checkmarkPlacement == checkmarkPlacement &&
+      other.checkmarkColor == checkmarkColor &&
+      other.selectedAvatarShape == selectedAvatarShape &&
+      other.selectedAvatarColor == selectedAvatarColor &&
+      other.checkmarkScale == checkmarkScale &&
       other.deleteIcon == deleteIcon &&
       other.showCheckmark == showCheckmark &&
       other.textStyle == textStyle &&
@@ -246,6 +296,11 @@ final class HyperChipStyle {
     deleteTargetWidth,
     minimumTapTargetSize,
     checkmarkIcon,
+    checkmarkPlacement,
+    checkmarkColor,
+    selectedAvatarShape,
+    selectedAvatarColor,
+    checkmarkScale,
     deleteIcon,
     showCheckmark,
     textStyle,

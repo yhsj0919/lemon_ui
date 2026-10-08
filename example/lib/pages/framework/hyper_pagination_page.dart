@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperPaginationPage extends StatefulWidget {
   const HyperPaginationPage({super.key});
   @override
@@ -14,13 +16,11 @@ class _PageState extends State<HyperPaginationPage> {
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context);
     final colors = HyperTheme.of(context).colors;
-    Widget section(String title, List<Widget> children) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
+    Widget section(String title, List<Widget> children) => DemoSection(
+      title: title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
           for (final child in children) ...[
             child,
             SizedBox(height: sizes.pagination.runSpacing),

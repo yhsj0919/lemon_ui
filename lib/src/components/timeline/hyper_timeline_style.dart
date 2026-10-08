@@ -17,6 +17,8 @@ final class HyperTimelineStyle {
     this.nodeForeground,
     this.lineColor,
     this.lineThickness,
+    this.nodeLineGap,
+    this.highlightLine,
     this.spacing,
     this.itemSpacing,
     this.textSpacing,
@@ -38,6 +40,8 @@ final class HyperTimelineStyle {
   final Color? nodeForeground;
   final Color? lineColor;
   final double? lineThickness;
+  final double? nodeLineGap;
+  final bool? highlightLine;
   final double? spacing;
   final double? itemSpacing;
   final double? textSpacing;
@@ -59,6 +63,8 @@ final class HyperTimelineStyle {
     Color? nodeForeground,
     Color? lineColor,
     double? lineThickness,
+    double? nodeLineGap,
+    bool? highlightLine,
     double? spacing,
     double? itemSpacing,
     double? textSpacing,
@@ -80,6 +86,8 @@ final class HyperTimelineStyle {
     nodeForeground: nodeForeground ?? this.nodeForeground,
     lineColor: lineColor ?? this.lineColor,
     lineThickness: lineThickness ?? this.lineThickness,
+    nodeLineGap: nodeLineGap ?? this.nodeLineGap,
+    highlightLine: highlightLine ?? this.highlightLine,
     spacing: spacing ?? this.spacing,
     itemSpacing: itemSpacing ?? this.itemSpacing,
     textSpacing: textSpacing ?? this.textSpacing,
@@ -104,6 +112,8 @@ final class HyperTimelineStyle {
           nodeForeground: other.nodeForeground ?? nodeForeground,
           lineColor: other.lineColor ?? lineColor,
           lineThickness: other.lineThickness ?? lineThickness,
+          nodeLineGap: other.nodeLineGap ?? nodeLineGap,
+          highlightLine: other.highlightLine ?? highlightLine,
           spacing: other.spacing ?? spacing,
           itemSpacing: other.itemSpacing ?? itemSpacing,
           textSpacing: other.textSpacing ?? textSpacing,
@@ -151,6 +161,10 @@ final class HyperTimelineStyle {
           : a.iconSize! + (b.iconSize! - a.iconSize!) * t,
       nodeForeground: Color.lerp(a.nodeForeground, b.nodeForeground, t),
       lineColor: Color.lerp(a.lineColor, b.lineColor, t),
+      nodeLineGap: a.nodeLineGap == null || b.nodeLineGap == null
+          ? (t < .5 ? a.nodeLineGap : b.nodeLineGap)
+          : a.nodeLineGap! + (b.nodeLineGap! - a.nodeLineGap!) * t,
+      highlightLine: t < .5 ? a.highlightLine : b.highlightLine,
       lineThickness: a.lineThickness == null || b.lineThickness == null
           ? (t < .5 ? a.lineThickness : b.lineThickness)
           : a.lineThickness! + (b.lineThickness! - a.lineThickness!) * t,
@@ -195,6 +209,8 @@ final class HyperTimelineStyle {
       nodeForeground == other.nodeForeground &&
       lineColor == other.lineColor &&
       lineThickness == other.lineThickness &&
+      nodeLineGap == other.nodeLineGap &&
+      highlightLine == other.highlightLine &&
       spacing == other.spacing &&
       itemSpacing == other.itemSpacing &&
       textSpacing == other.textSpacing &&
@@ -217,6 +233,8 @@ final class HyperTimelineStyle {
     nodeForeground,
     lineColor,
     lineThickness,
+    nodeLineGap,
+    highlightLine,
     spacing,
     itemSpacing,
     textSpacing,

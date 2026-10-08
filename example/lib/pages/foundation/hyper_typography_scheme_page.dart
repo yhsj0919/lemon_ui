@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示语义字号及全局精确覆盖效果。
 class HyperTypographySchemePage extends StatefulWidget {
   const HyperTypographySchemePage({super.key});
@@ -39,32 +41,40 @@ class _HyperTypographySchemePageState extends State<HyperTypographySchemePage> {
                 const SizedBox(height: 8),
                 Text('每一级都是明确逻辑字号，不使用倍率缩放。', style: text.bodyMedium),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Expanded(child: Text('全局正文改为 18')),
-                    HyperSwitch(
-                      value: _useLargeBody,
-                      onChanged: (value) =>
-                          setState(() => _useLargeBody = value),
-                    ),
-                  ],
+                DemoSection(
+                  title: '基础用法',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(child: Text('全局正文改为 18')),
+                          HyperSwitch(
+                            value: _useLargeBody,
+                            onChanged: (value) =>
+                                setState(() => _useLargeBody = value),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _sample('超大展示 · 48', text.displayLarge),
+                      _sample('大展示 · 40', text.displayMedium),
+                      _sample('小展示 · 36', text.displaySmall),
+                      _sample('页面标题 · 32', text.headlineLarge),
+                      _sample('区块标题 · 24', text.headlineMedium),
+                      _sample('小节标题 · 20', text.headlineSmall),
+                      _sample('强调正文 · 18', text.bodyLarge),
+                      _sample(
+                        '正文 · ${typography.body.toStringAsFixed(0)}',
+                        text.bodyMedium,
+                      ),
+                      _sample('辅助正文 · 14', text.bodySmall),
+                      _sample('控件文字 · 16', text.labelLarge),
+                      _sample('标签 · 14', text.labelMedium),
+                      _sample('注释 · 12', text.labelSmall),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20),
-                _sample('超大展示 · 48', text.displayLarge),
-                _sample('大展示 · 40', text.displayMedium),
-                _sample('小展示 · 36', text.displaySmall),
-                _sample('页面标题 · 32', text.headlineLarge),
-                _sample('区块标题 · 24', text.headlineMedium),
-                _sample('小节标题 · 20', text.headlineSmall),
-                _sample('强调正文 · 18', text.bodyLarge),
-                _sample(
-                  '正文 · ${typography.body.toStringAsFixed(0)}',
-                  text.bodyMedium,
-                ),
-                _sample('辅助正文 · 14', text.bodySmall),
-                _sample('控件文字 · 16', text.labelLarge),
-                _sample('标签 · 14', text.labelMedium),
-                _sample('注释 · 12', text.labelSmall),
               ],
             ),
           );

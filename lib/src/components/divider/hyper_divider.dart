@@ -237,6 +237,7 @@ class _HyperDividerPainter extends CustomPainter {
     canvas.save();
     canvas.clipRect(rect);
     final paint = Paint()
+      ..isAntiAlias = true
       ..color = color
       ..style = PaintingStyle.fill
       ..shader = gradient?.createShader(rect);

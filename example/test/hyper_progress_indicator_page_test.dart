@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
-import 'package:lemon_ui_example/pages/feedback/hyper_progress_indicator_page.dart';
+import 'package:lemon_ui_example/pages/feedback/hyper_progress_page.dart';
 
 void main() {
   testWidgets('进度 Demo 可以修改进度并切换减少动画', (tester) async {
@@ -10,7 +10,7 @@ void main() {
         home: HyperTheme(
           data: HyperThemeData.light(),
           duration: Duration.zero,
-          child: const HyperProgressIndicatorPage(),
+          child: const HyperProgressPage(),
         ),
       ),
     );
@@ -40,3 +40,4 @@ void main() {
     );
   });
 }
+

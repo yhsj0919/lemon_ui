@@ -1,3 +1,5 @@
+import '../../motion/hyper_animated_checkmark.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -197,6 +199,7 @@ class HyperChip extends StatelessWidget {
         minimumTapTargetSize: sizes.minimumInteractiveDimension,
         showCheckmark: true,
         checkmarkIcon: Icons.check,
+        checkmarkPlacement: HyperChipCheckmarkPlacement.leading,
         deleteIcon: Icons.close,
         duration: theme.motion.fastDuration,
         curve: theme.motion.fastCurve,
@@ -225,6 +228,13 @@ class HyperChip extends StatelessWidget {
           );
       final leading = avatar ?? icon;
       final showCheck = (showCheckmark ?? resolved.showCheckmark!) && selected;
+      final overlayCheck =
+          avatar != null &&
+          resolved.checkmarkPlacement != HyperChipCheckmarkPlacement.leading;
+      final replaceAvatar =
+          showCheck &&
+          resolved.checkmarkPlacement ==
+              HyperChipCheckmarkPlacement.avatarReplacement;
       final textStyle = (theme.textTheme.labelMedium ?? const TextStyle())
           .copyWith(color: foreground, height: 1)
           .merge(resolved.textStyle);
@@ -291,7 +301,99 @@ class HyperChip extends StatelessWidget {
                                     ),
                                     child: SizedBox.square(
                                       dimension: resolved.avatarSize,
-                                      child: leading,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        fit: StackFit.expand,
+                                        children: [
+                                          if (replaceAvatar)
+                                            DecoratedBox(
+                                              decoration: ShapeDecoration(
+                                                color:
+                                                    resolved
+                                                        .selectedAvatarColor ??
+                                                    colors.primary,
+                                                shape:
+                                                    resolved
+                                                        .selectedAvatarShape ??
+                                                    const CircleBorder(),
+                                              ),
+                                            )
+                                          else
+                                            leading,
+                                          if (overlayCheck)
+                                            resolved.checkmarkIcon ==
+                                                        Icons.check &&
+                                                    resolved.transitionBuilder ==
+                                                        null
+                                                ? Center(
+                                                    child: SizedBox.square(
+                                                      dimension:
+                                                          resolved.iconSize,
+                                                      child: HyperAnimatedCheckmark(
+                                                        glyphScale:
+                                                            resolved
+                                                                .checkmarkScale ??
+                                                            1.8,
+                                                        state: showCheck,
+                                                        color:
+                                                            resolved
+                                                                .checkmarkColor ??
+                                                            colors.onPrimary,
+                                                        strokeWidth: sizes
+                                                            .checkbox
+                                                            .markStrokeWidth,
+                                                        duration: reduceMotion
+                                                            ? Duration.zero
+                                                            : style?.duration ??
+                                                                  chipTheme
+                                                                      .resolve(
+                                                                        visualStates,
+                                                                      )
+                                                                      .duration ??
+                                                                  HyperAnimatedCheckmark
+                                                                      .defaultDuration,
+                                                        curve:
+                                                            style?.curve ??
+                                                            chipTheme
+                                                                .resolve(
+                                                                  visualStates,
+                                                                )
+                                                                .curve ??
+                                                            HyperAnimatedCheckmark
+                                                                .defaultCurve,
+                                                      ),
+                                                    ),
+                                                  )
+                                                : AnimatedSwitcher(
+                                                    duration: duration,
+                                                    transitionBuilder:
+                                                        resolved
+                                                            .transitionBuilder ??
+                                                        AnimatedSwitcher
+                                                            .defaultTransitionBuilder,
+                                                    child: showCheck
+                                                        ? Icon(
+                                                            resolved
+                                                                .checkmarkIcon,
+                                                            key: const ValueKey(
+                                                              true,
+                                                            ),
+                                                            size: resolved
+                                                                .iconSize,
+                                                            color:
+                                                                resolved
+                                                                    .checkmarkColor ??
+                                                                colors
+                                                                    .onPrimary,
+                                                          )
+                                                        : const SizedBox.shrink(
+                                                            key: ValueKey(
+                                                              false,
+                                                            ),
+                                                          ),
+                                                  ),
+                                        ],
+                                      ),
                                     ),
                                   )
                                 : animatedIcon(leading, resolved.iconSize),
@@ -307,16 +409,58 @@ class HyperChip extends StatelessWidget {
                             transitionBuilder:
                                 resolved.transitionBuilder ??
                                 AnimatedSwitcher.defaultTransitionBuilder,
-                            child: showCheck
+                            child: showCheck && !overlayCheck
                                 ? Row(
                                     key: const ValueKey(true),
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       ExcludeSemantics(
-                                        child: animatedIcon(
-                                          Icon(resolved.checkmarkIcon),
-                                          resolved.iconSize,
-                                        ),
+                                        child:
+                                            resolved.checkmarkIcon ==
+                                                    Icons.check &&
+                                                resolved.transitionBuilder ==
+                                                    null
+                                            ? SizedBox.square(
+                                                dimension: resolved.iconSize,
+                                                child: HyperAnimatedCheckmark(
+                                                  glyphScale:
+                                                      resolved.checkmarkScale ??
+                                                      1.8,
+                                                  animateOnMount: true,
+                                                  state: true,
+                                                  color:
+                                                      resolved.checkmarkColor ??
+                                                      foreground,
+                                                  strokeWidth: sizes
+                                                      .checkbox
+                                                      .markStrokeWidth,
+                                                  duration: reduceMotion
+                                                      ? Duration.zero
+                                                      : style?.duration ??
+                                                            chipTheme
+                                                                .resolve(
+                                                                  visualStates,
+                                                                )
+                                                                .duration ??
+                                                            HyperAnimatedCheckmark
+                                                                .defaultDuration,
+                                                  curve:
+                                                      style?.curve ??
+                                                      chipTheme
+                                                          .resolve(visualStates)
+                                                          .curve ??
+                                                      HyperAnimatedCheckmark
+                                                          .defaultCurve,
+                                                ),
+                                              )
+                                            : animatedIcon(
+                                                Icon(
+                                                  resolved.checkmarkIcon,
+                                                  color:
+                                                      resolved.checkmarkColor,
+                                                ),
+                                                resolved.iconSize,
+                                              ),
                                       ),
                                       SizedBox(width: resolved.iconSpacing),
                                     ],

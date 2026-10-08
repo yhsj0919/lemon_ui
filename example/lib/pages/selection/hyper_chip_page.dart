@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperChipPage extends StatefulWidget {
   const HyperChipPage({super.key});
   @override
@@ -19,21 +21,13 @@ class _HyperChipPageState extends State<HyperChipPage> {
     final sizes = HyperTheme.sizesOf(context);
     final theme = HyperTheme.of(context);
     Widget chips(List<Widget> children) => Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
       spacing: sizes.compactSectionSpacing,
       runSpacing: sizes.compactSectionSpacing,
       children: children,
     );
-    Widget section(String title, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperCard(child: child),
-        ],
-      ),
-    );
+    Widget section(String title, Widget child) =>
+        DemoSection(title: title, child: child);
     return ListView(
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
@@ -251,6 +245,25 @@ class _HyperChipPageState extends State<HyperChipPage> {
                     HyperChip.filter(
                       label: '可选择',
                       selected: _personSelected,
+                      onSelected: (value) =>
+                          setState(() => _personSelected = value),
+                    ),
+                  ]),
+                ),
+                section(
+                  '头像上的选中对勾',
+                  chips([
+                    HyperChip.choice(
+                      label: '蓝色',
+                      selected: _personSelected,
+                      avatar: const HyperAvatar(
+                        style: HyperAvatarStyle(backgroundColor: Colors.blue),
+                      ),
+                      style: const HyperChipStyle(
+                        checkmarkPlacement:
+                            HyperChipCheckmarkPlacement.avatarReplacement,
+                        checkmarkColor: Colors.white,
+                      ),
                       onSelected: (value) =>
                           setState(() => _personSelected = value),
                     ),

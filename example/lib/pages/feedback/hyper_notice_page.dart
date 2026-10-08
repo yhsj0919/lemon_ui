@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperNoticePage extends StatefulWidget {
   const HyperNoticePage({super.key});
   @override
@@ -26,13 +28,11 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
         background: HyperFill.color(colors.surfaceElevated),
       ),
     );
-    Widget section(String title, List<Widget> children) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
+    Widget section(String title, List<Widget> children) => DemoSection(
+      title: title,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
           for (var i = 0; i < children.length; i++) ...[
             if (i > 0) SizedBox(height: sizes.alert.spacing),
             children[i],

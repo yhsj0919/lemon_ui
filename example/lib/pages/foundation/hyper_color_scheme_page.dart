@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 可交互查看语义色、种子色和亮暗模式的演示页。
 class HyperColorSchemePage extends StatefulWidget {
   const HyperColorSchemePage({super.key});
@@ -49,42 +51,56 @@ class _HyperColorSchemePageState extends State<HyperColorSchemePage> {
             style: TextStyle(color: scheme.onBackground),
           ),
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              SegmentedButton<Brightness>(
-                segments: const [
-                  ButtonSegment(
-                    value: Brightness.light,
-                    label: Text('亮色'),
-                    icon: Icon(Icons.light_mode_outlined),
-                  ),
-                  ButtonSegment(
-                    value: Brightness.dark,
-                    label: Text('暗色'),
-                    icon: Icon(Icons.dark_mode_outlined),
-                  ),
-                ],
-                selected: {_brightness},
-                onSelectionChanged: (value) {
-                  setState(() => _brightness = value.single);
-                },
-              ),
-              for (final entry in _seeds.entries)
-                ChoiceChip(
-                  label: Text(entry.key),
-                  selected: entry.key == _seedName,
-                  avatar: CircleAvatar(backgroundColor: entry.value),
-                  onSelected: (_) => setState(() => _seedName = entry.key),
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    HyperSegmentedButton<Brightness>(
+                      segments: const [
+                        HyperSegment(
+                          value: Brightness.light,
+                          label: '亮色',
+                          icon: Icon(Icons.light_mode_outlined),
+                        ),
+                        HyperSegment(
+                          value: Brightness.dark,
+                          label: '暗色',
+                          icon: Icon(Icons.dark_mode_outlined),
+                        ),
+                      ],
+                      selected: {_brightness},
+                      onSelectionChanged: (value) {
+                        setState(() => _brightness = value.single);
+                      },
+                    ),
+                    for (final entry in _seeds.entries)
+                      HyperChip.choice(
+                        label: entry.key,
+                        selected: entry.key == _seedName,
+                        avatar: CircleAvatar(backgroundColor: entry.value),
+                        style: const HyperChipStyle(
+                          checkmarkPlacement:
+                              HyperChipCheckmarkPlacement.avatarOverlay,
+                          checkmarkColor: Colors.white,
+                        ),
+                        onSelected: (_) =>
+                            setState(() => _seedName = entry.key),
+                      ),
+                  ],
                 ),
-            ],
+                const SizedBox(height: 24),
+                _RealPagePreview(scheme: scheme),
+                const SizedBox(height: 24),
+                _ColorGrid(scheme: scheme),
+              ],
+            ),
           ),
-          const SizedBox(height: 24),
-          _RealPagePreview(scheme: scheme),
-          const SizedBox(height: 24),
-          _ColorGrid(scheme: scheme),
         ],
       ),
     );
@@ -99,12 +115,12 @@ class _RealPagePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return HyperCard(
       height: 420,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: scheme.background,
-        borderRadius: BorderRadius.circular(24),
+      style: HyperCardStyle(
+        background: HyperFill.color(scheme.background),
+        material: const HyperSurfaceMaterial.solid(),
+        padding: EdgeInsets.zero,
         border: Border.all(color: scheme.outline),
       ),
       child: Stack(
@@ -136,51 +152,53 @@ class _RealPagePreview extends StatelessWidget {
           Positioned.fill(child: ColoredBox(color: scheme.scrim)),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
-              decoration: BoxDecoration(
-                color: scheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '退出合并',
-                    style: HyperTheme.of(context).textTheme.titleMedium
-                        ?.copyWith(
-                          color: scheme.onSurfaceElevated,
-                          fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: EdgeInsets.all(HyperSizeScheme.spaceXl),
+              child: HyperCard(
+                width: double.infinity,
+                style: HyperCardStyle(
+                  padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+                  background: HyperFill.color(scheme.surfaceElevated),
+                  material: const HyperSurfaceMaterial.solid(),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '退出合并',
+                      style: HyperTheme.of(context).textTheme.titleMedium
+                          ?.copyWith(
+                            color: scheme.onSurfaceElevated,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '是否要退出联系人合并？',
+                      style: TextStyle(color: scheme.textSecondary),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _PreviewAction(
+                            label: '取消',
+                            background: scheme.surfaceMuted,
+                            foreground: scheme.onSurfaceMuted,
+                          ),
                         ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '是否要退出联系人合并？',
-                    style: TextStyle(color: scheme.textSecondary),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _PreviewAction(
-                          label: '取消',
-                          background: scheme.surfaceMuted,
-                          foreground: scheme.onSurfaceMuted,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _PreviewAction(
+                            label: '确定',
+                            background: scheme.primary,
+                            foreground: scheme.onPrimary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _PreviewAction(
-                          label: '确定',
-                          background: scheme.primary,
-                          foreground: scheme.onPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -300,13 +318,13 @@ class _ColorTile extends StatelessWidget {
         .padLeft(8, '0')
         .toUpperCase();
 
-    return Container(
+    return HyperCard(
       height: 104,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color,
+      style: HyperCardStyle(
+        padding: EdgeInsets.all(HyperSizeScheme.spaceXl),
+        background: HyperFill.color(color),
+        material: const HyperSurfaceMaterial.solid(),
         border: Border.all(color: foreground.withValues(alpha: 0.22)),
-        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

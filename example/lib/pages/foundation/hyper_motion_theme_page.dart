@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示统一动画档位和减少动画行为。
 class HyperMotionThemePage extends StatefulWidget {
   const HyperMotionThemePage({super.key});
@@ -29,42 +31,51 @@ class _HyperMotionThemePageState extends State<HyperMotionThemePage> {
           const SizedBox(height: 8),
           const Text('快速、标准和强调档位共享全局主题；减少动画时立即到达最终状态。'),
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              FilledButton(
-                onPressed: () => setState(() => _atEnd = !_atEnd),
-                child: const Text('播放动画'),
-              ),
-              FilterChip(
-                label: const Text('模拟减少动画'),
-                selected: _reduceMotion,
-                onSelected: (value) => setState(() => _reduceMotion = value),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          for (final item in <(String, HyperMotionSpeed)>[
-            ('快速 120ms', HyperMotionSpeed.fast),
-            ('标准 240ms', HyperMotionSpeed.standard),
-            ('强调 360ms', HyperMotionSpeed.emphasized),
-          ]) ...[
-            _MotionTrack(
-              label: item.$1,
-              atEnd: _atEnd,
-              duration: motion.durationFor(
-                item.$2,
-                disableAnimations: _reduceMotion,
-              ),
-              curve: motion.curveFor(item.$2),
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    HyperButton.filled(
+                      onPressed: () => setState(() => _atEnd = !_atEnd),
+                      child: const Text('播放动画'),
+                    ),
+                    HyperChip.filter(
+                      label: '模拟减少动画',
+                      selected: _reduceMotion,
+                      onSelected: (value) =>
+                          setState(() => _reduceMotion = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                for (final item in <(String, HyperMotionSpeed)>[
+                  ('快速 120ms', HyperMotionSpeed.fast),
+                  ('标准 240ms', HyperMotionSpeed.standard),
+                  ('强调 360ms', HyperMotionSpeed.emphasized),
+                ]) ...[
+                  _MotionTrack(
+                    label: item.$1,
+                    atEnd: _atEnd,
+                    duration: motion.durationFor(
+                      item.$2,
+                      disableAnimations: _reduceMotion,
+                    ),
+                    curve: motion.curveFor(item.$2),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                Text(
+                  '弹簧：mass ${motion.spring.mass.toStringAsFixed(0)} · '
+                  'stiffness ${motion.spring.stiffness.toStringAsFixed(0)} · '
+                  'damping ${motion.spring.damping.toStringAsFixed(0)}',
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-          ],
-          Text(
-            '弹簧：mass ${motion.spring.mass.toStringAsFixed(0)} · '
-            'stiffness ${motion.spring.stiffness.toStringAsFixed(0)} · '
-            'damping ${motion.spring.damping.toStringAsFixed(0)}',
           ),
         ],
       ),

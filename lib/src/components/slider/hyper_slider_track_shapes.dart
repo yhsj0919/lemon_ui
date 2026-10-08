@@ -54,7 +54,12 @@ class HyperSliderTrackShape extends RoundedRectSliderTrackShape {
     )!;
     canvas.save();
     canvas.clipRRect(track);
-    canvas.drawRRect(track, Paint()..color = inactive);
+    canvas.drawRRect(
+      track,
+      Paint()
+        ..isAntiAlias = true
+        ..color = inactive,
+    );
     final selected = textDirection == TextDirection.ltr
         ? Rect.fromLTRB(
             travel.left,
@@ -70,7 +75,9 @@ class HyperSliderTrackShape extends RoundedRectSliderTrackShape {
           );
     canvas.drawRRect(
       RRect.fromRectAndRadius(selected, radius),
-      Paint()..color = active,
+      Paint()
+        ..isAntiAlias = true
+        ..color = active,
     );
     _paintPoints(
       canvas: canvas,
@@ -149,7 +156,12 @@ class HyperRangeSliderTrackShape extends RoundedRectRangeSliderTrackShape {
     )!;
     canvas.save();
     canvas.clipRRect(track);
-    canvas.drawRRect(track, Paint()..color = inactive);
+    canvas.drawRRect(
+      track,
+      Paint()
+        ..isAntiAlias = true
+        ..color = inactive,
+    );
     canvas.drawRRect(
       RRect.fromLTRBR(
         left - half,
@@ -158,7 +170,9 @@ class HyperRangeSliderTrackShape extends RoundedRectRangeSliderTrackShape {
         travel.bottom,
         radius,
       ),
-      Paint()..color = active,
+      Paint()
+        ..isAntiAlias = true
+        ..color = active,
     );
     _paintPoints(
       canvas: canvas,
@@ -205,6 +219,7 @@ void _paintPoints({
       Offset(x, travel.center.dy),
       radius,
       Paint()
+        ..isAntiAlias = true
         ..color = Color.lerp(
           disabledColor,
           isSelected(x) ? activeColor : inactiveColor,

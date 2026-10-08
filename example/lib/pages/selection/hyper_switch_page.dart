@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示开关状态、设备尺寸、局部主题和拖动交互。
 class HyperSwitchPage extends StatefulWidget {
   const HyperSwitchPage({super.key});
@@ -30,38 +32,51 @@ class _HyperSwitchPageState extends State<HyperSwitchPage> {
             '使用独立尺寸；手机参考 MIUIX 并修正为偶数48×28，桌面采用舒适44×24。',
           ),
           const SizedBox(height: 24),
-          _row('关闭', HyperSwitch(value: false, onChanged: (_) {})),
-          _row('开启', HyperSwitch(value: true, onChanged: (_) {})),
-          _row('禁用关闭', const HyperSwitch(value: false, onChanged: null)),
-          _row('禁用开启', const HyperSwitch(value: true, onChanged: null)),
-          _row(
-            '可交互',
-            HyperSwitch(
-              key: const Key('interactive-switch'),
-              value: _enabled,
-              onChanged: (value) => setState(() => _enabled = value),
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _row('关闭', HyperSwitch(value: false, onChanged: (_) {})),
+                _row('开启', HyperSwitch(value: true, onChanged: (_) {})),
+                _row('禁用关闭', const HyperSwitch(value: false, onChanged: null)),
+                _row('禁用开启', const HyperSwitch(value: true, onChanged: null)),
+                _row(
+                  '可交互',
+                  HyperSwitch(
+                    key: const Key('interactive-switch'),
+                    value: _enabled,
+                    onChanged: (value) => setState(() => _enabled = value),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text('局部主题', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          HyperSwitchTheme(
-            data: HyperSwitchThemeData(
-              style: HyperSwitchStyle(
-                activeTrackColor: theme.colors.success,
-                width: 52,
-                height: 28,
-                thumbSize: 24,
-                uncheckedThumbOffset: 3,
-                checkedThumbOffset: 25,
-              ),
-            ),
-            child: _row(
-              '绿色明确尺寸',
-              HyperSwitch(
-                value: _custom,
-                onChanged: (value) => setState(() => _custom = value),
-              ),
+          DemoSection(
+            title: '局部主题',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HyperSwitchTheme(
+                  data: HyperSwitchThemeData(
+                    style: HyperSwitchStyle(
+                      activeTrackColor: theme.colors.success,
+                      width: 52,
+                      height: 28,
+                      thumbSize: 24,
+                      uncheckedThumbOffset: 3,
+                      checkedThumbOffset: 25,
+                    ),
+                  ),
+                  child: _row(
+                    '绿色明确尺寸',
+                    HyperSwitch(
+                      value: _custom,
+                      onChanged: (value) => setState(() => _custom = value),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

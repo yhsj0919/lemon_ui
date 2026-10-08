@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperSliderPage extends StatefulWidget {
   const HyperSliderPage({super.key});
   @override
@@ -82,24 +84,15 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
 
   Widget section(String title, List<Widget> examples) {
     final sizes = HyperTheme.sizesOf(context);
-    return Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
+    return DemoSection(
+      title: title,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 0; i < examples.length; i++) ...[
-                  if (i > 0) SizedBox(height: sizes.sectionSpacing),
-                  examples[i],
-                ],
-              ],
-            ),
-          ),
+          for (var i = 0; i < examples.length; i++) ...[
+            if (i > 0) SizedBox(height: sizes.sectionSpacing),
+            examples[i],
+          ],
         ],
       ),
     );

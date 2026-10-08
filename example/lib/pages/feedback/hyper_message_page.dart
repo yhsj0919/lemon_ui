@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperMessagePage extends StatefulWidget {
   const HyperMessagePage({super.key});
   @override
@@ -48,21 +50,20 @@ class _HyperMessagePageState extends State<HyperMessagePage> {
           toastMode: _toastMode,
           child: Builder(
             builder: (context) {
-              Widget section(String title, List<Widget> children) => Padding(
-                padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HyperText(title, variant: HyperTextVariant.sectionTitle),
-                    SizedBox(height: sizes.compactSectionSpacing),
-                    Wrap(
-                      spacing: sizes.snackbar.spacing,
-                      runSpacing: sizes.snackbar.spacing,
-                      children: children,
+              Widget section(String title, List<Widget> children) =>
+                  DemoSection(
+                    title: title,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: sizes.snackbar.spacing,
+                          runSpacing: sizes.snackbar.spacing,
+                          children: children,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
+                  );
               return ListView(
                 padding: EdgeInsets.all(sizes.pageHorizontalPadding),
                 children: [
@@ -324,25 +325,27 @@ class _HyperMessagePageState extends State<HyperMessagePage> {
                   ),
                   SizedBox(height: sizes.compactSectionSpacing),
                   Text(_result),
-                  SizedBox(height: sizes.sectionSpacing),
-                  const HyperText(
-                    '独立表面',
-                    variant: HyperTextVariant.sectionTitle,
-                  ),
-                  SizedBox(height: sizes.compactSectionSpacing),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: HyperToast(content: Text('静态 Toast 示例')),
-                  ),
-                  SizedBox(height: sizes.compactSectionSpacing),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: HyperSnackbar(
-                      content: const Text('静态 Snackbar 示例'),
-                      action: HyperButton.text(
-                        label: const Text('操作'),
-                        onPressed: () {},
-                      ),
+                  DemoSection(
+                    title: '独立表面',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: HyperToast(content: Text('静态 Toast 示例')),
+                        ),
+                        SizedBox(height: sizes.compactSectionSpacing),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: HyperSnackbar(
+                            content: const Text('静态 Snackbar 示例'),
+                            action: HyperButton.text(
+                              label: const Text('操作'),
+                              onPressed: () {},
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

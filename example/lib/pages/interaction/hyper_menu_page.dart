@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示菜单分组、多级操作、禁用项与锚定浮层的组合。
 class HyperMenuPage extends StatefulWidget {
   const HyperMenuPage({super.key});
@@ -44,27 +46,33 @@ class _HyperMenuPageState extends State<HyperMenuPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText('操作菜单', variant: HyperTextVariant.subsectionTitle),
-          const SizedBox(height: 16),
-          HyperMenuButton(
-            groups: groups,
-            onSelected: select,
-            child: const HyperText('打开菜单'),
-          ),
-          const SizedBox(height: 16),
-          HyperContextMenu(
-            groups: groups,
-            onSelected: select,
-            child: const HyperCard(
-              child: SizedBox(
-                width: 240,
-                height: 72,
-                child: Center(child: HyperText('右键或长按此区域')),
-              ),
+          DemoSection(
+            title: '操作菜单',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HyperMenuButton(
+                  groups: groups,
+                  onSelected: select,
+                  child: const HyperText('打开菜单'),
+                ),
+                const SizedBox(height: 16),
+                HyperContextMenu(
+                  groups: groups,
+                  onSelected: select,
+                  child: const HyperCard(
+                    child: SizedBox(
+                      width: 240,
+                      height: 72,
+                      child: Center(child: HyperText('右键或长按此区域')),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                HyperText('最近操作：$_lastAction'),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          HyperText('最近操作：$_lastAction'),
         ],
       ),
     );

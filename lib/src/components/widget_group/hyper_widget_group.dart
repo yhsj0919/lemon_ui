@@ -85,24 +85,28 @@ class HyperWidgetGroup extends StatelessWidget {
         ? Duration.zero
         : resolved.duration ?? theme.motion.fastDuration;
     final curve = resolved.curve ?? theme.motion.fastCurve;
+    final border =
+        resolved.border ??
+        (connected ? Border.all(color: theme.colors.outline) : null);
+    final radius =
+        resolved.borderRadius ?? BorderRadius.circular(metrics.radius);
 
     return AnimatedContainer(
       duration: duration,
       curve: curve,
       width: resolved.width,
-      padding: resolved.padding ?? EdgeInsets.zero,
+      padding: (resolved.padding ?? EdgeInsets.zero).add(
+        border?.dimensions ?? EdgeInsets.zero,
+      ),
       clipBehavior: connected ? Clip.antiAlias : clipBehavior,
       decoration: BoxDecoration(
         color:
             resolved.backgroundColor ??
             (connected ? theme.colors.surface : null),
-        border:
-            resolved.border ??
-            (connected ? Border.all(color: theme.colors.outline) : null),
-        borderRadius:
-            resolved.borderRadius ?? BorderRadius.circular(metrics.radius),
+        borderRadius: radius,
         boxShadow: resolved.boxShadow,
       ),
+      foregroundDecoration: BoxDecoration(border: border, borderRadius: radius),
       child: TweenAnimationBuilder<double>(
         tween: Tween<double>(end: spacing),
         duration: duration,

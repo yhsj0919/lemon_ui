@@ -70,6 +70,14 @@ HyperDialog 管理标题、滚动正文、操作区和表面；showHyperDialog �
 与 `onSelected` 互斥，`selected` 由调用方持有，单选互斥与多选集合归父级。
 `onDeleted` 只调用删除回调，不改变选中态、不自行隐藏控件；删除按钮有独立
 点击区域和键盘焦点。主体无回调时不增加无效焦点，删除入口仍可单独使用。
+`HyperChipStyle.checkmarkPlacement` 默认 leading；avatarOverlay 在保留头像的同时
+将选中对勾叠在头像中心，未选中时隐藏，不增加选中内容宽度。无头像时沿用 leading。
+avatarReplacement 隐藏选中头像的原内容，以强类型 selectedAvatarColor / selectedAvatarShape
+绘制替代表面；取消后恢复原头像。checkmarkScale 默认 1.8，只放大路径而不改变布局和描边。
+Checkbox 与 Chip 的对勾路径及两阶段描画动画采用 Flutter Checkbox 的实现，
+只保留主题描边与圆角端点。无额外采样、图像过滤或变换层。
+对勾颜色通过 checkmarkColor 配置，头像叠加默认复用 onPrimary；调用方按头像内容
+选择适合的颜色。配置参与 copyWith、merge、lerp 和值相等，沿用 Motion 与减少动画策略。
 `icon` 与 `avatar` 互斥；选中对勾可关闭、替换或通过主题配置。
 交互复用 `HyperPressable`，支持鼠标、触摸、Enter/Space 激活、禁用和焦点，
 不创建水波纹。背景、文字、图标、头像禁用透明度和对勾使用 Motion fast 过渡；
@@ -573,3 +581,12 @@ timelineTheme / sizes.timeline 独立强类型存储。全局、局部、实例�
 时间线与步骤组件是不同的数据职责和布局语义，不读取 stepIndicatorTheme；仅复用统一文字、材质与 Motion 基础设施。轨道宽度统一由当前解析后最大节点尺寸决定，以保持混合节点和对侧内容时连接线连续。父级提供有限宽度及外部滚动；反转不做日期排序。
 
 默认圆点继承统一材质配方、质量与减少透明度，复用 HyperMaterialSurface。自定义节点由调用方负责自身视觉，时间线仅提供槽位与图标主题。
+
+## Timeline 点线状态（2026-10-08）
+
+按用户指定方向调整节点与连线，属于项目定制外观，不宣称来自官方规格。
+四端 nodeSize、lineThickness 与 nodeLineGap 统一由 HyperSizeScheme.timeline 管理；
+Style 的 nodeLineGap 可局部覆盖，highlightLine 默认 false。
+开启后当前节点的出线跟随节点状态语义色，normal / disabled 保持 lineColor；
+末项不绘制连线，反转只改变展示顺序。节点状态填充绘制在材质表面之上，
+避免材质背景遮住状态颜色；颜色过渡沿用 Motion 与减少动画设置。

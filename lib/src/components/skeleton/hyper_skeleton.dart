@@ -242,6 +242,7 @@ class HyperSkeletonShimmerPainter extends CustomPainter {
     canvas.drawRect(
       band,
       Paint()
+        ..isAntiAlias = true
         ..shader = LinearGradient(
           colors: [
             color.withValues(alpha: 0),

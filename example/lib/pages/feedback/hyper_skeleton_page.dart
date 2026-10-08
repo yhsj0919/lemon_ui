@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperSkeletonPage extends StatefulWidget {
   const HyperSkeletonPage({super.key});
   @override
@@ -34,17 +36,8 @@ class _HyperSkeletonPageState extends State<HyperSkeletonPage> {
         Expanded(child: lines()),
       ],
     );
-    Widget section(String label, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          HyperText(label, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: gap),
-          HyperCard(child: child),
-        ],
-      ),
-    );
+    Widget section(String label, Widget child) =>
+        DemoSection(title: label, child: child);
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
         disableAnimations: _reduced || MediaQuery.of(context).disableAnimations,

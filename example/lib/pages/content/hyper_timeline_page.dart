@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperTimelinePage extends StatefulWidget {
   const HyperTimelinePage({super.key});
   @override
@@ -10,17 +12,16 @@ class HyperTimelinePage extends StatefulWidget {
 class _PageState extends State<HyperTimelinePage> {
   HyperTimelineAlignment _alignment = HyperTimelineAlignment.start;
   bool _reverse = false;
+  bool _highlightLine = false;
   HyperTimelineStatus _status = HyperTimelineStatus.active;
   @override
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context);
-    Widget section(String title, List<Widget> children) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
+    Widget section(String title, List<Widget> children) => DemoSection(
+      title: title,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
           for (final child in children) ...[
             child,
             SizedBox(height: sizes.timeline.spacing),
@@ -31,8 +32,6 @@ class _PageState extends State<HyperTimelinePage> {
     return ListView(
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
-        const HyperText('Timeline', variant: HyperTextVariant.pageTitle),
-        SizedBox(height: sizes.sectionSpacing),
         section('记录顺序与展示方向', [
           Wrap(
             spacing: sizes.timeline.spacing,
@@ -43,6 +42,11 @@ class _PageState extends State<HyperTimelinePage> {
                   label: Text(alignment.name),
                   onPressed: () => setState(() => _alignment = alignment),
                 ),
+              HyperButton.text(
+                label: Text(_highlightLine ? '关闭连线高亮' : '开启连线高亮'),
+                onPressed: () =>
+                    setState(() => _highlightLine = !_highlightLine),
+              ),
               HyperButton.text(
                 label: Text(_reverse ? '恢复顺序' : '反转顺序'),
                 onPressed: () => setState(() => _reverse = !_reverse),
@@ -58,6 +62,7 @@ class _PageState extends State<HyperTimelinePage> {
             ],
           ),
           HyperTimeline(
+            style: HyperTimelineStyle(highlightLine: _highlightLine),
             alignment: _alignment,
             reverse: _reverse,
             items: [
@@ -93,6 +98,31 @@ class _PageState extends State<HyperTimelinePage> {
                   title: Text(status.name),
                   status: status,
                 ),
+            ],
+          ),
+        ]),
+        section('横向时间线', [
+          HyperTimeline(
+            direction: Axis.horizontal,
+            style: HyperTimelineStyle(highlightLine: _highlightLine),
+            items: [
+              const HyperTimelineItem(
+                id: 'horizontal-created',
+                title: Text('已创建'),
+                time: Text('10:20'),
+                status: HyperTimelineStatus.success,
+              ),
+              HyperTimelineItem(
+                id: 'horizontal-shipping',
+                title: const Text('配送中'),
+                time: const Text('11:30'),
+                status: _status,
+              ),
+              const HyperTimelineItem(
+                id: 'horizontal-delivered',
+                title: Text('待签收'),
+                time: Text('12:00'),
+              ),
             ],
           ),
         ]),

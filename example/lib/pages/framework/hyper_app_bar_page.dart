@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
-/// 在普通列表中预览固定、展开和玻璃顶栏。
+import '../../gallery/demo_section.dart';
+
 class HyperAppBarPage extends StatefulWidget {
   const HyperAppBarPage({super.key});
 
@@ -15,104 +16,115 @@ class _HyperAppBarPageState extends State<HyperAppBarPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = HyperTheme.of(context);
+    final sizes = HyperTheme.sizesOf(context);
     final barStyle = _glass
         ? null
         : HyperAppBarStyle(
             material: HyperSurfaceMaterial.solid(
-              background: HyperFill.color(
-                HyperTheme.of(context).colors.background,
-              ),
+              background: HyperFill.color(theme.colors.background),
             ),
           );
     final bar = switch (_variant) {
       HyperAppBarVariant.small => HyperAppBar(
-        title: const HyperText('普通顶栏'),
-        leading: _menuButton(context),
+        title: const Text('普通顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
       ),
       HyperAppBarVariant.medium => HyperAppBar.medium(
-        title: const HyperText('展开顶栏'),
-        leading: _menuButton(context),
+        title: const Text('展开顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
       ),
       HyperAppBarVariant.large => HyperAppBar.large(
-        title: const HyperText('展开顶栏'),
-        leading: _menuButton(context),
+        title: const Text('展开顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
       ),
     };
-
-    return Stack(
+    return ListView(
+      padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFFFA06A),
-                  Color(0xFF9C71D8),
-                  Color(0xFF5E9DF0),
+        DemoSection(
+          title: '变体与材质',
+          child: Wrap(
+            spacing: sizes.compactSectionSpacing,
+            runSpacing: sizes.compactSectionSpacing,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              HyperSegmentedButton<HyperAppBarVariant>(
+                segments: const [
+                  HyperSegment(value: HyperAppBarVariant.small, label: '普通'),
+                  HyperSegment(value: HyperAppBarVariant.medium, label: '中等展开'),
+                  HyperSegment(value: HyperAppBarVariant.large, label: '大幅展开'),
                 ],
+                selected: {_variant},
+                onSelectionChanged: (values) =>
+                    setState(() => _variant = values.single),
               ),
-            ),
+              HyperButton.tonal(
+                onPressed: () => setState(() => _glass = !_glass),
+                label: Text(_glass ? '关闭玻璃' : '开启玻璃'),
+              ),
+            ],
           ),
         ),
-        // 顶栏和列表共用整屏视口，使状态栏也参与顶栏的展开与收起。
-        CustomScrollView(
-          slivers: [
-            bar.toSliver(),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    HyperButton.tonal(
-                      onPressed: () =>
-                          setState(() => _variant = HyperAppBarVariant.small),
-                      child: const HyperText('普通'),
+        DemoSection(
+          title: '滚动预览',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('在预览内滚动，观察顶栏收起与材质变化。'),
+              SizedBox(height: sizes.compactSectionSpacing),
+              SizedBox(
+                height: sizes.controlHeightMd * 8,
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(sizes.card.radius),
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    removeBottom: true,
+                    child: Stack(
+                      children: [
+                        const Positioned.fill(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFFFFA06A),
+                                  Color(0xFF9C71D8),
+                                  Color(0xFF5E9DF0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        CustomScrollView(
+                          key: const ValueKey('app-bar-preview'),
+                          primary: false,
+                          slivers: [
+                            bar.toSliver(),
+                            SliverList.builder(
+                              itemCount: 30,
+                              itemBuilder: (context, index) => HyperListTile(
+                                title: Text('列表项目 ${index + 1}'),
+                                subtitle: const Text('上滑观察顶栏收起和背景透出'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    HyperButton.tonal(
-                      onPressed: () =>
-                          setState(() => _variant = HyperAppBarVariant.medium),
-                      child: const HyperText('中等展开'),
-                    ),
-                    HyperButton.tonal(
-                      onPressed: () =>
-                          setState(() => _variant = HyperAppBarVariant.large),
-                      child: const HyperText('大幅展开'),
-                    ),
-                    HyperButton.tonal(
-                      onPressed: () => setState(() => _glass = !_glass),
-                      child: HyperText(_glass ? '关闭玻璃' : '开启玻璃'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            SliverList.builder(itemCount: 30, itemBuilder: _buildItem),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
-
-  Widget? _menuButton(BuildContext context) => Scaffold.hasDrawer(context)
-      ? HyperIconButton.ghost(
-          tooltip: '打开组件菜单',
-          onPressed: () => HyperScaffold.openDrawer(context),
-          icon: const Icon(Icons.menu),
-        )
-      : null;
-
-  Widget _buildItem(BuildContext context, int index) => HyperListTile(
-    title: HyperText('列表项目 ${index + 1}'),
-    subtitle: const HyperText('上滑观察顶栏收起和背景透出'),
-  );
 }

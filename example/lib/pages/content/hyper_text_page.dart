@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示 HyperText 的语义层级和三层样式覆盖。
 class HyperTextPage extends StatefulWidget {
   const HyperTextPage({super.key});
@@ -36,53 +38,66 @@ class _HyperTextPageState extends State<HyperTextPage> {
               const SizedBox(height: 8),
               const HyperText('直接使用系统字体和明确语义字号，不执行倍率缩放。'),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Expanded(child: HyperText('全局强调正文')),
-                  HyperSwitch(
-                    value: _emphasizeBody,
-                    onChanged: (value) =>
-                        setState(() => _emphasizeBody = value),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              for (final sample in _samples) ...[
-                HyperText(sample.$2, variant: sample.$1),
-                const SizedBox(height: 12),
-              ],
-              const SizedBox(height: 12),
-              const HyperText('局部主题覆盖', variant: HyperTextVariant.sectionTitle),
-              const SizedBox(height: 12),
-              HyperTextTheme(
-                data: const HyperTextThemeData(
-                  label: TextStyle(
-                    color: Color(0xFF7A4DFF),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                child: const HyperText(
-                  '当前子树的标签样式',
-                  variant: HyperTextVariant.label,
+              DemoSection(
+                title: '基础用法',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(child: HyperText('全局强调正文')),
+                        HyperSwitch(
+                          value: _emphasizeBody,
+                          onChanged: (value) =>
+                              setState(() => _emphasizeBody = value),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    for (final sample in _samples) ...[
+                      HyperText(sample.$2, variant: sample.$1),
+                      const SizedBox(height: 12),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              const HyperText(
-                '实例精确覆盖 · 17px',
-                variant: HyperTextVariant.body,
-                style: TextStyle(
-                  fontSize: 17,
-                  letterSpacing: .4,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const SizedBox(
-                width: 220,
-                child: HyperText(
-                  '最大两行和省略号由 Flutter Text 原生参数直接控制，内容不会改变控件 API。',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              DemoSection(
+                title: '局部主题覆盖',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HyperTextTheme(
+                      data: const HyperTextThemeData(
+                        label: TextStyle(
+                          color: Color(0xFF7A4DFF),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      child: const HyperText(
+                        '当前子树的标签样式',
+                        variant: HyperTextVariant.label,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const HyperText(
+                      '实例精确覆盖 · 17px',
+                      variant: HyperTextVariant.body,
+                      style: TextStyle(
+                        fontSize: 17,
+                        letterSpacing: .4,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const SizedBox(
+                      width: 220,
+                      child: HyperText(
+                        '最大两行和省略号由 Flutter Text 原生参数直接控制，内容不会改变控件 API。',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

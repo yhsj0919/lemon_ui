@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示全局基础主题、局部主题覆盖和 Material 同步效果。
 class HyperThemePage extends StatefulWidget {
   const HyperThemePage({super.key});
@@ -42,69 +44,78 @@ class _HyperThemePageState extends State<HyperThemePage> {
                   style: TextStyle(color: theme.colors.onBackground),
                 ),
                 const SizedBox(height: 20),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    SegmentedButton<Brightness>(
-                      segments: const [
-                        ButtonSegment(
-                          value: Brightness.light,
-                          label: Text('亮色'),
+                DemoSection(
+                  title: '基础用法',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          HyperSegmentedButton<Brightness>(
+                            segments: const [
+                              HyperSegment(
+                                value: Brightness.light,
+                                label: '亮色',
+                              ),
+                              HyperSegment(value: Brightness.dark, label: '暗色'),
+                            ],
+                            selected: {_brightness},
+                            onSelectionChanged: (value) {
+                              setState(() => _brightness = value.single);
+                            },
+                          ),
+                          HyperChip.choice(
+                            label: '小米橙',
+                            selected: _seedColor == const Color(0xFFFF6900),
+                            onSelected: (_) {
+                              setState(
+                                () => _seedColor = const Color(0xFFFF6900),
+                              );
+                            },
+                          ),
+                          HyperChip.choice(
+                            label: '蓝色',
+                            selected: _seedColor == const Color(0xFF3367D6),
+                            onSelected: (_) {
+                              setState(
+                                () => _seedColor = const Color(0xFF3367D6),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _ThemePreview(
+                        title: '全局默认值',
+                        description:
+                            '高度 ${sizes.controlHeightMd.toStringAsFixed(0)} · '
+                            '圆角 ${sizes.controlRadius.toStringAsFixed(0)}',
+                        controlKey: const Key('global-control'),
+                      ),
+                      const SizedBox(height: 16),
+                      HyperTheme(
+                        data: theme.copyWith(
+                          sizes: _replaceCurrentSizes(
+                            theme.sizes,
+                            sizes.copyWith(
+                              controlHeightMd: 68,
+                              controlRadius: 28,
+                              controlPadding: const EdgeInsets.symmetric(
+                                horizontal: 28,
+                                vertical: 16,
+                              ),
+                            ),
+                          ),
                         ),
-                        ButtonSegment(
-                          value: Brightness.dark,
-                          label: Text('暗色'),
-                        ),
-                      ],
-                      selected: {_brightness},
-                      onSelectionChanged: (value) {
-                        setState(() => _brightness = value.single);
-                      },
-                    ),
-                    ChoiceChip(
-                      label: const Text('小米橙'),
-                      selected: _seedColor == const Color(0xFFFF6900),
-                      onSelected: (_) {
-                        setState(() => _seedColor = const Color(0xFFFF6900));
-                      },
-                    ),
-                    ChoiceChip(
-                      label: const Text('蓝色'),
-                      selected: _seedColor == const Color(0xFF3367D6),
-                      onSelected: (_) {
-                        setState(() => _seedColor = const Color(0xFF3367D6));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _ThemePreview(
-                  title: '全局默认值',
-                  description:
-                      '高度 ${sizes.controlHeightMd.toStringAsFixed(0)} · '
-                      '圆角 ${sizes.controlRadius.toStringAsFixed(0)}',
-                  controlKey: const Key('global-control'),
-                ),
-                const SizedBox(height: 16),
-                HyperTheme(
-                  data: theme.copyWith(
-                    sizes: _replaceCurrentSizes(
-                      theme.sizes,
-                      sizes.copyWith(
-                        controlHeightMd: 68,
-                        controlRadius: 28,
-                        controlPadding: const EdgeInsets.symmetric(
-                          horizontal: 28,
-                          vertical: 16,
+                        child: const _ThemePreview(
+                          title: '局部显式覆盖',
+                          description: '高度 68 · 圆角 28 · 内边距 28 / 16',
+                          controlKey: Key('local-control'),
                         ),
                       ),
-                    ),
-                  ),
-                  child: const _ThemePreview(
-                    title: '局部显式覆盖',
-                    description: '高度 68 · 圆角 28 · 内边距 28 / 16',
-                    controlKey: Key('local-control'),
+                    ],
                   ),
                 ),
               ],
@@ -141,11 +152,9 @@ class _ThemePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colors.surface,
-        borderRadius: BorderRadius.circular(sizes.controlRadius),
+    return HyperCard(
+      style: HyperCardStyle(
+        padding: EdgeInsets.all(HyperSizeScheme.space2xl),
         border: Border.all(color: theme.colors.outline),
       ),
       child: Column(

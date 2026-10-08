@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperLoadingOverlayPage extends StatefulWidget {
   const HyperLoadingOverlayPage({super.key});
   @override
@@ -72,126 +74,135 @@ class _HyperLoadingOverlayPageState extends State<HyperLoadingOverlayPage> {
             variant: HyperTextVariant.pageTitle,
           ),
           SizedBox(height: sizes.sectionSpacing),
-          const HyperText(
-            '区域加载与短请求防闪烁',
-            variant: HyperTextVariant.sectionTitle,
-          ),
-          SizedBox(height: sizes.compactSectionSpacing),
-          Wrap(
-            spacing: sizes.loadingOverlay.spacing,
-            runSpacing: sizes.loadingOverlay.spacing,
-            children: [
-              HyperButton.filled(
-                label: const Text('加载 3 秒'),
-                onPressed: () => _start(const Duration(seconds: 3)),
-              ),
-              HyperButton.tonal(
-                label: const Text('短请求 60ms'),
-                onPressed: () => _start(const Duration(milliseconds: 60)),
-              ),
-              HyperButton.tonal(
-                label: const Text('快速重复请求'),
-                onPressed: () => _start(const Duration(milliseconds: 350)),
-              ),
-            ],
-          ),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperLoadingOverlay(
-            loading: _loading,
-            blockInteraction: _blocking,
-            message: const Text('正在读取数据…'),
-            onCancel: _cancel,
-            style: HyperLoadingOverlayStyle(
-              borderRadius: BorderRadius.circular(sizes.loadingOverlay.radius),
-              material: _glass
-                  ? glass
-                  : HyperSurfaceMaterial.translucent(
-                      background: HyperFill.color(
-                        colors.surface.withValues(alpha: .8),
+          DemoSection(
+            title: '区域加载与短请求防闪烁',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: sizes.loadingOverlay.spacing,
+                  runSpacing: sizes.loadingOverlay.spacing,
+                  children: [
+                    HyperButton.filled(
+                      label: const Text('加载 3 秒'),
+                      onPressed: () => _start(const Duration(seconds: 3)),
+                    ),
+                    HyperButton.tonal(
+                      label: const Text('短请求 60ms'),
+                      onPressed: () => _start(const Duration(milliseconds: 60)),
+                    ),
+                    HyperButton.tonal(
+                      label: const Text('快速重复请求'),
+                      onPressed: () =>
+                          _start(const Duration(milliseconds: 350)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: sizes.compactSectionSpacing),
+                HyperLoadingOverlay(
+                  loading: _loading,
+                  blockInteraction: _blocking,
+                  message: const Text('正在读取数据…'),
+                  onCancel: _cancel,
+                  style: HyperLoadingOverlayStyle(
+                    borderRadius: BorderRadius.circular(
+                      sizes.loadingOverlay.radius,
+                    ),
+                    material: _glass
+                        ? glass
+                        : HyperSurfaceMaterial.translucent(
+                            background: HyperFill.color(
+                              colors.surface.withValues(alpha: .8),
+                            ),
+                          ),
+                  ),
+                  child: HyperCard(
+                    height: 240,
+                    alignment: Alignment.center,
+                    style: HyperCardStyle(
+                      padding: EdgeInsets.zero,
+                      background: HyperFill.color(colors.primaryContainer),
+                      borderRadius: BorderRadius.circular(
+                        sizes.loadingOverlay.radius,
                       ),
                     ),
-            ),
-            child: Container(
-              height: 240,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colors.primaryContainer,
-                borderRadius: BorderRadius.circular(
-                  sizes.loadingOverlay.radius,
+                    child: HyperButton.tonal(
+                      label: Text('底层按钮：$_clicks 次'),
+                      onPressed: () => setState(() => _clicks++),
+                    ),
+                  ),
                 ),
-              ),
-              child: HyperButton.tonal(
-                label: Text('底层按钮：$_clicks 次'),
-                onPressed: () => setState(() => _clicks++),
-              ),
-            ),
-          ),
-          SizedBox(height: sizes.compactSectionSpacing),
-          Text(_result),
-          Row(
-            children: [
-              const Expanded(child: Text('阻止底层交互')),
-              HyperSwitch(
-                value: _blocking,
-                onChanged: (value) => setState(() => _blocking = value),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Expanded(child: Text('玻璃材质配方')),
-              HyperSwitch(
-                value: _glass,
-                onChanged: (value) => setState(() => _glass = value),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Expanded(child: Text('统一高级材质质量')),
-              HyperSwitch(
-                value: _advanced,
-                onChanged: (value) => setState(() => _advanced = value),
-              ),
-            ],
-          ),
-          SizedBox(height: sizes.sectionSpacing),
-          const HyperText(
-            '自定义加载内容与立即显示',
-            variant: HyperTextVariant.sectionTitle,
-          ),
-          SizedBox(height: sizes.compactSectionSpacing),
-          HyperLoadingOverlay(
-            loading: _loading,
-            blockInteraction: false,
-            indicator: const Icon(Icons.cloud_download_outlined),
-            message: const Text('后台同步中，可以继续浏览'),
-            style: HyperLoadingOverlayStyle(
-              showDelay: Duration.zero,
-              contentBackground: HyperFill.color(colors.surfaceElevated),
-              contentBorder: Border.all(color: colors.outline),
-            ),
-            child: Container(
-              height: 160,
-              color: colors.surfaceMuted,
-              child: Center(
-                child: HyperButton.text(
-                  label: const Text('仍可操作'),
-                  onPressed: () => setState(() => _result = '后台同步时的按钮点击'),
+                SizedBox(height: sizes.compactSectionSpacing),
+                Text(_result),
+                Row(
+                  children: [
+                    const Expanded(child: Text('阻止底层交互')),
+                    HyperSwitch(
+                      value: _blocking,
+                      onChanged: (value) => setState(() => _blocking = value),
+                    ),
+                  ],
                 ),
-              ),
+                Row(
+                  children: [
+                    const Expanded(child: Text('玻璃材质配方')),
+                    HyperSwitch(
+                      value: _glass,
+                      onChanged: (value) => setState(() => _glass = value),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Expanded(child: Text('统一高级材质质量')),
+                    HyperSwitch(
+                      value: _advanced,
+                      onChanged: (value) => setState(() => _advanced = value),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          SizedBox(height: sizes.sectionSpacing),
-          HyperButton.tonal(
-            label: const Text('整页加载示例'),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const _FullPageExample(),
+          DemoSection(
+            title: '自定义加载内容与立即显示',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HyperLoadingOverlay(
+                  loading: _loading,
+                  blockInteraction: false,
+                  indicator: const Icon(Icons.cloud_download_outlined),
+                  message: const Text('后台同步中，可以继续浏览'),
+                  style: HyperLoadingOverlayStyle(
+                    showDelay: Duration.zero,
+                    contentBackground: HyperFill.color(colors.surfaceElevated),
+                    contentBorder: Border.all(color: colors.outline),
+                  ),
+                  child: Container(
+                    height: 160,
+                    color: colors.surfaceMuted,
+                    child: Center(
+                      child: HyperButton.text(
+                        label: const Text('仍可操作'),
+                        onPressed: () => setState(() => _result = '后台同步时的按钮点击'),
+                      ),
+                    ),
+                  ),
                 ),
-              );
-            },
+                SizedBox(height: sizes.sectionSpacing),
+                HyperButton.tonal(
+                  label: const Text('整页加载示例'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const _FullPageExample(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

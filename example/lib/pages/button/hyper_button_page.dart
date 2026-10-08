@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 展示按钮变体、图标文字、异步状态和明确尺寸。
 class HyperButtonPage extends StatefulWidget {
   const HyperButtonPage({super.key});
@@ -70,132 +72,158 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
           const SizedBox(height: 8),
           Text('当前设备规格：$buttonSizeDescription'),
           const SizedBox(height: 20),
-          Wrap(spacing: 12, runSpacing: 12, children: buttons),
-          const SizedBox(height: 20),
-          Text('尺寸档位', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              for (final size in HyperButtonSizeVariant.values)
-                HyperButton.filled(
-                  key: Key('button-size-${size.name}'),
-                  size: size,
-                  onPressed: () => _record('尺寸 ${size.name}'),
-                  child: Text(switch (size) {
-                    HyperButtonSizeVariant.small => '小',
-                    HyperButtonSizeVariant.medium => '中',
-                    HyperButtonSizeVariant.large => '大',
-                  }),
-                ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text('最近事件：$_event', key: const Key('hyper-button-event')),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: HyperButton.outlined(
-              onPressed: null,
-              child: const Text('禁用按钮'),
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Wrap(spacing: 12, runSpacing: 12, children: buttons)],
             ),
           ),
-          const SizedBox(height: 28),
-          Text('材质变化', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          SegmentedButton<HyperMaterialQuality>(
-            segments: const [
-              ButtonSegment(
-                value: HyperMaterialQuality.standard,
-                label: Text('普通材质'),
-              ),
-              ButtonSegment(
-                value: HyperMaterialQuality.advanced,
-                label: Text('高级材质'),
-              ),
-            ],
-            selected: {_materialQuality},
-            onSelectionChanged: (value) =>
-                setState(() => _materialQuality = value.single),
-          ),
-          const SizedBox(height: 12),
-          SegmentedButton<HyperContrastMode>(
-            segments: const [
-              ButtonSegment(
-                value: HyperContrastMode.standard,
-                label: Text('原色'),
-              ),
-              ButtonSegment(
-                value: HyperContrastMode.adaptive,
-                label: Text('自适应反色'),
-              ),
-              ButtonSegment(
-                value: HyperContrastMode.inverted,
-                label: Text('强制反色'),
-              ),
-            ],
-            selected: {_contrastMode},
-            onSelectionChanged: (value) =>
-                setState(() => _contrastMode = value.single),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFF8A45),
-                  Color(0xFF7E57C2),
-                  Color(0xFF42A5F5),
-                ],
-              ),
-            ),
-            child: HyperContrastTheme(
-              data: HyperContrastThemeData(mode: _contrastMode),
-              child: HyperMaterialTheme(
-                data: HyperMaterialThemeData(quality: _materialQuality),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+          DemoSection(
+            title: '尺寸档位',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    HyperButton.filled(
-                      key: const Key('button-frosted-material'),
-                      onPressed: () => _record('毛玻璃'),
-                      style: HyperButtonStyle(
-                        width: 156,
-                        material: const HyperSurfaceMaterial.frostedGlass(
-                          background: HyperFill.color(Color(0x66FFFFFF)),
-                          border: BorderSide(color: Color(0x99FFFFFF)),
-                          fallback: HyperSurfaceMaterial.solid(
-                            background: HyperFill.color(Color(0xFFF2F2F4)),
-                          ),
-                        ),
+                    for (final size in HyperButtonSizeVariant.values)
+                      HyperButton.filled(
+                        key: Key('button-size-${size.name}'),
+                        size: size,
+                        onPressed: () => _record('尺寸 ${size.name}'),
+                        child: Text(switch (size) {
+                          HyperButtonSizeVariant.small => '小',
+                          HyperButtonSizeVariant.medium => '中',
+                          HyperButtonSizeVariant.large => '大',
+                        }),
                       ),
-                      child: const Text('毛玻璃按钮'),
-                    ),
-                    const SizedBox(height: 12),
-                    HyperButton.filled(
-                      key: const Key('button-soft-light-material'),
-                      onPressed: () => _record('柔光玻璃'),
-                      style: HyperButtonStyle(
-                        width: 156,
-                        material: const HyperSurfaceMaterial.softLightGlass(
-                          background: HyperFill.gradient(
-                            LinearGradient(
-                              colors: [Color(0x88FFFFFF), Color(0x55FFE0C8)],
-                            ),
-                          ),
-                          border: BorderSide(color: Color(0xAAFFFFFF)),
-                          fallback: HyperSurfaceMaterial.solid(
-                            background: HyperFill.color(Color(0xFFF7EEE8)),
-                          ),
-                        ),
-                      ),
-                      child: const Text('柔光玻璃按钮'),
-                    ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 20),
+                Text('最近事件：$_event', key: const Key('hyper-button-event')),
+                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: HyperButton.outlined(
+                    onPressed: null,
+                    child: const Text('禁用按钮'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          DemoSection(
+            title: '材质变化',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HyperSegmentedButton<HyperMaterialQuality>(
+                  segments: const [
+                    HyperSegment(
+                      value: HyperMaterialQuality.standard,
+                      label: '普通材质',
+                    ),
+                    HyperSegment(
+                      value: HyperMaterialQuality.advanced,
+                      label: '高级材质',
+                    ),
+                  ],
+                  selected: {_materialQuality},
+                  onSelectionChanged: (value) =>
+                      setState(() => _materialQuality = value.single),
+                ),
+                const SizedBox(height: 12),
+                HyperSegmentedButton<HyperContrastMode>(
+                  segments: const [
+                    HyperSegment(
+                      value: HyperContrastMode.standard,
+                      label: '原色',
+                    ),
+                    HyperSegment(
+                      value: HyperContrastMode.adaptive,
+                      label: '自适应反色',
+                    ),
+                    HyperSegment(
+                      value: HyperContrastMode.inverted,
+                      label: '强制反色',
+                    ),
+                  ],
+                  selected: {_contrastMode},
+                  onSelectionChanged: (value) =>
+                      setState(() => _contrastMode = value.single),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFF8A45),
+                        Color(0xFF7E57C2),
+                        Color(0xFF42A5F5),
+                      ],
+                    ),
+                  ),
+                  child: HyperContrastTheme(
+                    data: HyperContrastThemeData(mode: _contrastMode),
+                    child: HyperMaterialTheme(
+                      data: HyperMaterialThemeData(quality: _materialQuality),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          HyperButton.filled(
+                            key: const Key('button-frosted-material'),
+                            onPressed: () => _record('毛玻璃'),
+                            style: HyperButtonStyle(
+                              width: 156,
+                              material: const HyperSurfaceMaterial.frostedGlass(
+                                background: HyperFill.color(Color(0x66FFFFFF)),
+                                border: BorderSide(color: Color(0x99FFFFFF)),
+                                fallback: HyperSurfaceMaterial.solid(
+                                  background: HyperFill.color(
+                                    Color(0xFFF2F2F4),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            child: const Text('毛玻璃按钮'),
+                          ),
+                          const SizedBox(height: 12),
+                          HyperButton.filled(
+                            key: const Key('button-soft-light-material'),
+                            onPressed: () => _record('柔光玻璃'),
+                            style: HyperButtonStyle(
+                              width: 156,
+                              material:
+                                  const HyperSurfaceMaterial.softLightGlass(
+                                    background: HyperFill.gradient(
+                                      LinearGradient(
+                                        colors: [
+                                          Color(0x88FFFFFF),
+                                          Color(0x55FFE0C8),
+                                        ],
+                                      ),
+                                    ),
+                                    border: BorderSide(
+                                      color: Color(0xAAFFFFFF),
+                                    ),
+                                    fallback: HyperSurfaceMaterial.solid(
+                                      background: HyperFill.color(
+                                        Color(0xFFF7EEE8),
+                                      ),
+                                    ),
+                                  ),
+                            ),
+                            child: const Text('柔光玻璃按钮'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

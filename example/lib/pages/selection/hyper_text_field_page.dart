@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 class HyperTextFieldPage extends StatefulWidget {
   const HyperTextFieldPage({super.key});
   @override
@@ -23,13 +25,11 @@ class _PageState extends State<HyperTextFieldPage> {
   @override
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context);
-    Widget section(String title, List<Widget> fields) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
+    Widget section(String title, List<Widget> fields) => DemoSection(
+      title: title,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
           for (final field in fields)
             Padding(
               padding: EdgeInsets.only(bottom: sizes.compactSectionSpacing),

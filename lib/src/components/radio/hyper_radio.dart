@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
 import '../../interaction/hyper_pressable.dart';
+import '../../motion/hyper_animated_checkmark.dart';
 import '../../theme/core/hyper_theme.dart';
 import 'hyper_radio_style.dart';
 import 'hyper_radio_theme.dart';
@@ -362,34 +363,13 @@ class _RadioMarkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (progress <= 0) return;
-    final points = [
-      Offset(size.width * (10.9 / 56), size.height * (29 / 56)),
-      Offset(size.width * (23.1 / 56), size.height * (40.8 / 56)),
-      Offset(size.width * (44 / 56), size.height * (16 / 56)),
-    ];
-    final firstLength = (points[1] - points[0]).distance;
-    final secondLength = (points[2] - points[1]).distance;
-    final visibleLength = (firstLength + secondLength) * progress;
-    final path = Path()..moveTo(points[0].dx, points[0].dy);
-    if (visibleLength <= firstLength) {
-      final end = Offset.lerp(
-        points[0],
-        points[1],
-        visibleLength / firstLength,
-      )!;
-      path.lineTo(end.dx, end.dy);
-    } else {
-      path.lineTo(points[1].dx, points[1].dy);
-      final end = Offset.lerp(
-        points[1],
-        points[2],
-        ((visibleLength - firstLength) / secondLength).clamp(0, 1),
-      )!;
-      path.lineTo(end.dx, end.dy);
-    }
+    final edge = size.shortestSide;
+    final origin = size.center(Offset.zero) - Offset(edge / 2, edge / 2);
+    final path = hyperCheckboxCheckPath(origin, edge, progress);
     canvas.drawPath(
       path,
       Paint()
+        ..isAntiAlias = true
         ..color = color.withValues(alpha: progress)
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round

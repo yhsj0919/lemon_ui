@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 /// 可交互查看多个状态同时存在时的统一解析结果。
 class HyperStateValuePage extends StatefulWidget {
   const HyperStateValuePage({super.key});
@@ -66,49 +68,57 @@ class _HyperStateValuePageState extends State<HyperStateValuePage> {
           const SizedBox(height: 8),
           const Text('可以同时启用多个状态；最终样式始终按统一优先级解析。'),
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final state in HyperControlState.values)
-                FilterChip(
-                  label: Text(_stateName(state)),
-                  selected: _states.contains(state),
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _states.add(state);
-                      } else {
-                        _states.remove(state);
-                      }
-                    });
-                  },
+          DemoSection(
+            title: '基础用法',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final state in HyperControlState.values)
+                      HyperChip.filter(
+                        label: _stateName(state),
+                        selected: _states.contains(state),
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _states.add(state);
+                            } else {
+                              _states.remove(state);
+                            }
+                          });
+                        },
+                      ),
+                  ],
                 ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          AnimatedContainer(
-            key: const Key('state-preview'),
-            height: 120,
-            alignment: Alignment.center,
-            duration: const Duration(milliseconds: 240),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(20),
+                const SizedBox(height: 24),
+                AnimatedContainer(
+                  key: const Key('state-preview'),
+                  height: 120,
+                  alignment: Alignment.center,
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    label,
+                    key: const Key('resolved-state-label'),
+                    style: HyperTheme.of(context).textTheme.titleLarge
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text('最高优先级：${highest == null ? '无' : _stateName(highest)}'),
+                const SizedBox(height: 8),
+                const Text(
+                  '禁用 > 加载 > 错误 > 成功 > 长按 > 右键按压 > 中键按压 > 按压 > 拖动 > 选中 > 聚焦 > 悬停',
+                ),
+              ],
             ),
-            child: Text(
-              label,
-              key: const Key('resolved-state-label'),
-              style: HyperTheme.of(context).textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text('最高优先级：${highest == null ? '无' : _stateName(highest)}'),
-          const SizedBox(height: 8),
-          const Text(
-            '禁用 > 加载 > 错误 > 成功 > 长按 > 右键按压 > 中键按压 > 按压 > 拖动 > 选中 > 聚焦 > 悬停',
           ),
         ],
       ),

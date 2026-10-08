@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import '../../gallery/demo_section.dart';
+
 import 'avatar_demo_images.dart';
 
 class HyperAvatarPage extends StatelessWidget {
@@ -54,17 +56,8 @@ class HyperAvatarPage extends StatelessWidget {
       for (final data in avatarDemoImages)
         HyperAvatar(image: MemoryImage(base64Decode(data))),
     ];
-    Widget section(String title, Widget child) => Padding(
-      padding: EdgeInsets.only(bottom: sizes.sectionSpacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HyperText(title, variant: HyperTextVariant.sectionTitle),
-          SizedBox(height: sizes.compactSectionSpacing),
-          child,
-        ],
-      ),
-    );
+    Widget section(String title, Widget child) =>
+        DemoSection(title: title, child: child);
     return Material(
       color: theme.colors.background,
       child: ListView(

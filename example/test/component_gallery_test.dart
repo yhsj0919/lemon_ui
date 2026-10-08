@@ -83,15 +83,15 @@ void main() {
 
     await tester.tap(find.text('暗色'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ChoiceChip, '蓝色'));
+    await tester.tap(find.widgetWithText(HyperChip, '蓝色'));
     await tester.pumpAndSettle();
 
-    final segmented = tester.widget<SegmentedButton<Brightness>>(
-      find.byType(SegmentedButton<Brightness>),
+    final segmented = tester.widget<HyperSegmentedButton<Brightness>>(
+      find.byType(HyperSegmentedButton<Brightness>),
     );
     expect(segmented.selected, {Brightness.dark});
     expect(
-      tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '蓝色')).selected,
+      tester.widget<HyperChip>(find.widgetWithText(HyperChip, '蓝色')).selected,
       isTrue,
     );
   });

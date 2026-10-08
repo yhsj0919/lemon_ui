@@ -138,7 +138,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperAppBar',
         description: '普通与滚动展开顶栏、统一玻璃材质。',
         icon: Icons.web_asset_outlined,
-        ownsAppBar: true,
+
         builder: (_) => const HyperAppBarPage(),
       ),
     ],

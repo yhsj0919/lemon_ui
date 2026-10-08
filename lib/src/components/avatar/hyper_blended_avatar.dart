@@ -115,7 +115,7 @@ class _HyperBlendedAvatarState extends State<HyperBlendedAvatar> {
         image,
         Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
         const Rect.fromLTWH(0, 0, 32, 32),
-        Paint(),
+        Paint()..isAntiAlias = true,
       );
       picture = recorder.endRecording();
       thumbnail = await picture.toImage(32, 32);
@@ -401,7 +401,12 @@ class HyperAvatarWindmillPainter extends CustomPainter {
             stops: const [0, .28, .55, 1],
             transform: GradientRotation(angle),
           );
-      canvas.drawPath(visible, Paint()..shader = fill.createShader(bounds));
+      canvas.drawPath(
+        visible,
+        Paint()
+          ..isAntiAlias = true
+          ..shader = fill.createShader(bounds),
+      );
       canvas.save();
       canvas.clipPath(visible);
       // 只在真实搭接处透出下层色彩，连续渐变模拟磨砂后的柔和叠色。
@@ -420,6 +425,7 @@ class HyperAvatarWindmillPainter extends CustomPainter {
         canvas.drawPath(
           overlap,
           Paint()
+            ..isAntiAlias = true
             ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * .025)
             ..shader = LinearGradient(
               begin: Alignment.topCenter,
@@ -438,6 +444,7 @@ class HyperAvatarWindmillPainter extends CustomPainter {
       canvas.drawPath(
         visible,
         Paint()
+          ..isAntiAlias = true
           ..shader = ui.Gradient.radial(
             foldCenter,
             foldRadius,
@@ -449,6 +456,7 @@ class HyperAvatarWindmillPainter extends CustomPainter {
         canvas.drawPath(
           visible,
           border.toPaint()
+            ..isAntiAlias = true
             ..strokeWidth = border.width * 2
             ..shader = LinearGradient(
               begin: Alignment.topLeft,

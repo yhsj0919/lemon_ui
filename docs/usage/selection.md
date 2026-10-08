@@ -65,6 +65,16 @@ Wrap(
 
 selected 为受控值；onDeleted 只通知应用，不自行移除、不改变选中。
 icon/avatar 互斥；showCheckmark 控制选中对勾。删除目标有独立焦点。
+默认对勾位于文字前。头像上叠加对勾可设置
+`HyperChipStyle(checkmarkPlacement: HyperChipCheckmarkPlacement.avatarOverlay,
+checkmarkColor: Colors.white)`；选中时保留头像，对勾居中叠加，不增加内容宽度。
+没有头像时回退到文字前的对勾。颜色由样式指定，应与传入头像保持可辨识对比。
+默认对勾复用 Checkbox 的路径与逐笔动画，头像叠加取消选中时反向收回。
+`avatarReplacement` 选中时隐藏头像内容，以 selectedAvatarColor（默认 primary）
+和 selectedAvatarShape（默认圆形）替代；取消选中后恢复头像。
+`checkmarkScale` 控制路径大小（默认 1.8），不会缩放头像区域或描边粗细。
+Chip 的显式 duration / curve 可覆盖默认节奏；系统减少动画时直接切换。
+自定义 checkmarkIcon 或 transitionBuilder 时保留自定义图标过渡。
 普通 HyperChip 可组合操作/删除，但 onPressed 与 onSelected 互斥。
 enabled 禁用；没有对应回调的入口不产生有效交互。
 全局 chipTheme、局部 HyperChipTheme、实例 HyperChipStyle，

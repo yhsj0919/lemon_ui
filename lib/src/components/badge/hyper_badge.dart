@@ -115,8 +115,10 @@ class HyperBadge extends StatelessWidget {
       duration: duration,
       curve: curve,
       width: dot ? dotSize : null,
-      height: dot ? dotSize : height,
-      constraints: dot ? null : BoxConstraints(minWidth: height),
+      height: dot ? dotSize : null,
+      constraints: dot
+          ? null
+          : BoxConstraints(minWidth: height, minHeight: height),
       padding: dot
           ? EdgeInsets.zero
           : EdgeInsets.symmetric(
@@ -142,6 +144,7 @@ class HyperBadge extends StatelessWidget {
           ? null
           : Center(
               widthFactor: 1,
+              heightFactor: 1,
               child: DefaultTextStyle.merge(
                 style: textStyle,
                 child: IconTheme.merge(

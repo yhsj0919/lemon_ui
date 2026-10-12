@@ -6,6 +6,7 @@ final class HyperMenuItem {
   const HyperMenuItem({
     required this.id,
     required this.label,
+    this.description,
     this.leading,
     this.trailing,
     this.children = const [],
@@ -14,6 +15,9 @@ final class HyperMenuItem {
 
   final String id;
   final String label;
+
+  /// 标题下方的辅助说明，支持多行；null 不占空间。
+  final String? description;
   final Widget? leading;
   final Widget? trailing;
 

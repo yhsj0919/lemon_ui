@@ -228,3 +228,4 @@ capsuleBottomIconTurns / TopIconTurns 控制跟随进度的旋转圈数；
 [滑块源码](../../lib/src/components/slider/hyper_slider.dart) ·
 [胶囊源码](../../lib/src/components/slider/hyper_capsule_slider.dart) ·
 [完整 Demo](../../example/lib/pages/selection/hyper_slider_page.dart)。
+按钮公共 boxShadow 默认由 filled、tonal、gradient 继承。outlined、ghost、text 默认无阴影；如需启用，可在对应变体主题或实例 HyperButtonStyle 中显式设置 boxShadow。

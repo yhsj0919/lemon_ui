@@ -100,8 +100,12 @@ class HyperCard extends StatelessWidget {
       if (material?.usesBackdrop ?? false) {
         // 毛玻璃只过滤背景；内容作为兄弟前景层保持清晰，避免文字重影。
         final background = BackdropFilter(
+          enabled: material!.blurSigmaX > 0 || material.blurSigmaY > 0,
+          // Opacity/FadeTransition uses an offscreen layer before reaching
+          // 1.0. Replace its filtered backdrop instead of blending it twice.
+          blendMode: BlendMode.src,
           filter: ImageFilter.blur(
-            sigmaX: material!.blurSigmaX,
+            sigmaX: material.blurSigmaX,
             sigmaY: material.blurSigmaY,
           ),
           child: DecoratedBox(

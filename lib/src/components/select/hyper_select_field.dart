@@ -271,7 +271,7 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
     }
   }
 
-  void _close() {
+  void _close({bool restoreFocus = false}) {
     _debounce?.cancel();
     _closeModal?.call();
     _closeModal = null;
@@ -279,7 +279,11 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_open) {
         _syncText();
-        _focus.requestFocus();
+        if (restoreFocus) {
+          _focus.requestFocus();
+        } else {
+          _focus.unfocus();
+        }
       }
     });
   }
@@ -306,7 +310,11 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
       (_modal ? _modalFocus : _focus).requestFocus();
     }
     if (!widget.multiple) {
-      _close();
+      _close(
+        restoreFocus:
+            FocusManager.instance.highlightMode ==
+            FocusHighlightMode.traditional,
+      );
     }
   }
 
@@ -439,7 +447,7 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
   KeyEventResult _key(FocusNode node, KeyEvent event) {
     if (!_enabled || event is! KeyDownEvent) return KeyEventResult.ignored;
     if (event.logicalKey == LogicalKeyboardKey.escape && _open) {
-      _close();
+      _close(restoreFocus: true);
       return KeyEventResult.handled;
     }
     if ((event.logicalKey == LogicalKeyboardKey.arrowDown ||
@@ -519,6 +527,7 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
       anchor = HyperButton.outlined(
         onPressed: _enabled ? () => _open ? _close() : _show() : null,
         focusNode: _focus,
+        focusHighlight: _open ? true : null,
         size: widget.size,
         style: HyperButtonStyle(
           width: width,

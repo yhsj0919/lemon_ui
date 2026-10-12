@@ -183,3 +183,4 @@ style 管理列表行，menuStyle 管理菜单，transitionBuilder 替换展开�
 ## 菜单项间距
 
 菜单、Sidebar 与树的基础行间距统一继承各端 HyperSizeScheme.navigationItemSpacing，默认 4 个 Flutter 逻辑像素（用户确认的项目规格）。menu.itemSpacing、sidebar.rowGap、treeView.rowSpacing 默认为 null 表示继承，尺寸 copyWith 或各自实例 Style 可覆盖；0 表示紧贴。Sidebar.itemSpacing 仍只表示内部图标/文字间距。菜单仅在同组项目之间添加间隔，首尾不额外留白，分组仍使用 groupSpacing。下拉、右键菜单和子菜单复用同一菜单布局。
+HyperTabBar 的内容边缘留白由当前设备 sizes.tabBar.padding 管理；实例 padding 可覆盖，EdgeInsets.zero 可关闭。它与独立标签之间的 itemSpacing、标签内部的控件内边距各自独立。默认两侧留白沿用同端既有 overlaySpacing 的项目语义规格（D 级，逻辑像素）。

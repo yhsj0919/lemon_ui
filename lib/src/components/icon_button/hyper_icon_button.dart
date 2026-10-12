@@ -307,8 +307,12 @@ class _HyperIconButtonState extends State<HyperIconButton> {
           children: [
             Positioned.fill(
               child: BackdropFilter(
+                enabled: material!.blurSigmaX > 0 || material.blurSigmaY > 0,
+                // Opacity/FadeTransition uses an offscreen layer before reaching
+                // 1.0. Replace its filtered backdrop instead of blending it twice.
+                blendMode: BlendMode.src,
                 filter: ImageFilter.blur(
-                  sigmaX: material!.blurSigmaX,
+                  sigmaX: material.blurSigmaX,
                   sigmaY: material.blurSigmaY,
                 ),
                 child: DecoratedBox(

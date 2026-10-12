@@ -1,5 +1,11 @@
 # Lemon UI 主题与尺寸架构
 
+## 高级材质与透明度动画
+
+录屏对照确认：整个模糊表面置于 Fade/Opacity 的离屏层内时，部分桌面后端在动画中无法采样真实背景，达到完全不透明后才恢复模糊。混合模式修改不能单独解决背景采样隔离。内部材质容器与浮层统一使用 `hyper_backdrop_safe_opacity.dart`：高级质量且未减少透明度时，先关闭背景滤镜并使用降级配方淡入，再保持外层完全不透明，连续恢复背景、模糊、染色、边框和阴影参数；关闭按同一进度反向运行。`materialTheme.transitionFadeFraction` 配置两阶段占比（默认 .6），动画提供临时 `transitionProgress`，嵌套动画取较小恢复进度，避免祖先淡入未结束时提前开启模糊。布局与内容状态保留；普通质量维持淡入淡出。自定义 transitionBuilder 仍由调用者管理，模糊表面不得整体包在分数透明度的离屏层内。
+
+背景模糊与清晰前景保持分层。`HyperMaterialSurface`、Card、Button 和 IconButton 的背景滤镜统一使用 `BlendMode.src`，避免 Fade/Opacity 的离屏层在透明度达到 1 时移除后产生重复混合造成的观感变化。材质配方与质量不随开场动画切换；默认时长、曲线与减少动画仍由 Motion 管理。依据：[Flutter BackdropFilter.blendMode](https://api.flutter.dev/flutter/widgets/BackdropFilter/blendMode.html)。Widget 回归测试检查 .5、.99、1 三个透明度阶段的合成配置；实际模糊效果还需目标渲染后端验证。
+
 ## LoadingOverlay（2026-10-03）
 
 全局 loadingOverlayTheme、局部 HyperLoadingOverlayTheme 和实例 Style 逐字段合并，
@@ -619,3 +625,9 @@ HyperTreeController<T> 管理展开、单选、子节点缓存和异步加载状
 共用 HyperSelectField 宿主、HyperSelectOptionsController 查询模型和 HyperSelectPanel；模型不管理编辑器、业务选择与路由。Dropdown 在面板内搜索，Autocomplete 在主输入框搜索，模态时同步编辑器。共用 selectionTheme / HyperSelectionTheme，Autocomplete 独立 autocompleteTheme；Dropdown 的 selectionStyle 嵌入现有 DropdownMenuStyle。配置强类型合并、插值、相等；四端额外尺寸统一存储于 sizes.selection。输入、按钮、Chip、菜单、表面、模态路由和高级材质沿用现有基础设施。Menu 外部导航控制器允许编辑器保留焦点，selectedIds 统一多选的视觉和语义。
 
 选择受控，分页/查询不清除选中值；标签缓存只保留当前结果和已选值。异步请求按 generation 忽略过期结果，追加失败不提交页面，游标须前进且不循环。来源替换时销毁旧控制器，视图卸载后关闭所属模态路由。adaptive 依据稳定真实设备类别解析，不按窗口尺寸重分类；显式 presentation 优先。PopupListTile 保留原尾部布局/弹出动效，模态复用共用 presenter，避免新增重复列表控件。
+
+## 顶部导航（2026-10-12）
+
+HyperTopNavigation 复用 HyperMenuItem 的树结构与 HyperMenu 多级浮层，叶项通过受控 selectedId / onSelected 请求切换，父项只展开菜单。选中后代映射到顶层选中提示。全局 topNavigationTheme、局部 HyperTopNavigationTheme 与实例 Style 逐字段合并；四端 sizes.topNavigation 独立管理顶层尺寸，子菜单继续使用 sizes.menu。顶层按钮、浮层、材质、焦点和动画复用现有基础设施。Menu 项新增 description，描述文字及间距可通过 Menu Style / Size 配置，各级菜单一致继承。
+
+默认顶层尺寸由同端现有 Button 规格推导，属于项目语义推导（D 级，逻辑像素）；子菜单直接沿用现有 Menu。未依据截图物理像素反推尺寸，尚未完成官方视觉对照。外部表面、布局和页面内容由调用方管理，空间不足时顶层横向滚动。

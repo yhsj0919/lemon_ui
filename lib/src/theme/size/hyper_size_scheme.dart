@@ -1,3 +1,5 @@
+import 'components/hyper_top_navigation_size.dart';
+import 'components/hyper_color_picker_size.dart';
 import 'components/hyper_selection_size.dart';
 import 'components/hyper_tree_view_size.dart';
 import 'components/hyper_page_indicator_size.dart';
@@ -96,6 +98,8 @@ final class HyperSizeScheme {
     required this.drawer,
     required this.sidebar,
     required this.menu,
+    required this.topNavigation,
+    required this.colorPicker,
     required this.select,
     required this.popupListTile,
     required this.tabBar,
@@ -299,7 +303,8 @@ final class HyperSizeScheme {
           actionRunSpacing: 8,
         ),
         bottomSheet: const HyperBottomSheetSize(
-          maxWidth: 320,
+          maxWidth: double.infinity,
+          landscapeMaxWidth: 320,
           radius: 28,
           titleSpacing: 16,
           actionSpacing: 12,
@@ -368,6 +373,7 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
+          padding: EdgeInsets.symmetric(horizontal: 4),
           height: 42,
           separatedRadius: 12,
           segmentedRadius: 8,
@@ -414,6 +420,22 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        topNavigation: const HyperTopNavigationSize(
+          height: 48,
+          radius: 16,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          iconSize: 24,
+          iconSpacing: 8,
+        ),
+        colorPicker: const HyperColorPickerSize(
+          width: 280,
+          paletteHeight: 280,
+          radius: 16,
+          spacing: 12,
+          markerRadius: 12,
+          previewHeight: 48,
+        ),
+
         pageIndicator: const HyperPageIndicatorSize(
           dotSize: 6,
           selectedWidth: 6,
@@ -704,7 +726,7 @@ final class HyperSizeScheme {
           actionRunSpacing: 12,
         ),
         bottomSheet: const HyperBottomSheetSize(
-          maxWidth: 400,
+          maxWidth: 640,
           radius: 28,
           titleSpacing: 20,
           actionSpacing: 12,
@@ -773,6 +795,7 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
+          padding: EdgeInsets.symmetric(horizontal: 4),
           height: 44,
           separatedRadius: 16,
           segmentedRadius: 16,
@@ -819,6 +842,22 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        topNavigation: const HyperTopNavigationSize(
+          height: 44,
+          radius: 16,
+          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          iconSize: 24,
+          iconSpacing: 8,
+        ),
+        colorPicker: const HyperColorPickerSize(
+          width: 280,
+          paletteHeight: 280,
+          radius: 16,
+          spacing: 12,
+          markerRadius: 12,
+          previewHeight: 48,
+        ),
+
         pageIndicator: const HyperPageIndicatorSize(
           dotSize: 6,
           selectedWidth: 6,
@@ -1178,6 +1217,7 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
+          padding: EdgeInsets.symmetric(horizontal: 4),
           height: 36,
           separatedRadius: 10,
           segmentedRadius: 10,
@@ -1224,6 +1264,22 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .07,
           pressOverlayOpacity: .08,
         ),
+        topNavigation: const HyperTopNavigationSize(
+          height: 32,
+          radius: 6,
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          iconSize: 16,
+          iconSpacing: 4,
+        ),
+        colorPicker: const HyperColorPickerSize(
+          width: 192,
+          paletteHeight: 192,
+          radius: 6,
+          spacing: 8,
+          markerRadius: 8,
+          previewHeight: 32,
+        ),
+
         pageIndicator: const HyperPageIndicatorSize(
           dotSize: 6,
           selectedWidth: 6,
@@ -1583,6 +1639,7 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
+          padding: EdgeInsets.symmetric(horizontal: 4),
           height: 40,
           separatedRadius: 20,
           segmentedRadius: 20,
@@ -1629,6 +1686,22 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        topNavigation: const HyperTopNavigationSize(
+          height: 40,
+          radius: 20,
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          iconSize: 20,
+          iconSpacing: 6,
+        ),
+        colorPicker: const HyperColorPickerSize(
+          width: 200,
+          paletteHeight: 200,
+          radius: 20,
+          spacing: 4,
+          markerRadius: 10,
+          previewHeight: 48,
+        ),
+
         pageIndicator: const HyperPageIndicatorSize(
           dotSize: 5,
           selectedWidth: 5,
@@ -1786,6 +1859,10 @@ final class HyperSizeScheme {
   final HyperDrawerSize drawer;
   final HyperSidebarSize sidebar;
   final HyperMenuSize menu;
+
+  /// 当前设备的顶部导航独立规格。
+  final HyperTopNavigationSize topNavigation;
+  final HyperColorPickerSize colorPicker;
   final HyperSelectSize select;
   final HyperPopupListTileSize popupListTile;
   final HyperTabBarSize tabBar;
@@ -1855,6 +1932,8 @@ final class HyperSizeScheme {
     HyperDrawerSize? drawer,
     HyperSidebarSize? sidebar,
     HyperMenuSize? menu,
+    HyperTopNavigationSize? topNavigation,
+    HyperColorPickerSize? colorPicker,
     HyperSelectSize? select,
     HyperPopupListTileSize? popupListTile,
     HyperTabBarSize? tabBar,
@@ -1924,6 +2003,8 @@ final class HyperSizeScheme {
     drawer: drawer ?? this.drawer,
     sidebar: sidebar ?? this.sidebar,
     menu: menu ?? this.menu,
+    topNavigation: topNavigation ?? this.topNavigation,
+    colorPicker: colorPicker ?? this.colorPicker,
     select: select ?? this.select,
     popupListTile: popupListTile ?? this.popupListTile,
     tabBar: tabBar ?? this.tabBar,
@@ -2051,6 +2132,12 @@ final class HyperSizeScheme {
       bottomSheet: HyperBottomSheetSize.lerp(a.bottomSheet, b.bottomSheet, t),
       sidebar: HyperSidebarSize.lerp(a.sidebar, b.sidebar, t),
       menu: HyperMenuSize.lerp(a.menu, b.menu, t),
+      topNavigation: HyperTopNavigationSize.lerp(
+        a.topNavigation,
+        b.topNavigation,
+        t,
+      ),
+      colorPicker: HyperColorPickerSize.lerp(a.colorPicker, b.colorPicker, t),
       select: HyperSelectSize.lerp(a.select, b.select, t),
       popupListTile: HyperPopupListTileSize.lerp(
         a.popupListTile,
@@ -2123,6 +2210,8 @@ final class HyperSizeScheme {
           other.drawer == drawer &&
           other.sidebar == sidebar &&
           other.menu == menu &&
+          other.topNavigation == topNavigation &&
+          other.colorPicker == colorPicker &&
           other.select == select &&
           other.popupListTile == popupListTile &&
           other.tabBar == tabBar &&
@@ -2193,6 +2282,8 @@ final class HyperSizeScheme {
     drawer,
     sidebar,
     menu,
+    topNavigation,
+    colorPicker,
     select,
     popupListTile,
     tabBar,

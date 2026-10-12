@@ -1,10 +1,15 @@
+import '../overlay/hyper_navigator_scope.dart';
+import '../overlay/hyper_live_route_themes.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
+import '../../theme/material/hyper_material_theme.dart';
 import '../icon_button/hyper_icon_button.dart';
 import '../icon_button/hyper_icon_button_style.dart';
 import '../overlay/hyper_modal_content.dart';
+import '../overlay/hyper_overlay_material.dart';
 import '../surface/hyper_material_surface.dart';
 import 'hyper_bottom_sheet_style.dart';
 import 'hyper_bottom_sheet_theme.dart';
@@ -15,10 +20,23 @@ HyperBottomSheetStyle _resolveStyle(
 ) {
   final theme = HyperTheme.of(context);
   final metrics = HyperTheme.sizesOf(context).bottomSheet;
+  final component = HyperBottomSheetTheme.of(context).style;
   return HyperBottomSheetStyle(
+    material:
+        HyperMaterialTheme.of(context).material ??
+        HyperOverlayMaterial.fallback(
+          context,
+          componentMaterial: component.material,
+          instanceMaterial: style?.material,
+          hasExplicitBackground:
+              component.background != null || style?.background != null,
+        ),
+    margin: EdgeInsets.zero,
     background: HyperFill.color(theme.colors.surfaceElevated),
     borderRadius: BorderRadius.vertical(top: Radius.circular(metrics.radius)),
-    maxWidth: metrics.maxWidth,
+    maxWidth: MediaQuery.orientationOf(context) == Orientation.landscape
+        ? metrics.landscapeMaxWidth ?? metrics.maxWidth
+        : metrics.maxWidth,
     padding: metrics.padding,
     titleStyle: theme.textTheme.titleMedium ?? const TextStyle(),
     contentStyle: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
@@ -36,7 +54,7 @@ HyperBottomSheetStyle _resolveStyle(
     dragHandleSize: metrics.dragHandleSize,
     dragHandleBorderRadius: BorderRadius.circular(metrics.dragHandleRadius),
     dragHandlePadding: metrics.dragHandlePadding,
-    barrierColor: Colors.black.withValues(alpha: .4),
+    barrierColor: Colors.black.withValues(alpha: .2),
     animationStyle: AnimationStyle(
       duration: theme.motion.standardDuration,
       reverseDuration: theme.motion.fastDuration,
@@ -170,8 +188,8 @@ class HyperBottomSheet extends StatelessWidget {
     return Semantics(
       label: semanticLabel,
       child: AnimatedPadding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        padding: resolved.margin!.add(
+          EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
         ),
         duration: duration,
         curve: curve,
@@ -198,26 +216,36 @@ Future<T?> showHyperBottomSheet<T>({
   bool enableDrag = true,
   bool barrierDismissible = true,
   String? barrierLabel,
-  bool useRootNavigator = true,
+  bool? useRootNavigator,
   bool useSafeArea = true,
   bool? requestFocus,
   RouteSettings? routeSettings,
   Offset? anchorPoint,
 }) {
-  final navigator = Navigator.of(context, rootNavigator: useRootNavigator);
-  final themes = InheritedTheme.capture(from: context, to: navigator.context);
+  final navigator = Navigator.of(
+    context,
+    rootNavigator: HyperNavigatorScope.resolve(
+      context,
+      useRootNavigator: useRootNavigator,
+    ),
+  );
   final resolved = _resolveStyle(context, style);
   final reduced = MediaQuery.of(context).disableAnimations;
   final direction = Directionality.of(context);
   return navigator.push<T>(
     ModalBottomSheetRoute<T>(
-      capturedThemes: themes,
       builder: (routeContext) {
-        Widget page = HyperBottomSheetTheme(
-          data: HyperBottomSheetThemeData(style: resolved),
-          child: Directionality(
-            textDirection: direction,
-            child: Builder(builder: builder),
+        Widget page = HyperLiveRouteThemes(
+          source: context,
+          destination: navigator.context,
+          child: HyperBottomSheetTheme(
+            data: HyperBottomSheetThemeData(
+              style: style ?? const HyperBottomSheetStyle(),
+            ),
+            child: Directionality(
+              textDirection: direction,
+              child: Builder(builder: builder),
+            ),
           ),
         );
         if (reduced) {
@@ -236,7 +264,10 @@ Future<T?> showHyperBottomSheet<T>({
       elevation: 0,
       shape: const RoundedRectangleBorder(),
       clipBehavior: Clip.none,
-      constraints: BoxConstraints(maxWidth: resolved.maxWidth!),
+      constraints: BoxConstraints(
+        maxWidth:
+            resolved.maxWidth! + resolved.margin!.resolve(direction).horizontal,
+      ),
       modalBarrierColor: resolved.barrierColor,
       barrierLabel:
           barrierLabel ??

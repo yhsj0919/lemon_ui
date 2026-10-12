@@ -1,8 +1,143 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
+import 'package:lemon_ui/src/components/message/hyper_message_surface.dart';
 
 void main() {
+  testWidgets('显示中的提示跟随主题，显式样式仍保留', (tester) async {
+    for (final toast in [true, false]) {
+      final controller = HyperSnackbarController();
+      late BuildContext messageContext;
+      Widget app(HyperThemeData theme) => MaterialApp(
+        home: HyperTheme(
+          data: theme,
+          duration: Duration.zero,
+          child: HyperSnackbarHost(
+            controller: controller,
+            child: Builder(
+              builder: (context) {
+                messageContext = context;
+                return const Scaffold(body: SizedBox.expand());
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(app(HyperThemeData.light()));
+      final explicit = const HyperMessageStyle(iconColor: Colors.orange);
+      if (toast) {
+        showHyperToast(
+          messageContext,
+          content: const Text('跟随主题'),
+          duration: Duration.zero,
+          style: explicit,
+        );
+      } else {
+        showHyperSnackbar(
+          messageContext,
+          content: const Text('跟随主题'),
+          duration: Duration.zero,
+          style: explicit,
+        );
+      }
+      await tester.pumpAndSettle();
+      final light = tester
+          .widget<HyperMessageSurface>(find.byType(HyperMessageSurface))
+          .style;
+      await tester.pumpWidget(app(HyperThemeData.dark()));
+      await tester.pumpAndSettle();
+      final dark = tester
+          .widget<HyperMessageSurface>(find.byType(HyperMessageSurface))
+          .style;
+      expect(dark.textStyle!.color, HyperThemeData.dark().colors.textPrimary);
+      expect(dark.textStyle!.color, isNot(light.textStyle!.color));
+      expect(dark.material!.background, isNot(light.material!.background));
+      expect(dark.iconColor, Colors.orange);
+      controller.clear();
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(const SizedBox.shrink());
+      controller.dispose();
+    }
+  });
+  testWidgets('消息收展动画不裁切表面外的阴影', (tester) async {
+    final controller = HyperSnackbarController();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: HyperSnackbarHost(
+            controller: controller,
+            child: const Scaffold(body: SizedBox.expand()),
+          ),
+        ),
+      ),
+    );
+    controller.show(
+      content: const Text('阴影提示'),
+      toast: true,
+      duration: Duration.zero,
+    );
+    await tester.pumpAndSettle();
+    final surface = find.byType(HyperMessageSurface);
+    expect(surface, findsOneWidget);
+    final filter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
+    expect(filter.enabled, isTrue);
+    expect(filter.filter.toString(), contains('20.0'));
+    expect(
+      find.ancestor(
+        of: surface,
+        matching: find.byWidgetPredicate(
+          (widget) => widget is ClipRect && widget.clipBehavior != Clip.none,
+        ),
+      ),
+      findsNothing,
+    );
+    controller.clear();
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox.shrink());
+    controller.dispose();
+  });
+  testWidgets('Toast 与 Snackbar 默认玻璃和阴影，显式无阴影可关闭', (tester) async {
+    for (final toast in [true, false]) {
+      for (final clearShadow in [false, true]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: HyperTheme(
+              data: HyperThemeData.light(),
+              duration: Duration.zero,
+              child: Builder(
+                builder: (context) => Center(
+                  child: HyperMessageSurface(
+                    content: const Text('已保存'),
+                    style: resolveMessageStyle(
+                      context,
+                      toast,
+                      clearShadow
+                          ? const HyperMessageStyle(boxShadow: [])
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        final material = tester
+            .widget<HyperMaterialSurface>(find.byType(HyperMaterialSurface))
+            .material!;
+        expect(material.kind, HyperSurfaceMaterialKind.softLightGlass);
+        expect(material.boxShadow.isEmpty, clearShadow);
+        expect(
+          material
+              .resolve(quality: HyperMaterialQuality.standard)
+              .boxShadow
+              .isEmpty,
+          clearShadow,
+        );
+      }
+    }
+  });
   test('高级材质质量和透明度策略参与主题覆盖、插值和降级', () {
     const base = HyperMessageStyle(
       material: HyperSurfaceMaterial.frostedGlass(

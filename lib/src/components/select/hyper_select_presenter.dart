@@ -1,3 +1,8 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
+import '../overlay/hyper_navigator_scope.dart';
+import '../overlay/hyper_live_route_themes.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -31,8 +36,10 @@ Future<void> showHyperSelectModal({
   if (presentation != HyperSelectPresentation.fullScreen) {
     throw ArgumentError('模态呈现只支持底部弹窗或全屏页。');
   }
-  final navigator = Navigator.of(context, rootNavigator: true);
-  final themes = InheritedTheme.capture(from: context, to: navigator.context);
+  final navigator = Navigator.of(
+    context,
+    rootNavigator: HyperNavigatorScope.resolve(context),
+  );
   final theme = HyperTheme.of(context);
   final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
   await navigator.push<void>(
@@ -44,15 +51,18 @@ Future<void> showHyperSelectModal({
       reverseTransitionDuration: reduced
           ? Duration.zero
           : theme.motion.fastDuration,
-      pageBuilder: (context, animation, secondaryAnimation) => themes.wrap(
-        HyperScaffold(
-          appBar: HyperAppBar(title: Text(title)),
-          body: SafeArea(child: builder(context)),
-        ),
-      ),
+      pageBuilder: (routeContext, animation, secondaryAnimation) =>
+          HyperLiveRouteThemes(
+            source: context,
+            destination: navigator.context,
+            child: HyperScaffold(
+              appBar: HyperAppBar(title: Text(title)),
+              body: SafeArea(child: builder(context)),
+            ),
+          ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) =>
           style?.transitionBuilder?.call(context, animation, child) ??
-          FadeTransition(
+          HyperBackdropSafeFade(
             opacity: animation.drive(
               CurveTween(curve: style?.curve ?? theme.motion.standardCurve),
             ),

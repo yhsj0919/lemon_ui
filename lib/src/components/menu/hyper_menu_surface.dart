@@ -51,13 +51,18 @@ HyperCardStyle resolveHyperMenuSurfaceStyle({
       style?.material != null ||
       fallbackMaterial != null;
   final shadow =
-      hasMaterial ||
+      fallbackMaterial != null ||
+          cardThemeStyle?.material != null ||
+          style?.material != null ||
+          (globalMaterial?.boxShadow.isNotEmpty ?? false) ||
           cardThemeStyle?.boxShadow != null ||
           style?.boxShadow != null
       ? null
       : [
           BoxShadow(
-            color: colors.scrim.withValues(alpha: .10),
+            color: colors.scrim.withValues(
+              alpha: globalMaterial == null ? .10 : .12,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

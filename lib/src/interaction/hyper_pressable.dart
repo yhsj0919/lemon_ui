@@ -241,7 +241,7 @@ class _HyperPressableState extends State<HyperPressable> {
   }
 
   void _setState(HyperControlState state, bool active) {
-    if (!widget.enabled) return;
+    if (!widget.enabled && active) return;
     final changed = active
         ? _internalStates.add(state)
         : _internalStates.remove(state);
@@ -253,6 +253,8 @@ class _HyperPressableState extends State<HyperPressable> {
   void _clearTransientStates() {
     final before = _internalStates.length;
     _internalStates.removeAll({
+      HyperControlState.hovered,
+      HyperControlState.focused,
       HyperControlState.pressed,
       HyperControlState.secondaryPressed,
       HyperControlState.tertiaryPressed,

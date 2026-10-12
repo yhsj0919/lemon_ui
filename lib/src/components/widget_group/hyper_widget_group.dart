@@ -72,9 +72,7 @@ class HyperWidgetGroup extends StatelessWidget {
     final sizes = HyperTheme.sizesOf(context);
     final metrics = sizes.widgetGroup;
     final resolved = HyperWidgetGroupTheme.of(context).style.merge(style);
-    final itemHeight =
-        resolved.itemHeight ??
-        (connected ? sizes.button.minimumSize.height : null);
+    final itemHeight = resolved.itemHeight;
     final spacing = resolved.spacing ?? (connected ? 0 : metrics.spacing);
     final hasFlexibleItem = children.any(
       (child) => child is HyperWidgetGroupItem && child.flex != null,
@@ -95,8 +93,9 @@ class HyperWidgetGroup extends StatelessWidget {
       duration: duration,
       curve: curve,
       width: resolved.width,
+      // 边框绘制在外框内部，不增加连接项的主题高度；显式内容留白独立生效。
       padding: (resolved.padding ?? EdgeInsets.zero).add(
-        border?.dimensions ?? EdgeInsets.zero,
+        connected ? EdgeInsets.zero : border?.dimensions ?? EdgeInsets.zero,
       ),
       clipBehavior: connected ? Clip.antiAlias : clipBehavior,
       decoration: BoxDecoration(

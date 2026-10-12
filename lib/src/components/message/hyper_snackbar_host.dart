@@ -1,3 +1,6 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+import '../overlay/hyper_navigator_scope.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -145,6 +148,7 @@ class _HyperSnackbarHostState extends State<HyperSnackbarHost> {
                   (entry) => entry.toast || entry.closeReason != null,
                 ),
                 child: SingleChildScrollView(
+                  clipBehavior: Clip.none,
                   reverse: alignment.y > 0,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -177,6 +181,9 @@ class _HyperSnackbarHostState extends State<HyperSnackbarHost> {
     controller: _controller,
     child: OverlayPortal(
       controller: _portal,
+      overlayLocation: HyperNavigatorScope.resolve(context)
+          ? OverlayChildLocation.rootOverlay
+          : OverlayChildLocation.nearestOverlay,
       overlayChildBuilder: _overlay,
       child: widget.child,
     ),
@@ -340,9 +347,14 @@ class _MessageItemState extends State<_MessageItem>
       semanticLabel: request.semanticLabel,
       style: style,
     );
-    return SizeTransition(
-      sizeFactor: _curved!,
-      alignment: Alignment.topLeft,
+    return AnimatedBuilder(
+      animation: _curved!,
+      builder: (context, child) => Align(
+        alignment: Alignment.topLeft,
+        widthFactor: 1,
+        heightFactor: _curved!.value,
+        child: child,
+      ),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: widget.hasFollowing ? (widget.spacing ?? style.spacing!) : 0,
@@ -375,7 +387,7 @@ class _MessageItemState extends State<_MessageItem>
                     );
                   }
                   final value = _curved!.value;
-                  return Opacity(
+                  return HyperBackdropSafeOpacity(
                     opacity: value.clamp(0, 1),
                     child: FractionalTranslation(
                       translation: style.entryOffset! * (1 - value),

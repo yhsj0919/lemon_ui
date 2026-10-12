@@ -8,6 +8,7 @@ final class HyperMenuSize {
     required this.itemHeight,
     required this.padding,
     this.itemSpacing,
+    this.descriptionGap = 2,
     required this.groupSpacing,
     required this.iconSize,
     required this.iconSpacing,
@@ -19,6 +20,9 @@ final class HyperMenuSize {
   final double itemHeight;
   final double padding;
   final double? itemSpacing;
+
+  /// 菜单标题与描述的逻辑像素间距。
+  final double descriptionGap;
   final double groupSpacing;
   final double iconSize;
   final double iconSpacing;
@@ -32,6 +36,7 @@ final class HyperMenuSize {
     double? itemHeight,
     double? padding,
     double? itemSpacing,
+    double? descriptionGap,
     double? groupSpacing,
     double? iconSize,
     double? iconSpacing,
@@ -42,6 +47,7 @@ final class HyperMenuSize {
     itemHeight: itemHeight ?? this.itemHeight,
     padding: padding ?? this.padding,
     itemSpacing: itemSpacing ?? this.itemSpacing,
+    descriptionGap: descriptionGap ?? this.descriptionGap,
     groupSpacing: groupSpacing ?? this.groupSpacing,
     iconSize: iconSize ?? this.iconSize,
     iconSpacing: iconSpacing ?? this.iconSpacing,
@@ -58,6 +64,7 @@ final class HyperMenuSize {
       itemSpacing: a.itemSpacing == null || b.itemSpacing == null
           ? (t < .5 ? a.itemSpacing : b.itemSpacing)
           : value(a.itemSpacing!, b.itemSpacing!),
+      descriptionGap: value(a.descriptionGap, b.descriptionGap),
       groupSpacing: value(a.groupSpacing, b.groupSpacing),
       iconSize: value(a.iconSize, b.iconSize),
       iconSpacing: value(a.iconSpacing, b.iconSpacing),
@@ -73,6 +80,7 @@ final class HyperMenuSize {
       other.itemHeight == itemHeight &&
       other.padding == padding &&
       other.itemSpacing == itemSpacing &&
+      other.descriptionGap == descriptionGap &&
       other.groupSpacing == groupSpacing &&
       other.iconSize == iconSize &&
       other.iconSpacing == iconSpacing &&
@@ -85,6 +93,7 @@ final class HyperMenuSize {
     itemHeight,
     padding,
     itemSpacing,
+    descriptionGap,
     groupSpacing,
     iconSize,
     iconSpacing,

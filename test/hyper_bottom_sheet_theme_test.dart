@@ -3,6 +3,116 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('未指定配方时默认高级浮层材质，普通质量保留降级配方', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: const Scaffold(body: HyperBottomSheet(content: Text('默认材质'))),
+        ),
+      ),
+    );
+    final recipe = tester
+        .widget<HyperMaterialSurface>(find.byType(HyperMaterialSurface))
+        .material!;
+    expect(recipe.kind, HyperSurfaceMaterialKind.softLightGlass);
+    expect(
+      recipe.resolve(quality: HyperMaterialQuality.advanced).usesBackdrop,
+      isTrue,
+    );
+    expect(
+      recipe.resolve(quality: HyperMaterialQuality.standard).usesBackdrop,
+      isFalse,
+    );
+    expect(recipe.boxShadow, isNotEmpty);
+  });
+  testWidgets('默认面板随全局材质更新，实例配方可覆盖', (tester) async {
+    for (final color in [Colors.blue, Colors.green]) {
+      final recipe = HyperSurfaceMaterial.frostedGlass(
+        background: HyperFill.color(color.withValues(alpha: .7)),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light().copyWith(
+              materialTheme: HyperMaterialThemeData(
+                quality: HyperMaterialQuality.advanced,
+                material: recipe,
+              ),
+            ),
+            duration: Duration.zero,
+            child: const Scaffold(body: HyperBottomSheet(content: Text('正文'))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<HyperMaterialSurface>(find.byType(HyperMaterialSurface))
+            .material,
+        recipe,
+      );
+    }
+  });
+  test('面板内外边距支持主题合并、复制、插值与相等', () {
+    const a = HyperBottomSheetStyle(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.all(12),
+    );
+    final b = a.copyWith(margin: const EdgeInsets.all(20));
+    expect(a.merge(b), b);
+    expect(b.copyWith(), b);
+    expect(a, isNot(b));
+    expect(
+      HyperBottomSheetStyle.lerp(a, b, .5).margin,
+      const EdgeInsets.all(10),
+    );
+    expect(b.padding, a.padding);
+  });
+  testWidgets('手机竖屏到边，横屏限宽，实例可覆盖', (tester) async {
+    for (final size in [const Size(400, 800), const Size(800, 400)]) {
+      await tester.binding.setSurfaceSize(size);
+      for (final override in [false, true]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(size: size),
+              child: HyperDeviceDetector(
+                deviceType: HyperDeviceType.phone,
+                builder: (context, _, _) => HyperTheme(
+                  data: HyperThemeData.light(),
+                  duration: Duration.zero,
+                  child: Scaffold(
+                    body: HyperBottomSheet(
+                      style: override
+                          ? const HyperBottomSheetStyle(maxWidth: 250)
+                          : null,
+                      content: const Text('面板内容'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final surface = find.descendant(
+          of: find.byType(HyperBottomSheet),
+          matching: find.byType(AnimatedContainer),
+        );
+        expect(
+          tester.getSize(surface).width,
+          override
+              ? 250
+              : size.width > size.height
+              ? 320
+              : 400,
+        );
+      }
+    }
+    await tester.binding.setSurfaceSize(null);
+  });
   test('主题覆盖保留未修改的动画和按钮字段', () {
     final global = HyperBottomSheetThemeData(
       style: HyperBottomSheetStyle(
@@ -98,7 +208,7 @@ void main() {
         sizes.desktop.bottomSheet.maxWidth,
         sizes.watch.bottomSheet.maxWidth,
       ],
-      [320, 400, 640, 180],
+      [double.infinity, 640, 640, 180],
     );
     final changed = sizes.copyWith(
       desktop: sizes.desktop.copyWith(

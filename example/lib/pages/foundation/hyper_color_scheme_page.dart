@@ -319,8 +319,8 @@ class _ColorTile extends StatelessWidget {
         .toUpperCase();
 
     return HyperCard(
-      height: 104,
       style: HyperCardStyle(
+        constraints: const BoxConstraints(minHeight: 104),
         padding: EdgeInsets.all(HyperSizeScheme.spaceXl),
         background: HyperFill.color(color),
         material: const HyperSurfaceMaterial.solid(),
@@ -328,6 +328,7 @@ class _ColorTile extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(

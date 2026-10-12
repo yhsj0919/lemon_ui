@@ -1,3 +1,5 @@
+import '../../components/top_navigation/hyper_top_navigation_theme.dart';
+import '../../components/color_picker/hyper_color_picker_theme.dart';
 import '../../components/select/hyper_selection_theme.dart';
 import '../../components/autocomplete/hyper_autocomplete_theme.dart';
 import '../../components/tree/hyper_tree_view_theme.dart';
@@ -101,6 +103,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.drawerTheme = const HyperDrawerThemeData(),
     this.sidebarTheme = const HyperSidebarThemeData(),
     this.menuTheme = const HyperMenuThemeData(),
+    this.topNavigationTheme = const HyperTopNavigationThemeData(),
+    this.colorPickerTheme = const HyperColorPickerThemeData(),
     this.selectTheme = const HyperSelectThemeData(),
     this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
     this.cardTheme = const HyperCardThemeData(),
@@ -212,6 +216,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       drawerTheme: const HyperDrawerThemeData(),
       sidebarTheme: const HyperSidebarThemeData(),
       menuTheme: const HyperMenuThemeData(),
+      topNavigationTheme: const HyperTopNavigationThemeData(),
+      colorPickerTheme: const HyperColorPickerThemeData(),
       cardTheme: const HyperCardThemeData(),
       titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
@@ -286,6 +292,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       drawerTheme: const HyperDrawerThemeData(),
       sidebarTheme: const HyperSidebarThemeData(),
       menuTheme: const HyperMenuThemeData(),
+      topNavigationTheme: const HyperTopNavigationThemeData(),
+      colorPickerTheme: const HyperColorPickerThemeData(),
       cardTheme: const HyperCardThemeData(),
       titledCardTheme: const HyperTitledCardThemeData(),
       buttonTheme: const HyperButtonThemeData(),
@@ -346,6 +354,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   /// 全局弹出菜单主题。
   final HyperMenuThemeData menuTheme;
+
+  /// 顶部导航全局主题。
+  final HyperTopNavigationThemeData topNavigationTheme;
+  final HyperColorPickerThemeData colorPickerTheme;
 
   /// 全局下拉选择器主题。
   final HyperSelectThemeData selectTheme;
@@ -494,6 +506,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperDrawerThemeData? drawerTheme,
     HyperSidebarThemeData? sidebarTheme,
     HyperMenuThemeData? menuTheme,
+    HyperTopNavigationThemeData? topNavigationTheme,
+    HyperColorPickerThemeData? colorPickerTheme,
     HyperSelectThemeData? selectTheme,
     HyperBreadcrumbThemeData? breadcrumbTheme,
     HyperCardThemeData? cardTheme,
@@ -567,6 +581,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       drawerTheme: drawerTheme ?? this.drawerTheme,
       sidebarTheme: sidebarTheme ?? this.sidebarTheme,
       menuTheme: menuTheme ?? this.menuTheme,
+      topNavigationTheme: topNavigationTheme ?? this.topNavigationTheme,
+      colorPickerTheme: colorPickerTheme ?? this.colorPickerTheme,
       selectTheme: selectTheme ?? this.selectTheme,
       breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
       cardTheme: cardTheme ?? this.cardTheme,
@@ -716,6 +732,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       menuTheme: HyperMenuThemeData.lerp(menuTheme, other.menuTheme, t),
+      topNavigationTheme: HyperTopNavigationThemeData.lerp(
+        topNavigationTheme,
+        other.topNavigationTheme,
+        t,
+      ),
+      colorPickerTheme: HyperColorPickerThemeData.lerp(
+        colorPickerTheme,
+        other.colorPickerTheme,
+        t,
+      ),
       selectTheme: HyperSelectThemeData.lerp(selectTheme, other.selectTheme, t),
       breadcrumbTheme: HyperBreadcrumbThemeData.lerp(
         breadcrumbTheme,
@@ -842,6 +868,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.drawerTheme == drawerTheme &&
           other.sidebarTheme == sidebarTheme &&
           other.menuTheme == menuTheme &&
+          other.topNavigationTheme == topNavigationTheme &&
+          other.colorPickerTheme == colorPickerTheme &&
           other.selectTheme == selectTheme &&
           other.breadcrumbTheme == breadcrumbTheme &&
           other.cardTheme == cardTheme &&
@@ -904,6 +932,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     drawerTheme,
     sidebarTheme,
     menuTheme,
+    topNavigationTheme,
+    colorPickerTheme,
     selectTheme,
     breadcrumbTheme,
     cardTheme,

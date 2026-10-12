@@ -107,8 +107,8 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
     final disabledColor = resolved.disabledColor ?? theme.colors.disabled;
     final radius = BorderRadius.circular(sizes.itemHeight / 2);
 
-    return SizedBox(
-      height: sizes.itemHeight,
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: sizes.itemHeight),
       child: SingleChildScrollView(
         controller: widget.controller,
         scrollDirection: Axis.horizontal,
@@ -143,8 +143,8 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
                     button: interactive,
                     enabled: widget.enabled && item.enabled,
                     selected: highlighted,
-                    child: SizedBox(
-                      height: sizes.itemHeight,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: sizes.itemHeight),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           maxWidth: sizes.itemMaxWidth,

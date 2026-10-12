@@ -1,6 +1,10 @@
 /// Lemon UI 组件库。
 library;
 
+export 'src/adaptive/hyper_text_scale.dart';
+
+export 'src/components/overlay/hyper_navigator_scope.dart';
+
 export 'src/components/notification/hyper_notification.dart';
 export 'src/components/notification/hyper_notification_style.dart';
 export 'src/components/notification/hyper_notification_theme.dart';
@@ -251,3 +255,15 @@ export 'src/components/select/hyper_select_model.dart';
 export 'src/components/select/hyper_selection_style.dart';
 export 'src/components/select/hyper_selection_theme.dart';
 export 'src/theme/size/components/hyper_selection_size.dart';
+
+export 'src/components/top_navigation/hyper_top_navigation.dart';
+export 'src/components/top_navigation/hyper_top_navigation_style.dart';
+export 'src/components/top_navigation/hyper_top_navigation_theme.dart';
+export 'src/theme/size/components/hyper_top_navigation_size.dart';
+
+export 'src/components/color_picker/hyper_color_picker.dart';
+export 'src/components/color_picker/hyper_color_picker_dialog.dart';
+export 'src/components/color_picker/hyper_color_picker_field.dart';
+export 'src/components/color_picker/hyper_color_picker_style.dart';
+export 'src/components/color_picker/hyper_color_picker_theme.dart';
+export 'src/theme/size/components/hyper_color_picker_size.dart';

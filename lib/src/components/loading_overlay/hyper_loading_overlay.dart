@@ -1,3 +1,5 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -214,7 +216,10 @@ class _HyperLoadingOverlayState extends State<HyperLoadingOverlay> {
                               value,
                               child!,
                             ) ??
-                            Opacity(opacity: value.clamp(0, 1), child: child),
+                            HyperBackdropSafeOpacity(
+                              opacity: value.clamp(0, 1),
+                              child: child,
+                            ),
                       ),
                     ),
                   ),

@@ -264,6 +264,10 @@ class _HyperMenuState extends State<HyperMenu> {
         fontSize: theme.typography.listTitle,
         height: theme.typography.listTitleLineHeight,
       ),
+      descriptionGap: metrics.descriptionGap,
+      descriptionStyle: theme.textTheme.bodySmall?.copyWith(
+        color: theme.colors.textSecondary,
+      ),
       groupTitleStyle: theme.textTheme.labelMedium?.copyWith(
         color: theme.colors.textSecondary,
       ),
@@ -345,7 +349,10 @@ class _HyperMenuState extends State<HyperMenu> {
       child: HyperPressable(
         enabled: item.enabled,
         focusNode: _focusNodeFor(item.id),
-        semanticLabel: item.label,
+        semanticLabel: [
+          item.label,
+          if (item.description != null) item.description!,
+        ].join('，'),
         onEnter: item.enabled
             ? (_) => setState(() {
                 _activeId = item.id;
@@ -393,18 +400,35 @@ class _HyperMenuState extends State<HyperMenu> {
                   SizedBox(width: style.iconSpacing),
                 ],
                 Expanded(
-                  child: Text(
-                    item.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: style.itemTextStyle!.copyWith(color: foreground),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: style.itemTextStyle!.copyWith(color: foreground),
+                      ),
+                      if (item.description != null) ...[
+                        SizedBox(height: style.descriptionGap),
+                        Text(
+                          item.description!,
+                          style: style.descriptionStyle!.copyWith(
+                            color: item.enabled
+                                ? style.descriptionStyle!.color
+                                : style.disabledColor,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 if (item.trailing != null) ...[
                   SizedBox(width: style.iconSpacing),
                   item.trailing!,
                 ],
-                if (selected) ...[
+                if (selected && (style.showCheckmark ?? true)) ...[
                   SizedBox(width: style.iconSpacing),
                   Icon(
                     style.checkIcon ?? Icons.check,

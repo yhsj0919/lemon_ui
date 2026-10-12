@@ -1,3 +1,5 @@
+import 'hyper_backdrop_safe_opacity.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -293,7 +295,7 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
             final transition = widget.transitionBuilder;
             final animatedContent = transition != null
                 ? transition(overlayContext, _animation, content)
-                : FadeTransition(
+                : HyperBackdropSafeFade(
                     opacity: opacity,
                     child: widget.transition == HyperOverlayTransition.fade
                         ? content

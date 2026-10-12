@@ -46,5 +46,5 @@ HyperMessageHandle showHyperSnackbar(
   mode: mode,
   duration: duration,
   semanticLabel: semanticLabel,
-  style: resolveMessageStyle(context, false, style),
+  style: style,
 );

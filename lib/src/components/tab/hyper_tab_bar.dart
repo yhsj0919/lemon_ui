@@ -25,6 +25,7 @@ class HyperTabBar extends StatelessWidget {
     this.variant = HyperTabBarVariant.segmented,
     this.isScrollable = false,
     this.onTap,
+    this.padding,
   });
 
   const HyperTabBar.separated({
@@ -33,6 +34,7 @@ class HyperTabBar extends StatelessWidget {
     this.controller,
     this.isScrollable = false,
     this.onTap,
+    this.padding,
   }) : variant = HyperTabBarVariant.separated;
 
   const HyperTabBar.underline({
@@ -41,7 +43,11 @@ class HyperTabBar extends StatelessWidget {
     this.controller,
     this.isScrollable = false,
     this.onTap,
+    this.padding,
   }) : variant = HyperTabBarVariant.underline;
+
+  /// 覆盖主题中的标签栏边缘留白；EdgeInsets.zero 可关闭。
+  final EdgeInsetsGeometry? padding;
 
   final List<Widget> tabs;
   final TabController? controller;
@@ -56,13 +62,26 @@ class HyperTabBar extends StatelessWidget {
     final segmented = variant == HyperTabBarVariant.segmented;
     final separated = variant == HyperTabBarVariant.separated;
     final effectiveController = controller ?? DefaultTabController.of(context);
-    final height = sizes.tabBar.height;
     final radius = BorderRadius.circular(
       segmented ? sizes.tabBar.segmentedRadius : sizes.tabBar.separatedRadius,
     );
     final style = theme.textTheme.labelLarge?.copyWith(
       fontSize: theme.typography.control,
     );
+    final painter = TextPainter(
+      text: TextSpan(text: 'Hg', style: style),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final scaledLineHeight = painter.height;
+    painter.textScaler = TextScaler.noScaling;
+    painter.layout();
+    final extraHeight = (scaledLineHeight - painter.height).clamp(
+      0.0,
+      double.infinity,
+    );
+    painter.dispose();
+    final height = sizes.tabBar.height + extraHeight;
     final tabContents = [
       for (final tab in tabs)
         if (tab is Tab)
@@ -90,6 +109,7 @@ class HyperTabBar extends StatelessWidget {
         height: height,
         child: TabBar(
           controller: effectiveController,
+          padding: padding ?? sizes.tabBar.padding,
           tabs: [
             for (final (index, tab) in tabContents.indexed)
               separated
@@ -99,7 +119,12 @@ class HyperTabBar extends StatelessWidget {
                       color: theme.colors.surfaceMuted,
                       selectedColor: theme.colors.surface,
                       radius: radius,
-                      child: tab,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: sizes.controlPadding.horizontal / 2,
+                        ),
+                        child: tab,
+                      ),
                     )
                   : tab,
           ],

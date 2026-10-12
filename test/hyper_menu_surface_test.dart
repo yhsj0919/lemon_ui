@@ -6,6 +6,30 @@ import 'package:lemon_ui/src/components/overlay/hyper_overlay_material.dart';
 
 void main() {
   final colors = HyperThemeData.light().colors;
+  test('切换无阴影的全局材质保留浮层阴影，显式关闭仍优先', () {
+    for (final material in [
+      const HyperSurfaceMaterial.solid(),
+      const HyperSurfaceMaterial.translucent(),
+      const HyperSurfaceMaterial.frostedGlass(),
+      const HyperSurfaceMaterial.softLightGlass(),
+    ]) {
+      final surface = resolveHyperMenuSurfaceStyle(
+        colors: colors,
+        radius: 12,
+        padding: EdgeInsets.zero,
+        globalMaterial: material,
+      );
+      expect(surface.boxShadow, isNotEmpty);
+      final disabled = resolveHyperMenuSurfaceStyle(
+        colors: colors,
+        radius: 12,
+        padding: EdgeInsets.zero,
+        globalMaterial: material,
+        style: HyperCardStyle(boxShadow: const []),
+      );
+      expect(disabled.boxShadow, isEmpty);
+    }
+  });
   test('Menu 与 Select 共用玻璃配方及阴影，统一质量降级仍保留阴影', () {
     final material = HyperOverlayMaterial.fallbackFor(colors: colors)!;
     for (final padding in [EdgeInsets.zero, const EdgeInsets.all(8)]) {

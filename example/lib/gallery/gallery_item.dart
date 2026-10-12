@@ -21,6 +21,7 @@ final class GalleryItem {
     required this.icon,
     required this.builder,
     this.ownsAppBar = false,
+    this.hasStyleOverrides = false,
   });
 
   /// 跨版本保持稳定的页面标识。
@@ -40,6 +41,13 @@ final class GalleryItem {
 
   /// 页面自行绘制顶栏时，Gallery 不再额外叠加一层顶栏。
   final bool ownsAppBar;
+
+  /// 页面包含局部主题、实例样式或自定义表面演示。
+  final bool hasStyleOverrides;
+
+  /// 提醒这些示例中的显式字段优先于编辑器全局设置。
+  static const styleOverridesNotice =
+      '含样式覆盖示例：局部主题、实例 Style 或自定义表面的显式字段优先于全局主题。';
 }
 
 /// 菜单中的组件分类。

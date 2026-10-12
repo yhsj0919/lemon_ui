@@ -5,6 +5,45 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('悬停后禁用不会残留高亮，移出再启用仍无悬停', (tester) async {
+    var enabled = true;
+    late StateSetter update;
+    Set<HyperControlState> current = {};
+    await tester.pumpWidget(
+      MaterialApp(
+        home: StatefulBuilder(
+          builder: (context, setState) {
+            update = setState;
+            return Center(
+              child: HyperPressable(
+                enabled: enabled,
+                onTap: () {},
+                builder: (context, states, _) {
+                  current = states;
+                  return const SizedBox(width: 100, height: 50);
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(find.byType(HyperPressable)));
+    await tester.pump();
+    expect(current, contains(HyperControlState.hovered));
+    update(() => enabled = false);
+    await tester.pump();
+    expect(current, contains(HyperControlState.disabled));
+    expect(current, isNot(contains(HyperControlState.hovered)));
+    expect(current, isNot(contains(HyperControlState.focused)));
+    await mouse.moveTo(Offset.zero);
+    update(() => enabled = true);
+    await tester.pump();
+    expect(current, isNot(contains(HyperControlState.hovered)));
+    await mouse.removePointer();
+  });
   Widget buildPressable({
     VoidCallback? onTap,
     VoidCallback? onDoubleTap,

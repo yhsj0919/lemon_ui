@@ -6,6 +6,54 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('收起与展开高级材质时，分数透明度阶段关闭背景滤镜', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: HyperScaffold(
+            appBar: const HyperAppBar.large(title: Text('滚动材质')),
+            body: ListView.builder(
+              itemCount: 40,
+              itemBuilder: (_, index) => const SizedBox(height: 64),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final scroll = tester.state<NestedScrollViewState>(
+      find.byType(NestedScrollView),
+    );
+    void checkFilters() {
+      for (final element in find.byType(BackdropFilter).evaluate()) {
+        if (!(element.widget as BackdropFilter).enabled) continue;
+        element.visitAncestorElements((ancestor) {
+          if (ancestor.widget case Opacity(:final opacity)) {
+            expect(opacity == 0 || opacity == 1, isTrue);
+          }
+          return true;
+        });
+      }
+    }
+
+    for (final collapsed in [true, false, true, false]) {
+      scroll.outerController.jumpTo(
+        collapsed ? scroll.outerController.position.maxScrollExtent : 0,
+      );
+      await tester.pump();
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 20));
+        checkFilters();
+      }
+      expect(
+        tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+        collapsed,
+      );
+    }
+    expect(tester.takeException(), isNull);
+  });
   test('顶栏四端尺寸集中在主题方案中，可单独覆盖', () {
     const sizes = HyperSizeThemeData();
     expect(sizes.phone.appBar.collapsedHeight, 58);
@@ -306,7 +354,12 @@ void main() {
       matching: find.text('设置'),
     );
     expect(tester.getTopLeft(largeTitle).dx, 26);
-    expect(tester.getTopLeft(largeTitle).dy, 106);
+    final titleHeight = tester.getSize(largeTitle).height;
+    expect(
+      tester.getTopLeft(largeTitle).dy,
+      (settings.maxExtent - titleHeight).clamp(0.0, settings.minExtent),
+    );
+    expect(tester.getBottomLeft(largeTitle).dy, lessThanOrEqualTo(144));
 
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -250));
     await tester.pumpAndSettle();

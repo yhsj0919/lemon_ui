@@ -1,3 +1,5 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -29,7 +31,7 @@ Widget _defaultContentTransition(
   BuildContext context,
   double visibility,
   Widget child,
-) => Opacity(opacity: visibility, child: child);
+) => HyperBackdropSafeOpacity(opacity: visibility, child: child);
 
 Widget _defaultChildrenTransition(
   BuildContext context,
@@ -39,7 +41,7 @@ Widget _defaultChildrenTransition(
   child: SizeTransition(
     sizeFactor: animation,
     alignment: AlignmentDirectional.topStart,
-    child: FadeTransition(opacity: animation, child: child),
+    child: HyperBackdropSafeFade(opacity: animation, child: child),
   ),
 );
 

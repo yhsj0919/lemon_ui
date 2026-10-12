@@ -5,6 +5,7 @@ import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
 import '../button/hyper_button_theme.dart';
 import '../surface/hyper_material_surface.dart';
+import '../overlay/hyper_overlay_material.dart';
 import 'hyper_message_style.dart';
 import 'hyper_toast_theme.dart';
 import 'hyper_snackbar_theme.dart';
@@ -18,9 +19,27 @@ HyperMessageStyle resolveMessageStyle(
   final sizes = HyperTheme.sizesOf(context);
   final metrics = toast ? sizes.toast : sizes.snackbar;
   final materialTheme = HyperMaterialTheme.of(context);
+  final component = toast
+      ? HyperToastTheme.of(context).style
+      : HyperSnackbarTheme.of(context).style;
+  final defaultMaterial = HyperOverlayMaterial.fallbackFor(
+    colors: theme.colors,
+  )!;
+  final material =
+      style?.material ??
+      component.material ??
+      materialTheme.material ??
+      HyperOverlayMaterial.fallback(
+        context,
+        hasExplicitBackground:
+            style?.background != null || component.background != null,
+      );
   return HyperMessageStyle(
         background: HyperFill.color(theme.colors.surfaceElevated),
-        material: materialTheme.material,
+        material: material,
+        boxShadow: material != null && material.boxShadow.isNotEmpty
+            ? material.boxShadow
+            : defaultMaterial.boxShadow,
         materialQuality: materialTheme.quality,
         reduceTransparency: materialTheme.reduceTransparency,
         borderRadius: BorderRadius.circular(metrics.radius),
@@ -101,7 +120,7 @@ class HyperMessageSurface extends StatelessWidget {
         gradient: style.material == null ? style.background?.gradient : null,
         border: style.border,
         borderRadius: style.borderRadius,
-        boxShadow: style.boxShadow,
+        boxShadow: style.material == null ? style.boxShadow : null,
       ),
       child: ClipRRect(
         borderRadius: style.borderRadius!,
@@ -110,7 +129,12 @@ class HyperMessageSurface extends StatelessWidget {
     );
     if (style.material != null) {
       result = HyperMaterialSurface(
-        material: style.material,
+        material: style.material!.copyWith(
+          boxShadow: style.boxShadow,
+          fallback: style.material!.fallback?.copyWith(
+            boxShadow: style.boxShadow,
+          ),
+        ),
         quality: style.materialQuality,
         reduceTransparency: style.reduceTransparency,
         borderRadius: style.borderRadius,

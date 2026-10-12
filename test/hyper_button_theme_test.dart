@@ -3,6 +3,40 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  test('公共阴影只作用于实体变体，变体和实例可显式开启', () {
+    const shadows = [BoxShadow(color: Colors.blue, blurRadius: 8)];
+    final theme = HyperButtonThemeData(
+      style: HyperButtonStyle(boxShadow: shadows),
+    );
+    for (final variant in [
+      HyperButtonVariant.filled,
+      HyperButtonVariant.tonal,
+      HyperButtonVariant.gradient,
+    ]) {
+      expect(theme.resolve(variant).boxShadow, shadows);
+    }
+    for (final variant in [
+      HyperButtonVariant.outlined,
+      HyperButtonVariant.ghost,
+      HyperButtonVariant.text,
+    ]) {
+      expect(theme.resolve(variant).boxShadow, isEmpty);
+      expect(
+        theme
+            .resolve(variant)
+            .merge(HyperButtonStyle(boxShadow: shadows))
+            .boxShadow,
+        shadows,
+      );
+    }
+    expect(
+      theme
+          .copyWith(ghost: HyperButtonStyle(boxShadow: shadows))
+          .resolve(HyperButtonVariant.ghost)
+          .boxShadow,
+      shadows,
+    );
+  });
   test('按钮样式支持继承、显式清除和恢复继承', () {
     final base = HyperButtonStyle(
       background: const HyperFill.color(Colors.orange),

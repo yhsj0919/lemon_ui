@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../button/hyper_button.dart';
+import '../tooltip/hyper_tooltip.dart';
 import '../button/hyper_button_style.dart';
 import '../widget_group/hyper_widget_group.dart';
 import 'hyper_segmented_button_style.dart';
@@ -41,6 +42,7 @@ class HyperSegmentedButton<T> extends StatelessWidget {
     this.expanded = false,
     this.direction = Axis.horizontal,
     this.showSeparators = true,
+    this.showLabels = true,
     this.style,
   }) : segments = List.unmodifiable(segments),
        selected = Set.unmodifiable(selected) {
@@ -57,6 +59,9 @@ class HyperSegmentedButton<T> extends StatelessWidget {
   final bool multiSelectionEnabled, emptySelectionAllowed, enabled, expanded;
   final Axis direction;
   final bool showSeparators;
+
+  /// false 时有图标的分段仅显示图标，文字用于语义和 HyperTooltip；无图标仍显示文字。
+  final bool showLabels;
   final HyperSegmentedButtonStyle? style;
 
   /// 返回合法的新集合；无变化或禁用时不发出回调。
@@ -106,14 +111,20 @@ class HyperSegmentedButton<T> extends StatelessWidget {
                 ? item.flex ?? (expanded ? 1 : null)
                 : null,
             child: Semantics(
+              label: !showLabels && item.icon != null ? item.label : null,
               selected: selected.contains(item.value),
               inMutuallyExclusiveGroup: !multiSelectionEnabled,
               child: HyperButton.ghost(
-                label: Text(item.label),
-                icon: item.icon,
+                label: showLabels || item.icon == null
+                    ? Text(item.label)
+                    : null,
+                icon: showLabels ? item.icon : null,
                 style: selected.contains(item.value) ? active : normal,
                 onPressed: enabled && item.enabled && onSelectionChanged != null
                     ? () => select(item.value)
+                    : null,
+                child: !showLabels && item.icon != null
+                    ? HyperTooltip(message: item.label, child: item.icon!)
                     : null,
               ),
             ),

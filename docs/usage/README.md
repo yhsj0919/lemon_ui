@@ -10,6 +10,7 @@
 - [布局容器：页面、顶栏、卡片、抽屉、控件组](layout.md)
 - [操作与选择：按钮、Chip、分段按钮、开关、单选、复选、滑块](selection.md)
 - [文本输入：单行、多行、密码和尾部错误提示](input.md)
+- [颜色选择器：HSV、透明度与 HEX 输入](color-picker.md)
 - [下拉与自动填充：单多选、搜索、异步分页和多种呈现](select-fields.md)
 - [对话框：位置、表面、按钮、关闭规则和自由内容](dialog.md)
 - [底部面板：高度、拖动关闭、滚动正文与固定操作区](bottom-sheet.md)
@@ -17,6 +18,7 @@
 - [内联提示与横幅：Alert、Banner、状态、操作和受控关闭](notices.md)
 - [加载遮罩：区域、整页、延迟显示、交互拦截与取消](loading-overlay.md)
 - [导航与列表：Tab、面包屑、侧栏及列表行](navigation.md)
+- [顶部导航：多级菜单、描述文字与主题](top-navigation.md)
 - [浮层与反馈：菜单、下拉、提示、进度、骨架与空状态](feedback.md)
 - [交互与材质：锚定浮层、Pressable、越界弹性与材质表面](foundation.md)
 

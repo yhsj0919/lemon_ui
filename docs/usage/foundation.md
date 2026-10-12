@@ -131,4 +131,4 @@ width/height/padding/margin/alignment 属于当前表面布局参数。
 - HyperMotionThemeData / HyperMotionTheme：全局或局部过渡节奏与弹簧；
   自定义动效同样需要遵守 MediaQuery.disableAnimations。
 - HyperFill.none/color/gradient：强类型背景填充，none 表示明确关闭填充。
-- 所有公开基础类型与主题入口见 [lib/lemon_ui.dart](../../lib/lemon_ui.dart)。
+- 所有公开基础类型与主题入口见 [lib/lemon_ui.dart](../../lib/lemon_ui.dart)。HyperNavigatorScope(useRootNavigator: false, child: ...) 可将嵌套工作区的 Dialog、BottomSheet、选择控件全屏页及列表项模态选项限制在最近的 Navigator。放在内部 Navigator 上方。未配置作用域时保持根 Navigator 默认；showHyperDialog / showHyperBottomSheet 的显式 useRootNavigator 参数优先。作用域只选择导航宿主，不改变主题、材质或路由内容。

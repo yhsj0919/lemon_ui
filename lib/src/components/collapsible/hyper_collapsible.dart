@@ -1,3 +1,5 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -184,7 +186,7 @@ class HyperCollapsible extends StatelessWidget {
         child: surface,
       );
     }
-    return AnimatedOpacity(
+    return HyperBackdropSafeAnimatedOpacity(
       opacity: enabled ? 1 : resolved.disabledOpacity!.clamp(0, 1),
       duration: duration,
       curve: resolved.curve!,
@@ -285,7 +287,10 @@ class _ContentState extends State<_Content>
                           widthFactor: widget.axis == Axis.horizontal
                               ? value
                               : 1,
-                          child: Opacity(opacity: value, child: child),
+                          child: HyperBackdropSafeOpacity(
+                            opacity: value,
+                            child: child,
+                          ),
                         ),
                       );
                 },

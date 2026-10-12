@@ -98,6 +98,8 @@ void main() {
         ),
         device == HyperDeviceType.desktop
             ? HyperSelectPresentation.anchored
+            : device == HyperDeviceType.watch
+            ? HyperSelectPresentation.fullScreen
             : HyperSelectPresentation.bottomSheet,
       );
     }

@@ -9,10 +9,18 @@ const _unchanged = Object();
 @immutable
 final class HyperMaterialThemeData {
   const HyperMaterialThemeData({
+    this.transitionFadeFraction,
+    this.transitionProgress,
     this.quality,
     this.reduceTransparency,
     this.material,
   });
+
+  /// 开合动画中普通表面淡入段所占比例；默认 .6。
+  final double? transitionFadeFraction;
+
+  /// 动画层提供的高级材质恢复进度，null 表示稳定状态。
+  final double? transitionProgress;
 
   /// 材质渲染质量；null 表示继承。
   final HyperMaterialQuality? quality;
@@ -28,16 +36,43 @@ final class HyperMaterialThemeData {
     HyperSurfaceMaterial? material,
     HyperMaterialQuality? quality,
     bool? reduceTransparency,
-  }) => (material ?? this.material)?.resolve(
-    quality: quality ?? this.quality ?? HyperMaterialQuality.standard,
-    reduceTransparency: reduceTransparency ?? this.reduceTransparency ?? false,
-  );
+  }) {
+    final resolved = (material ?? this.material)?.resolve(
+      quality: quality ?? this.quality ?? HyperMaterialQuality.standard,
+      reduceTransparency:
+          reduceTransparency ?? this.reduceTransparency ?? false,
+    );
+    if (resolved == null ||
+        !resolved.usesBackdrop ||
+        transitionProgress == null) {
+      return resolved;
+    }
+    final progress = transitionProgress!.clamp(0.0, 1.0);
+    if (progress == 1) return resolved;
+    final ordinary = resolved.resolve(quality: HyperMaterialQuality.standard);
+    // Keep the same painting structure; a zero-radius filter is disabled by
+    // consumers during the opacity stage. Only recipe parameters interpolate.
+    final source = ordinary.copyWith(
+      kind: resolved.kind,
+      blurSigmaX: 0,
+      blurSigmaY: 0,
+    );
+    return HyperSurfaceMaterial.lerp(source, resolved, progress);
+  }
 
   HyperMaterialThemeData copyWith({
+    Object? transitionFadeFraction = _unchanged,
+    Object? transitionProgress = _unchanged,
     Object? quality = _unchanged,
     Object? reduceTransparency = _unchanged,
     Object? material = _unchanged,
   }) => HyperMaterialThemeData(
+    transitionFadeFraction: identical(transitionFadeFraction, _unchanged)
+        ? this.transitionFadeFraction
+        : transitionFadeFraction as double?,
+    transitionProgress: identical(transitionProgress, _unchanged)
+        ? this.transitionProgress
+        : transitionProgress as double?,
     quality: identical(quality, _unchanged)
         ? this.quality
         : quality as HyperMaterialQuality?,
@@ -52,6 +87,15 @@ final class HyperMaterialThemeData {
   HyperMaterialThemeData merge(HyperMaterialThemeData? other) => other == null
       ? this
       : HyperMaterialThemeData(
+          transitionFadeFraction:
+              other.transitionFadeFraction ?? transitionFadeFraction,
+          transitionProgress: other.transitionProgress == null
+              ? transitionProgress
+              : transitionProgress == null
+              ? other.transitionProgress
+              : (other.transitionProgress! < transitionProgress!
+                    ? other.transitionProgress
+                    : transitionProgress),
           quality: other.quality ?? quality,
           reduceTransparency: other.reduceTransparency ?? reduceTransparency,
           material: other.material ?? material,
@@ -69,6 +113,16 @@ final class HyperMaterialThemeData {
       material = t < .5 ? a.material : b.material;
     }
     return HyperMaterialThemeData(
+      transitionFadeFraction:
+          a.transitionFadeFraction == null || b.transitionFadeFraction == null
+          ? (t < .5 ? a.transitionFadeFraction : b.transitionFadeFraction)
+          : a.transitionFadeFraction! +
+                (b.transitionFadeFraction! - a.transitionFadeFraction!) * t,
+      transitionProgress:
+          a.transitionProgress == null || b.transitionProgress == null
+          ? (t < .5 ? a.transitionProgress : b.transitionProgress)
+          : a.transitionProgress! +
+                (b.transitionProgress! - a.transitionProgress!) * t,
       quality: t < .5 ? a.quality : b.quality,
       reduceTransparency: t < .5 ? a.reduceTransparency : b.reduceTransparency,
       material: material,
@@ -79,12 +133,20 @@ final class HyperMaterialThemeData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is HyperMaterialThemeData &&
+          other.transitionFadeFraction == transitionFadeFraction &&
+          other.transitionProgress == transitionProgress &&
           other.quality == quality &&
           other.reduceTransparency == reduceTransparency &&
           other.material == material;
 
   @override
-  int get hashCode => Object.hash(quality, reduceTransparency, material);
+  int get hashCode => Object.hash(
+    quality,
+    reduceTransparency,
+    material,
+    transitionFadeFraction,
+    transitionProgress,
+  );
 }
 
 /// 在子树中显式替换材质策略。

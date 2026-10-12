@@ -31,7 +31,6 @@ class _HyperMessagePageState extends State<HyperMessagePage> {
       background: HyperFill.color(
         colors.surfaceElevated.withValues(alpha: .65),
       ),
-      tint: colors.primary.withValues(alpha: .04),
       border: BorderSide(color: colors.textPrimary.withValues(alpha: .08)),
       fallback: HyperSurfaceMaterial.solid(
         background: HyperFill.color(colors.surfaceElevated),
@@ -288,6 +287,12 @@ class _HyperMessagePageState extends State<HyperMessagePage> {
                           style: HyperMessageStyle(
                             material: glass.copyWith(
                               kind: HyperSurfaceMaterialKind.softLightGlass,
+                              blurSigmaX:
+                                  const HyperSurfaceMaterial.softLightGlass()
+                                      .blurSigmaX,
+                              blurSigmaY:
+                                  const HyperSurfaceMaterial.softLightGlass()
+                                      .blurSigmaY,
                             ),
                             materialQuality: HyperMaterialQuality.advanced,
                           ),

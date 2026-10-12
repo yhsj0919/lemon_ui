@@ -59,7 +59,6 @@ class HyperPagination extends StatelessWidget {
       borderRadius: BorderRadius.circular(metrics.radius),
       boxShadow: const [],
       padding: metrics.padding,
-      height: metrics.height,
       minimumSize: Size(metrics.minWidth, metrics.height),
       minimumTapTargetSize: Size.square(sizes.minimumInteractiveDimension),
       iconSize: metrics.iconSize,

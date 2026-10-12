@@ -35,6 +35,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.filled,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -54,6 +55,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.tonal,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -73,6 +75,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.outlined,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -92,6 +95,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.ghost,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -111,6 +115,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.text,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -130,6 +135,7 @@ class HyperButton extends StatefulWidget {
     this.onError,
     this.autofocus = false,
     this.focusNode,
+    this.focusHighlight,
   }) : variant = HyperButtonVariant.gradient,
        assert((child == null) != (label == null)),
        assert(icon == null || label != null);
@@ -178,6 +184,9 @@ class HyperButton extends StatefulWidget {
   /// 按钮自身的焦点节点，由调用方创建和释放。
   final FocusNode? focusNode;
 
+  /// 覆盖焦点高亮；用于浮层打开时焦点转移到内容的组合控件。
+  final bool? focusHighlight;
+
   @override
   State<HyperButton> createState() => _HyperButtonState();
 }
@@ -221,7 +230,6 @@ class _HyperButtonState extends State<HyperButton> {
     // 组件只消费主题已经解析好的当前设备规格，不再自行判断设备类型。
     final metrics = sizes.button;
     final defaults = HyperButtonStyle(
-      height: metrics.heightFor(widget.size),
       minimumSize: Size(
         metrics.minimumSize.width,
         metrics.heightFor(widget.size),
@@ -281,7 +289,8 @@ class _HyperButtonState extends State<HyperButton> {
       builder: (context, states, _) {
         final pressed = states.contains(HyperControlState.pressed);
         final hovered = states.contains(HyperControlState.hovered);
-        final focused = states.contains(HyperControlState.focused);
+        final focused =
+            widget.focusHighlight ?? states.contains(HyperControlState.focused);
         final overlay = style.overlayColor ?? colors.stateLayer;
         final overlayAlpha = switch ((pressed, focused, hovered)) {
           (true, _, _) => style.pressOverlayOpacity!,
@@ -541,8 +550,12 @@ class _HyperButtonState extends State<HyperButton> {
           children: [
             Positioned.fill(
               child: BackdropFilter(
+                enabled: material!.blurSigmaX > 0 || material.blurSigmaY > 0,
+                // Opacity/FadeTransition uses an offscreen layer before reaching
+                // 1.0. Replace its filtered backdrop instead of blending it twice.
+                blendMode: BlendMode.src,
                 filter: ImageFilter.blur(
-                  sigmaX: material!.blurSigmaX,
+                  sigmaX: material.blurSigmaX,
                   sigmaY: material.blurSigmaY,
                 ),
                 child: DecoratedBox(

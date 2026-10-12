@@ -17,6 +17,7 @@ final class HyperMenuStyle {
     this.itemRadius,
     this.surfaceRadius,
     this.checkIcon,
+    this.showCheckmark,
     this.iconSize,
     this.iconSpacing,
     this.foregroundColor,
@@ -25,6 +26,8 @@ final class HyperMenuStyle {
     this.selectedForegroundColor,
     this.activeBackgroundColor,
     this.itemTextStyle,
+    this.descriptionStyle,
+    this.descriptionGap,
     this.groupTitleStyle,
     this.surfaceStyle,
     this.submenuTransitionBuilder,
@@ -46,6 +49,9 @@ final class HyperMenuStyle {
 
   /// 选中项的标记图标。
   final IconData? checkIcon;
+
+  /// 是否显示选中对勾；false 保留选中配色但不占标记空间。
+  final bool? showCheckmark;
   final double? iconSize;
   final double? iconSpacing;
   final Color? foregroundColor;
@@ -54,6 +60,12 @@ final class HyperMenuStyle {
   final Color? selectedForegroundColor;
   final Color? activeBackgroundColor;
   final TextStyle? itemTextStyle;
+
+  /// 菜单描述的文字样式。
+  final TextStyle? descriptionStyle;
+
+  /// 菜单描述的标题间距，单位为逻辑像素。
+  final double? descriptionGap;
   final TextStyle? groupTitleStyle;
   final HyperCardStyle? surfaceStyle;
   final HyperOverlayTransitionBuilder? submenuTransitionBuilder;
@@ -69,6 +81,7 @@ final class HyperMenuStyle {
     double? itemRadius,
     double? surfaceRadius,
     IconData? checkIcon,
+    bool? showCheckmark,
     double? iconSize,
     double? iconSpacing,
     Color? foregroundColor,
@@ -77,6 +90,8 @@ final class HyperMenuStyle {
     Color? selectedForegroundColor,
     Color? activeBackgroundColor,
     TextStyle? itemTextStyle,
+    TextStyle? descriptionStyle,
+    double? descriptionGap,
     TextStyle? groupTitleStyle,
     HyperCardStyle? surfaceStyle,
     HyperOverlayTransitionBuilder? submenuTransitionBuilder,
@@ -91,6 +106,7 @@ final class HyperMenuStyle {
     itemRadius: itemRadius ?? this.itemRadius,
     surfaceRadius: surfaceRadius ?? this.surfaceRadius,
     checkIcon: checkIcon ?? this.checkIcon,
+    showCheckmark: showCheckmark ?? this.showCheckmark,
     iconSize: iconSize ?? this.iconSize,
     iconSpacing: iconSpacing ?? this.iconSpacing,
     foregroundColor: foregroundColor ?? this.foregroundColor,
@@ -101,6 +117,8 @@ final class HyperMenuStyle {
         selectedForegroundColor ?? this.selectedForegroundColor,
     activeBackgroundColor: activeBackgroundColor ?? this.activeBackgroundColor,
     itemTextStyle: itemTextStyle ?? this.itemTextStyle,
+    descriptionStyle: descriptionStyle ?? this.descriptionStyle,
+    descriptionGap: descriptionGap ?? this.descriptionGap,
     groupTitleStyle: groupTitleStyle ?? this.groupTitleStyle,
     surfaceStyle: surfaceStyle ?? this.surfaceStyle,
     submenuTransitionBuilder:
@@ -120,6 +138,7 @@ final class HyperMenuStyle {
       itemRadius: other.itemRadius ?? itemRadius,
       surfaceRadius: other.surfaceRadius ?? surfaceRadius,
       checkIcon: other.checkIcon ?? checkIcon,
+      showCheckmark: other.showCheckmark ?? showCheckmark,
       iconSize: other.iconSize ?? iconSize,
       iconSpacing: other.iconSpacing ?? iconSpacing,
       foregroundColor: other.foregroundColor ?? foregroundColor,
@@ -131,6 +150,10 @@ final class HyperMenuStyle {
       activeBackgroundColor:
           other.activeBackgroundColor ?? activeBackgroundColor,
       itemTextStyle: other.itemTextStyle ?? itemTextStyle,
+      descriptionStyle:
+          descriptionStyle?.merge(other.descriptionStyle) ??
+          other.descriptionStyle,
+      descriptionGap: other.descriptionGap ?? descriptionGap,
       groupTitleStyle: other.groupTitleStyle ?? groupTitleStyle,
       surfaceStyle:
           surfaceStyle?.merge(other.surfaceStyle) ?? other.surfaceStyle,
@@ -154,6 +177,7 @@ final class HyperMenuStyle {
       itemRadius: number(a.itemRadius, b.itemRadius),
       surfaceRadius: number(a.surfaceRadius, b.surfaceRadius),
       checkIcon: discrete(a.checkIcon, b.checkIcon),
+      showCheckmark: discrete(a.showCheckmark, b.showCheckmark),
       iconSize: number(a.iconSize, b.iconSize),
       iconSpacing: number(a.iconSpacing, b.iconSpacing),
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
@@ -174,6 +198,12 @@ final class HyperMenuStyle {
         t,
       ),
       itemTextStyle: TextStyle.lerp(a.itemTextStyle, b.itemTextStyle, t),
+      descriptionStyle: TextStyle.lerp(
+        a.descriptionStyle,
+        b.descriptionStyle,
+        t,
+      ),
+      descriptionGap: number(a.descriptionGap, b.descriptionGap),
       groupTitleStyle: TextStyle.lerp(a.groupTitleStyle, b.groupTitleStyle, t),
       surfaceStyle: a.surfaceStyle == null || b.surfaceStyle == null
           ? discrete(a.surfaceStyle, b.surfaceStyle)
@@ -198,6 +228,7 @@ final class HyperMenuStyle {
       other.itemRadius == itemRadius &&
       other.surfaceRadius == surfaceRadius &&
       other.checkIcon == checkIcon &&
+      other.showCheckmark == showCheckmark &&
       other.iconSize == iconSize &&
       other.iconSpacing == iconSpacing &&
       other.foregroundColor == foregroundColor &&
@@ -206,6 +237,8 @@ final class HyperMenuStyle {
       other.selectedForegroundColor == selectedForegroundColor &&
       other.activeBackgroundColor == activeBackgroundColor &&
       other.itemTextStyle == itemTextStyle &&
+      other.descriptionStyle == descriptionStyle &&
+      other.descriptionGap == descriptionGap &&
       other.groupTitleStyle == groupTitleStyle &&
       other.surfaceStyle == surfaceStyle &&
       other.submenuTransitionBuilder == submenuTransitionBuilder;
@@ -222,6 +255,7 @@ final class HyperMenuStyle {
     itemRadius,
     surfaceRadius,
     checkIcon,
+    showCheckmark,
     iconSize,
     iconSpacing,
     foregroundColor,
@@ -230,6 +264,8 @@ final class HyperMenuStyle {
     selectedForegroundColor,
     activeBackgroundColor,
     itemTextStyle,
+    descriptionStyle,
+    descriptionGap,
     groupTitleStyle,
     surfaceStyle,
     submenuTransitionBuilder,

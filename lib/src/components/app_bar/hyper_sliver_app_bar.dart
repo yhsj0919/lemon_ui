@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../overlay/hyper_backdrop_safe_opacity.dart';
 import 'hyper_app_bar_resolved.dart';
 import 'hyper_app_bar_style.dart';
 import 'hyper_app_bar_variant.dart';
@@ -97,7 +98,7 @@ class HyperSliverAppBar extends StatelessWidget {
                   fit: StackFit.expand,
                   children: [
                     // 展开时直接露出页面背景；收起后才显示完整材质配方。
-                    AnimatedOpacity(
+                    HyperBackdropSafeAnimatedOpacity(
                       opacity: collapsed ? 1 : 0,
                       duration: motion.fastDuration,
                       curve: motion.fastCurve,
@@ -108,14 +109,22 @@ class HyperSliverAppBar extends StatelessWidget {
                         children: [
                           // 大标题随滚动上移并渐隐，不在大小之间插值。
                           PositionedDirectional(
-                            top: settings.minExtent - scrolledDistance,
+                            top: 0,
+                            bottom: 0,
                             start: metrics.titleHorizontalPadding,
                             end: metrics.titleHorizontalPadding,
-                            child: Opacity(
-                              opacity: (1 - progress * 3).clamp(0.0, 1.0),
-                              child: DefaultTextStyle.merge(
-                                style: resolved.expandedTitleTextStyle,
-                                child: title,
+                            child: CustomSingleChildLayout(
+                              delegate: _ExpandedTitleLayout(
+                                top: settings.minExtent,
+                                expandedHeight: settings.maxExtent,
+                                scrolledDistance: scrolledDistance,
+                              ),
+                              child: Opacity(
+                                opacity: (1 - progress * 3).clamp(0.0, 1.0),
+                                child: DefaultTextStyle.merge(
+                                  style: resolved.expandedTitleTextStyle,
+                                  child: title,
+                                ),
                               ),
                             ),
                           ),
@@ -138,4 +147,31 @@ class HyperSliverAppBar extends StatelessWidget {
       1.0,
     );
   }
+}
+
+class _ExpandedTitleLayout extends SingleChildLayoutDelegate {
+  const _ExpandedTitleLayout({
+    required this.top,
+    required this.expandedHeight,
+    required this.scrolledDistance,
+  });
+  final double top;
+  final double expandedHeight;
+  final double scrolledDistance;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints(maxWidth: constraints.maxWidth);
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final availableTop = (expandedHeight - childSize.height).clamp(0.0, top);
+    return Offset(0, availableTop - scrolledDistance);
+  }
+
+  @override
+  bool shouldRelayout(_ExpandedTitleLayout oldDelegate) =>
+      top != oldDelegate.top ||
+      expandedHeight != oldDelegate.expandedHeight ||
+      scrolledDistance != oldDelegate.scrolledDistance;
 }

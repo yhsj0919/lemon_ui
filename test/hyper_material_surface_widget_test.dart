@@ -3,6 +3,60 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('透明度到达 1 前后，各材质消费者使用相同背景合成方式', (tester) async {
+    const recipe = HyperSurfaceMaterial.frostedGlass(
+      background: HyperFill.color(Color(0x70FFFFFF)),
+    );
+    for (final opacity in [.5, .99, 1.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            duration: Duration.zero,
+            data: HyperThemeData.light().copyWith(
+              materialTheme: const HyperMaterialThemeData(
+                quality: HyperMaterialQuality.advanced,
+                material: recipe,
+              ),
+            ),
+            child: Center(
+              child: Opacity(
+                opacity: opacity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const HyperMaterialSurface(
+                      width: 120,
+                      height: 48,
+                      child: Text('表面'),
+                    ),
+                    const HyperCard(width: 120, height: 48, child: Text('卡片')),
+                    HyperButton.filled(
+                      onPressed: () {},
+                      child: const Text('按钮'),
+                    ),
+                    HyperIconButton.filled(
+                      onPressed: () {},
+                      icon: const Icon(Icons.star),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final filters = tester.widgetList<BackdropFilter>(
+        find.byType(BackdropFilter),
+      );
+      expect(filters, hasLength(4));
+      expect(
+        filters.every((filter) => filter.blendMode == BlendMode.src),
+        isTrue,
+      );
+      expect(tester.takeException(), isNull);
+    }
+  });
   Widget app(Widget child) => MaterialApp(
     home: HyperTheme(
       data: HyperThemeData.light(),

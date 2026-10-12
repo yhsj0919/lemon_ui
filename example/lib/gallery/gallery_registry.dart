@@ -1,3 +1,5 @@
+import '../pages/framework/hyper_top_navigation_page.dart';
+import '../pages/selection/hyper_color_picker_page.dart';
 import '../pages/content/hyper_description_list_page.dart';
 import '../pages/selection/hyper_select_fields_page.dart';
 import '../pages/content/hyper_result_page.dart';
@@ -63,7 +65,7 @@ import 'gallery_item.dart';
 
 /// Example 中所有演示页的唯一注册入口。
 ///
-/// 新控件实现后只需新增页面并登记在对应分类中，菜单壳无需跟随修改。
+/// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
   GallerySection(
     title: '基础能力',
@@ -73,6 +75,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperFill',
         description: '纯色、渐变和显式无填充。',
         icon: Icons.format_color_fill_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperFillPage(),
       ),
       GalleryItem(
@@ -80,6 +83,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperContainerThemeData',
         description: '容器主题、单项覆盖与插值。',
         icon: Icons.crop_square,
+        hasStyleOverrides: true,
         builder: (_) => const HyperContainerThemePage(),
       ),
       GalleryItem(
@@ -87,6 +91,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperColorScheme',
         description: '语义色、种子色与亮暗方案。',
         icon: Icons.palette_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperColorSchemePage(),
       ),
       GalleryItem(
@@ -94,6 +99,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTheme',
         description: '全局基础主题、局部覆盖和统一动画。',
         icon: Icons.style_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperThemePage(),
       ),
       GalleryItem(
@@ -101,6 +107,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSizeScheme',
         description: '手机、平板、桌面和手表的明确尺寸。',
         icon: Icons.straighten,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSizeSchemePage(),
       ),
       GalleryItem(
@@ -115,6 +122,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperDeviceDetector',
         description: '在主题外层自动选择终端尺寸方案。',
         icon: Icons.devices_other,
+        hasStyleOverrides: true,
         builder: (_) => const HyperDeviceDetectorPage(),
       ),
       GalleryItem(
@@ -122,6 +130,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperStateValue',
         description: '组合状态、统一优先级与属性解析。',
         icon: Icons.toggle_on_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperStateValuePage(),
       ),
       GalleryItem(
@@ -129,6 +138,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperMotionThemeData',
         description: '统一动画时长、曲线、弹簧和减少动画。',
         icon: Icons.animation,
+        hasStyleOverrides: true,
         builder: (_) => const HyperMotionThemePage(),
       ),
     ],
@@ -143,6 +153,7 @@ final List<GallerySection> gallerySections = [
         description: '普通与滚动展开顶栏、统一玻璃材质。',
         icon: Icons.web_asset_outlined,
 
+        hasStyleOverrides: true,
         builder: (_) => const HyperAppBarPage(),
       ),
     ],
@@ -168,6 +179,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperContainer',
         description: '轻量容器、主题优先级与精确尺寸。',
         icon: Icons.rounded_corner,
+        hasStyleOverrides: true,
         builder: (_) => const HyperContainerPage(),
       ),
       GalleryItem(
@@ -175,6 +187,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperCollapsible / Accordion',
         description: '折叠区域、互斥与多项展开。',
         icon: Icons.unfold_more,
+        hasStyleOverrides: true,
         builder: (_) => const HyperCollapsiblePage(),
       ),
       GalleryItem(
@@ -182,6 +195,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperCard',
         description: '独立主题、设备圆角、自由内容和整卡交互。',
         icon: Icons.view_agenda_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperCardPage(),
       ),
       GalleryItem(
@@ -189,6 +203,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperWidgetGroup',
         description: '混合控件排列、分隔与可配置的外层视觉。',
         icon: Icons.view_week_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperWidgetGroupPage(),
       ),
       GalleryItem(
@@ -196,6 +211,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperMaterialSurface',
         description: '普通、半透明、毛玻璃、柔光玻璃及明确降级。',
         icon: Icons.blur_on_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperMaterialSurfacePage(),
       ),
     ],
@@ -208,6 +224,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTreeView',
         description: '静态树、动态子节点、加载重试与缓存。',
         icon: Icons.account_tree_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTreeViewPage(),
       ),
       GalleryItem(
@@ -215,6 +232,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperResult',
         description: '操作结果、状态、自定义插图和操作区。',
         icon: Icons.task_alt,
+        hasStyleOverrides: true,
         builder: (_) => const HyperResultPage(),
       ),
       GalleryItem(
@@ -222,6 +240,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperDescriptionList',
         description: '键值、多列与跨列、表格边框和自定义内容。',
         icon: Icons.list_alt,
+        hasStyleOverrides: true,
         builder: (_) => const HyperDescriptionListPage(),
       ),
       GalleryItem(
@@ -229,6 +248,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTimeline',
         description: '时间记录、交错布局与自定义节点。',
         icon: Icons.timeline,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTimelinePage(),
       ),
       GalleryItem(
@@ -236,6 +256,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperText',
         description: '系统字体、语义字号和三层样式覆盖。',
         icon: Icons.title,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTextPage(),
       ),
       GalleryItem(
@@ -243,6 +264,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperIcon',
         description: '设备尺寸、状态样式和可变图标轴。',
         icon: Icons.insert_emoticon_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperIconPage(),
       ),
       GalleryItem(
@@ -250,6 +272,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperBadge',
         description: '点、数量、短文本徽标和独立锚点定位。',
         icon: Icons.notification_important_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperBadgePage(),
       ),
       GalleryItem(
@@ -257,6 +280,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperAvatar',
         description: '头像、横向堆叠、圆形五角与宫格头像组。',
         icon: Icons.account_circle_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperAvatarPage(),
       ),
       GalleryItem(
@@ -264,6 +288,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTag',
         description: '普通、强调与禁用的静态内容标签。',
         icon: Icons.label_outline,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTagPage(),
       ),
       GalleryItem(
@@ -271,6 +296,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperDivider',
         description: '横向、纵向、渐变、虚线和点线。',
         icon: Icons.horizontal_rule,
+        hasStyleOverrides: true,
         builder: (_) => const HyperDividerPage(),
       ),
       GalleryItem(
@@ -278,6 +304,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperListTile',
         description: 'MIUIX 风格首部、正文、尾部布局与整行交互。',
         icon: Icons.view_agenda_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperListTilePage(),
       ),
     ],
@@ -297,6 +324,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperPressable',
         description: '单击、双击、长按、右键、焦点与统一状态。',
         icon: Icons.touch_app_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperPressablePage(),
       ),
     ],
@@ -309,6 +337,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTextField',
         description: '单行、多行、密码和尾部错误提示。',
         icon: Icons.edit_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTextFieldPage(),
       ),
     ],
@@ -317,10 +346,18 @@ final List<GallerySection> gallerySections = [
     title: '选择控件',
     items: [
       GalleryItem(
+        id: 'hyper-color-picker',
+        title: 'HyperColorPicker',
+        description: '色轮、明度、透明度与 HEX 输入，支持自适应选色面板。',
+        icon: Icons.colorize,
+        builder: (_) => const HyperColorPickerPage(),
+      ),
+      GalleryItem(
         id: 'hyper-select-fields',
         title: 'HyperSelect / HyperAutocomplete',
         description: '搜索、多选、异步分页与多种弹出方式。',
         icon: Icons.manage_search,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSelectFieldsPage(),
       ),
       GalleryItem(
@@ -335,6 +372,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperRadio',
         description: 'MIUIX 勾线单选、分组值和取消选择。',
         icon: Icons.radio_button_checked,
+        hasStyleOverrides: true,
         builder: (_) => const HyperRadioPage(),
       ),
       GalleryItem(
@@ -342,6 +380,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSwitch',
         description: '点击、拖动、设备尺寸与独立主题。',
         icon: Icons.toggle_on_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSwitchPage(),
       ),
       GalleryItem(
@@ -349,6 +388,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSlider',
         description: '单值、范围和垂直滑块；共享四端尺寸与主题。',
         icon: Icons.tune,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSliderPage(),
       ),
       GalleryItem(
@@ -356,6 +396,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSegmentedButton',
         description: '单选、多选、图标和连接布局。',
         icon: Icons.view_week_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSegmentedButtonPage(),
       ),
       GalleryItem(
@@ -363,6 +404,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperChip',
         description: '操作、单选、多选、头像和独立删除。',
         icon: Icons.label_outline,
+        hasStyleOverrides: true,
         builder: (_) => const HyperChipPage(),
       ),
     ],
@@ -375,6 +417,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperNotificationCenter',
         description: '受控通知列表、分组和批量操作。',
         icon: Icons.notifications_active_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperNotificationCenterPage(),
       ),
       GalleryItem(
@@ -382,6 +425,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperNotification',
         description: '通知卡片、已读状态与独立操作。',
         icon: Icons.notifications_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperNotificationPage(),
       ),
       GalleryItem(
@@ -389,6 +433,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperLoadingOverlay',
         description: '区域和整页加载、延迟显示、点击拦截与取消。',
         icon: Icons.hourglass_empty,
+        hasStyleOverrides: true,
         builder: (_) => const HyperLoadingOverlayPage(),
       ),
       GalleryItem(
@@ -396,6 +441,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperAlert / HyperBanner',
         description: '四种状态、内联提示、页面横幅、操作与关闭。',
         icon: Icons.info_outline,
+        hasStyleOverrides: true,
         builder: (_) => const HyperNoticePage(),
       ),
       GalleryItem(
@@ -403,6 +449,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperBottomSheet',
         description: '高度、拖动关闭、边框圆角、正文滚动与固定操作区。',
         icon: Icons.vertical_align_bottom,
+        hasStyleOverrides: true,
         builder: (_) => const HyperBottomSheetPage(),
       ),
       GalleryItem(
@@ -410,6 +457,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperToast / HyperSnackbar',
         description: '轻提示、操作提示、队列、位置和主题覆盖。',
         icon: Icons.notifications_none,
+        hasStyleOverrides: true,
         builder: (_) => const HyperMessagePage(),
       ),
       GalleryItem(
@@ -417,6 +465,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperDialog',
         description: '位置、边框、圆角、按钮排列和自由内容。',
         icon: Icons.web_asset_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperDialogPage(),
       ),
       GalleryItem(
@@ -424,6 +473,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperEmptyState',
         description: '暂无数据、搜索无结果、加载失败及自定义内容。',
         icon: Icons.inbox_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperEmptyStatePage(),
       ),
       GalleryItem(
@@ -431,6 +481,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSkeleton',
         description: '基础形状、微光、呼吸及加载内容过渡。',
         icon: Icons.view_agenda_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSkeletonPage(),
       ),
       GalleryItem(
@@ -438,6 +489,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperProgress',
         description: '线性、圆形、确定进度与不确定进度。',
         icon: Icons.data_usage,
+        hasStyleOverrides: true,
         builder: (_) => const HyperProgressPage(),
       ),
     ],
@@ -450,6 +502,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperButton',
         description: '六种变体、图标文字与自动异步进度。',
         icon: Icons.ads_click_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperButtonPage(),
       ),
       GalleryItem(
@@ -457,6 +510,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperButtonThemeData',
         description: '公共样式、六种变体与局部主题覆盖。',
         icon: Icons.smart_button_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperButtonThemePage(),
       ),
       GalleryItem(
@@ -464,6 +518,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperIconButton',
         description: '四种变体、异步进度、Tooltip 与材质。',
         icon: Icons.radio_button_checked,
+        hasStyleOverrides: true,
         builder: (_) => const HyperIconButtonPage(),
       ),
     ],
@@ -477,6 +532,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperSidebar',
         description: '分组、树形、折叠与悬停子菜单。',
         icon: Icons.view_sidebar_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperSidebarPage(),
       ),
     ],
@@ -496,6 +552,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperStepIndicator / StepperNavigation',
         description: '步骤状态、横纵布局和受控导航。',
         icon: Icons.format_list_numbered,
+        hasStyleOverrides: true,
         builder: (_) => const HyperStepsPage(),
       ),
       GalleryItem(
@@ -503,6 +560,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperPagination',
         description: '受控页码、省略号与首尾导航。',
         icon: Icons.more_horiz,
+        hasStyleOverrides: true,
         builder: (_) => const HyperPaginationPage(),
       ),
       GalleryItem(
@@ -510,6 +568,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperPageIndicator',
         description: '圆点、数字与 PageView 受控联动。',
         icon: Icons.more_horiz,
+        hasStyleOverrides: true,
         builder: (_) => const HyperPageIndicatorPage(),
       ),
       GalleryItem(
@@ -517,6 +576,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperBreadcrumb',
         description: '胶囊路径、节点点击和长路径滚动。',
         icon: Icons.chevron_right,
+        hasStyleOverrides: true,
         builder: (_) => const HyperBreadcrumbPage(),
       ),
     ],
@@ -526,10 +586,19 @@ final List<GallerySection> gallerySections = [
     audience: GalleryAudience.desktop,
     items: [
       GalleryItem(
+        id: 'hyper-top-navigation',
+        title: 'HyperTopNavigation',
+        description: '横向顶部导航、多级菜单与描述文字。',
+        icon: Icons.navigation_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperTopNavigationPage(),
+      ),
+      GalleryItem(
         id: 'hyper-menu',
         title: 'HyperMenu',
         description: '分组操作、选择状态与键盘导航。',
         icon: Icons.menu_open_outlined,
+        hasStyleOverrides: true,
         builder: (_) => const HyperMenuPage(),
       ),
       GalleryItem(
@@ -537,6 +606,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperTooltip',
         description: '悬停与焦点提示，支持延迟、避让和替换动画。',
         icon: Icons.info_outline,
+        hasStyleOverrides: true,
         builder: (_) => const HyperTooltipPage(),
       ),
     ],

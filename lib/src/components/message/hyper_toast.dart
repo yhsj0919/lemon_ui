@@ -44,5 +44,5 @@ HyperMessageHandle showHyperToast(
   toast: true,
   mode: mode,
   semanticLabel: semanticLabel,
-  style: resolveMessageStyle(context, true, style),
+  style: style,
 );

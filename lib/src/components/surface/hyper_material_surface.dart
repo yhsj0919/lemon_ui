@@ -95,6 +95,10 @@ class HyperMaterialSurface extends StatelessWidget {
         child: resolved.tint == null ? null : ColoredBox(color: resolved.tint!),
       );
       filteredBackground = BackdropFilter(
+        enabled: resolved.blurSigmaX > 0 || resolved.blurSigmaY > 0,
+        // Opacity/FadeTransition uses an offscreen layer before reaching
+        // 1.0. Replace its filtered backdrop instead of blending it twice.
+        blendMode: BlendMode.src,
         filter: ImageFilter.blur(
           sigmaX: resolved.blurSigmaX,
           sigmaY: resolved.blurSigmaY,

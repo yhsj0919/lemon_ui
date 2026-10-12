@@ -1,7 +1,14 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
+import '../overlay/hyper_navigator_scope.dart';
+import '../overlay/hyper_live_route_themes.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
+import '../../theme/material/hyper_material_theme.dart';
+import '../overlay/hyper_overlay_material.dart';
 import '../overlay/hyper_modal_content.dart';
 import '../icon_button/hyper_icon_button.dart';
 import '../icon_button/hyper_icon_button_style.dart';
@@ -38,7 +45,17 @@ class HyperDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final metrics = HyperTheme.sizesOf(context).dialog;
+    final component = HyperDialogTheme.of(context).style;
     final resolved = HyperDialogStyle(
+      material:
+          HyperMaterialTheme.of(context).material ??
+          HyperOverlayMaterial.fallback(
+            context,
+            componentMaterial: component.material,
+            instanceMaterial: style?.material,
+            hasExplicitBackground:
+                component.background != null || style?.background != null,
+          ),
       background: HyperFill.color(theme.colors.surfaceElevated),
       borderRadius: BorderRadius.circular(metrics.radius),
       maxWidth: metrics.maxWidth,
@@ -147,14 +164,19 @@ Future<T?> showHyperDialog<T>({
   HyperDialogStyle? style,
   bool barrierDismissible = true,
   String? barrierLabel,
-  bool useRootNavigator = true,
+  bool? useRootNavigator,
   bool useSafeArea = true,
   bool? requestFocus,
   RouteSettings? routeSettings,
   Offset? anchorPoint,
 }) {
-  final navigator = Navigator.of(context, rootNavigator: useRootNavigator);
-  final themes = InheritedTheme.capture(from: context, to: navigator.context);
+  final navigator = Navigator.of(
+    context,
+    rootNavigator: HyperNavigatorScope.resolve(
+      context,
+      useRootNavigator: useRootNavigator,
+    ),
+  );
   final resolved = HyperDialogTheme.of(context).style.merge(style);
   final motion = HyperTheme.of(context).motion;
   final reduced = MediaQuery.of(context).disableAnimations;
@@ -165,7 +187,7 @@ Future<T?> showHyperDialog<T>({
       barrierLabel:
           barrierLabel ??
           MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: resolved.barrierColor ?? Colors.black.withValues(alpha: .4),
+      barrierColor: resolved.barrierColor ?? Colors.black.withValues(alpha: .2),
       transitionDuration: reduced
           ? Duration.zero
           : (resolved.duration ?? motion.fastDuration),
@@ -173,10 +195,14 @@ Future<T?> showHyperDialog<T>({
       anchorPoint: anchorPoint,
       requestFocus: requestFocus,
       traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
-      pageBuilder: (context, animation, secondaryAnimation) {
-        Widget page = themes.wrap(
-          HyperDialogTheme(
-            data: HyperDialogThemeData(style: resolved),
+      pageBuilder: (routeContext, animation, secondaryAnimation) {
+        Widget page = HyperLiveRouteThemes(
+          source: context,
+          destination: navigator.context,
+          child: HyperDialogTheme(
+            data: HyperDialogThemeData(
+              style: style ?? const HyperDialogStyle(),
+            ),
             child: Builder(builder: builder),
           ),
         );
@@ -185,7 +211,7 @@ Future<T?> showHyperDialog<T>({
         page = Directionality(textDirection: textDirection, child: page);
         if (reduced) {
           page = MediaQuery(
-            data: MediaQuery.of(context).copyWith(disableAnimations: true),
+            data: MediaQuery.of(routeContext).copyWith(disableAnimations: true),
             child: page,
           );
         }
@@ -199,7 +225,7 @@ Future<T?> showHyperDialog<T>({
         final eased = animation.drive(
           CurveTween(curve: resolved.curve ?? motion.fastCurve),
         );
-        return FadeTransition(
+        return HyperBackdropSafeFade(
           opacity: eased,
           child: ScaleTransition(
             scale: Tween<double>(begin: .96, end: 1).animate(eased),

@@ -17,7 +17,7 @@ class GalleryShell extends StatefulWidget {
 class _GalleryShellState extends State<GalleryShell> {
   static const double _sidebarBreakpoint = 720;
 
-  late String _selectedId = galleryItems.first.id;
+  String _selectedId = 'hyper-fill';
 
   GalleryItem get _selectedItem => galleryItems.firstWhere(
     (item) => item.id == _selectedId,
@@ -61,6 +61,16 @@ class _GalleryShellState extends State<GalleryShell> {
                 ),
               ),
             ),
+            if (selectedItem.hasStyleOverrides)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        HyperTheme.sizesOf(context).pageHorizontalPadding,
+                  ),
+                  child: const HyperText(GalleryItem.styleOverridesNotice),
+                ),
+              ),
           ],
           body: ScrollConfiguration(
             behavior: ScrollConfiguration.of(context)

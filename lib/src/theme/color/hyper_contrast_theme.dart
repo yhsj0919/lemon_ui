@@ -10,13 +10,17 @@ enum HyperContrastMode { standard, adaptive, inverted }
 @immutable
 final class HyperContrastThemeData {
   const HyperContrastThemeData({
-    this.mode = HyperContrastMode.standard,
+    this.mode = HyperContrastMode.adaptive,
+    this.minimumContrastRatio = 4.5,
     this.lightForeground = const Color(0xFFFFFFFF),
     this.darkForeground = const Color(0xFF202124),
-  });
+  }) : assert(minimumContrastRatio >= 1 && minimumContrastRatio <= 21);
 
   /// 默认反色模式。
   final HyperContrastMode mode;
+
+  /// 自适应模式保留原色的最低对比度；不足时选择浅色或深色前景。
+  final double minimumContrastRatio;
 
   /// 深色背景上使用的浅色前景。
   final Color lightForeground;
@@ -26,10 +30,12 @@ final class HyperContrastThemeData {
 
   HyperContrastThemeData copyWith({
     HyperContrastMode? mode,
+    double? minimumContrastRatio,
     Color? lightForeground,
     Color? darkForeground,
   }) => HyperContrastThemeData(
     mode: mode ?? this.mode,
+    minimumContrastRatio: minimumContrastRatio ?? this.minimumContrastRatio,
     lightForeground: lightForeground ?? this.lightForeground,
     darkForeground: darkForeground ?? this.darkForeground,
   );
@@ -52,15 +58,23 @@ final class HyperContrastThemeData {
     final luminance =
         backgroundLuminance ??
         _backgroundColor(background, canvasColor).computeLuminance();
-    final lightRatio = _contrastRatio(
-      lightForeground.computeLuminance(),
-      luminance,
+    final visibleForeground = Color.alphaBlend(
+      foreground,
+      _backgroundColor(background, canvasColor),
     );
-    final darkRatio = _contrastRatio(
-      darkForeground.computeLuminance(),
-      luminance,
-    );
-    return lightRatio >= darkRatio ? lightForeground : darkForeground;
+    final foregroundLuminance = backgroundLuminance == null
+        ? visibleForeground.computeLuminance()
+        : foreground.computeLuminance() * foreground.a +
+              luminance * (1 - foreground.a);
+    if (_contrastRatio(foregroundLuminance, luminance) >=
+        minimumContrastRatio) {
+      return foreground;
+    }
+    // 与 Flutter ThemeData.estimateBrightnessForColor 使用相同的亮暗判定，
+    // 保持语义 onPrimary 与自动前景一致；中等亮度的主色仍归为深色背景。
+    // 最低对比度用于决定是否保留原色，兜底按背景亮暗取色，不承诺达标。
+    final lightBackground = (luminance + .05) * (luminance + .05) > .15;
+    return lightBackground ? darkForeground : lightForeground;
   }
 
   static Color _backgroundColor(HyperFill? fill, Color canvasColor) {
@@ -105,6 +119,9 @@ final class HyperContrastThemeData {
     double t,
   ) => HyperContrastThemeData(
     mode: t < .5 ? a.mode : b.mode,
+    minimumContrastRatio:
+        a.minimumContrastRatio +
+        (b.minimumContrastRatio - a.minimumContrastRatio) * t,
     lightForeground: Color.lerp(a.lightForeground, b.lightForeground, t)!,
     darkForeground: Color.lerp(a.darkForeground, b.darkForeground, t)!,
   );
@@ -114,11 +131,13 @@ final class HyperContrastThemeData {
       identical(this, other) ||
       other is HyperContrastThemeData &&
           other.mode == mode &&
+          other.minimumContrastRatio == minimumContrastRatio &&
           other.lightForeground == lightForeground &&
           other.darkForeground == darkForeground;
 
   @override
-  int get hashCode => Object.hash(mode, lightForeground, darkForeground);
+  int get hashCode =>
+      Object.hash(mode, minimumContrastRatio, lightForeground, darkForeground);
 }
 
 /// 为子树替换全局反色策略。

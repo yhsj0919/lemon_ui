@@ -41,9 +41,11 @@ HyperSelectPresentation hyperResolveSelectPresentation(
   HyperDeviceType device,
 ) => presentation != HyperSelectPresentation.adaptive
     ? presentation
-    : device == HyperDeviceType.desktop
-    ? HyperSelectPresentation.anchored
-    : HyperSelectPresentation.bottomSheet;
+    : switch (device) {
+        HyperDeviceType.desktop => HyperSelectPresentation.anchored,
+        HyperDeviceType.watch => HyperSelectPresentation.fullScreen,
+        _ => HyperSelectPresentation.bottomSheet,
+      };
 
 @immutable
 class HyperSelectQuery {

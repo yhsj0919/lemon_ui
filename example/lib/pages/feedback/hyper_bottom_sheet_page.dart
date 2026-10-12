@@ -141,6 +141,60 @@ class _HyperBottomSheetPageState extends State<HyperBottomSheetPage> {
                 ),
               ),
             ]),
+            section('材质与边距', [
+              HyperButton.tonal(
+                label: const Text('跟随全局材质'),
+                onPressed: () => _open(context),
+              ),
+              for (final kind in HyperSurfaceMaterialKind.values)
+                HyperButton.tonal(
+                  label: Text(switch (kind) {
+                    HyperSurfaceMaterialKind.solid => '普通填充',
+                    HyperSurfaceMaterialKind.translucent => '半透明',
+                    HyperSurfaceMaterialKind.frostedGlass => '毛玻璃',
+                    HyperSurfaceMaterialKind.softLightGlass => '柔光玻璃',
+                  }),
+                  onPressed: () => _open(
+                    context,
+                    style: HyperBottomSheetStyle(
+                      material: switch (kind) {
+                        HyperSurfaceMaterialKind.solid =>
+                          HyperSurfaceMaterial.solid(
+                            background: HyperFill.color(colors.surfaceElevated),
+                          ),
+                        HyperSurfaceMaterialKind.translucent =>
+                          HyperSurfaceMaterial.translucent(
+                            background: HyperFill.color(
+                              colors.surfaceElevated.withValues(alpha: .75),
+                            ),
+                          ),
+                        HyperSurfaceMaterialKind.frostedGlass =>
+                          HyperSurfaceMaterial.frostedGlass(
+                            background: HyperFill.color(
+                              colors.surfaceElevated.withValues(alpha: .75),
+                            ),
+                          ),
+                        HyperSurfaceMaterialKind.softLightGlass =>
+                          HyperSurfaceMaterial.softLightGlass(
+                            background: HyperFill.color(
+                              colors.surfaceElevated.withValues(alpha: .75),
+                            ),
+                          ),
+                      },
+                    ),
+                  ),
+                ),
+              HyperButton.tonal(
+                label: const Text('自定义内外边距'),
+                onPressed: () => _open(
+                  context,
+                  style: HyperBottomSheetStyle(
+                    margin: EdgeInsets.all(sizes.pageHorizontalPadding),
+                    padding: EdgeInsets.all(sizes.pageHorizontalPadding),
+                  ),
+                ),
+              ),
+            ]),
             section('拖动条和局部主题', [
               HyperButton.tonal(
                 label: const Text('自定义拖动条'),

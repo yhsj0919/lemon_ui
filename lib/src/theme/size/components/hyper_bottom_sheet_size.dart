@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 final class HyperBottomSheetSize {
   const HyperBottomSheetSize({
     required this.maxWidth,
+    this.landscapeMaxWidth,
     required this.radius,
     required this.titleSpacing,
     required this.actionSpacing,
@@ -16,6 +17,9 @@ final class HyperBottomSheetSize {
     required this.padding,
   });
   final double maxWidth;
+
+  /// 横屏时的默认宽度上限；null 沿用 maxWidth。
+  final double? landscapeMaxWidth;
   final double radius;
   final double titleSpacing;
   final double actionSpacing;
@@ -27,6 +31,7 @@ final class HyperBottomSheetSize {
   final EdgeInsetsGeometry padding;
   HyperBottomSheetSize copyWith({
     double? maxWidth,
+    double? landscapeMaxWidth,
     double? radius,
     double? titleSpacing,
     double? actionSpacing,
@@ -38,6 +43,7 @@ final class HyperBottomSheetSize {
     EdgeInsetsGeometry? padding,
   }) => HyperBottomSheetSize(
     maxWidth: maxWidth ?? this.maxWidth,
+    landscapeMaxWidth: landscapeMaxWidth ?? this.landscapeMaxWidth,
     radius: radius ?? this.radius,
     titleSpacing: titleSpacing ?? this.titleSpacing,
     actionSpacing: actionSpacing ?? this.actionSpacing,
@@ -53,7 +59,20 @@ final class HyperBottomSheetSize {
     HyperBottomSheetSize b,
     double t,
   ) => HyperBottomSheetSize(
-    maxWidth: a.maxWidth + (b.maxWidth - a.maxWidth) * t,
+    landscapeMaxWidth:
+        a.landscapeMaxWidth == null || b.landscapeMaxWidth == null
+        ? (t < .5 ? a.landscapeMaxWidth : b.landscapeMaxWidth)
+        : a.landscapeMaxWidth == b.landscapeMaxWidth
+        ? a.landscapeMaxWidth
+        : !a.landscapeMaxWidth!.isFinite || !b.landscapeMaxWidth!.isFinite
+        ? (t < .5 ? a.landscapeMaxWidth : b.landscapeMaxWidth)
+        : a.landscapeMaxWidth! +
+              (b.landscapeMaxWidth! - a.landscapeMaxWidth!) * t,
+    maxWidth: a.maxWidth == b.maxWidth
+        ? a.maxWidth
+        : !a.maxWidth.isFinite || !b.maxWidth.isFinite
+        ? (t < .5 ? a.maxWidth : b.maxWidth)
+        : a.maxWidth + (b.maxWidth - a.maxWidth) * t,
     radius: a.radius + (b.radius - a.radius) * t,
     titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
     actionSpacing: a.actionSpacing + (b.actionSpacing - a.actionSpacing) * t,
@@ -74,6 +93,7 @@ final class HyperBottomSheetSize {
   bool operator ==(Object other) =>
       other is HyperBottomSheetSize &&
       maxWidth == other.maxWidth &&
+      landscapeMaxWidth == other.landscapeMaxWidth &&
       radius == other.radius &&
       titleSpacing == other.titleSpacing &&
       actionSpacing == other.actionSpacing &&
@@ -86,6 +106,7 @@ final class HyperBottomSheetSize {
   @override
   int get hashCode => Object.hashAll([
     maxWidth,
+    landscapeMaxWidth,
     radius,
     titleSpacing,
     actionSpacing,

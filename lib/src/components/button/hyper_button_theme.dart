@@ -36,8 +36,17 @@ final class HyperButtonThemeData {
     HyperButtonVariant.gradient => gradient,
   };
 
-  HyperButtonStyle resolve(HyperButtonVariant variant) =>
-      (style ?? HyperButtonStyle()).merge(styleFor(variant));
+  /// 描边及无表面变体不继承公共阴影；变体或实例仍可显式启用。
+  HyperButtonStyle resolve(HyperButtonVariant variant) {
+    final common = style ?? HyperButtonStyle();
+    final surface = switch (variant) {
+      HyperButtonVariant.outlined ||
+      HyperButtonVariant.ghost ||
+      HyperButtonVariant.text => common.copyWith(boxShadow: const <BoxShadow>[]),
+      _ => common,
+    };
+    return surface.merge(styleFor(variant));
+  }
 
   HyperButtonThemeData merge(HyperButtonThemeData? other) {
     if (other == null) return this;

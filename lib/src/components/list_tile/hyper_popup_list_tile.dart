@@ -1,3 +1,7 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
+import '../overlay/hyper_navigator_scope.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -167,7 +171,7 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     final anchorBox = _anchorKey.currentContext?.findRenderObject();
     final overlayBox = Navigator.of(
       context,
-      rootNavigator: true,
+      rootNavigator: HyperNavigatorScope.resolve(context),
     ).overlay?.context.findRenderObject();
     if (anchorBox is! RenderBox || overlayBox is! RenderBox) return;
     final origin = anchorBox.localToGlobal(Offset.zero, ancestor: overlayBox);
@@ -470,7 +474,7 @@ class _PopupListTileReveal extends StatelessWidget {
         final springProgress =
             simulation.x(animation.value * totalSeconds) / settled;
         final reveal = springProgress.clamp(0.0, 1.0);
-        return Opacity(
+        return HyperBackdropSafeOpacity(
           opacity: alpha,
           child: Transform.scale(
             scale: .15 + .85 * springProgress,

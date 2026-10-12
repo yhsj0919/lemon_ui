@@ -1,3 +1,5 @@
+import '../overlay/hyper_backdrop_safe_opacity.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
@@ -229,7 +231,7 @@ class HyperNotification extends StatelessWidget {
           child: surface,
         );
       }
-      surface = AnimatedOpacity(
+      surface = HyperBackdropSafeAnimatedOpacity(
         opacity: enabled ? 1 : resolved.disabledOpacity!.clamp(0, 1),
         duration: duration,
         curve: resolved.curve!,
@@ -257,7 +259,10 @@ class HyperNotification extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 heightFactor: value.clamp(0, 1),
-                child: Opacity(opacity: value.clamp(0, 1), child: child),
+                child: HyperBackdropSafeOpacity(
+                  opacity: value.clamp(0, 1),
+                  child: child,
+                ),
               ),
             ),
       );

@@ -18,6 +18,7 @@ final class HyperBottomSheetStyle {
     this.height,
     this.maxHeight,
     this.padding,
+    this.margin,
     this.titleStyle,
     this.contentStyle,
     this.titleSpacing,
@@ -47,6 +48,9 @@ final class HyperBottomSheetStyle {
   final double? height;
   final double? maxHeight;
   final EdgeInsetsGeometry? padding;
+
+  /// 面板表面与可用区域之间的留白，不计入内容内边距。
+  final EdgeInsetsGeometry? margin;
   final TextStyle? titleStyle;
   final TextStyle? contentStyle;
   final double? titleSpacing;
@@ -76,6 +80,7 @@ final class HyperBottomSheetStyle {
     double? height,
     double? maxHeight,
     EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
     TextStyle? titleStyle,
     TextStyle? contentStyle,
     double? titleSpacing,
@@ -105,6 +110,7 @@ final class HyperBottomSheetStyle {
     height: height ?? this.height,
     maxHeight: maxHeight ?? this.maxHeight,
     padding: padding ?? this.padding,
+    margin: margin ?? this.margin,
     titleStyle: titleStyle ?? this.titleStyle,
     contentStyle: contentStyle ?? this.contentStyle,
     titleSpacing: titleSpacing ?? this.titleSpacing,
@@ -138,6 +144,7 @@ final class HyperBottomSheetStyle {
           height: other.height,
           maxHeight: other.maxHeight,
           padding: other.padding,
+          margin: other.margin,
           titleStyle: other.titleStyle,
           contentStyle: other.contentStyle,
           titleSpacing: other.titleSpacing,
@@ -186,7 +193,12 @@ final class HyperBottomSheetStyle {
       width: a.width == null || b.width == null
           ? (t < .5 ? a.width : b.width)
           : a.width! + (b.width! - a.width!) * t,
-      maxWidth: a.maxWidth == null || b.maxWidth == null
+      maxWidth: a.maxWidth == b.maxWidth
+          ? a.maxWidth
+          : a.maxWidth == null ||
+                b.maxWidth == null ||
+                !a.maxWidth!.isFinite ||
+                !b.maxWidth!.isFinite
           ? (t < .5 ? a.maxWidth : b.maxWidth)
           : a.maxWidth! + (b.maxWidth! - a.maxWidth!) * t,
       height: a.height == null || b.height == null
@@ -198,6 +210,9 @@ final class HyperBottomSheetStyle {
       padding: a.padding == null || b.padding == null
           ? (t < .5 ? a.padding : b.padding)
           : EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
+      margin: a.margin == null || b.margin == null
+          ? (t < .5 ? a.margin : b.margin)
+          : EdgeInsetsGeometry.lerp(a.margin, b.margin, t),
       titleStyle: a.titleStyle == null || b.titleStyle == null
           ? (t < .5 ? a.titleStyle : b.titleStyle)
           : TextStyle.lerp(a.titleStyle, b.titleStyle, t),
@@ -287,6 +302,7 @@ final class HyperBottomSheetStyle {
       height == other.height &&
       maxHeight == other.maxHeight &&
       padding == other.padding &&
+      margin == other.margin &&
       titleStyle == other.titleStyle &&
       contentStyle == other.contentStyle &&
       titleSpacing == other.titleSpacing &&
@@ -317,6 +333,7 @@ final class HyperBottomSheetStyle {
     height,
     maxHeight,
     padding,
+    margin,
     titleStyle,
     contentStyle,
     titleSpacing,

@@ -388,7 +388,7 @@ MIUIX 规格；收起标题读取排版主题的 20 号字号。用户提供的�
 待有直接参考后再分别校准。`HyperMenu` 使用 `HyperCard` 绘制表面，实例样式与
 局部主题只覆盖明确提供的字段。
 
-下拉选择器的锚点宽度、箭头尺寸和间距由四端 `HyperDropdownMenuSize` 单独管理；
+下拉选择器的锚点宽度、箭头尺寸和间距由四端 `HyperSelectSize` 单独管理；
 当前手机 280／24／12、平板 280／28／12、桌面 192／20／12、手表 200／24／8
 （依次为宽度／箭头尺寸／间距，单位均为逻辑像素）。浮层与锚点之间使用四端
 `HyperSizeScheme.overlaySpacing`，目前均为 4 逻辑像素；下拉菜单主题和实例样式可以单独覆盖。
@@ -646,3 +646,77 @@ widgetGroup 的圆角、分隔线规格。实例 group.itemHeight 可统一覆�
 | 文字段落间距 | 4 | 4 | 4 | 4 |
 
 标题 bodyMedium/textPrimary，时间 bodySmall/textTertiary，正文 bodySmall/textSecondary。正常/禁用节点 textTertiary，活动 primary，成功 success，警告 warning，错误 error；连接线默认 outline。每项无固定高度，节点位于条目顶部；轨道按解析后最大节点宽度保留。颜色和尺寸过渡沿用 Motion fast 候选。
+
+## 描述列表候选规格（2026-10-08）
+
+当前缺少已验证的同代 HyperOS 描述列表及 HIUI 同状态参考，默认值记为 D 级同端语义推导，不宣称官方精确还原。最小列宽复用各端 PopupListTile 的 minWidth；圆角复用同端 Card；单元格内边距参考同端 Collapsible headerPadding；文字与边界颜色复用统一语义主题。全部单位为 Flutter 逻辑像素；字体继承各端文字主题。仍待手机截图和 HIUI 版本规格核对。
+
+| 字段 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| minimumColumnWidth | 200 | 220 | 160 | 160 |
+| radius | 16 | 20 | 8 | 20 |
+| cellPadding 水平/垂直 | 16/8 | 20/8 | 12/8 | 12/6 |
+| columnSpacing / headerSpacing | 16 | 20 | 12 | 12 |
+| rowSpacing / labelValueSpacing | 8 | 12 | 8 | 6 |
+| borderThickness | 1 | 1 | 1 | 1 |
+
+标签和值的默认 flex 1:2 是布局分配规则，不是跨设备尺寸倍率。边框模式列间距为零，以分隔线组织信息；外部边距和最大宽度由父布局组合。
+
+## Result 候选规格（2026-10-09）
+
+来源 D：按同端现有 EmptyState 语义规格初始化独立 result 尺寸模板，不采用跨端倍率。核对过小米官方 HyperOS 宣传与开发资料入口，以及 HIUI Result 源码入口；目前没有得到可测量的同代结果页资料。小米域名上的旧 MINA 文档是微信小程序设计，不作为 HyperOS 规格。以下为 Flutter 逻辑像素，仍待目标设备与 HIUI 对照确认。
+
+| 字段 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| iconSize | 48 | 56 | 40 | 32 |
+| illustrationSize | 80 | 96 | 72 | 48 |
+| maxWidth | 320 | 400 | 360 | 180 |
+| contentSpacing | 16 | 20 | 16 | 12 |
+| titleSpacing | 8 | 8 | 6 | 4 |
+| actionSpacing | 12 | 12 | 8 | 6 |
+| actionRunSpacing | 8 | 8 | 8 | 6 |
+| padding | 16 | 20 | 16 | 8 |
+
+文字使用同端 titleMedium/bodySmall，状态色来自统一颜色语义。默认无独立背景填充、无边框、无阴影、圆角为零；统一材质若开启则继承其配方，实例可覆盖。
+
+## PageIndicator 候选规格（2026-10-09）
+
+官方参考检索入口：HIUI Carousel 与小米营销页轮播说明；目前没有获得可直接移植且单位确定的独立指示器尺寸。HIUI 轮播能力不代表 HyperOS 手机规格，因此默认视觉标记为 D 级同端语义推导，待同状态截图与 HIUI 源码核对。
+
+| 字段 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| dotSize | 6 | 6 | 6 | 5 |
+| selectedWidth | 6 | 6 | 6 | 5 |
+| spacing | 6 | 6 | 6 | 5 |
+| padding | 0 | 0 | 0 | 0 |
+
+单位为 Flutter 逻辑像素；点径和紧凑间距借用同端 Badge.dotSize，默认选中不改变形状，仅使用 primary 色。数字文字继承 bodySmall/textSecondary，未选中填充继承 outline。可点击模式 minimumTapTargetSize 取同端统一 minimumInteractiveDimension，不按窗口改设备。选中长点、局部背景及材质通过 Style 选择，默认不增加独立配方。
+
+## Tree 与导航行间距（2026-10-10）
+
+公共 navigationItemSpacing 四端均为 4 逻辑像素，是用户确认的项目规格；菜单原 2 改为继承 4，Sidebar 的原 rowGap 4 改为继承，图标文字 itemSpacing 保持独立。treeView.rowSpacing 默认继承同一语义，各自尺寸或 Style 可覆盖。
+
+Tree 视觉为 D 级同端 Sidebar 语义推导；已尝试官方 HIUI Tree 入口但未能读取可核对的规格，缺少同代 HyperOS 树目标截图，后续仍需设备对照。行高、缩进、图标、行内留白和圆角独立保存于 treeView，不在组件内按设备切换或计算倍率。
+
+| 字段 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| rowHeight | 48 | 48 | 32 | 48 |
+| indent | 16 | 16 | 16 | 12 |
+| iconSize | 24 | 24 | 16 | 20 |
+| contentSpacing | 12 | 12 | 12 | 8 |
+| rowRadius | 12 | 12 | 6 | 10 |
+| rowPadding 水平 | 12 | 12 | 8 | 4 |
+
+全部为 Flutter 逻辑像素，文字继承 bodyMedium。展开箭头和加载图标复用图标尺寸，选中色/错误色等来自公共颜色语义，加载指示器复用 Progress。需通过与目标平台同状态对照验证后再重定默认值。
+
+## 选择字段额外规格（2026-10-10）
+
+新增 sizes.selection，仅包含共用呈现/标签所需的额外规格，主控件、选项和 Chip 分别继承同端 Button/TextField、Menu 和 Chip。单位均为 Flutter 逻辑像素。本阶段没有可核对的同代系统目标图，新增数值为 D 级同端语义推导，尚未设备视觉对照：面板高度预算采用同端六行 Menu 行高；最小可编辑宽度借用同端 Sidebar.collapsedWidth；标签间距继承 spaceXs（4）。六行为项目初始容量选择，非官方规格。
+
+| 字段 | phone | tablet | desktop | watch |
+| --- | --- | --- | --- | --- |
+| maxPanelHeight | 288 | 288 | 192 | 288 |
+| minimumInputWidth | 72 | 72 | 64 | 56 |
+| chipSpacing | 4 | 4 | 4 | 4 |
+
+面板受安全区、窗口可用空间及父约束进一步限制；布局不会按高度缩小字体。实际列宽、弹出位置和容量可由主题/实例覆盖，设备类型不随窗口改变。后续树形下拉与级联框复用呈现，不把不同层级选择规则塞入扁平选项模型。

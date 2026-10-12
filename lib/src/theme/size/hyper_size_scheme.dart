@@ -1,3 +1,8 @@
+import 'components/hyper_selection_size.dart';
+import 'components/hyper_tree_view_size.dart';
+import 'components/hyper_page_indicator_size.dart';
+import 'components/hyper_result_size.dart';
+import 'components/hyper_description_list_size.dart';
 import 'components/hyper_timeline_size.dart';
 import 'components/hyper_step_size.dart';
 import 'components/hyper_pagination_size.dart';
@@ -33,7 +38,7 @@ import 'components/hyper_icon_size.dart';
 import 'components/hyper_icon_button_size.dart';
 import 'components/hyper_list_tile_size.dart';
 import 'components/hyper_menu_size.dart';
-import 'components/hyper_dropdown_menu_size.dart';
+import 'components/hyper_select_size.dart';
 import 'components/hyper_popup_list_tile_size.dart';
 import 'components/hyper_tab_bar_size.dart';
 import 'components/hyper_breadcrumb_size.dart';
@@ -70,6 +75,7 @@ final class HyperSizeScheme {
   static const double radius4xl = 48;
 
   const HyperSizeScheme({
+    this.navigationItemSpacing = spaceXs,
     required this.deviceType,
     required this.controlHeightXs,
     required this.controlHeightSm,
@@ -90,7 +96,7 @@ final class HyperSizeScheme {
     required this.drawer,
     required this.sidebar,
     required this.menu,
-    required this.dropdownMenu,
+    required this.select,
     required this.popupListTile,
     required this.tabBar,
     required this.breadcrumb,
@@ -104,6 +110,10 @@ final class HyperSizeScheme {
     required this.tag,
     required this.avatar,
     required this.skeleton,
+    required this.pageIndicator,
+    required this.treeView,
+    required this.selection,
+    required this.result,
     required this.emptyState,
     required this.textField,
     required this.dialog,
@@ -117,6 +127,7 @@ final class HyperSizeScheme {
     required this.stepIndicator,
     required this.stepperNavigation,
     required this.timeline,
+    required this.descriptionList,
     required this.notification,
     required this.alert,
     required this.banner,
@@ -243,6 +254,16 @@ final class HyperSizeScheme {
           itemSpacing: 16,
           textSpacing: 4,
         ),
+        descriptionList: const HyperDescriptionListSize(
+          radius: 16,
+          cellPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          columnSpacing: 16,
+          rowSpacing: 8,
+          labelValueSpacing: 8,
+          headerSpacing: 16,
+          minimumColumnWidth: 200,
+          borderThickness: 1,
+        ),
         notification: const HyperNotificationSize(
           radius: 16,
           padding: EdgeInsets.all(16),
@@ -299,13 +320,21 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(16),
           insetPadding: EdgeInsets.all(16),
         ),
+        treeView: const HyperTreeViewSize(
+          rowHeight: 48,
+          indent: 16,
+          iconSize: 24,
+          contentSpacing: 12,
+          rowRadius: 12,
+          rowPadding: EdgeInsets.symmetric(horizontal: 12),
+        ),
         sidebar: const HyperSidebarSize(
           width: 280,
           collapsedWidth: 72,
           itemHeight: 48,
           iconSize: 24,
           itemSpacing: 12,
-          rowGap: 4,
+          rowGap: null,
           indent: 16,
           sectionSpacing: 16,
           horizontalPadding: 12,
@@ -313,6 +342,7 @@ final class HyperSizeScheme {
           itemRadius: 12,
         ),
         menu: const HyperMenuSize(
+          itemSpacing: null,
           width: 280,
           itemHeight: 48,
           padding: 12,
@@ -322,10 +352,15 @@ final class HyperSizeScheme {
           itemRadius: 12,
           surfaceRadius: 16,
         ),
-        dropdownMenu: const HyperDropdownMenuSize(
+        select: const HyperSelectSize(
           width: 280,
           arrowSize: 24,
           arrowSpacing: 12,
+        ),
+        selection: const HyperSelectionSize(
+          maxPanelHeight: 288,
+          chipSpacing: spaceXs,
+          minimumInputWidth: 72,
         ),
         popupListTile: const HyperPopupListTileSize(
           minWidth: 200,
@@ -379,6 +414,12 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        pageIndicator: const HyperPageIndicatorSize(
+          dotSize: 6,
+          selectedWidth: 6,
+          spacing: 6,
+          padding: EdgeInsets.zero,
+        ),
         badge: const HyperBadgeSize(
           dotSize: 6,
           dotRadius: 3,
@@ -406,6 +447,16 @@ final class HyperSizeScheme {
           avatarSize: 24,
           deleteIconSize: 16,
           deleteTargetWidth: 32,
+        ),
+        result: const HyperResultSize(
+          iconSize: 48,
+          illustrationSize: 80,
+          maxWidth: 320,
+          contentSpacing: 16,
+          titleSpacing: 8,
+          actionSpacing: 12,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(16),
         ),
         emptyState: const HyperEmptyStateSize(
           iconSize: 48,
@@ -608,6 +659,16 @@ final class HyperSizeScheme {
           itemSpacing: 20,
           textSpacing: 4,
         ),
+        descriptionList: const HyperDescriptionListSize(
+          radius: 20,
+          cellPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          columnSpacing: 20,
+          rowSpacing: 12,
+          labelValueSpacing: 12,
+          headerSpacing: 20,
+          minimumColumnWidth: 220,
+          borderThickness: 1,
+        ),
         notification: const HyperNotificationSize(
           radius: 20,
           padding: EdgeInsets.all(20),
@@ -664,13 +725,21 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(20),
           insetPadding: EdgeInsets.all(16),
         ),
+        treeView: const HyperTreeViewSize(
+          rowHeight: 48,
+          indent: 16,
+          iconSize: 24,
+          contentSpacing: 12,
+          rowRadius: 12,
+          rowPadding: EdgeInsets.symmetric(horizontal: 12),
+        ),
         sidebar: const HyperSidebarSize(
           width: 280,
           collapsedWidth: 72,
           itemHeight: 48,
           iconSize: 24,
           itemSpacing: 12,
-          rowGap: 4,
+          rowGap: null,
           indent: 16,
           sectionSpacing: 16,
           horizontalPadding: 12,
@@ -678,6 +747,7 @@ final class HyperSizeScheme {
           itemRadius: 12,
         ),
         menu: const HyperMenuSize(
+          itemSpacing: null,
           width: 280,
           itemHeight: 48,
           padding: 12,
@@ -687,10 +757,15 @@ final class HyperSizeScheme {
           itemRadius: 12,
           surfaceRadius: 20,
         ),
-        dropdownMenu: const HyperDropdownMenuSize(
+        select: const HyperSelectSize(
           width: 280,
           arrowSize: 28,
           arrowSpacing: 12,
+        ),
+        selection: const HyperSelectionSize(
+          maxPanelHeight: 288,
+          chipSpacing: spaceXs,
+          minimumInputWidth: 72,
         ),
         popupListTile: const HyperPopupListTileSize(
           minWidth: 220,
@@ -744,6 +819,12 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        pageIndicator: const HyperPageIndicatorSize(
+          dotSize: 6,
+          selectedWidth: 6,
+          spacing: 6,
+          padding: EdgeInsets.zero,
+        ),
         badge: const HyperBadgeSize(
           dotSize: 6,
           dotRadius: 3,
@@ -771,6 +852,16 @@ final class HyperSizeScheme {
           avatarSize: 28,
           deleteIconSize: 18,
           deleteTargetWidth: 36,
+        ),
+        result: const HyperResultSize(
+          iconSize: 56,
+          illustrationSize: 96,
+          maxWidth: 400,
+          contentSpacing: 20,
+          titleSpacing: 8,
+          actionSpacing: 12,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(20),
         ),
         emptyState: const HyperEmptyStateSize(
           iconSize: 56,
@@ -973,6 +1064,16 @@ final class HyperSizeScheme {
           itemSpacing: 12,
           textSpacing: 4,
         ),
+        descriptionList: const HyperDescriptionListSize(
+          radius: 8,
+          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          columnSpacing: 12,
+          rowSpacing: 8,
+          labelValueSpacing: 8,
+          headerSpacing: 12,
+          minimumColumnWidth: 160,
+          borderThickness: 1,
+        ),
         notification: const HyperNotificationSize(
           radius: 8,
           padding: EdgeInsets.all(12),
@@ -1029,13 +1130,21 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(16),
           insetPadding: EdgeInsets.all(16),
         ),
+        treeView: const HyperTreeViewSize(
+          rowHeight: 32,
+          indent: 16,
+          iconSize: 16,
+          contentSpacing: 12,
+          rowRadius: 6,
+          rowPadding: EdgeInsets.symmetric(horizontal: 8),
+        ),
         sidebar: const HyperSidebarSize(
           width: 180,
           collapsedWidth: 64,
           itemHeight: 32,
           iconSize: 16,
           itemSpacing: 12,
-          rowGap: 4,
+          rowGap: null,
           indent: 16,
           sectionSpacing: 12,
           horizontalPadding: 8,
@@ -1043,6 +1152,7 @@ final class HyperSizeScheme {
           itemRadius: 6,
         ),
         menu: const HyperMenuSize(
+          itemSpacing: null,
           width: 192,
           itemHeight: 32,
           padding: 8,
@@ -1052,10 +1162,15 @@ final class HyperSizeScheme {
           itemRadius: 6,
           surfaceRadius: 8,
         ),
-        dropdownMenu: const HyperDropdownMenuSize(
+        select: const HyperSelectSize(
           width: 192,
           arrowSize: 20,
           arrowSpacing: 12,
+        ),
+        selection: const HyperSelectionSize(
+          maxPanelHeight: 192,
+          chipSpacing: spaceXs,
+          minimumInputWidth: 64,
         ),
         popupListTile: const HyperPopupListTileSize(
           minWidth: 160,
@@ -1109,6 +1224,12 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .07,
           pressOverlayOpacity: .08,
         ),
+        pageIndicator: const HyperPageIndicatorSize(
+          dotSize: 6,
+          selectedWidth: 6,
+          spacing: 6,
+          padding: EdgeInsets.zero,
+        ),
         badge: const HyperBadgeSize(
           dotSize: 6,
           dotRadius: 3,
@@ -1136,6 +1257,16 @@ final class HyperSizeScheme {
           avatarSize: 20,
           deleteIconSize: 14,
           deleteTargetWidth: 28,
+        ),
+        result: const HyperResultSize(
+          iconSize: 40,
+          illustrationSize: 72,
+          maxWidth: 360,
+          contentSpacing: 16,
+          titleSpacing: 6,
+          actionSpacing: 8,
+          actionRunSpacing: 8,
+          padding: EdgeInsets.all(16),
         ),
         emptyState: const HyperEmptyStateSize(
           iconSize: 40,
@@ -1338,6 +1469,16 @@ final class HyperSizeScheme {
           itemSpacing: 12,
           textSpacing: 4,
         ),
+        descriptionList: const HyperDescriptionListSize(
+          radius: 20,
+          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          columnSpacing: 12,
+          rowSpacing: 6,
+          labelValueSpacing: 6,
+          headerSpacing: 12,
+          minimumColumnWidth: 160,
+          borderThickness: 1,
+        ),
         notification: const HyperNotificationSize(
           radius: 20,
           padding: EdgeInsets.all(12),
@@ -1394,13 +1535,21 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(12),
           insetPadding: EdgeInsets.all(12),
         ),
+        treeView: const HyperTreeViewSize(
+          rowHeight: 48,
+          indent: 12,
+          iconSize: 20,
+          contentSpacing: 8,
+          rowRadius: 10,
+          rowPadding: EdgeInsets.symmetric(horizontal: 4),
+        ),
         sidebar: const HyperSidebarSize(
           width: 200,
           collapsedWidth: 56,
           itemHeight: 48,
           iconSize: 20,
           itemSpacing: 8,
-          rowGap: 4,
+          rowGap: null,
           indent: 12,
           sectionSpacing: 8,
           horizontalPadding: 4,
@@ -1408,6 +1557,7 @@ final class HyperSizeScheme {
           itemRadius: 10,
         ),
         menu: const HyperMenuSize(
+          itemSpacing: null,
           width: 200,
           itemHeight: 48,
           padding: 4,
@@ -1417,10 +1567,15 @@ final class HyperSizeScheme {
           itemRadius: 10,
           surfaceRadius: 20,
         ),
-        dropdownMenu: const HyperDropdownMenuSize(
+        select: const HyperSelectSize(
           width: 200,
           arrowSize: 24,
           arrowSpacing: 8,
+        ),
+        selection: const HyperSelectionSize(
+          maxPanelHeight: 288,
+          chipSpacing: spaceXs,
+          minimumInputWidth: 56,
         ),
         popupListTile: const HyperPopupListTileSize(
           minWidth: 160,
@@ -1474,6 +1629,12 @@ final class HyperSizeScheme {
           focusOverlayOpacity: .08,
           pressOverlayOpacity: .10,
         ),
+        pageIndicator: const HyperPageIndicatorSize(
+          dotSize: 5,
+          selectedWidth: 5,
+          spacing: 5,
+          padding: EdgeInsets.zero,
+        ),
         badge: const HyperBadgeSize(
           dotSize: 5,
           dotRadius: 2.5,
@@ -1501,6 +1662,16 @@ final class HyperSizeScheme {
           avatarSize: 24,
           deleteIconSize: 16,
           deleteTargetWidth: 32,
+        ),
+        result: const HyperResultSize(
+          iconSize: 32,
+          illustrationSize: 48,
+          maxWidth: 180,
+          contentSpacing: 12,
+          titleSpacing: 4,
+          actionSpacing: 6,
+          actionRunSpacing: 6,
+          padding: EdgeInsets.all(8),
         ),
         emptyState: const HyperEmptyStateSize(
           iconSize: 32,
@@ -1593,6 +1764,8 @@ final class HyperSizeScheme {
         ),
       );
 
+  /// 菜单、侧栏和树等导航项之间的默认间距。
+  final double navigationItemSpacing;
   final HyperDeviceType deviceType;
   final double controlHeightXs;
   final double controlHeightSm;
@@ -1613,7 +1786,7 @@ final class HyperSizeScheme {
   final HyperDrawerSize drawer;
   final HyperSidebarSize sidebar;
   final HyperMenuSize menu;
-  final HyperDropdownMenuSize dropdownMenu;
+  final HyperSelectSize select;
   final HyperPopupListTileSize popupListTile;
   final HyperTabBarSize tabBar;
   final HyperBreadcrumbSize breadcrumb;
@@ -1627,6 +1800,10 @@ final class HyperSizeScheme {
   final HyperTagSize tag;
   final HyperAvatarSize avatar;
   final HyperSkeletonSize skeleton;
+  final HyperPageIndicatorSize pageIndicator;
+  final HyperTreeViewSize treeView;
+  final HyperSelectionSize selection;
+  final HyperResultSize result;
   final HyperEmptyStateSize emptyState;
   final HyperTextFieldSize textField;
   final HyperDialogSize dialog;
@@ -1640,6 +1817,7 @@ final class HyperSizeScheme {
   final HyperStepSize stepIndicator;
   final HyperStepSize stepperNavigation;
   final HyperTimelineSize timeline;
+  final HyperDescriptionListSize descriptionList;
   final HyperNotificationSize notification;
   final HyperNoticeSize alert;
   final HyperNoticeSize banner;
@@ -1656,6 +1834,7 @@ final class HyperSizeScheme {
   final HyperProgressSize progress;
 
   HyperSizeScheme copyWith({
+    double? navigationItemSpacing,
     HyperDeviceType? deviceType,
     double? controlHeightXs,
     double? controlHeightSm,
@@ -1676,7 +1855,7 @@ final class HyperSizeScheme {
     HyperDrawerSize? drawer,
     HyperSidebarSize? sidebar,
     HyperMenuSize? menu,
-    HyperDropdownMenuSize? dropdownMenu,
+    HyperSelectSize? select,
     HyperPopupListTileSize? popupListTile,
     HyperTabBarSize? tabBar,
     HyperBreadcrumbSize? breadcrumb,
@@ -1690,6 +1869,10 @@ final class HyperSizeScheme {
     HyperTagSize? tag,
     HyperAvatarSize? avatar,
     HyperSkeletonSize? skeleton,
+    HyperPageIndicatorSize? pageIndicator,
+    HyperTreeViewSize? treeView,
+    HyperSelectionSize? selection,
+    HyperResultSize? result,
     HyperEmptyStateSize? emptyState,
     HyperTextFieldSize? textField,
     HyperDialogSize? dialog,
@@ -1703,6 +1886,7 @@ final class HyperSizeScheme {
     HyperStepSize? stepIndicator,
     HyperStepSize? stepperNavigation,
     HyperTimelineSize? timeline,
+    HyperDescriptionListSize? descriptionList,
     HyperNotificationSize? notification,
     HyperNoticeSize? alert,
     HyperNoticeSize? banner,
@@ -1718,6 +1902,7 @@ final class HyperSizeScheme {
     HyperIconSize? icon,
     HyperProgressSize? progress,
   }) => HyperSizeScheme(
+    navigationItemSpacing: navigationItemSpacing ?? this.navigationItemSpacing,
     deviceType: deviceType ?? this.deviceType,
     controlHeightXs: controlHeightXs ?? this.controlHeightXs,
     controlHeightSm: controlHeightSm ?? this.controlHeightSm,
@@ -1739,7 +1924,7 @@ final class HyperSizeScheme {
     drawer: drawer ?? this.drawer,
     sidebar: sidebar ?? this.sidebar,
     menu: menu ?? this.menu,
-    dropdownMenu: dropdownMenu ?? this.dropdownMenu,
+    select: select ?? this.select,
     popupListTile: popupListTile ?? this.popupListTile,
     tabBar: tabBar ?? this.tabBar,
     breadcrumb: breadcrumb ?? this.breadcrumb,
@@ -1754,6 +1939,10 @@ final class HyperSizeScheme {
     tag: tag ?? this.tag,
     avatar: avatar ?? this.avatar,
     skeleton: skeleton ?? this.skeleton,
+    pageIndicator: pageIndicator ?? this.pageIndicator,
+    treeView: treeView ?? this.treeView,
+    selection: selection ?? this.selection,
+    result: result ?? this.result,
     emptyState: emptyState ?? this.emptyState,
     textField: textField ?? this.textField,
     dialog: dialog ?? this.dialog,
@@ -1767,6 +1956,7 @@ final class HyperSizeScheme {
     stepIndicator: stepIndicator ?? this.stepIndicator,
     stepperNavigation: stepperNavigation ?? this.stepperNavigation,
     timeline: timeline ?? this.timeline,
+    descriptionList: descriptionList ?? this.descriptionList,
     notification: notification ?? this.notification,
     alert: alert ?? this.alert,
     banner: banner ?? this.banner,
@@ -1789,6 +1979,9 @@ final class HyperSizeScheme {
     if (t == 1) return b;
     double value(double x, double y) => x + (y - x) * t;
     return HyperSizeScheme(
+      navigationItemSpacing:
+          a.navigationItemSpacing +
+          (b.navigationItemSpacing - a.navigationItemSpacing) * t,
       deviceType: t < .5 ? a.deviceType : b.deviceType,
       controlHeightXs: value(a.controlHeightXs, b.controlHeightXs),
       controlHeightSm: value(a.controlHeightSm, b.controlHeightSm),
@@ -1843,6 +2036,11 @@ final class HyperSizeScheme {
         t,
       ),
       timeline: HyperTimelineSize.lerp(a.timeline, b.timeline, t),
+      descriptionList: HyperDescriptionListSize.lerp(
+        a.descriptionList,
+        b.descriptionList,
+        t,
+      ),
       notification: HyperNotificationSize.lerp(
         a.notification,
         b.notification,
@@ -1853,11 +2051,7 @@ final class HyperSizeScheme {
       bottomSheet: HyperBottomSheetSize.lerp(a.bottomSheet, b.bottomSheet, t),
       sidebar: HyperSidebarSize.lerp(a.sidebar, b.sidebar, t),
       menu: HyperMenuSize.lerp(a.menu, b.menu, t),
-      dropdownMenu: HyperDropdownMenuSize.lerp(
-        a.dropdownMenu,
-        b.dropdownMenu,
-        t,
-      ),
+      select: HyperSelectSize.lerp(a.select, b.select, t),
       popupListTile: HyperPopupListTileSize.lerp(
         a.popupListTile,
         b.popupListTile,
@@ -1881,6 +2075,14 @@ final class HyperSizeScheme {
       tag: HyperTagSize.lerp(a.tag, b.tag, t),
       avatar: HyperAvatarSize.lerp(a.avatar, b.avatar, t),
       skeleton: HyperSkeletonSize.lerp(a.skeleton, b.skeleton, t),
+      pageIndicator: HyperPageIndicatorSize.lerp(
+        a.pageIndicator,
+        b.pageIndicator,
+        t,
+      ),
+      treeView: HyperTreeViewSize.lerp(a.treeView, b.treeView, t),
+      selection: HyperSelectionSize.lerp(a.selection, b.selection, t),
+      result: HyperResultSize.lerp(a.result, b.result, t),
       emptyState: HyperEmptyStateSize.lerp(a.emptyState, b.emptyState, t),
       textField: HyperTextFieldSize.lerp(a.textField, b.textField, t),
       chip: HyperChipSize.lerp(a.chip, b.chip, t),
@@ -1900,6 +2102,7 @@ final class HyperSizeScheme {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is HyperSizeScheme &&
+          other.navigationItemSpacing == navigationItemSpacing &&
           other.deviceType == deviceType &&
           other.controlHeightXs == controlHeightXs &&
           other.controlHeightSm == controlHeightSm &&
@@ -1920,7 +2123,7 @@ final class HyperSizeScheme {
           other.drawer == drawer &&
           other.sidebar == sidebar &&
           other.menu == menu &&
-          other.dropdownMenu == dropdownMenu &&
+          other.select == select &&
           other.popupListTile == popupListTile &&
           other.tabBar == tabBar &&
           other.breadcrumb == breadcrumb &&
@@ -1934,6 +2137,10 @@ final class HyperSizeScheme {
           other.tag == tag &&
           other.avatar == avatar &&
           other.skeleton == skeleton &&
+          other.pageIndicator == pageIndicator &&
+          other.treeView == treeView &&
+          other.selection == selection &&
+          other.result == result &&
           other.emptyState == emptyState &&
           other.textField == textField &&
           other.dialog == dialog &&
@@ -1947,6 +2154,7 @@ final class HyperSizeScheme {
           other.stepIndicator == stepIndicator &&
           other.stepperNavigation == stepperNavigation &&
           other.timeline == timeline &&
+          other.descriptionList == descriptionList &&
           other.notification == notification &&
           other.alert == alert &&
           other.banner == banner &&
@@ -1964,6 +2172,7 @@ final class HyperSizeScheme {
 
   @override
   int get hashCode => Object.hashAll([
+    navigationItemSpacing,
     deviceType,
     controlHeightXs,
     controlHeightSm,
@@ -1984,7 +2193,7 @@ final class HyperSizeScheme {
     drawer,
     sidebar,
     menu,
-    dropdownMenu,
+    select,
     popupListTile,
     tabBar,
     breadcrumb,
@@ -1998,6 +2207,10 @@ final class HyperSizeScheme {
     tag,
     avatar,
     skeleton,
+    pageIndicator,
+    treeView,
+    selection,
+    result,
     emptyState,
     textField,
     dialog,
@@ -2011,6 +2224,7 @@ final class HyperSizeScheme {
     stepIndicator,
     stepperNavigation,
     timeline,
+    descriptionList,
     notification,
     alert,
     banner,

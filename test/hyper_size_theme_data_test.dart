@@ -69,9 +69,7 @@ void main() {
     final changed = sizes.copyWith(
       desktop: sizes.desktop.copyWith(
         switchSize: sizes.desktop.switchSize.copyWith(width: 50),
-        progress: sizes.desktop.progress.copyWith(
-          circularSize: 28,
-        ),
+        progress: sizes.desktop.progress.copyWith(circularSize: 28),
       ),
     );
 

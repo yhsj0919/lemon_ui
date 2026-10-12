@@ -72,13 +72,18 @@ class _GalleryShellState extends State<GalleryShell> {
           return HyperScaffold(
             // 宽屏的侧栏占完整左列，页面标题只属于右侧内容列。
             body: SafeArea(
+              // 顶栏负责顶部系统安全区，材质必须延伸到状态栏后方。
+              top: false,
               child: Row(
                 children: [
-                  _GalleryMenu(
-                    selectedId: _selectedId,
-                    onSelected: _select,
-                    style: HyperSidebarStyle(
-                      width: HyperTheme.sizesOf(context).drawer.width,
+                  SafeArea(
+                    bottom: false,
+                    child: _GalleryMenu(
+                      selectedId: _selectedId,
+                      onSelected: _select,
+                      style: HyperSidebarStyle(
+                        width: HyperTheme.sizesOf(context).drawer.width,
+                      ),
                     ),
                   ),
                   Expanded(child: page),
@@ -100,7 +105,7 @@ class _GalleryShellState extends State<GalleryShell> {
               ),
             ),
           ),
-          body: SafeArea(child: page),
+          body: SafeArea(top: false, child: page),
         );
       },
     );

@@ -70,6 +70,13 @@ class _HyperMenuPageState extends State<HyperMenuPage> {
                 ),
                 const SizedBox(height: 16),
                 HyperText('最近操作：$_lastAction'),
+                const SizedBox(height: 16),
+                HyperMenuButton(
+                  groups: groups,
+                  onSelected: select,
+                  menuStyle: const HyperMenuStyle(itemSpacing: 6),
+                  child: const HyperText('项间距 6（默认 4）'),
+                ),
               ],
             ),
           ),

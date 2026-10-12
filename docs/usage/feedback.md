@@ -72,13 +72,15 @@ HyperContextMenu(
 菜单处理动作由应用回调负责。
 [源码](../../lib/src/components/menu/hyper_context_menu.dart)。
 
-## HyperDropdownMenu 下拉选择
+## HyperSelect 下拉选择
+
+组合选择面板复用 HyperMenu；`showSurface: false` 只绘制菜单内容，表面和外层留白由组合面板负责。
 
 ~~~dart
-HyperDropdownMenu<String>(
+HyperSelect<String>(
   options: const [
-    HyperDropdownOption(value: 'auto', label: '自动'),
-    HyperDropdownOption(value: 'manual', label: '手动'),
+    HyperSelectOption(value: 'auto', label: '自动'),
+    HyperSelectOption(value: 'manual', label: '手动'),
   ],
   value: 'auto',
   onChanged: (value) {},
@@ -88,9 +90,10 @@ HyperDropdownMenu<String>(
 
 value 与 options 的泛型一致，空值显示 placeholder；
 单项 enabled 控制禁用，整体 enabled / 空回调控制交互。
-buttonStyle、menuStyle 配置两部分；style 使用 HyperDropdownMenuStyle，
-全局 dropdownMenuTheme、局部 HyperDropdownMenuTheme。
-[源码](../../lib/src/components/menu/hyper_dropdown_menu.dart)。
+buttonStyle、menuStyle 配置两部分；style 使用 HyperSelectStyle，
+全局 selectTheme、局部 HyperSelectTheme。
+[源码](../../lib/src/components/select/hyper_select.dart)。
+搜索、多选、取消选择、异步分页、自动填充和呈现方式见[下拉与自动填充](select-fields.md)。
 
 ## HyperTooltip 提示
 

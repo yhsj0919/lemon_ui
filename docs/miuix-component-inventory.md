@@ -59,7 +59,7 @@
 | `VerticalSlider` | `HyperVerticalSlider` | 已覆盖 |
 | `RangeSlider` | `HyperRangeSlider` | 已覆盖 |
 | `NumberPicker` | `HyperNumberPicker`、`HyperWheelPicker<T>` | 合并；数字便捷入口建立在滚轮选择器上 |
-| `DropdownImpl`、`SpinnerItemImpl` | `HyperDropdownMenu<T>`、`HyperDropdownField<T>` | 已覆盖；MIUIX 的 Impl 不进入公开命名 |
+| `DropdownImpl`、`SpinnerItemImpl` | `HyperSelect<T>` | 已覆盖；MIUIX 的 Impl 不进入公开命名 |
 
 ### 输入、反馈和进度
 
@@ -93,7 +93,7 @@
 | MIUIX | Lemon UI 规划 | 合并结果 |
 | --- | --- | --- |
 | `TooltipBox`、Plain / Rich Tooltip | `HyperTooltip.plain`、`.rich` | 补充明确变体，共用主题骨架 |
-| `ListPopup` | `HyperMenu`、`HyperDropdownMenu<T>`、`HyperPopup` | 按语义合并，不公开 Impl 名称 |
+| `ListPopup` | `HyperMenu`、`HyperSelect<T>`、`HyperPopup` | 按语义合并，不公开 Impl 名称 |
 | Cascading List Popup | `HyperCascadingMenu` | **补充**；桌面悬浮子菜单与移动端层级变换共用数据模型 |
 | Dialog content + Overlay/Window Dialog | `HyperDialog` + `HyperOverlayPresentation` | 已覆盖内容；补充显式 overlay/window 呈现策略 |
 | BottomSheet content + Overlay/Window BottomSheet | `HyperBottomSheet` + 呈现策略 | 已覆盖 |

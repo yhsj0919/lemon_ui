@@ -6,12 +6,13 @@ import 'package:flutter/services.dart';
 
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/motion/hyper_motion_theme.dart';
-import '../menu/hyper_dropdown_menu.dart';
+import '../select/hyper_select.dart';
 import '../menu/hyper_menu.dart';
 import '../menu/hyper_menu_model.dart';
 import '../menu/hyper_menu_style.dart';
 import '../menu/hyper_menu_theme.dart';
 import '../overlay/hyper_anchored_overlay.dart';
+import '../select/hyper_select_presenter.dart';
 import 'hyper_list_tile.dart';
 import 'hyper_list_tile_style.dart';
 
@@ -38,6 +39,8 @@ class HyperPopupListTile<T> extends StatefulWidget {
     this.minPopupWidth,
     this.maxPopupWidth,
     this.transitionBuilder,
+    this.presentation = HyperSelectPresentation.adaptive,
+    this.allowDeselect = false,
   }) : assert(minPopupWidth == null || minPopupWidth > 0),
        assert(maxPopupWidth == null || maxPopupWidth > 0),
        assert(
@@ -49,9 +52,11 @@ class HyperPopupListTile<T> extends StatefulWidget {
   final Widget title;
   final Widget? subtitle;
   final Widget? leading;
-  final List<HyperDropdownOption<T>> options;
+  final List<HyperSelectOption<T>> options;
   final T? value;
-  final ValueChanged<T>? onChanged;
+  final ValueChanged<T?>? onChanged;
+  final HyperSelectPresentation presentation;
+  final bool allowDeselect;
   final String placeholder;
   final HyperListTileDensity density;
   final bool enabled;
@@ -113,6 +118,51 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
   }
 
   Future<void> _showOptions() async {
+    final presentation = hyperResolveSelectPresentation(
+      widget.presentation,
+      HyperTheme.sizesOf(context).deviceType,
+    );
+    if (presentation == HyperSelectPresentation.bottomSheet ||
+        presentation == HyperSelectPresentation.fullScreen) {
+      if (!_enabled || _open) return;
+      setState(() => _open = true);
+      await showHyperSelectModal(
+        context: context,
+        presentation: presentation,
+        title: widget.placeholder,
+        builder: (context) => HyperMenu(
+          style: widget.menuStyle,
+          selectedId: widget.value == null
+              ? null
+              : '${widget.options.indexWhere((o) => o.value == widget.value)}',
+          items: [
+            for (final (index, option) in widget.options.indexed)
+              HyperMenuItem(
+                id: '$index',
+                label: option.label,
+                leading: option.leading,
+                trailing: option.trailing,
+                enabled: option.enabled,
+              ),
+          ],
+          onSelected: (id) {
+            if (!mounted || !_enabled) return;
+            final option = widget.options[int.parse(id)];
+            Navigator.of(context).pop();
+            widget.onChanged?.call(
+              widget.allowDeselect && option.value == widget.value
+                  ? null
+                  : option.value,
+            );
+          },
+        ),
+      );
+      if (mounted) {
+        setState(() => _open = false);
+        _restoreFocus();
+      }
+      return;
+    }
     if (!_enabled || _open) return;
     final anchorBox = _anchorKey.currentContext?.findRenderObject();
     final overlayBox = Navigator.of(
@@ -135,13 +185,12 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
           id: '$index',
           label: option.label,
           leading: option.leading,
+          trailing: option.trailing,
           enabled: option.enabled,
         ),
     ];
     final itemPadding =
-        widget.menuStyle?.padding ??
-        menuTheme?.padding ??
-        sizes.popupListTile.itemHorizontalPadding;
+        widget.menuStyle?.padding ?? menuTheme?.padding ?? sizes.menu.padding;
     final iconSize =
         widget.menuStyle?.iconSize ??
         menuTheme?.iconSize ??
@@ -151,7 +200,9 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
         menuTheme?.iconSpacing ??
         sizes.menu.iconSpacing;
     final surfacePadding =
-        widget.menuStyle?.surfacePadding ?? menuTheme?.surfacePadding ?? 0.0;
+        widget.menuStyle?.surfacePadding ??
+        menuTheme?.surfacePadding ??
+        sizes.menu.padding;
     final textStyle =
         widget.menuStyle?.itemTextStyle ??
         menuTheme?.itemTextStyle ??
@@ -172,7 +223,9 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
       )..layout();
       contentWidth = math.max(
         contentWidth,
-        painter.width + (option.leading == null ? 0 : iconSize + iconSpacing),
+        painter.width +
+            (option.leading == null ? 0 : iconSize + iconSpacing) +
+            (option.trailing == null ? 0 : iconSize + iconSpacing),
       );
       painter.dispose();
     }
@@ -195,16 +248,9 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     final menuStyle = HyperMenuStyle(
       width: popupWidth,
       padding: itemPadding,
-      itemHeight: widget.density == HyperListTileDensity.compact
-          ? sizes.listTile.compactMinHeight
-          : sizes.listTile.minHeight,
-      surfacePadding: menuTheme?.surfacePadding ?? 0,
-      itemRadius: menuTheme?.itemRadius ?? 0,
-      selectedBackgroundColor:
-          menuTheme?.selectedBackgroundColor ?? Colors.transparent,
-      selectedForegroundColor:
-          menuTheme?.selectedForegroundColor ?? theme.colors.primary,
-    ).merge(widget.menuStyle);
+      itemHeight: sizes.menu.itemHeight,
+      surfacePadding: surfacePadding,
+    ).merge(menuTheme).merge(widget.menuStyle);
     final duration = theme.motion.durationFor(
       HyperMotionSpeed.standard,
       disableAnimations:
@@ -227,7 +273,10 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     );
     final above = math.max(0, anchor.top - bounds.top - sizes.overlaySpacing);
     final desiredHeight = math.min(
-      entries.length * menuStyle.itemHeight! + 2 * menuStyle.surfacePadding!,
+      entries.length * menuStyle.itemHeight! +
+          math.max(0, entries.length - 1) *
+              (menuStyle.itemSpacing ?? sizes.navigationItemSpacing) +
+          2 * menuStyle.surfacePadding!,
       menuStyle.maxHeight ?? double.infinity,
     );
     final showBelow = below >= desiredHeight || below >= above;
@@ -274,7 +323,13 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     setState(() => _open = false);
     if (index != null && index >= 0 && index < widget.options.length) {
       final option = widget.options[index];
-      if (option.enabled) widget.onChanged?.call(option.value);
+      if (option.enabled) {
+        widget.onChanged?.call(
+          widget.allowDeselect && option.value == widget.value
+              ? null
+              : option.value,
+        );
+      }
     }
     _restoreFocus();
   }

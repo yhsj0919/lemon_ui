@@ -76,6 +76,7 @@ class HyperSliverAppBar extends StatelessWidget {
           : resolved.backgroundColor,
       forceMaterialTransparency: isExpandedVariant || resolved.material != null,
       surfaceTintColor: Colors.transparent,
+      systemOverlayStyle: resolved.systemOverlayStyle,
       scrolledUnderElevation: 0,
       elevation: isExpandedVariant ? 0 : resolved.style.elevation,
       flexibleSpace: isExpandedVariant

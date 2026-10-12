@@ -17,6 +17,10 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档，Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。表单、字段校验、提交状态和表单弹窗留到最后，见“当前推进顺序”。
 
+## UI 审核状态
+
+实现状态与视觉验收分开：`[x]` 不表示四端 UI 已审核。逐端状态及审核证据见 [设备预览与 UI 审核台账](device-preview-and-review.md)。新实现先记「已创建未审核」，修改后重新审核受影响端。
+
 ## 标记说明
 
 - `[ ]`：尚未实现。
@@ -224,8 +228,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperUrlField`：URL 输入便捷配置。
 - [ ] `HyperPinInput`：PIN 输入。
 - [ ] `HyperOtpInput`：验证码输入。
-- [ ] `HyperAutocomplete<T>`：自动完成。
-- [ ] `HyperDropdownField<T>`：下拉选择字段。
+- [~] `HyperAutocomplete<T>`：主输入搜索、单多选、异步分页与可选自由值；设备视觉验证待补齐。
+- [~] `HyperSelect<T>`：受控单多选、搜索、异步分页与多种呈现；Form 适配后置。
 - [ ] `HyperComboBox<T>`：输入与选择组合。
 - [ ] `HyperEditableText`：低层级可编辑文本封装。
 - [ ] `HyperSearchBar`：搜索栏。
@@ -297,10 +301,10 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperDataTable`：排序、选择和操作的数据表格。
 - [ ] `HyperPaginatedDataTable`：分页数据表格。
 - [ ] `HyperDataGrid`：高密度可编辑数据网格。
-- [ ] `HyperTreeView<T>`：树形结构。
+- [x] `HyperTreeView<T>`：静态与动态子树、展开单选、加载重试、缓存和键盘操作。
 - [ ] `HyperTreeTable<T>`：树形表格。
 - [ ] `HyperKeyValueTable`：键值信息表。
-- [ ] `HyperDescriptionList`：描述列表。
+- [x] `HyperDescriptionList`：描述列表，支持响应式多列、跨列、键值和表格式布局。
 - [x] `HyperTimeline`：时间线。
 - [x] `HyperStepIndicator`：步骤状态展示。
 - [ ] `HyperMetric`：指标卡。
@@ -312,7 +316,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperAsyncView<T>`：异步数据状态切换。
 - [x] `HyperEmptyState`：默认图标、自定义插图、标题、说明、附加内容和可换行操作区；四端尺寸、三级主题覆盖及内容过渡，Demo 包含无数据、搜索无结果和失败场景。
 - [ ] `HyperErrorView`：错误状态。
-- [ ] `HyperResult`：成功、失败和结果页面。
+- [x] `HyperResult`：成功、错误、警告、信息与中性结果展示，支持插图、详情和操作区。
 
 ## 十三、导航
 
@@ -329,7 +333,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperSegmentedNavigation`：分段导航。
 - [x] `HyperBreadcrumb`：胶囊路径导航，节点点击、独立高亮与横向滚动。
 - [x] `HyperPagination`：页码导航。
-- [ ] `HyperPageIndicator`：页面指示器。
+- [x] `HyperPageIndicator`：圆点、数字、有限窗口、横纵布局与受控点击切换。
 - [x] `HyperStepperNavigation`：步骤导航。
 - [ ] `HyperBottomAppBar`：底部应用栏。
 - [ ] `HyperNavigationSplitView`：侧栏与内容区域。
@@ -348,7 +352,6 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [~] `HyperMenuItem`：带图标、尾部内容和子菜单的操作项；运行验证待补齐。
 - [ ] `HyperMenuBar`：桌面菜单栏。
 - [~] `HyperContextMenu`：右键或触摸长按在触发位置打开菜单，也支持菜单键与 Shift+F10；运行验证待补齐。
-- [~] `HyperDropdownMenu<T>`：受控单选、禁用选项和键盘导航已实现；运行验证待补齐。
 - [~] `HyperPopupListTile<T>`：整行打开锚定模态选项列表，复用菜单与列表项主题；运行验证待补齐。
 - [ ] `HyperPopup`：通用弹出层。
 - [ ] `HyperPopover`：带锚点的内容浮层。
@@ -708,20 +711,20 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperObjectInput<T>`：领域对象与格式化值双向转换输入。
 - [ ] `HyperItemPicker<T>`：在列表或网格中选择领域对象。
 - [ ] `HyperMultipleChoice<T>`：单题单选或多选题式输入。
-- [ ] `HyperMultiSelect<T>`：多选下拉或 Token 输入。
+- [~] `HyperMultiSelect<T>`：由 DropdownMenu.multiple / Autocomplete.multiple 提供，不另建重复接口。
 - [ ] `HyperCheckboxGroup<T>`：复选框组。
 - [ ] `HyperCascader<T>`：级联选择器。
 - [ ] `HyperTransfer<T>`：双栏穿梭选择器，主要用于平板和桌面。
 - [ ] `HyperInlineEdit<T>`：展示态和编辑态原位切换。
 - [ ] `HyperInputGroup`：多个输入框或操作的组合边界。
 - [ ] `HyperInputGroupAddon`：输入组的前后附加内容。
-- [ ] `HyperOption<T>`：Select、Autocomplete、Combobox 等共用的格式化选项模型。
+- [~] `HyperOption<T>`：共用 HyperSelectOption<T>；支持稳定 value、label、图标/尾部与禁用。
 - [ ] `HyperAsyncOptionSource<T>`：带缓存、过期结果保护和分页能力的异步选项源。
 
 ### 数据与内容展示
 
 - [ ] `HyperTracker`：按时间或序列展示离散状态块。
-- [ ] `HyperDescriptions`：响应式描述信息列表，支持键值和表格式布局。
+- 描述信息列表统一使用已实现的 `HyperDescriptionList`，不另设 `HyperDescriptions`。
 - [ ] `HyperItem`：比 ListTile 更通用的标题、说明、前后内容单元。
 - [ ] `HyperItemGroup`：关联内容单元组。
 - [ ] `HyperCornerBadge`：贴附在内容角落的状态标识。

@@ -96,7 +96,7 @@
 这一组仍属于基础层，但必须在 B0 至 B5 稳定后实现。
 
 - Overlay 核心：`HyperOverlayScope`、`HyperOverlayPresentation`、`HyperOverlayController<T>`、`HyperOverlayAnchor`、`HyperAnchoredOverlay`、`HyperModalBarrier`。
-- 提示与菜单：`HyperTooltip`、`HyperMenu`、`HyperMenuItem`、`HyperContextMenu`、`HyperDropdownMenu<T>`、`HyperPopup`、`HyperPopover`。
+- 提示与菜单：`HyperTooltip`、`HyperMenu`、`HyperMenuItem`、`HyperContextMenu`、`HyperSelect<T>`、`HyperPopup`、`HyperPopover`。
 - 页面浮层：`HyperActionSheet`、`HyperBottomSheet`、`HyperModalBottomSheet`、`HyperSideSheet`。
 - 对话框：`HyperDialog`、`HyperAlertDialog`、`HyperConfirmDialog`、`HyperInputDialog`、`HyperSelectionDialog<T>`、`HyperDialogActions`、`HyperProgressDialog`。
 - 队列反馈：`HyperToast`、`HyperSnackbar`、`HyperSnackbarHost`、`HyperNotification`、`HyperNotificationCenter`。
@@ -128,7 +128,7 @@
 
 ### A3：高级输入、选择器与日期时间
 
-- 输入与建议：`HyperAutocomplete<T>`、`HyperDropdownField<T>`、`HyperComboBox<T>`、`HyperSearchAnchor`、`HyperTagInput<T>`、`HyperMentionInput<T>`、`HyperFormattedInput`、`HyperFormattedInputController`、`HyperImageInput`、`HyperSortableInput<T>`、`HyperObjectInput<T>`、`HyperInlineEdit<T>`。
+- 输入与建议：`HyperAutocomplete<T>`、`HyperSelect<T>`、`HyperComboBox<T>`、`HyperSearchAnchor`、`HyperTagInput<T>`、`HyperMentionInput<T>`、`HyperFormattedInput`、`HyperFormattedInputController`、`HyperImageInput`、`HyperSortableInput<T>`、`HyperObjectInput<T>`、`HyperInlineEdit<T>`。
 - 复杂选择：`HyperColorPicker`、`HyperColorSwatchPicker`、`HyperNumberPicker`、`HyperWheelPicker<T>`、`HyperItemPicker<T>`、`HyperMultipleChoice<T>`、`HyperMultiSelect<T>`、`HyperCheckboxGroup<T>`、`HyperCascader<T>`、`HyperTransfer<T>`、`HyperAsyncOptionSource<T>`。
 - 高级调节：`HyperProgressSlider`、`HyperDial`、`HyperKnob`、`HyperCircularSlider`、`HyperRangeDial`、`HyperScrubber`。
 - 日期时间：`HyperDatePicker`、`HyperDateRangePicker`、`HyperTimePicker`、`HyperDateTimePicker`、`HyperDurationPicker`、`HyperTimerPicker`、`HyperCalendar`、`HyperCalendarView`、`HyperCalendarGrid`、`HyperAgenda`、`HyperSchedule`、`HyperTimeRangePicker`、`HyperTimezonePicker`、`HyperCountdownPicker`、`HyperDatePickerDialog`、`HyperTimePickerDialog`、`HyperColorPickerDialog`。

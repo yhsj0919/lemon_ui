@@ -70,6 +70,7 @@ class HyperAppBar extends StatelessWidget {
       actionsIconTheme: IconThemeData(color: resolved.style.foregroundColor),
       backgroundColor: resolved.backgroundColor,
       flexibleSpace: resolved.materialBackground,
+      systemOverlayStyle: resolved.systemOverlayStyle,
       forceMaterialTransparency: resolved.material != null,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: resolved.material == null ? null : 0,

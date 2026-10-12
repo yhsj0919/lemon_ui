@@ -273,20 +273,20 @@ Escape 关闭，子菜单仍共享同一点击区域。
 长按松开后按 `showDuration` 延迟收起。内容只提供说明，不接收点击。可通过 `placement`、
 `waitDuration`、`exitDuration` 和 `transitionBuilder` 调整行为与过渡。
 
-`HyperDropdownMenu<T>` 是受控单选入口：调用方传入 `value` 和 `onChanged`，
+`HyperSelect<T>` 是受控单选入口：调用方传入 `value` 和 `onChanged`，
 禁用选项不可触发选择。锚点复用 `HyperButton` 的尺寸与样式，弹出的选项复用
 `HyperMenu` 的焦点导航、主题和浮层材质；方向键可从锚点打开，选择或按 Escape
 关闭后将焦点返回按钮自身。`HyperButton.focusNode` 支持这种组合场景，节点由调用方释放。
-锚点宽度、箭头尺寸和间距来自四端 `HyperDropdownMenuSize`；前景、箭头和选中底色
-由全局 `dropdownMenuTheme`、局部 `HyperDropdownMenuTheme` 与实例
-`HyperDropdownMenuStyle` 逐层覆盖。显式 `buttonStyle` 和 `menuStyle` 最后覆盖各自底层控件。
+锚点宽度、箭头尺寸和间距来自四端 `HyperSelectSize`；前景、箭头和选中底色
+由全局 `selectTheme`、局部 `HyperSelectTheme` 与实例
+`HyperSelectStyle` 逐层覆盖。显式 `buttonStyle` 和 `menuStyle` 最后覆盖各自底层控件。
 
 `HyperPopupListTile<T>` 将 `HyperListTile` 与锚定模态选项列表组合。整行显示
 当前值和上下双箭头，打开时使用语义遮罩；弹窗以尾部上下箭头图标为锚点，并在上下空间不足时翻转、限制在安全区域。弹窗复用 `HyperMenu` 的焦点、禁用和选中
 状态。弹窗选项行高默认取当前端 `HyperListTileSize.minHeight`，紧凑行取
 `compactMinHeight`，`menuStyle.itemHeight` 可显式覆盖。宽度按选项文字和图标测量，
 由四端 `HyperPopupListTileSize` 限制最小和最大值，实例可覆盖边界或指定固定宽度。
-弹窗表面内边距与选项文字内边距独立；选项左右内边距由四端 `HyperPopupListTileSize.itemHorizontalPadding` 管理，默认均为 16 逻辑像素，可通过 `menuStyle.padding` 显式覆盖。默认选中和悬停背景铺满整行，外框负责裁剪圆角。
+弹窗表面内边距与选项文字内边距独立；默认行高、内边距、圆角、选中背景和文字颜色统一继承同端 `HyperMenu` 尺寸与主题，与 Select / Autocomplete 保持一致。ListTile 的 density 只影响主列表行，不影响选项行高；`menuStyle` 可显式覆盖弹层选项。此统一基于项目现有同端菜单语义（D 级，逻辑像素），未从截图像素推导尺寸。
 默认过渡从靠近列表项的弹窗角开始缩放、淡入并按打开方向逐步揭示，退场反向收起；
 缩放取全局 Motion 弹簧，时长与淡入曲线取全局 Motion，减少动画时直接显示。
 `transitionBuilder` 可替换默认过渡。选择后关闭并将焦点返回列表项。
@@ -315,7 +315,7 @@ HyperSizeScheme
 ├─ drawer: HyperDrawerSize
 ├─ sidebar: HyperSidebarSize
 ├─ menu: HyperMenuSize
-├─ dropdownMenu: HyperDropdownMenuSize
+├─ select: HyperSelectSize
 ├─ button: HyperButtonSize
 ├─ iconButton: HyperIconButtonSize
 ├─ progress: HyperProgressSize
@@ -590,3 +590,32 @@ Style 的 nodeLineGap 可局部覆盖，highlightLine 默认 false。
 开启后当前节点的出线跟随节点状态语义色，normal / disabled 保持 lineColor；
 末项不绘制连线，反转只改变展示顺序。节点状态填充绘制在材质表面之上，
 避免材质背景遮住状态颜色；颜色过渡沿用 Motion 与减少动画设置。
+
+## 描述列表（2026-10-08）
+
+HyperDescriptionList 的全局视觉使用 descriptionListTheme，四端尺寸使用 HyperSizeScheme.descriptionList。局部主题与实例 Style 覆盖当前解析结果，item Style 仅参与单项视觉与标签布局。响应式列数依据父级有限宽度，不重新判断设备；跨度按实际列数限制，空尾列不扩张前项。自然行高用于少量描述信息，不承担大数据虚拟滚动。材质沿用统一 HyperMaterialTheme 与 HyperMaterialSurface，动效沿用 Motion 和系统减少动画。
+
+## Result（2026-10-09）
+
+HyperResult 展示调用方控制的 neutral/success/error/warning/info 状态，不管理加载、请求、重试、导航与自动关闭。全局 resultTheme、局部 HyperResultTheme 和实例 Style 逐字段合并，状态 Style 叠加通用 Style；文字字段深合并。四端 sizes.result 独立存储，不读取 emptyStateTheme 或 sizes.emptyState。材质、质量与降级继承统一 HyperMaterialTheme，表面复用 HyperMaterialSurface；前景边框与外部阴影不会被材质遮盖。默认过渡沿用 Motion 与减少动画策略，transitionBuilder 可替换内容过渡。父级负责页面滚动与安全区。
+
+## PageIndicator（2026-10-09）
+
+全局 pageIndicatorTheme、局部 HyperPageIndicatorTheme 与实例 Style 逐字段合并；四端 sizes.pageIndicator 独立管理点径、选中宽度、间距和内边距。PageView 使用零起始索引，因此 currentIndex 独立于 Pagination 的一开始页码。纯模型只验证数据与计算有限窗口，不读取设备、修改当前页或绑定控制器。可点击模式复用 HyperPressable，触控槽位继承当前统一 minimumInteractiveDimension；只读与数字模式不创建无效焦点。材质与降级统一由 HyperMaterialTheme/HyperMaterialSurface 管理，外层边框和阴影独立于材质填充。默认 Motion 与减少动画设置覆盖圆点尺寸、填充及数字过渡。
+
+## 统一导航行间距与 Tree（2026-10-10）
+
+HyperSizeScheme.navigationItemSpacing 默认 4，作为菜单、Sidebar 和树的行间距语义值；对应 menu.itemSpacing、sidebar.rowGap、treeView.rowSpacing 可空覆盖，null 继承公共语义，0 显式紧贴。Sidebar.itemSpacing 是行内图标/文字间距，不能混同。全局尺寸通过强类型 copyWith 修改公共语义即可同时影响三个组件；局部和实例 Style 优先。
+
+HyperTreeController<T> 管理展开、单选、子节点缓存和异步加载状态；视图只负责布局、交互和反馈，不承担网络协议或导航。请求按 id 去重并登记后通知，数据替换用 generation 忽略旧响应，销毁后不写入或通知。请求结果全局验证 id 后一次性写入，失败可重试，空结果成为叶节点。children 的静态快照与加载缓存独立，加载完成不会反转用户收起意图。
+
+全局 treeViewTheme、局部 HyperTreeViewTheme 与实例 Style 按字段覆盖；四端 sizes.treeView 独立存储。材质与降级复用统一基础设施，动效沿用 Motion/减少动画，展开过渡与反馈过渡均可替换。父级负责有限宽度、外部滚动与控制器生命周期。本阶段为自然高度的中小规模树，不承诺虚拟滚动。
+
+## Select / Autocomplete（2026-10-10）
+
+2026-10-11：Menu 与 Select 的浮层表面统一由 hyper_menu_surface 解析，恢复原菜单玻璃配方及阴影。
+组合面板只嵌入 Menu 内容，外层负责唯一表面；高级质量、透明度和降级继续由统一材质主题管理。
+
+共用 HyperSelectField 宿主、HyperSelectOptionsController 查询模型和 HyperSelectPanel；模型不管理编辑器、业务选择与路由。Dropdown 在面板内搜索，Autocomplete 在主输入框搜索，模态时同步编辑器。共用 selectionTheme / HyperSelectionTheme，Autocomplete 独立 autocompleteTheme；Dropdown 的 selectionStyle 嵌入现有 DropdownMenuStyle。配置强类型合并、插值、相等；四端额外尺寸统一存储于 sizes.selection。输入、按钮、Chip、菜单、表面、模态路由和高级材质沿用现有基础设施。Menu 外部导航控制器允许编辑器保留焦点，selectedIds 统一多选的视觉和语义。
+
+选择受控，分页/查询不清除选中值；标签缓存只保留当前结果和已选值。异步请求按 generation 忽略过期结果，追加失败不提交页面，游标须前进且不循环。来源替换时销毁旧控制器，视图卸载后关闭所属模态路由。adaptive 依据稳定真实设备类别解析，不按窗口尺寸重分类；显式 presentation 优先。PopupListTile 保留原尾部布局/弹出动效，模态复用共用 presenter，避免新增重复列表控件。

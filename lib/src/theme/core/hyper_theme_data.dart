@@ -1,3 +1,9 @@
+import '../../components/select/hyper_selection_theme.dart';
+import '../../components/autocomplete/hyper_autocomplete_theme.dart';
+import '../../components/tree/hyper_tree_view_theme.dart';
+import '../../components/page_indicator/hyper_page_indicator_theme.dart';
+import '../../components/result/hyper_result_theme.dart';
+import '../../components/description_list/hyper_description_list_theme.dart';
 import '../../components/timeline/hyper_timeline_theme.dart';
 import '../../components/steps/hyper_stepper_navigation_theme.dart';
 import '../../components/steps/hyper_step_indicator_theme.dart';
@@ -41,7 +47,7 @@ import '../../components/icon/hyper_icon_theme.dart';
 import '../../components/icon_button/hyper_icon_button_theme.dart';
 import '../../components/list_tile/hyper_list_tile_theme.dart';
 import '../../components/menu/hyper_menu_theme.dart';
-import '../../components/menu/hyper_dropdown_menu_theme.dart';
+import '../../components/select/hyper_select_theme.dart';
 import '../../components/progress/hyper_progress_theme.dart';
 import '../../components/radio/hyper_radio_theme.dart';
 import '../../components/scaffold/hyper_scaffold_theme.dart';
@@ -95,7 +101,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.drawerTheme = const HyperDrawerThemeData(),
     this.sidebarTheme = const HyperSidebarThemeData(),
     this.menuTheme = const HyperMenuThemeData(),
-    this.dropdownMenuTheme = const HyperDropdownMenuThemeData(),
+    this.selectTheme = const HyperSelectThemeData(),
     this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
     this.cardTheme = const HyperCardThemeData(),
     this.titledCardTheme = const HyperTitledCardThemeData(),
@@ -104,6 +110,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.tagTheme = const HyperTagThemeData(),
     this.avatarTheme = const HyperAvatarThemeData(),
     this.skeletonTheme = const HyperSkeletonThemeData(),
+    this.pageIndicatorTheme = const HyperPageIndicatorThemeData(),
+    this.treeViewTheme = const HyperTreeViewThemeData(),
+    this.selectionTheme = const HyperSelectionThemeData(),
+    this.autocompleteTheme = const HyperAutocompleteThemeData(),
+    this.resultTheme = const HyperResultThemeData(),
     this.emptyStateTheme = const HyperEmptyStateThemeData(),
     this.segmentedButtonTheme = const HyperSegmentedButtonThemeData(),
     this.textFieldTheme = const HyperTextFieldThemeData(),
@@ -118,6 +129,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.stepIndicatorTheme = const HyperStepIndicatorThemeData(),
     this.stepperNavigationTheme = const HyperStepperNavigationThemeData(),
     this.timelineTheme = const HyperTimelineThemeData(),
+    this.descriptionListTheme = const HyperDescriptionListThemeData(),
     this.notificationTheme = const HyperNotificationThemeData(),
     this.alertTheme = const HyperAlertThemeData(),
     this.bannerTheme = const HyperBannerThemeData(),
@@ -336,7 +348,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperMenuThemeData menuTheme;
 
   /// 全局下拉选择器主题。
-  final HyperDropdownMenuThemeData dropdownMenuTheme;
+  final HyperSelectThemeData selectTheme;
 
   /// 全局面包屑视觉主题。
   final HyperBreadcrumbThemeData breadcrumbTheme;
@@ -355,6 +367,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperTagThemeData tagTheme;
   final HyperAvatarThemeData avatarTheme;
   final HyperSkeletonThemeData skeletonTheme;
+  final HyperPageIndicatorThemeData pageIndicatorTheme;
+  final HyperTreeViewThemeData treeViewTheme;
+  final HyperSelectionThemeData selectionTheme;
+  final HyperAutocompleteThemeData autocompleteTheme;
+  final HyperResultThemeData resultTheme;
   final HyperEmptyStateThemeData emptyStateTheme;
   final HyperSegmentedButtonThemeData segmentedButtonTheme;
   final HyperTextFieldThemeData textFieldTheme;
@@ -369,6 +386,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperStepIndicatorThemeData stepIndicatorTheme;
   final HyperStepperNavigationThemeData stepperNavigationTheme;
   final HyperTimelineThemeData timelineTheme;
+  final HyperDescriptionListThemeData descriptionListTheme;
   final HyperNotificationThemeData notificationTheme;
   final HyperAlertThemeData alertTheme;
   final HyperBannerThemeData bannerTheme;
@@ -476,7 +494,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperDrawerThemeData? drawerTheme,
     HyperSidebarThemeData? sidebarTheme,
     HyperMenuThemeData? menuTheme,
-    HyperDropdownMenuThemeData? dropdownMenuTheme,
+    HyperSelectThemeData? selectTheme,
     HyperBreadcrumbThemeData? breadcrumbTheme,
     HyperCardThemeData? cardTheme,
     HyperTitledCardThemeData? titledCardTheme,
@@ -485,6 +503,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperTagThemeData? tagTheme,
     HyperAvatarThemeData? avatarTheme,
     HyperSkeletonThemeData? skeletonTheme,
+    HyperPageIndicatorThemeData? pageIndicatorTheme,
+    HyperTreeViewThemeData? treeViewTheme,
+    HyperSelectionThemeData? selectionTheme,
+    HyperAutocompleteThemeData? autocompleteTheme,
+    HyperResultThemeData? resultTheme,
     HyperEmptyStateThemeData? emptyStateTheme,
     HyperSegmentedButtonThemeData? segmentedButtonTheme,
     HyperTextFieldThemeData? textFieldTheme,
@@ -499,6 +522,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperStepIndicatorThemeData? stepIndicatorTheme,
     HyperStepperNavigationThemeData? stepperNavigationTheme,
     HyperTimelineThemeData? timelineTheme,
+    HyperDescriptionListThemeData? descriptionListTheme,
     HyperNotificationThemeData? notificationTheme,
     HyperAlertThemeData? alertTheme,
     HyperBannerThemeData? bannerTheme,
@@ -543,7 +567,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       drawerTheme: drawerTheme ?? this.drawerTheme,
       sidebarTheme: sidebarTheme ?? this.sidebarTheme,
       menuTheme: menuTheme ?? this.menuTheme,
-      dropdownMenuTheme: dropdownMenuTheme ?? this.dropdownMenuTheme,
+      selectTheme: selectTheme ?? this.selectTheme,
       breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
       cardTheme: cardTheme ?? this.cardTheme,
       titledCardTheme: titledCardTheme ?? this.titledCardTheme,
@@ -552,6 +576,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       tagTheme: tagTheme ?? this.tagTheme,
       avatarTheme: avatarTheme ?? this.avatarTheme,
       skeletonTheme: skeletonTheme ?? this.skeletonTheme,
+      pageIndicatorTheme: pageIndicatorTheme ?? this.pageIndicatorTheme,
+      treeViewTheme: treeViewTheme ?? this.treeViewTheme,
+      selectionTheme: selectionTheme ?? this.selectionTheme,
+      autocompleteTheme: autocompleteTheme ?? this.autocompleteTheme,
+      resultTheme: resultTheme ?? this.resultTheme,
       emptyStateTheme: emptyStateTheme ?? this.emptyStateTheme,
       segmentedButtonTheme: segmentedButtonTheme ?? this.segmentedButtonTheme,
       textFieldTheme: textFieldTheme ?? this.textFieldTheme,
@@ -568,6 +597,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       stepperNavigationTheme:
           stepperNavigationTheme ?? this.stepperNavigationTheme,
       timelineTheme: timelineTheme ?? this.timelineTheme,
+      descriptionListTheme: descriptionListTheme ?? this.descriptionListTheme,
       notificationTheme: notificationTheme ?? this.notificationTheme,
       alertTheme: alertTheme ?? this.alertTheme,
       bannerTheme: bannerTheme ?? this.bannerTheme,
@@ -663,6 +693,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.timelineTheme,
         t,
       ),
+      descriptionListTheme: HyperDescriptionListThemeData.lerp(
+        descriptionListTheme,
+        other.descriptionListTheme,
+        t,
+      ),
       notificationTheme: HyperNotificationThemeData.lerp(
         notificationTheme,
         other.notificationTheme,
@@ -681,11 +716,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       menuTheme: HyperMenuThemeData.lerp(menuTheme, other.menuTheme, t),
-      dropdownMenuTheme: HyperDropdownMenuThemeData.lerp(
-        dropdownMenuTheme,
-        other.dropdownMenuTheme,
-        t,
-      ),
+      selectTheme: HyperSelectThemeData.lerp(selectTheme, other.selectTheme, t),
       breadcrumbTheme: HyperBreadcrumbThemeData.lerp(
         breadcrumbTheme,
         other.breadcrumbTheme,
@@ -712,6 +743,27 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       chipTheme: HyperChipThemeData.lerp(chipTheme, other.chipTheme, t),
+      pageIndicatorTheme: HyperPageIndicatorThemeData.lerp(
+        pageIndicatorTheme,
+        other.pageIndicatorTheme,
+        t,
+      ),
+      treeViewTheme: HyperTreeViewThemeData.lerp(
+        treeViewTheme,
+        other.treeViewTheme,
+        t,
+      ),
+      selectionTheme: HyperSelectionThemeData.lerp(
+        selectionTheme,
+        other.selectionTheme,
+        t,
+      ),
+      autocompleteTheme: HyperAutocompleteThemeData.lerp(
+        autocompleteTheme,
+        other.autocompleteTheme,
+        t,
+      ),
+      resultTheme: HyperResultThemeData.lerp(resultTheme, other.resultTheme, t),
       emptyStateTheme: HyperEmptyStateThemeData.lerp(
         emptyStateTheme,
         other.emptyStateTheme,
@@ -790,13 +842,18 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.drawerTheme == drawerTheme &&
           other.sidebarTheme == sidebarTheme &&
           other.menuTheme == menuTheme &&
-          other.dropdownMenuTheme == dropdownMenuTheme &&
+          other.selectTheme == selectTheme &&
           other.breadcrumbTheme == breadcrumbTheme &&
           other.cardTheme == cardTheme &&
           other.titledCardTheme == titledCardTheme &&
           other.buttonTheme == buttonTheme &&
           other.badgeTheme == badgeTheme &&
           other.skeletonTheme == skeletonTheme &&
+          other.pageIndicatorTheme == pageIndicatorTheme &&
+          other.treeViewTheme == treeViewTheme &&
+          other.selectionTheme == selectionTheme &&
+          other.autocompleteTheme == autocompleteTheme &&
+          other.resultTheme == resultTheme &&
           other.emptyStateTheme == emptyStateTheme &&
           other.segmentedButtonTheme == segmentedButtonTheme &&
           other.textFieldTheme == textFieldTheme &&
@@ -811,6 +868,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.stepIndicatorTheme == stepIndicatorTheme &&
           other.stepperNavigationTheme == stepperNavigationTheme &&
           other.timelineTheme == timelineTheme &&
+          other.descriptionListTheme == descriptionListTheme &&
           other.notificationTheme == notificationTheme &&
           other.alertTheme == alertTheme &&
           other.bannerTheme == bannerTheme &&
@@ -846,13 +904,18 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     drawerTheme,
     sidebarTheme,
     menuTheme,
-    dropdownMenuTheme,
+    selectTheme,
     breadcrumbTheme,
     cardTheme,
     titledCardTheme,
     buttonTheme,
     badgeTheme,
     skeletonTheme,
+    pageIndicatorTheme,
+    treeViewTheme,
+    selectionTheme,
+    autocompleteTheme,
+    resultTheme,
     emptyStateTheme,
     segmentedButtonTheme,
     textFieldTheme,
@@ -867,6 +930,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     stepIndicatorTheme,
     stepperNavigationTheme,
     timelineTheme,
+    descriptionListTheme,
     notificationTheme,
     alertTheme,
     bannerTheme,

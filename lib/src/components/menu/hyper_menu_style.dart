@@ -12,9 +12,11 @@ final class HyperMenuStyle {
     this.itemHeight,
     this.padding,
     this.surfacePadding,
+    this.itemSpacing,
     this.groupSpacing,
     this.itemRadius,
     this.surfaceRadius,
+    this.checkIcon,
     this.iconSize,
     this.iconSpacing,
     this.foregroundColor,
@@ -35,9 +37,15 @@ final class HyperMenuStyle {
 
   /// 菜单表面到菜单项的内边距，独立于菜单项文字内边距。
   final double? surfacePadding;
+
+  /// 同组相邻菜单项之间的间距。
+  final double? itemSpacing;
   final double? groupSpacing;
   final double? itemRadius;
   final double? surfaceRadius;
+
+  /// 选中项的标记图标。
+  final IconData? checkIcon;
   final double? iconSize;
   final double? iconSpacing;
   final Color? foregroundColor;
@@ -56,9 +64,11 @@ final class HyperMenuStyle {
     double? itemHeight,
     double? padding,
     double? surfacePadding,
+    double? itemSpacing,
     double? groupSpacing,
     double? itemRadius,
     double? surfaceRadius,
+    IconData? checkIcon,
     double? iconSize,
     double? iconSpacing,
     Color? foregroundColor,
@@ -76,9 +86,11 @@ final class HyperMenuStyle {
     itemHeight: itemHeight ?? this.itemHeight,
     padding: padding ?? this.padding,
     surfacePadding: surfacePadding ?? this.surfacePadding,
+    itemSpacing: itemSpacing ?? this.itemSpacing,
     groupSpacing: groupSpacing ?? this.groupSpacing,
     itemRadius: itemRadius ?? this.itemRadius,
     surfaceRadius: surfaceRadius ?? this.surfaceRadius,
+    checkIcon: checkIcon ?? this.checkIcon,
     iconSize: iconSize ?? this.iconSize,
     iconSpacing: iconSpacing ?? this.iconSpacing,
     foregroundColor: foregroundColor ?? this.foregroundColor,
@@ -103,9 +115,11 @@ final class HyperMenuStyle {
       itemHeight: other.itemHeight ?? itemHeight,
       padding: other.padding ?? padding,
       surfacePadding: other.surfacePadding ?? surfacePadding,
+      itemSpacing: other.itemSpacing ?? itemSpacing,
       groupSpacing: other.groupSpacing ?? groupSpacing,
       itemRadius: other.itemRadius ?? itemRadius,
       surfaceRadius: other.surfaceRadius ?? surfaceRadius,
+      checkIcon: other.checkIcon ?? checkIcon,
       iconSize: other.iconSize ?? iconSize,
       iconSpacing: other.iconSpacing ?? iconSpacing,
       foregroundColor: other.foregroundColor ?? foregroundColor,
@@ -135,9 +149,11 @@ final class HyperMenuStyle {
       itemHeight: number(a.itemHeight, b.itemHeight),
       padding: number(a.padding, b.padding),
       surfacePadding: number(a.surfacePadding, b.surfacePadding),
+      itemSpacing: number(a.itemSpacing, b.itemSpacing),
       groupSpacing: number(a.groupSpacing, b.groupSpacing),
       itemRadius: number(a.itemRadius, b.itemRadius),
       surfaceRadius: number(a.surfaceRadius, b.surfaceRadius),
+      checkIcon: discrete(a.checkIcon, b.checkIcon),
       iconSize: number(a.iconSize, b.iconSize),
       iconSpacing: number(a.iconSpacing, b.iconSpacing),
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
@@ -177,9 +193,11 @@ final class HyperMenuStyle {
       other.itemHeight == itemHeight &&
       other.padding == padding &&
       other.surfacePadding == surfacePadding &&
+      other.itemSpacing == itemSpacing &&
       other.groupSpacing == groupSpacing &&
       other.itemRadius == itemRadius &&
       other.surfaceRadius == surfaceRadius &&
+      other.checkIcon == checkIcon &&
       other.iconSize == iconSize &&
       other.iconSpacing == iconSpacing &&
       other.foregroundColor == foregroundColor &&
@@ -199,9 +217,11 @@ final class HyperMenuStyle {
     itemHeight,
     padding,
     surfacePadding,
+    itemSpacing,
     groupSpacing,
     itemRadius,
     surfaceRadius,
+    checkIcon,
     iconSize,
     iconSpacing,
     foregroundColor,

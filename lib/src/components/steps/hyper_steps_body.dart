@@ -91,7 +91,7 @@ class HyperStepsBody extends StatelessWidget {
             errorIcon: Icons.close,
             interactionRadius: BorderRadius.circular(metrics.interactionRadius),
             overlayColor: theme.colors.stateLayer,
-            hoverOpacity: .06,
+            hoverOpacity: 0,
             focusOpacity: .06,
             pressedOpacity: .10,
             duration: theme.motion.fastDuration,
@@ -103,6 +103,10 @@ class HyperStepsBody extends StatelessWidget {
     }
 
     final resolved = [for (var i = 0; i < model.items.length; i++) resolve(i)];
+    final railWidth = resolved.fold<double>(
+      0,
+      (width, step) => width > step.nodeSize! ? width : step.nodeSize!,
+    );
     Widget line(int owner, {bool visible = true, bool vertical = false}) {
       final s = resolved[owner];
       return AnimatedContainer(
@@ -235,23 +239,32 @@ class HyperStepsBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
-                width: s.nodeSize,
-                child: Column(
-                  children: [
-                    marker,
-                    SizedBox(
-                      height: index < model.items.length - 1 ? s.spacing : 0,
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: line(
-                          index,
-                          vertical: true,
-                          visible: index < model.items.length - 1,
+                width: railWidth,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: index < model.items.length - 1
+                        ? s.nodeSize! +
+                              s.spacing! +
+                              resolved[index + 1].spacing! +
+                              s.itemSpacing!
+                        : s.nodeSize!,
+                  ),
+                  child: Column(
+                    children: [
+                      marker,
+                      if (index < model.items.length - 1) ...[
+                        SizedBox(height: s.spacing),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              bottom: resolved[index + 1].spacing!,
+                            ),
+                            child: Center(child: line(index, vertical: true)),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    ],
+                  ),
                 ),
               ),
               SizedBox(width: s.spacing),
@@ -262,11 +275,17 @@ class HyperStepsBody extends StatelessWidget {
                         ? 0
                         : s.itemSpacing!,
                   ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: s.nodeSize!),
-                    child: Align(
-                      alignment: AlignmentDirectional.topStart,
-                      child: text,
+                  child: Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: s.nodeSize!),
+                      child: Align(
+                        heightFactor: 1,
+                        alignment: item.description == null
+                            ? AlignmentDirectional.centerStart
+                            : AlignmentDirectional.topStart,
+                        child: text,
+                      ),
                     ),
                   ),
                 ),

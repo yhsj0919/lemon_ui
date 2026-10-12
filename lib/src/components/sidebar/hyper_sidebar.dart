@@ -164,7 +164,8 @@ class _HyperSidebarState extends State<HyperSidebar> {
       itemHeight: metrics.itemHeight,
       iconSize: metrics.iconSize,
       itemSpacing: metrics.itemSpacing,
-      rowGap: metrics.rowGap,
+      rowGap:
+          metrics.rowGap ?? HyperTheme.sizesOf(context).navigationItemSpacing,
       indent: metrics.indent,
       sectionSpacing: metrics.sectionSpacing,
       horizontalPadding: metrics.horizontalPadding,

@@ -167,16 +167,19 @@ HyperSwitchListTile(
 HyperPopupListTile<String>(
   title: const Text('显示模式'),
   options: const [
-    HyperDropdownOption(value: 'auto', label: '自动'),
-    HyperDropdownOption(value: 'light', label: '浅色'),
+    HyperSelectOption(value: 'auto', label: '自动'),
+    HyperSelectOption(value: 'light', label: '浅色'),
   ],
   value: 'auto',
   onChanged: (value) {},
 )
 ~~~
 
-使用 HyperDropdownOption<T>；placeholder 显示空值提示。
+使用 HyperSelectOption<T>；placeholder 显示空值提示。
 弹出位置跟随行内部上下箭头锚点；minPopupWidth/maxPopupWidth 限制自适应宽度。
 style 管理列表行，menuStyle 管理菜单，transitionBuilder 替换展开效果。
 对应四端弹出行尺寸在 HyperSizeScheme.popupListTile。
 [源码](../../lib/src/components/list_tile/hyper_popup_list_tile.dart)。
+## 菜单项间距
+
+菜单、Sidebar 与树的基础行间距统一继承各端 HyperSizeScheme.navigationItemSpacing，默认 4 个 Flutter 逻辑像素（用户确认的项目规格）。menu.itemSpacing、sidebar.rowGap、treeView.rowSpacing 默认为 null 表示继承，尺寸 copyWith 或各自实例 Style 可覆盖；0 表示紧贴。Sidebar.itemSpacing 仍只表示内部图标/文字间距。菜单仅在同组项目之间添加间隔，首尾不额外留白，分组仍使用 groupSpacing。下拉、右键菜单和子菜单复用同一菜单布局。

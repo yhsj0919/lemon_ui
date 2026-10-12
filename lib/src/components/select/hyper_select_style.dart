@@ -1,9 +1,12 @@
+import '../select/hyper_selection_style.dart';
+
 import 'package:flutter/material.dart';
 
 /// 下拉选择器自身的尺寸和视觉覆盖；空字段继续继承。
 @immutable
-final class HyperDropdownMenuStyle {
-  const HyperDropdownMenuStyle({
+final class HyperSelectStyle {
+  const HyperSelectStyle({
+    this.selectionStyle,
     this.width,
     this.arrowSize,
     this.arrowSpacing,
@@ -14,6 +17,7 @@ final class HyperDropdownMenuStyle {
     this.selectedBackgroundColor,
   });
 
+  final HyperSelectionStyle? selectionStyle;
   final double? width;
   final double? arrowSize;
   final double? arrowSpacing;
@@ -23,7 +27,8 @@ final class HyperDropdownMenuStyle {
   final Color? disabledArrowColor;
   final Color? selectedBackgroundColor;
 
-  HyperDropdownMenuStyle copyWith({
+  HyperSelectStyle copyWith({
+    HyperSelectionStyle? selectionStyle,
     double? width,
     double? arrowSize,
     double? arrowSpacing,
@@ -33,7 +38,8 @@ final class HyperDropdownMenuStyle {
     Color? disabledArrowColor,
     Color? selectedBackgroundColor,
   }) => merge(
-    HyperDropdownMenuStyle(
+    HyperSelectStyle(
+      selectionStyle: selectionStyle,
       width: width,
       arrowSize: arrowSize,
       arrowSpacing: arrowSpacing,
@@ -45,9 +51,12 @@ final class HyperDropdownMenuStyle {
     ),
   );
 
-  HyperDropdownMenuStyle merge(HyperDropdownMenuStyle? other) => other == null
+  HyperSelectStyle merge(HyperSelectStyle? other) => other == null
       ? this
-      : HyperDropdownMenuStyle(
+      : HyperSelectStyle(
+          selectionStyle:
+              selectionStyle?.merge(other.selectionStyle) ??
+              other.selectionStyle,
           width: other.width ?? width,
           arrowSize: other.arrowSize ?? arrowSize,
           arrowSpacing: other.arrowSpacing ?? arrowSpacing,
@@ -59,14 +68,17 @@ final class HyperDropdownMenuStyle {
               other.selectedBackgroundColor ?? selectedBackgroundColor,
         );
 
-  static HyperDropdownMenuStyle lerp(
-    HyperDropdownMenuStyle a,
-    HyperDropdownMenuStyle b,
+  static HyperSelectStyle lerp(
+    HyperSelectStyle a,
+    HyperSelectStyle b,
     double t,
   ) {
     double? number(double? x, double? y) =>
         x == null || y == null ? (t < .5 ? x : y) : x + (y - x) * t;
-    return HyperDropdownMenuStyle(
+    return HyperSelectStyle(
+      selectionStyle: a.selectionStyle == null || b.selectionStyle == null
+          ? (t < .5 ? a.selectionStyle : b.selectionStyle)
+          : HyperSelectionStyle.lerp(a.selectionStyle!, b.selectionStyle!, t),
       width: number(a.width, b.width),
       arrowSize: number(a.arrowSize, b.arrowSize),
       arrowSpacing: number(a.arrowSpacing, b.arrowSpacing),
@@ -88,7 +100,8 @@ final class HyperDropdownMenuStyle {
 
   @override
   bool operator ==(Object other) =>
-      other is HyperDropdownMenuStyle &&
+      other is HyperSelectStyle &&
+      other.selectionStyle == selectionStyle &&
       other.width == width &&
       other.arrowSize == arrowSize &&
       other.arrowSpacing == arrowSpacing &&
@@ -100,6 +113,7 @@ final class HyperDropdownMenuStyle {
 
   @override
   int get hashCode => Object.hash(
+    selectionStyle,
     width,
     arrowSize,
     arrowSpacing,

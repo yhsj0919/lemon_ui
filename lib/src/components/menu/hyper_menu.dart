@@ -4,16 +4,20 @@ import 'package:flutter/services.dart';
 import '../../foundation/hyper_control_state.dart';
 import '../../interaction/hyper_pressable.dart';
 import '../../theme/core/hyper_theme.dart';
-import '../../theme/material/hyper_material_theme.dart';
 import '../../theme/motion/hyper_motion_theme.dart';
 import '../card/hyper_card.dart';
-import '../card/hyper_card_style.dart';
-import '../card/hyper_card_theme.dart';
 import '../overlay/hyper_anchored_overlay.dart';
-import '../overlay/hyper_overlay_material.dart';
+import 'hyper_menu_surface.dart';
 import 'hyper_menu_model.dart';
 import 'hyper_menu_style.dart';
 import 'hyper_menu_theme.dart';
+
+/// 将菜单键盘导航交给外部编辑器，同时保留编辑器焦点。
+class HyperMenuNavigationController {
+  KeyEventResult Function(KeyEvent)? _handle;
+  KeyEventResult handleKeyEvent(KeyEvent event) =>
+      _handle?.call(event) ?? KeyEventResult.ignored;
+}
 
 /// 弹出菜单内容；可放入 [HyperAnchoredOverlay] 等浮层中。
 ///
@@ -24,27 +28,38 @@ class HyperMenu extends StatefulWidget {
     this.items = const [],
     this.groups = const [],
     this.selectedId,
+    this.selectedIds = const {},
     this.onSelected,
     this.style,
-  }) : _onBack = null,
-       _requestFocusOnOpen = true;
+    this.requestFocusOnOpen = true,
+    this.navigationController,
+    this.showSurface = true,
+  }) : _onBack = null;
 
   const HyperMenu._submenu(
     this._onBack,
-    this._requestFocusOnOpen, {
+    this.requestFocusOnOpen, {
     required this.items,
     required this.selectedId,
     required this.onSelected,
     required this.style,
-  }) : groups = const [];
+  }) : groups = const [],
+       selectedIds = const {},
+       showSurface = true,
+       navigationController = null;
 
   final List<HyperMenuItem> items;
   final List<HyperMenuGroup> groups;
   final String? selectedId;
+  final Set<String> selectedIds;
   final ValueChanged<String>? onSelected;
   final HyperMenuStyle? style;
   final VoidCallback? _onBack;
-  final bool _requestFocusOnOpen;
+  final bool requestFocusOnOpen;
+  final HyperMenuNavigationController? navigationController;
+
+  /// 嵌入已有面板时只绘制菜单内容，由父级负责表面和外层内边距。
+  final bool showSurface;
 
   @override
   State<HyperMenu> createState() => _HyperMenuState();
@@ -72,14 +87,19 @@ class _HyperMenuState extends State<HyperMenu> {
   @override
   void initState() {
     super.initState();
+    widget.navigationController?._handle = _forwardKey;
     _activeId = _initialActiveId();
-    if (widget._requestFocusOnOpen) _requestMenuFocus();
+    if (widget.requestFocusOnOpen) _requestMenuFocus();
   }
 
   @override
   void didUpdateWidget(HyperMenu oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget._requestFocusOnOpen && widget._requestFocusOnOpen) {
+    if (oldWidget.navigationController != widget.navigationController) {
+      oldWidget.navigationController?._handle = null;
+      widget.navigationController?._handle = _forwardKey;
+    }
+    if (!oldWidget.requestFocusOnOpen && widget.requestFocusOnOpen) {
       _requestMenuFocus();
     }
     if (!_enabledItems.any((item) => item.id == _activeId)) {
@@ -89,12 +109,15 @@ class _HyperMenuState extends State<HyperMenu> {
 
   void _requestMenuFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget._requestFocusOnOpen) _focusNode.requestFocus();
+      if (mounted && widget.requestFocusOnOpen) _focusNode.requestFocus();
     });
   }
 
   @override
   void dispose() {
+    if (widget.navigationController?._handle == _forwardKey) {
+      widget.navigationController?._handle = null;
+    }
     for (final node in _itemFocusNodes.values) {
       node.dispose();
     }
@@ -103,7 +126,9 @@ class _HyperMenuState extends State<HyperMenu> {
   }
 
   bool _containsSelected(HyperMenuItem item) =>
-      item.id == widget.selectedId || item.children.any(_containsSelected);
+      item.id == widget.selectedId ||
+      widget.selectedIds.contains(item.id) ||
+      item.children.any(_containsSelected);
 
   FocusNode _focusNodeFor(String id) => _itemFocusNodes.putIfAbsent(id, () {
     final node = FocusNode(debugLabel: 'HyperMenuItem $id');
@@ -131,7 +156,9 @@ class _HyperMenuState extends State<HyperMenu> {
       _openSubmenuId = null;
       _keyboardActive = true;
     });
-    _itemFocusNodes[id]?.requestFocus();
+    if (widget.navigationController == null) {
+      _itemFocusNodes[id]?.requestFocus();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final itemContext = _itemKeys[_activeId]?.currentContext;
@@ -144,7 +171,9 @@ class _HyperMenuState extends State<HyperMenu> {
   void _move(int direction) {
     final enabled = _enabledItems;
     if (enabled.isEmpty) return;
-    if (!_keyboardActive && widget.selectedId == null) {
+    if (!_keyboardActive &&
+        widget.selectedId == null &&
+        widget.selectedIds.isEmpty) {
       _setActive(direction > 0 ? enabled.first.id : enabled.last.id);
       return;
     }
@@ -173,6 +202,8 @@ class _HyperMenuState extends State<HyperMenu> {
       widget.onSelected?.call(item.id);
     }
   }
+
+  KeyEventResult _forwardKey(KeyEvent event) => _onKeyEvent(_focusNode, event);
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
@@ -218,6 +249,9 @@ class _HyperMenuState extends State<HyperMenu> {
       padding: metrics.padding,
       surfacePadding: metrics.padding,
       groupSpacing: metrics.groupSpacing,
+      itemSpacing:
+          metrics.itemSpacing ??
+          HyperTheme.sizesOf(context).navigationItemSpacing,
       itemRadius: metrics.itemRadius,
       surfaceRadius: metrics.surfaceRadius,
       iconSize: metrics.iconSize,
@@ -234,81 +268,62 @@ class _HyperMenuState extends State<HyperMenu> {
         color: theme.colors.textSecondary,
       ),
     ).merge(HyperMenuTheme.of(context).style).merge(widget.style);
-    final cardThemeStyle = HyperCardTheme.of(context).style;
-    final defaultMaterial = HyperOverlayMaterial.fallback(
+    final surfaceStyle = resolveHyperMenuSurface(
       context,
-      componentMaterial: cardThemeStyle?.material,
-      instanceMaterial: style.surfaceStyle?.material,
-      hasExplicitBackground:
-          cardThemeStyle?.background != null ||
-          style.surfaceStyle?.background != null,
-    );
-    final hasMaterial =
-        HyperMaterialTheme.of(context).material != null ||
-        cardThemeStyle?.material != null ||
-        style.surfaceStyle?.material != null ||
-        defaultMaterial != null;
-    final shadow =
-        hasMaterial ||
-            cardThemeStyle?.boxShadow != null ||
-            style.surfaceStyle?.boxShadow != null
-        ? null
-        : [
-            BoxShadow(
-              color: theme.colors.scrim.withValues(alpha: .10),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ];
-    final surfaceStyle = HyperCardStyle(
-      material: defaultMaterial,
+      radius: style.surfaceRadius!,
       padding: EdgeInsets.zero,
-      borderRadius: BorderRadius.circular(style.surfaceRadius!),
-      border: hasMaterial
-          ? null
-          : Border.all(color: theme.colors.outline.withValues(alpha: .65)),
-      boxShadow: shadow,
-    ).merge(style.surfaceStyle);
+      style: style.surfaceStyle,
+    );
     final viewport = MediaQuery.sizeOf(context);
-    return Focus(
-      focusNode: _focusNode,
-      autofocus: widget._requestFocusOnOpen,
-      onKeyEvent: _onKeyEvent,
-      child: HyperCard(
-        width: style.width!.clamp(0.0, viewport.width),
-        style: surfaceStyle,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: style.maxHeight ?? viewport.height,
-          ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(style.surfacePadding!),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final (index, group) in _groups.indexed) ...[
-                  if (index > 0) ...[
-                    SizedBox(height: style.groupSpacing! / 2),
-                    Divider(height: 1, color: theme.colors.outline),
-                    SizedBox(height: style.groupSpacing! / 2),
-                  ],
-                  if (group.title != null)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: style.padding!,
-                        vertical: style.groupSpacing! / 2,
-                      ),
-                      child: Text(group.title!, style: style.groupTitleStyle),
-                    ),
-                  for (final item in group.items)
-                    _buildItem(context, item, style),
-                ],
+    final content = ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: style.maxHeight ?? viewport.height,
+      ),
+      child: SingleChildScrollView(
+        padding: widget.showSurface
+            ? EdgeInsets.all(style.surfacePadding!)
+            : EdgeInsets.zero,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (index, group) in _groups.indexed) ...[
+              if (index > 0) ...[
+                SizedBox(height: style.groupSpacing! / 2),
+                Divider(height: 1, color: theme.colors.outline),
+                SizedBox(height: style.groupSpacing! / 2),
               ],
-            ),
-          ),
+              if (group.title != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: style.padding!,
+                    vertical: style.groupSpacing! / 2,
+                  ),
+                  child: Text(group.title!, style: style.groupTitleStyle),
+                ),
+              for (final (itemIndex, item) in group.items.indexed) ...[
+                if (itemIndex > 0) SizedBox(height: style.itemSpacing!),
+                _buildItem(context, item, style),
+              ],
+            ],
+          ],
         ),
       ),
+    );
+    return Focus(
+      focusNode: _focusNode,
+      autofocus: widget.requestFocusOnOpen,
+      onKeyEvent: _onKeyEvent,
+      child: widget.showSurface
+          ? HyperCard(
+              width: style.width!.clamp(0.0, viewport.width),
+              style: surfaceStyle,
+              child: content,
+            )
+          : SizedBox(
+              width: style.width!.clamp(0.0, viewport.width),
+              child: content,
+            ),
     );
   }
 
@@ -317,7 +332,8 @@ class _HyperMenuState extends State<HyperMenu> {
     HyperMenuItem item,
     HyperMenuStyle style,
   ) {
-    final selected = widget.selectedId == item.id;
+    final selected =
+        widget.selectedId == item.id || widget.selectedIds.contains(item.id);
     final active = item.enabled && _keyboardActive && _activeId == item.id;
     final foreground = !item.enabled
         ? style.disabledColor!
@@ -390,7 +406,11 @@ class _HyperMenuState extends State<HyperMenu> {
                 ],
                 if (selected) ...[
                   SizedBox(width: style.iconSpacing),
-                  Icon(Icons.check, size: style.iconSize, color: foreground),
+                  Icon(
+                    style.checkIcon ?? Icons.check,
+                    size: style.iconSize,
+                    color: foreground,
+                  ),
                 ],
                 if (item.children.isNotEmpty) ...[
                   SizedBox(width: style.iconSpacing),

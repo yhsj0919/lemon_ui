@@ -9,7 +9,7 @@ final class HyperSidebarSize {
     required this.itemHeight,
     required this.iconSize,
     required this.itemSpacing,
-    required this.rowGap,
+    this.rowGap,
     required this.indent,
     required this.sectionSpacing,
     required this.horizontalPadding,
@@ -22,7 +22,7 @@ final class HyperSidebarSize {
   final double itemHeight;
   final double iconSize;
   final double itemSpacing;
-  final double rowGap;
+  final double? rowGap;
   final double indent;
   final double sectionSpacing;
   final double horizontalPadding;
@@ -67,7 +67,9 @@ final class HyperSidebarSize {
       itemHeight: value(a.itemHeight, b.itemHeight),
       iconSize: value(a.iconSize, b.iconSize),
       itemSpacing: value(a.itemSpacing, b.itemSpacing),
-      rowGap: value(a.rowGap, b.rowGap),
+      rowGap: a.rowGap == null || b.rowGap == null
+          ? (t < .5 ? a.rowGap : b.rowGap)
+          : value(a.rowGap!, b.rowGap!),
       indent: value(a.indent, b.indent),
       sectionSpacing: value(a.sectionSpacing, b.sectionSpacing),
       horizontalPadding: value(a.horizontalPadding, b.horizontalPadding),

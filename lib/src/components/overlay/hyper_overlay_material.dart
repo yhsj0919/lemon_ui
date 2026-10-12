@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
 import '../../theme/core/hyper_theme.dart';
+import '../../theme/color/hyper_color_scheme.dart';
 import '../../theme/material/hyper_material_theme.dart';
 
 /// 浮层消费者共用的默认材质；显式配方由原消费者保持完整优先级。
@@ -13,13 +14,29 @@ abstract final class HyperOverlayMaterial {
     HyperSurfaceMaterial? instanceMaterial,
     bool hasExplicitBackground = false,
   }) {
+    return fallbackFor(
+      colors: HyperTheme.of(context).colors,
+      globalMaterial: HyperMaterialTheme.of(context).material,
+      componentMaterial: componentMaterial,
+      instanceMaterial: instanceMaterial,
+      hasExplicitBackground: hasExplicitBackground,
+    );
+  }
+
+  /// 纯配方解析；不另行决定质量或降级策略。
+  static HyperSurfaceMaterial? fallbackFor({
+    required HyperColorScheme colors,
+    HyperSurfaceMaterial? globalMaterial,
+    HyperSurfaceMaterial? componentMaterial,
+    HyperSurfaceMaterial? instanceMaterial,
+    bool hasExplicitBackground = false,
+  }) {
     if (hasExplicitBackground ||
         instanceMaterial != null ||
         componentMaterial != null ||
-        HyperMaterialTheme.of(context).material != null) {
+        globalMaterial != null) {
       return null;
     }
-    final colors = HyperTheme.of(context).colors;
     return HyperSurfaceMaterial.softLightGlass(
       background: HyperFill.color(
         colors.surfaceElevated.withValues(alpha: .72),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../foundation/hyper_surface_material.dart';
 
@@ -13,6 +14,7 @@ final class HyperAppBarStyle {
     this.material,
     this.centerTitle,
     this.elevation,
+    this.systemOverlayStyle,
   });
 
   final Color? backgroundColor;
@@ -24,6 +26,9 @@ final class HyperAppBarStyle {
   /// 收起标题默认居中；设为 false 时按阅读方向在起始侧对齐。
   final bool? centerTitle;
   final double? elevation;
+
+  /// 状态栏与系统导航栏覆盖；默认状态栏透明，图标亮暗跟随顶栏前景。
+  final SystemUiOverlayStyle? systemOverlayStyle;
 
   HyperAppBarStyle merge(HyperAppBarStyle? other) => other == null
       ? this
@@ -39,6 +44,7 @@ final class HyperAppBarStyle {
           material: other.material ?? material,
           centerTitle: other.centerTitle ?? centerTitle,
           elevation: other.elevation ?? elevation,
+          systemOverlayStyle: other.systemOverlayStyle ?? systemOverlayStyle,
         );
 
   HyperAppBarStyle copyWith({
@@ -49,6 +55,7 @@ final class HyperAppBarStyle {
     HyperSurfaceMaterial? material,
     bool? centerTitle,
     double? elevation,
+    SystemUiOverlayStyle? systemOverlayStyle,
   }) => merge(
     HyperAppBarStyle(
       backgroundColor: backgroundColor,
@@ -58,6 +65,7 @@ final class HyperAppBarStyle {
       material: material,
       centerTitle: centerTitle,
       elevation: elevation,
+      systemOverlayStyle: systemOverlayStyle,
     ),
   );
 
@@ -78,6 +86,7 @@ final class HyperAppBarStyle {
         ? (t < .5 ? a.material : b.material)
         : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
     centerTitle: t < .5 ? a.centerTitle : b.centerTitle,
+    systemOverlayStyle: t < .5 ? a.systemOverlayStyle : b.systemOverlayStyle,
     elevation: a.elevation == null || b.elevation == null
         ? (t < .5 ? a.elevation : b.elevation)
         : a.elevation! + (b.elevation! - a.elevation!) * t,
@@ -92,7 +101,8 @@ final class HyperAppBarStyle {
       other.expandedTitleTextStyle == expandedTitleTextStyle &&
       other.material == material &&
       other.centerTitle == centerTitle &&
-      other.elevation == elevation;
+      other.elevation == elevation &&
+      other.systemOverlayStyle == systemOverlayStyle;
 
   @override
   int get hashCode => Object.hash(
@@ -103,5 +113,6 @@ final class HyperAppBarStyle {
     material,
     centerTitle,
     elevation,
+    systemOverlayStyle,
   );
 }

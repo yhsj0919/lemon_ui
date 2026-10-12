@@ -80,9 +80,13 @@ HyperStepperNavigationTheme(
 
 默认横向布局需要有限宽度，各项均分空间，节点顶部对齐，标题与描述自然换行。步骤较多或空间较窄时建议显式使用 Axis.vertical；不根据窗口宽度改变设备类别。纵向布局需要有限宽度，内容高度自然增长；不内置滚动区或表单内容。
 
+纵向连接线两端分别按相邻节点的 spacing 留白，避免线条顶住圆点；末项不绘制出线。整组轨道按最大 nodeSize 分配宽度，各节点与连接线共用中心线，自定义节点尺寸不同时仍保持对齐。
+
+短内容也为连接线预留 itemSpacing 长度，两端留白不会吞掉线段。没有描述的标题在当前节点高度内垂直居中；有描述时文字块顶部对齐，长文字自然增加行高。
+
 尺寸集中在 sizes.stepIndicator / sizes.stepperNavigation。节点可见尺寸与导航触达下限区分。颜色、文字和符号切换有 Motion fast 过渡；transitionBuilder 可替换节点符号切换动画。遵守减少动画设置。
 
-节点材质继承统一 HyperMaterialTheme，显式 Style 可覆盖配方、质量与减少透明度设置；复用 HyperMaterialSurface 渲染与降级。默认没有悬停阴影。
+节点材质继承统一 HyperMaterialTheme，显式 Style 可覆盖配方、质量与减少透明度设置；复用 HyperMaterialSurface 渲染与降级。默认没有鼠标悬浮背景或阴影（hoverOpacity 为 0）；按下与键盘焦点反馈分别由 pressedOpacity、focusOpacity 配置。
 
 默认视觉是同端既有语义规格的 D 级推导，未运行设备、Widget 或截图对照验证。
 

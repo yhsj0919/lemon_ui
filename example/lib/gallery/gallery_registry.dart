@@ -1,6 +1,11 @@
+import '../pages/content/hyper_description_list_page.dart';
+import '../pages/selection/hyper_select_fields_page.dart';
+import '../pages/content/hyper_result_page.dart';
+import '../pages/content/hyper_tree_view_page.dart';
 import '../pages/content/hyper_timeline_page.dart';
 import '../pages/framework/hyper_steps_page.dart';
 import '../pages/framework/hyper_pagination_page.dart';
+import '../pages/framework/hyper_page_indicator_page.dart';
 import '../pages/container/hyper_collapsible_page.dart';
 import '../pages/feedback/hyper_notification_center_page.dart';
 import '../pages/feedback/hyper_notification_page.dart';
@@ -54,7 +59,6 @@ import '../pages/selection/hyper_slider_page.dart';
 import '../pages/selection/hyper_chip_page.dart';
 import '../pages/selection/hyper_checkbox_page.dart';
 import '../pages/selection/hyper_radio_page.dart';
-import '../pages/selection/hyper_dropdown_menu_page.dart';
 import 'gallery_item.dart';
 
 /// Example 中所有演示页的唯一注册入口。
@@ -200,6 +204,27 @@ final List<GallerySection> gallerySections = [
     title: '文字与内容',
     items: [
       GalleryItem(
+        id: 'hyper-tree-view',
+        title: 'HyperTreeView',
+        description: '静态树、动态子节点、加载重试与缓存。',
+        icon: Icons.account_tree_outlined,
+        builder: (_) => const HyperTreeViewPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-result',
+        title: 'HyperResult',
+        description: '操作结果、状态、自定义插图和操作区。',
+        icon: Icons.task_alt,
+        builder: (_) => const HyperResultPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-description-list',
+        title: 'HyperDescriptionList',
+        description: '键值、多列与跨列、表格边框和自定义内容。',
+        icon: Icons.list_alt,
+        builder: (_) => const HyperDescriptionListPage(),
+      ),
+      GalleryItem(
         id: 'hyper-timeline',
         title: 'HyperTimeline',
         description: '时间记录、交错布局与自定义节点。',
@@ -292,11 +317,11 @@ final List<GallerySection> gallerySections = [
     title: '选择控件',
     items: [
       GalleryItem(
-        id: 'hyper-dropdown-menu',
-        title: 'HyperDropdownMenu',
-        description: '单选、禁用选项、键盘操作与受控值。',
-        icon: Icons.arrow_drop_down_circle_outlined,
-        builder: (_) => const HyperDropdownMenuPage(),
+        id: 'hyper-select-fields',
+        title: 'HyperSelect / HyperAutocomplete',
+        description: '搜索、多选、异步分页与多种弹出方式。',
+        icon: Icons.manage_search,
+        builder: (_) => const HyperSelectFieldsPage(),
       ),
       GalleryItem(
         id: 'hyper-checkbox',
@@ -479,6 +504,13 @@ final List<GallerySection> gallerySections = [
         description: '受控页码、省略号与首尾导航。',
         icon: Icons.more_horiz,
         builder: (_) => const HyperPaginationPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-page-indicator',
+        title: 'HyperPageIndicator',
+        description: '圆点、数字与 PageView 受控联动。',
+        icon: Icons.more_horiz,
+        builder: (_) => const HyperPageIndicatorPage(),
       ),
       GalleryItem(
         id: 'hyper-breadcrumb',

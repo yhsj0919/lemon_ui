@@ -174,14 +174,15 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
                     }),
                     value: _selectedLogLevel,
                     options: const [
-                      HyperDropdownOption(value: 'detail', label: '详细'),
-                      HyperDropdownOption(value: 'debug', label: '调试'),
-                      HyperDropdownOption(value: 'info', label: '信息'),
-                      HyperDropdownOption(value: 'warning', label: '警告'),
-                      HyperDropdownOption(value: 'error', label: '错误'),
+                      HyperSelectOption(value: 'detail', label: '详细'),
+                      HyperSelectOption(value: 'debug', label: '调试'),
+                      HyperSelectOption(value: 'info', label: '信息'),
+                      HyperSelectOption(value: 'warning', label: '警告'),
+                      HyperSelectOption(value: 'error', label: '错误'),
                     ],
-                    onChanged: (value) =>
-                        setState(() => _selectedLogLevel = value),
+                    onChanged: (value) => setState(
+                      () => _selectedLogLevel = value ?? _selectedLogLevel,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),

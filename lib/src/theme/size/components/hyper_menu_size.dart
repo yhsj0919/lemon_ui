@@ -7,6 +7,7 @@ final class HyperMenuSize {
     required this.width,
     required this.itemHeight,
     required this.padding,
+    this.itemSpacing,
     required this.groupSpacing,
     required this.iconSize,
     required this.iconSpacing,
@@ -17,6 +18,7 @@ final class HyperMenuSize {
   final double width;
   final double itemHeight;
   final double padding;
+  final double? itemSpacing;
   final double groupSpacing;
   final double iconSize;
   final double iconSpacing;
@@ -29,6 +31,7 @@ final class HyperMenuSize {
     double? width,
     double? itemHeight,
     double? padding,
+    double? itemSpacing,
     double? groupSpacing,
     double? iconSize,
     double? iconSpacing,
@@ -38,6 +41,7 @@ final class HyperMenuSize {
     width: width ?? this.width,
     itemHeight: itemHeight ?? this.itemHeight,
     padding: padding ?? this.padding,
+    itemSpacing: itemSpacing ?? this.itemSpacing,
     groupSpacing: groupSpacing ?? this.groupSpacing,
     iconSize: iconSize ?? this.iconSize,
     iconSpacing: iconSpacing ?? this.iconSpacing,
@@ -51,6 +55,9 @@ final class HyperMenuSize {
       width: value(a.width, b.width),
       itemHeight: value(a.itemHeight, b.itemHeight),
       padding: value(a.padding, b.padding),
+      itemSpacing: a.itemSpacing == null || b.itemSpacing == null
+          ? (t < .5 ? a.itemSpacing : b.itemSpacing)
+          : value(a.itemSpacing!, b.itemSpacing!),
       groupSpacing: value(a.groupSpacing, b.groupSpacing),
       iconSize: value(a.iconSize, b.iconSize),
       iconSpacing: value(a.iconSpacing, b.iconSpacing),
@@ -65,6 +72,7 @@ final class HyperMenuSize {
       other.width == width &&
       other.itemHeight == itemHeight &&
       other.padding == padding &&
+      other.itemSpacing == itemSpacing &&
       other.groupSpacing == groupSpacing &&
       other.iconSize == iconSize &&
       other.iconSpacing == iconSpacing &&
@@ -76,6 +84,7 @@ final class HyperMenuSize {
     width,
     itemHeight,
     padding,
+    itemSpacing,
     groupSpacing,
     iconSize,
     iconSpacing,

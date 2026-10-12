@@ -51,6 +51,40 @@ CustomScrollView(
 
 全局 appBarTheme、局部 HyperAppBarTheme、实例 HyperAppBarStyle 共用视觉配置；
 Sliver 变体通过 HyperAppBarVariant 选择。
+
+### 状态栏与顶部安全区
+
+页面顶层的 AppBar/SliverAppBar 自己处理顶部状态栏安全区。放在 body 内的
+CustomScrollView/NestedScrollView，不要再用默认 SafeArea 包住整条顶栏：这会
+提前移除顶部 padding，使材质背景画不到状态栏后方。需要避让左右和底部时使用：
+
+~~~dart
+HyperScaffold(
+  body: SafeArea(
+    top: false,
+    child: CustomScrollView(
+      slivers: const [
+        HyperSliverAppBar(title: Text('设置')),
+        SliverToBoxAdapter(child: Text('内容')),
+      ],
+    ),
+  ),
+)
+~~~
+
+并排侧栏应单独使用 SafeArea，不应连带移除顶栏所在列的顶部安全区。
+固定和滚动顶栏默认设置透明状态栏，状态栏图标亮暗跟随顶栏前景；材质仍由
+顶栏的同一个 flexibleSpace 绘制，不另建状态栏材质层。medium/large 展开时
+保持原有透明行为，完全收起后材质连同顶部状态栏区域一起显示。
+
+可通过全局/局部 AppBar 主题或实例 HyperAppBarStyle.systemOverlayStyle
+覆盖系统栏配置；缺省时保留 Material AppBarTheme 的显式配置。
+只覆盖部分字段时，其他状态栏字段继续使用透明及前景亮暗默认值。
+系统导航栏只在显式配置时覆盖。Android 边到边模式下，系统可能忽略
+statusBarColor，应依靠状态栏后方的 Flutter 表面显示背景。
+
+本次验证为静态分析和纯数据测试，未运行手机、Widget 或截图对照。
+
 [固定顶栏](../../lib/src/components/app_bar/hyper_app_bar.dart) ·
 [滚动顶栏](../../lib/src/components/app_bar/hyper_sliver_app_bar.dart)。
 

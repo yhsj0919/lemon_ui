@@ -1,3 +1,6 @@
+import '../../painting/hyper_box_decoration.dart';
+import '../../foundation/hyper_fill.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -34,7 +37,8 @@ class HyperTag extends StatelessWidget {
     final resolved = tagTheme.style
         .merge(variantStyle)
         .merge(enabled ? null : tagTheme.disabled)
-        .merge(style);
+        .merge(style)
+        .resolvePalette(theme.colors, theme.contrastTheme);
     final colors = theme.colors;
     final background =
         resolved.backgroundColor ??
@@ -43,6 +47,7 @@ class HyperTag extends StatelessWidget {
             : variant == HyperTagVariant.emphasized
             ? colors.primaryContainer
             : colors.surfaceMuted);
+    final fill = resolved.background ?? HyperFill.color(background);
     final foreground =
         resolved.foregroundColor ??
         (!enabled
@@ -73,17 +78,20 @@ class HyperTag extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             horizontal: resolved.horizontalPadding ?? metrics.horizontalPadding,
           ),
-          decoration: BoxDecoration(
-            color: background,
+          decoration: HyperBoxDecoration(
+            color: fill.color,
+            gradient: fill.gradient,
             borderRadius: BorderRadius.circular(
               resolved.radius ?? metrics.radius,
             ),
-            border: (resolved.borderWidth ?? 0) > 0
-                ? Border.all(
-                    color: resolved.borderColor ?? colors.outline,
-                    width: resolved.borderWidth!,
-                  )
-                : null,
+            border:
+                resolved.boxBorder ??
+                ((resolved.borderWidth ?? 0) > 0
+                    ? Border.all(
+                        color: resolved.borderColor ?? colors.outline,
+                        width: resolved.borderWidth!,
+                      )
+                    : null),
             boxShadow: resolved.boxShadow,
           ),
           child: Row(

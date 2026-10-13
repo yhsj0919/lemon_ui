@@ -1,3 +1,7 @@
+import '../../foundation/hyper_fill.dart';
+import '../text_field/hyper_text_field_theme.dart';
+import '../chip/hyper_chip_style.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -88,6 +92,12 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
   final _navigation = HyperMenuNavigationController();
   Timer? _debounce;
   bool _open = false, _writing = false, _modal = false;
+  bool _selectingWithKeyboard = false;
+  bool _triggerHovered = false, _triggerPressed = false;
+  String _lastSearchText = '';
+  TextRange _lastSearchComposing = TextRange.empty;
+  String _lastInputText = '';
+  TextRange _lastInputComposing = TextRange.empty;
   VoidCallback? _closeModal;
   HyperSelectionStyle _resolved = const HyperSelectionStyle();
   bool get _enabled => widget.enabled && widget.onChanged != null;
@@ -185,10 +195,24 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
 
   String get _query => widget.autocomplete ? _input.text : _search.text;
   void _inputChanged() {
+    final value = _input.value;
+    if (value.text == _lastInputText &&
+        value.composing == _lastInputComposing) {
+      return;
+    }
+    _lastInputText = value.text;
+    _lastInputComposing = value.composing;
     if (!_writing && widget.autocomplete) _changed(_input);
   }
 
   void _searchChanged() {
+    final value = _search.value;
+    if (value.text == _lastSearchText &&
+        value.composing == _lastSearchComposing) {
+      return;
+    }
+    _lastSearchText = value.text;
+    _lastSearchComposing = value.composing;
     if (!_writing && !widget.autocomplete) _changed(_search);
   }
 
@@ -272,9 +296,12 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
   }
 
   void _close({bool restoreFocus = false}) {
+    if (!_open) return;
     _debounce?.cancel();
     _closeModal?.call();
     _closeModal = null;
+    if (_searchFocus.hasFocus) _searchFocus.unfocus();
+    if (_modalFocus.hasFocus) _modalFocus.unfocus();
     if (mounted) setState(() => _open = false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_open) {
@@ -310,11 +337,7 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
       (_modal ? _modalFocus : _focus).requestFocus();
     }
     if (!widget.multiple) {
-      _close(
-        restoreFocus:
-            FocusManager.instance.highlightMode ==
-            FocusHighlightMode.traditional,
-      );
+      _close(restoreFocus: _selectingWithKeyboard);
     }
   }
 
@@ -326,76 +349,177 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
   }
 
   // 紧凑摘要不加入额外 Tab 停靠点；完整面板提供可聚焦的删除操作。
-  Widget _tags() => ExcludeFocus(
-    child: HyperSelectionTags(
-      tags: [
-        for (final value in widget.values)
-          HyperChip.input(
-            label: _label(value),
-            enabled: _enabled && _labels[value]?.enabled != false,
-            onDeleted: () => _remove(value),
-            deleteIcon: Icon(_resolved.clearIcon ?? Icons.close),
-            style: _resolved.chipStyle,
-          ),
-      ],
-      overflowBuilder: (count) => HyperChip.action(
-        label: '+$count',
-        onPressed: _show,
-        style: _resolved.chipStyle,
+  Widget _tags() {
+    final sizes = HyperTheme.sizesOf(context);
+    // Select 与 Autocomplete 共用表单内容区规格，不按宿主分别压缩标签。
+    final availableHeight =
+        sizes.textField.minimumHeight - sizes.textField.verticalPadding * 2;
+    final chipStyle = HyperChipStyle(
+      height: math.min(sizes.chip.height, math.max(0, availableHeight)),
+      minimumTapTargetSize: 0,
+    ).merge(_resolved.chipStyle);
+    final painter = TextPainter(
+      text: TextSpan(
+        text: widget.values.isEmpty
+            ? ''
+            : '${(_label(widget.values.first).characters.firstOrNull ?? '')}…',
+        style:
+            (HyperTheme.of(context).textTheme.labelMedium ?? const TextStyle())
+                .copyWith(height: 1)
+                .merge(chipStyle.textStyle),
       ),
-      spacing:
-          _resolved.chipSpacing ??
-          HyperTheme.sizesOf(context).selection.chipSpacing,
-      direction: Directionality.of(context),
-    ),
-  );
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final minimumTagWidth =
+        painter.width +
+        (chipStyle.horizontalPadding ?? sizes.chip.horizontalPadding) * 2 +
+        (chipStyle.deleteTargetWidth ?? sizes.chip.deleteTargetWidth);
+    painter.dispose();
+    return ExcludeFocus(
+      child: HyperSelectionTags(
+        minimumTagWidth: minimumTagWidth,
+        tags: [
+          for (final value in widget.values)
+            HyperChip.input(
+              label: _label(value),
+              enabled: _enabled && _labels[value]?.enabled != false,
+              onDeleted: () => _remove(value),
+              deleteIcon: Icon(_resolved.clearIcon ?? Icons.close),
+              style: chipStyle,
+            ),
+        ],
+        overflowBuilder: (count) => HyperChip.action(
+          label: '+$count',
+          onPressed: _show,
+          style: chipStyle,
+        ),
+        spacing:
+            _resolved.chipSpacing ??
+            HyperTheme.sizesOf(context).selection.chipSpacing,
+        direction: Directionality.of(context),
+      ),
+    );
+  }
+
+  HyperTextFieldThemeData _autocompleteTriggerTheme(BuildContext context) {
+    final button = HyperSelectTheme.of(context).style?.buttonStyle;
+    return HyperTextFieldThemeData(
+      style: HyperTextFieldStyle(
+        boxShadow: _triggerPressed
+            ? button?.pressedBoxShadow ?? button?.boxShadow
+            : button?.boxShadow,
+      ),
+      hovered: HyperTextFieldStyle(
+        boxShadow: _triggerPressed
+            ? button?.pressedBoxShadow
+            : button?.hoveredBoxShadow,
+      ),
+      focused: HyperTextFieldStyle(
+        boxShadow: _triggerPressed
+            ? button?.pressedBoxShadow
+            : button?.focusedBoxShadow,
+      ),
+      disabled: HyperTextFieldStyle(
+        background: button?.disabledBackground,
+        foregroundColor: button?.disabledForegroundColor,
+        boxShadow: button?.disabledBoxShadow,
+      ),
+    );
+  }
+
   Widget _editor({required bool modal}) => LayoutBuilder(
-    builder: (context, constraints) => HyperTextField(
-      controller: widget.autocomplete ? _input : _search,
-      focusNode: modal
-          ? _modalFocus
-          : widget.autocomplete
-          ? _focus
-          : _searchFocus,
-      autofocus: modal || !widget.autocomplete,
-      leading:
-          !modal &&
-              widget.autocomplete &&
-              widget.multiple &&
-              widget.values.isNotEmpty
-          ? SizedBox(
-              width: math.max(
-                0,
-                constraints.maxWidth -
-                    (_resolved.minimumInputWidth ??
-                        HyperTheme.sizesOf(context)
-                            .selection
-                            .minimumInputWidth) -
-                    HyperTheme.sizesOf(context).textField.horizontalPadding * 2,
-              ),
-              child: _tags(),
-            )
-          : null,
-      enabled: _enabled,
-      hintText: widget.autocomplete && !modal
-          ? widget.placeholder
-          : (_resolved.searchHint ?? '搜索'),
-      style: widget.autocomplete
-          ? _resolved.inputStyle?.merge(widget.inputStyle) ?? widget.inputStyle
-          : _resolved.searchStyle,
-      onTap: !modal ? _show : null,
-      onSubmitted: widget.createValue == null
-          ? null
-          : (text) {
-              if (text.trim().isNotEmpty) {
-                _select(
-                  HyperSelectOption(
-                    value: widget.createValue!(text.trim()),
-                    label: text.trim(),
-                  ),
-                );
-              }
-            },
+    builder: (context, constraints) => HyperTextFieldTheme(
+      data: widget.autocomplete && !modal
+          ? _autocompleteTriggerTheme(context)
+          : const HyperTextFieldThemeData(),
+      child: HyperTextField(
+        controller: widget.autocomplete ? _input : _search,
+        focusNode: modal
+            ? _modalFocus
+            : widget.autocomplete
+            ? _focus
+            : _searchFocus,
+        autofocus: modal || !widget.autocomplete,
+        leading:
+            !modal &&
+                widget.autocomplete &&
+                widget.multiple &&
+                widget.values.isNotEmpty
+            ? SizedBox(
+                width: math.max(
+                  0,
+                  constraints.maxWidth -
+                      (_resolved.minimumInputWidth ??
+                          HyperTheme.sizesOf(context)
+                              .selection
+                              .minimumInputWidth) -
+                      HyperTheme.sizesOf(context).textField.horizontalPadding *
+                          2,
+                ),
+                child: _tags(),
+              )
+            : null,
+        enabled: _enabled,
+        hintText: widget.autocomplete && !modal
+            ? widget.placeholder
+            : (_resolved.searchHint ?? '搜索'),
+        style: widget.autocomplete
+            ? HyperTextFieldStyle(
+                borderRadius:
+                    !modal && HyperTheme.sizesOf(context).select.radius != null
+                    ? BorderRadius.circular(
+                        HyperTheme.sizesOf(context).select.radius!,
+                      )
+                    : null,
+                background:
+                    HyperTextFieldTheme.of(context).style.background ??
+                    HyperFill.color(HyperTheme.of(context).colors.surface),
+                height:
+                    HyperTextFieldTheme.of(context).style.height ??
+                    HyperTheme.sizesOf(context).select.minimumHeight ??
+                    HyperTheme.sizesOf(context).textField.minimumHeight,
+                padding:
+                    !modal &&
+                        (HyperTheme.sizesOf(context).select.paddingHorizontal !=
+                                null ||
+                            HyperTheme.sizesOf(context)
+                                    .select
+                                    .paddingVertical !=
+                                null)
+                    ? EdgeInsets.symmetric(
+                        horizontal:
+                            HyperTheme.sizesOf(context)
+                                .select
+                                .paddingHorizontal ??
+                            HyperTheme.sizesOf(context)
+                                .textField
+                                .horizontalPadding,
+                        vertical:
+                            HyperTheme.sizesOf(context)
+                                .select
+                                .paddingVertical ??
+                            HyperTheme.sizesOf(context)
+                                .textField
+                                .verticalPadding,
+                      )
+                    : null,
+              ).merge(_resolved.inputStyle).merge(widget.inputStyle)
+            : _resolved.searchStyle,
+        onTap: !modal ? _show : null,
+        onSubmitted: widget.createValue == null
+            ? null
+            : (text) {
+                if (text.trim().isNotEmpty) {
+                  _select(
+                    HyperSelectOption(
+                      value: widget.createValue!(text.trim()),
+                      label: text.trim(),
+                    ),
+                  );
+                }
+              },
+      ),
     ),
   );
   Widget _panel(BuildContext context, double width, {bool modal = false}) {
@@ -462,7 +586,12 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
             event.logicalKey == LogicalKeyboardKey.enter)) {
       final editor = widget.autocomplete ? _input : _search;
       if (!hyperSelectCanQuery(editor.value)) return KeyEventResult.ignored;
-      return _navigation.handleKeyEvent(event);
+      _selectingWithKeyboard = true;
+      try {
+        return _navigation.handleKeyEvent(event);
+      } finally {
+        _selectingWithKeyboard = false;
+      }
     }
     if (widget.multiple &&
         widget.autocomplete &&
@@ -489,10 +618,19 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
     final theme = HyperTheme.of(context);
     final dropdown =
         HyperSelectStyle(
+              selectionStyle: HyperSelectionStyle(
+                menuStyle: HyperMenuStyle(
+                  itemHeight: sizes.select.itemHeight,
+                  padding: sizes.select.itemPadding,
+                  itemSpacing: sizes.select.itemSpacing,
+                  itemRadius: sizes.select.itemRadius,
+                  surfaceRadius: sizes.select.surfaceRadius,
+                ),
+              ),
               width: sizes.select.width,
               arrowSize: sizes.select.arrowSize,
               arrowSpacing: sizes.select.arrowSpacing,
-              popupSpacing: sizes.overlaySpacing,
+              popupSpacing: sizes.select.popupSpacing ?? sizes.overlaySpacing,
               arrowColor: theme.colors.textSecondary,
               foregroundColor: theme.colors.textPrimary,
               disabledArrowColor: theme.colors.disabled,
@@ -522,7 +660,65 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
         dropdown.width!;
     Widget anchor;
     if (widget.autocomplete) {
-      anchor = SizedBox(width: width, child: _editor(modal: false));
+      anchor = MouseRegion(
+        onEnter: (_) => setState(() => _triggerHovered = true),
+        onExit: (_) => setState(() => _triggerHovered = false),
+        child: Listener(
+          onPointerDown: (_) => setState(() => _triggerPressed = true),
+          onPointerUp: (_) => setState(() => _triggerPressed = false),
+          onPointerCancel: (_) => setState(() => _triggerPressed = false),
+          child: AnimatedBuilder(
+            animation: _focus,
+            builder: (context, _) {
+              final visual = HyperSelectTheme.of(context).style?.buttonStyle;
+              final reduced =
+                  MediaQuery.disableAnimationsOf(context) || !_enabled;
+              final offset = reduced
+                  ? Offset.zero
+                  : _triggerPressed
+                  ? visual?.pressedOffset ?? Offset.zero
+                  : _focus.hasFocus && visual?.focusedOffset != null
+                  ? visual!.focusedOffset!
+                  : _triggerHovered
+                  ? visual?.hoveredOffset ?? Offset.zero
+                  : Offset.zero;
+              final scale = reduced
+                  ? 1.0
+                  : _triggerPressed
+                  ? visual?.pressedScale ?? 1
+                  : _focus.hasFocus && visual?.focusedScale != null
+                  ? visual!.focusedScale!
+                  : _triggerHovered
+                  ? visual?.hoveredScale ?? 1
+                  : 1.0;
+              final duration = reduced
+                  ? Duration.zero
+                  : visual?.animationDuration ?? theme.motion.fastDuration;
+              return TweenAnimationBuilder<Offset>(
+                tween: Tween(end: offset),
+                duration: duration,
+                curve: visual?.animationCurve ?? theme.motion.fastCurve,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(end: scale),
+                  duration: duration,
+                  curve: visual?.animationCurve ?? theme.motion.fastCurve,
+                  child: SizedBox(width: width, child: _editor(modal: false)),
+                  builder: (context, value, child) => Transform.scale(
+                    scale: value,
+                    transformHitTests: false,
+                    child: child,
+                  ),
+                ),
+                builder: (context, value, child) => Transform.translate(
+                  offset: value,
+                  transformHitTests: false,
+                  child: child,
+                ),
+              );
+            },
+          ),
+        ),
+      );
     } else {
       anchor = HyperButton.outlined(
         onPressed: _enabled ? () => _open ? _close() : _show() : null,
@@ -531,8 +727,39 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
         size: widget.size,
         style: HyperButtonStyle(
           width: width,
+          minimumSize: Size(
+            0,
+            sizes.select.minimumHeight ??
+                (widget.size == HyperButtonSizeVariant.medium
+                    ? sizes.textField.minimumHeight
+                    : sizes.button.heightFor(widget.size)),
+          ),
+          padding:
+              sizes.select.paddingHorizontal == null &&
+                  sizes.select.paddingVertical == null
+              ? null
+              : EdgeInsets.symmetric(
+                  horizontal:
+                      sizes.select.paddingHorizontal ??
+                      sizes.button
+                          .paddingFor(widget.size)
+                          .resolve(Directionality.of(context))
+                          .left,
+                  vertical:
+                      sizes.select.paddingVertical ??
+                      sizes.button
+                          .paddingFor(widget.size)
+                          .resolve(Directionality.of(context))
+                          .top,
+                ),
+          borderRadius: sizes.select.radius == null
+              ? null
+              : BorderRadius.circular(sizes.select.radius!),
+          minimumTapTargetSize: sizes.select.minimumTapTargetSize == null
+              ? null
+              : Size.square(sizes.select.minimumTapTargetSize!),
           foregroundColor: dropdown.foregroundColor,
-        ).merge(widget.buttonStyle),
+        ).merge(dropdown.buttonStyle).merge(widget.buttonStyle),
         child: Row(
           children: [
             Expanded(
@@ -564,7 +791,12 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
         trigger: HyperOverlayTrigger.manual,
         isOpen: _open && !_modal,
         onOpenChanged: (value) {
-          if (!value) _close();
+          if (!value) {
+            _close(
+              restoreFocus: HardwareKeyboard.instance.logicalKeysPressed
+                  .contains(LogicalKeyboardKey.escape),
+            );
+          }
         },
         placement: _presentation == HyperSelectPresentation.trailing
             ? HyperOverlayPlacement.bottomEnd

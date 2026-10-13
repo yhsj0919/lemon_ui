@@ -27,6 +27,8 @@ Banner 不创建浮层或自动吸顶；定位、宽度和外边距由父级管�
 
 ## 统一高级材质策略（2026-10-03）
 
+继承全局高级材质时，消费者通过 `semanticBackground` 提供组件已经解析好的背景语义。统一材质解析保留配方的背景不透明度、模糊、边框和阴影，用组件底色或渐变替换中性底色及染色层；普通降级配方同步保留组件色彩。Button / IconButton 的无填充变体不因全局材质新增背景。显式组件或实例材质保留配方自身颜色，不自动染色。状态色仍由组件主题解析，材质层不自行判断主色或错误色。
+
 所有高级材质功能统一由 HyperThemeData.materialTheme / HyperMaterialTheme 管理质量、
 默认配方与减少透明度策略；组件不得拥有独立默认的高级材质开关或降级规则。
 支持材质的组件默认继承统一策略，允许通过局部主题或实例的显式字段覆盖，以局部开启或替换配方。
@@ -631,3 +633,41 @@ HyperTreeController<T> 管理展开、单选、子节点缓存和异步加载状
 HyperTopNavigation 复用 HyperMenuItem 的树结构与 HyperMenu 多级浮层，叶项通过受控 selectedId / onSelected 请求切换，父项只展开菜单。选中后代映射到顶层选中提示。全局 topNavigationTheme、局部 HyperTopNavigationTheme 与实例 Style 逐字段合并；四端 sizes.topNavigation 独立管理顶层尺寸，子菜单继续使用 sizes.menu。顶层按钮、浮层、材质、焦点和动画复用现有基础设施。Menu 项新增 description，描述文字及间距可通过 Menu Style / Size 配置，各级菜单一致继承。
 
 默认顶层尺寸由同端现有 Button 规格推导，属于项目语义推导（D 级，逻辑像素）；子菜单直接沿用现有 Menu。未依据截图物理像素反推尺寸，尚未完成官方视觉对照。外部表面、布局和页面内容由调用方管理，空间不足时顶层横向滚动。
+
+## 共享虚线边框
+
+分割线和 HyperDashedBorder 共用 hyperPatternSegments 计算线段和点线间隔；直线矩形与闭合圆角路径分别消费同一分段结果，不再重复计算。Button 通过 Style.boxBorder、TextField 通过 Style.border、Card / Menu 通过表面 Style.border 配置统一 BoxBorder。显式空 Border 关闭边框。自定义 BoxBorder 插值走 ShapeBorder.lerp，标准边框继续复用 Flutter BoxBorder.lerp；HyperBoxDecoration 仅适配自定义边框的插值，背景、渐变、圆角与阴影沿用 Flutter 插值，避免动画期间把虚线退化为实线或抛异常。
+
+## 共用 HyperLine 与按钮尺寸档位
+
+HyperLine 是与 HyperFill 配合的不可变线条样式对象，统一填充、粗细、线型、线段长度、间隔与端部圆角，支持 copyWith、插值和值相等。HyperDivider.line / HyperDividerStyle.line 和 HyperLine.toBorder() 复用同一对象；HyperDividerPattern 保留为 HyperLinePattern 的类型别名，旧参数继续转换为共用线条。HyperDashedBorder 仅保留便捷构造入口，绘制与插值集中于 HyperLineBorder，分段算法不重复。HyperLine 演示登记未确认；展示尺寸和默认颜色直接沿用 Divider 的同端语义规格（D 级、逻辑像素），没有改变现有默认外观。
+
+HyperButtonSize 的三档最小宽度与可选固定宽度集中于四端 sizes.button；新增默认最小宽度沿用对应设备已存在的按钮最小宽度，未引入组件内设备常量。实例 Style.width / minimumSize 优先。固定和自适应模式的约束由布局直接解析，AnimatedSize 负责实际有限布局尺寸过渡，避免 AnimatedContainer 在有限与无界 BoxConstraints 间插值；颜色、边框、阴影过渡保留现有 Motion 配置。
+
+## Button 交互变换（2026-10-13）
+
+HyperButtonStyle 的 hoveredOffset / focusedOffset / pressedOffset 与 hoveredScale / focusedScale / pressedScale 是显式状态覆盖，默认全部为空。位移 0、缩放 1 表示原始绘制；不存设备尺寸常量。变换放在 HyperPressable 的可视子树内，Transform.transformHitTests 为 false，布局与命中区域保持原位。按下状态优先，禁用与系统减少动画时恢复原始绘制。时长和曲线使用已有按钮样式与 Motion。减少动画时跳过 AnimatedSize，避免零时长尺寸动画在布局过程中重入。
+
+## Select 工作区规格（2026-10-13）
+
+HyperSelectSize 的可选 popupSpacing、itemHeight、itemPadding、itemSpacing、itemRadius、surfaceRadius 用于四端选择器独立规格；未设置时继承同端公共浮层和菜单语义。全局与局部 HyperSelectThemeData.style.buttonStyle 覆盖触发按钮，实例 buttonStyle 最后覆盖。Select 将当前设备规格转换为 selectionStyle.menuStyle 后逐层合并，选项面板沿用公共表面解析和统一材质降级。Autocomplete 不读取这些 Select 专属菜单规格。默认值保持现有语义来源，未新增独立设备常量。
+
+## 多选紧凑标签与局部锚点（2026-10-13）
+
+Select / Autocomplete 的摘要 Chip 和 +N 共用按外层已解析规格推导的紧凑样式，避免重复的独立触控留白撑高输入框；实例 Chip Style 仍优先。标签区不足以放下完整首项时，按实际文字缩放后的首字宽度、内边距和删除区域决定能否显示缩略首项与计数；更窄时只显示计数，保留最小输入宽度。干布局与实际布局使用同一条件。PopupListTile 的坐标、边界和弹窗路由统一使用 HyperNavigatorScope 选中的 Navigator / Overlay，跨路由保留调用处主题，避免嵌套预览中的锚点偏移。
+
+TextField 的 minimumHeight 是外部表面最小高度；普通边框厚度从内部最小约束中扣除，尾部操作与前缀只使用内容区高度，避免重复叠加边框及留白。默认输入与占位行高明确保留控制文本语义，避免继承 Material 正文行高；显式 TextStyle 仍优先。Select / Autocomplete 文本变化与光标变化分开处理；鼠标选择关闭释放焦点，键盘关闭恢复触发焦点，关闭回调重复通知不再次修改焦点。
+
+TextField 的表面最小高度由外层 ConstrainedBox 管理，单行文本区域通过 Align 居中，多行默认顶对齐，显式 textAlignVertical 优先；不把表面最小高度传入原生 InputDecorator 的内部约束，避免其布局高度与对齐计算高度不一致。Autocomplete 默认输入表面使用当前主题 surface（亮色为白色），显式 TextField 局部背景、Autocomplete inputStyle 与实例 inputStyle 仍可覆盖。
+
+Select 与 Autocomplete 的多选摘要标签统一从 textField 内容区规格推导紧凑高度，不再分别读取按钮与输入框留白。缩略标签的最小宽度包含至少一个实际字形和省略号及删除区域；无法容纳时仅显示数量，避免空标签只剩删除图标。测试同时比较两种标签的实际高度和自动填充表面的垂直中心。
+
+Select 的可选设备触发圆角 select.radius 同时作为 Autocomplete 单选与多选触发输入框的默认圆角；未设置时继续继承 TextField 圆角。Autocomplete 主题 inputStyle 和实例 inputStyle 的显式圆角优先；模态面板内的搜索框不读取触发圆角。
+
+PopupListTile 关闭后的焦点恢复依据打开来源：鼠标和触摸打开的面板关闭后释放触发行焦点，键盘方向键、Enter 或 Space 打开时恢复触发焦点。不以桌面传统高亮模式代替实际输入来源。锚定面板与底部弹窗共用该策略，延迟恢复前检查 mounted 与是否已重新打开，避免覆盖下一次交互。
+
+## HyperDropdown 自定义内容下拉（已确认）
+
+panelBuilder(context, close) 提供任意面板内容，组件只管理触发、开合、设备呈现、边界与表面。过滤数据、选择和多级业务由调用方管理；可组合 HyperMenu 的子菜单。默认样式及设备规格复用 Select / Selection 主题，局部与实例显式覆盖优先；面板复用 resolveHyperMenuSurface 及统一材质降级。Desktop 使用锚定浮层，其他设备复用 Select 呈现解析。用户明确确认后，Demo 已移入正式“选择控件”分类，页面 id hyper-dropdown 保持不变，工作区复用 Select 配置入口；未进行目标截图视觉还原。
+
+Tag 与 Chip 的标签配色由 foundation/hyper_label_palette.dart 统一解析，组件各自通过强类型 Style 公开基色、配色方式和背景/边框/前景减淡比例。Tag 的 background 与 boxBorder 分别复用 HyperFill 和公共线条边框；原 backgroundColor、borderColor、borderWidth 保持兼容，显式背景颜色覆盖上层填充。Tag 全局、局部主题和实例覆盖保留原有优先级，尺寸继续由 HyperSizeScheme.tag 管理。

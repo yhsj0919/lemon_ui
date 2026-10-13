@@ -389,6 +389,17 @@ class _HyperMenuState extends State<HyperMenu> {
             padding: EdgeInsets.symmetric(horizontal: style.padding!),
             child: Row(
               children: [
+                if (selected &&
+                    (style.showCheckmark ?? true) &&
+                    style.checkPlacement ==
+                        HyperMenuCheckPlacement.leading) ...[
+                  Icon(
+                    style.checkIcon ?? Icons.check,
+                    size: style.checkSize ?? style.iconSize,
+                    color: style.checkColor ?? foreground,
+                  ),
+                  SizedBox(width: style.checkSpacing ?? style.iconSpacing),
+                ],
                 if (item.leading != null) ...[
                   IconTheme(
                     data: IconThemeData(
@@ -428,12 +439,15 @@ class _HyperMenuState extends State<HyperMenu> {
                   SizedBox(width: style.iconSpacing),
                   item.trailing!,
                 ],
-                if (selected && (style.showCheckmark ?? true)) ...[
-                  SizedBox(width: style.iconSpacing),
+                if (selected &&
+                    (style.showCheckmark ?? true) &&
+                    style.checkPlacement !=
+                        HyperMenuCheckPlacement.leading) ...[
+                  SizedBox(width: style.checkSpacing ?? style.iconSpacing),
                   Icon(
                     style.checkIcon ?? Icons.check,
-                    size: style.iconSize,
-                    color: foreground,
+                    size: style.checkSize ?? style.iconSize,
+                    color: style.checkColor ?? foreground,
                   ),
                 ],
                 if (item.children.isNotEmpty) ...[

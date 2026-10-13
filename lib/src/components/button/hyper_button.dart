@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:async';
 import 'dart:ui';
 
@@ -231,11 +233,12 @@ class _HyperButtonState extends State<HyperButton> {
     final metrics = sizes.button;
     final defaults = HyperButtonStyle(
       minimumSize: Size(
-        metrics.minimumSize.width,
+        metrics.minimumWidthFor(widget.size),
         metrics.heightFor(widget.size),
       ),
       minimumTapTargetSize: Size.square(sizes.minimumInteractiveDimension),
       padding: metrics.paddingFor(widget.size),
+      width: metrics.widthFor(widget.size),
       borderRadius: BorderRadius.circular(metrics.radius),
       textStyle: theme.textTheme.labelLarge,
       disabledForegroundColor: colors.disabled,
@@ -259,6 +262,7 @@ class _HyperButtonState extends State<HyperButton> {
           groupConnected
               ? HyperButtonStyle(
                   border: BorderSide.none,
+                  boxBorder: const Border(),
                   borderRadius: BorderRadius.zero,
                   boxShadow: const [],
                   margin: EdgeInsets.zero,
@@ -272,8 +276,12 @@ class _HyperButtonState extends State<HyperButton> {
               : null,
         );
     final materialTheme = HyperMaterialTheme.of(context);
-    final material = materialTheme.resolveMaterial(material: style.material);
-    final explicitBackground = style.material == null
+    final material = materialTheme.resolveMaterial(
+      material: style.material,
+      semanticBackground: style.material == null ? style.background : null,
+    );
+    final explicitBackground =
+        style.material == null && !(material?.usesBackdrop ?? false)
         ? widget.style?.background ?? themedStyle.background
         : null;
     final enabled = widget.onPressed != null && !_loading;
@@ -313,23 +321,75 @@ class _HyperButtonState extends State<HyperButton> {
           mode: style.contrastMode,
         );
         final content = _buildContent(context, style, foregroundColor);
+        final stateShadows = !visuallyEnabled
+            ? style.disabledBoxShadow
+            : pressed
+            ? style.pressedBoxShadow
+            : focused
+            ? style.focusedBoxShadow
+            : hovered
+            ? style.hoveredBoxShadow
+            : null;
         final visual = _buildVisual(
           context,
-          style,
+          stateShadows != null
+              ? style.copyWith(boxShadow: stateShadows)
+              : style,
           content,
           overlay.withValues(alpha: overlayAlpha),
           visuallyEnabled,
           material,
           explicitBackground,
         );
+        final reduceMotion =
+            MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+        final offset = !visuallyEnabled || reduceMotion
+            ? Offset.zero
+            : pressed
+            ? style.pressedOffset ?? Offset.zero
+            : focused && style.focusedOffset != null
+            ? style.focusedOffset!
+            : hovered
+            ? style.hoveredOffset ?? Offset.zero
+            : Offset.zero;
+        final scale = !visuallyEnabled || reduceMotion
+            ? 1.0
+            : pressed
+            ? style.pressedScale ?? 1.0
+            : focused && style.focusedScale != null
+            ? style.focusedScale!
+            : hovered
+            ? style.hoveredScale ?? 1.0
+            : 1.0;
+        final transformed = TweenAnimationBuilder<Offset>(
+          tween: Tween<Offset>(end: offset),
+          duration: reduceMotion ? Duration.zero : style.animationDuration!,
+          curve: style.animationCurve!,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(end: scale),
+            duration: reduceMotion ? Duration.zero : style.animationDuration!,
+            curve: style.animationCurve!,
+            child: visual,
+            builder: (context, value, child) => Transform.scale(
+              scale: value,
+              transformHitTests: false,
+              child: child,
+            ),
+          ),
+          builder: (context, value, child) => Transform.translate(
+            offset: value,
+            transformHitTests: false,
+            child: child,
+          ),
+        );
         final tapSize = style.minimumTapTargetSize;
-        if (tapSize == null) return visual;
+        if (tapSize == null) return transformed;
         return ConstrainedBox(
           constraints: BoxConstraints(
             minWidth: tapSize.width,
             minHeight: tapSize.height,
           ),
-          child: Center(widthFactor: 1, heightFactor: 1, child: visual),
+          child: Center(widthFactor: 1, heightFactor: 1, child: transformed),
         );
       },
     );
@@ -484,20 +544,25 @@ class _HyperButtonState extends State<HyperButton> {
     );
     final glass = material?.usesBackdrop ?? false;
     final shadows = style.boxShadow ?? material?.boxShadow;
-    final decoration = BoxDecoration(
+    final decoration = HyperBoxDecoration(
       color: glass ? null : fill?.color,
       gradient: glass ? null : fill?.gradient,
       borderRadius: radius,
       boxShadow: glass ? null : shadows,
+      outerShadowsOnly: true,
     );
     final border = style.border ?? material?.border;
     final foregroundDecoration =
-        overlay.a > 0 || (border != null && border != BorderSide.none)
-        ? BoxDecoration(
+        overlay.a > 0 ||
+            style.boxBorder != null ||
+            (border != null && border != BorderSide.none)
+        ? HyperBoxDecoration(
             color: overlay.a > 0 ? overlay : null,
-            border: border == null || border == BorderSide.none
-                ? null
-                : Border.fromBorderSide(border),
+            border:
+                style.boxBorder ??
+                (border == null || border == BorderSide.none
+                    ? null
+                    : Border.fromBorderSide(border)),
             borderRadius: radius,
           )
         : null;
@@ -525,19 +590,37 @@ class _HyperButtonState extends State<HyperButton> {
     Widget result = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : style.animationDuration!,
       curve: style.animationCurve!,
-      width: style.width,
-      height: style.height,
+      decoration: decoration,
+      foregroundDecoration: foregroundDecoration,
+      child: layeredContent,
+    );
+    // 实际布局尺寸都是有限值；自适应与固定模式不做无界约束插值。
+    result = ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: style.minimumSize?.width ?? 0,
         minHeight: style.minimumSize?.height ?? 0,
         maxWidth: style.maximumSize?.width ?? double.infinity,
         maxHeight: style.maximumSize?.height ?? double.infinity,
-      ),
-      margin: glass ? null : style.margin,
-      decoration: decoration,
-      foregroundDecoration: foregroundDecoration,
-      child: layeredContent,
+      ).tighten(width: style.width, height: style.height),
+      child: result,
     );
+    if (!reduceMotion) {
+      result = AnimatedSize(
+        duration: style.animationDuration!,
+        curve: style.animationCurve!,
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        child: result,
+      );
+    }
+    if (!glass) {
+      result = AnimatedPadding(
+        duration: reduceMotion ? Duration.zero : style.animationDuration!,
+        curve: style.animationCurve!,
+        padding: style.margin ?? EdgeInsets.zero,
+        child: result,
+      );
+    }
     if (glass) {
       // 滤镜只作用于材质背景；文字、图标和加载状态留在清晰前景层。
       result = ClipRRect(
@@ -559,7 +642,7 @@ class _HyperButtonState extends State<HyperButton> {
                   sigmaY: material.blurSigmaY,
                 ),
                 child: DecoratedBox(
-                  decoration: BoxDecoration(
+                  decoration: HyperBoxDecoration(
                     color: fill?.color,
                     gradient: fill?.gradient,
                     borderRadius: radius,
@@ -576,12 +659,21 @@ class _HyperButtonState extends State<HyperButton> {
       );
       if (shadows != null && shadows.isNotEmpty) {
         result = DecoratedBox(
-          decoration: BoxDecoration(borderRadius: radius, boxShadow: shadows),
+          decoration: HyperBoxDecoration(
+            borderRadius: radius,
+            boxShadow: shadows,
+            outerShadowsOnly: true,
+          ),
           child: result,
         );
       }
       if (style.margin != null) {
-        result = Padding(padding: style.margin!, child: result);
+        result = AnimatedPadding(
+          duration: reduceMotion ? Duration.zero : style.animationDuration!,
+          curve: style.animationCurve!,
+          padding: style.margin!,
+          child: result,
+        );
       }
     }
     return result;

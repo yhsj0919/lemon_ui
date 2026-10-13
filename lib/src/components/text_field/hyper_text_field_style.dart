@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ final class HyperTextFieldStyle {
     this.background,
     this.material,
     this.borderColor,
+    this.border,
     this.borderWidth,
     this.borderRadius,
     this.boxShadow,
@@ -49,6 +52,9 @@ final class HyperTextFieldStyle {
   final HyperFill? background;
   final HyperSurfaceMaterial? material;
   final Color? borderColor;
+
+  /// 显式边框，优先于 borderColor 与 borderWidth。
+  final BoxBorder? border;
   final double? borderWidth;
   final BorderRadiusGeometry? borderRadius;
   final List<BoxShadow>? boxShadow;
@@ -87,6 +93,7 @@ final class HyperTextFieldStyle {
     HyperFill? background,
     HyperSurfaceMaterial? material,
     Color? borderColor,
+    BoxBorder? border,
     double? borderWidth,
     BorderRadiusGeometry? borderRadius,
     List<BoxShadow>? boxShadow,
@@ -124,6 +131,7 @@ final class HyperTextFieldStyle {
       background: background,
       material: material,
       borderColor: borderColor,
+      border: border,
       borderWidth: borderWidth,
       borderRadius: borderRadius,
       boxShadow: boxShadow,
@@ -164,6 +172,7 @@ final class HyperTextFieldStyle {
           background: other.background ?? background,
           material: other.material ?? material,
           borderColor: other.borderColor ?? borderColor,
+          border: other.border ?? border,
           borderWidth: other.borderWidth ?? borderWidth,
           borderRadius: other.borderRadius ?? borderRadius,
           boxShadow: other.boxShadow ?? boxShadow,
@@ -210,6 +219,11 @@ final class HyperTextFieldStyle {
     return HyperTextFieldStyle(
       background: blend(a.background, b.background, HyperFill.lerp),
       material: blend(a.material, b.material, HyperSurfaceMaterial.lerp),
+      border: blend(
+        a.border,
+        b.border,
+        (x, y, t) => lerpHyperBoxBorder(x, y, t)!,
+      ),
       borderColor: blend(
         a.borderColor,
         b.borderColor,
@@ -339,6 +353,7 @@ final class HyperTextFieldStyle {
           background == other.background &&
           material == other.material &&
           borderColor == other.borderColor &&
+          border == other.border &&
           borderWidth == other.borderWidth &&
           borderRadius == other.borderRadius &&
           listEquals(boxShadow, other.boxShadow) &&
@@ -375,6 +390,7 @@ final class HyperTextFieldStyle {
   int get hashCode => Object.hashAll([
     background,
     material,
+    border,
     borderColor,
     borderWidth,
     borderRadius,

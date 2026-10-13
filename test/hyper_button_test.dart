@@ -149,8 +149,8 @@ void main() {
         (widget) => widget is Container && widget.decoration is BoxDecoration,
       ),
     );
-    expect(visual.constraints?.minWidth, 58);
-    expect(visual.constraints?.minHeight, 48);
+    expect(tester.getSize(buttonVisual()).width, greaterThanOrEqualTo(58));
+    expect(tester.getSize(buttonVisual()).height, 48);
     expect(visual.padding, isNull);
     expect(
       buttonPadding(const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
@@ -273,8 +273,8 @@ void main() {
         (widget) => widget is Container && widget.decoration is BoxDecoration,
       ),
     );
-    expect(visual.constraints?.minWidth, 72);
-    expect(visual.constraints?.minHeight, 32);
+    expect(tester.getSize(buttonVisual()).width, greaterThanOrEqualTo(72));
+    expect(tester.getSize(buttonVisual()).height, 32);
     expect(visual.padding, isNull);
     expect(
       buttonPadding(const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
@@ -329,15 +329,14 @@ void main() {
       ),
     );
 
-    final visuals = tester
-        .widgetList<AnimatedContainer>(buttonVisual())
-        .toList();
-    expect(visuals.map((visual) => visual.constraints?.minHeight), [
-      24,
-      32,
-      40,
-      36,
-    ]);
+    final visuals = buttonVisual();
+    expect(
+      [
+        for (var i = 0; i < visuals.evaluate().length; i++)
+          tester.getSize(visuals.at(i)).height,
+      ],
+      [24, 32, 40, 36],
+    );
   });
 
   testWidgets('按钮消费主题中覆盖的组件尺寸', (tester) async {
@@ -363,9 +362,8 @@ void main() {
       ),
     );
 
-    final visual = tester.widget<AnimatedContainer>(buttonVisual());
-    expect(visual.constraints?.minWidth, 88);
-    expect(visual.constraints?.minHeight, 42);
+    expect(tester.getSize(buttonVisual()).width, greaterThanOrEqualTo(88));
+    expect(tester.getSize(buttonVisual()).height, 42);
     expect(
       buttonPadding(const EdgeInsets.symmetric(horizontal: 20, vertical: 9)),
       findsOneWidget,

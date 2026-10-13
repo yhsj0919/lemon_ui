@@ -21,6 +21,14 @@ class HyperTooltipPage extends StatelessWidget {
       runSpacing: 24,
       children: [
         HyperTooltip(
+          appearance: HyperTooltipAppearance.dark,
+          message: '深色高级材质提示，质量与降级跟随统一材质配置',
+          child: HyperButton.tonal(
+            onPressed: () {},
+            child: const HyperText('深色提示'),
+          ),
+        ),
+        HyperTooltip(
           message: '悬停、聚焦或长按后显示说明',
           child: HyperButton.tonal(
             onPressed: () {},

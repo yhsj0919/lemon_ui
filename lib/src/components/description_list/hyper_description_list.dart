@@ -236,6 +236,7 @@ class HyperDescriptionList extends StatelessWidget {
         if (s.material != null) {
           body = HyperMaterialSurface(
             material: s.material,
+            semanticBackground: s.background,
             quality: s.materialQuality,
             reduceTransparency: s.reduceTransparency,
             borderRadius: s.borderRadius,

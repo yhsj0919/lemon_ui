@@ -1,3 +1,4 @@
+import '../pages/selection/hyper_dropdown_page.dart';
 import '../pages/framework/hyper_top_navigation_page.dart';
 import '../pages/selection/hyper_color_picker_page.dart';
 import '../pages/content/hyper_description_list_page.dart';
@@ -26,6 +27,7 @@ import '../pages/foundation/hyper_color_scheme_page.dart';
 import '../pages/foundation/hyper_container_theme_page.dart';
 import '../pages/foundation/hyper_device_detector_page.dart';
 import '../pages/foundation/hyper_fill_page.dart';
+import '../pages/foundation/hyper_line_page.dart';
 import '../pages/foundation/hyper_motion_theme_page.dart';
 import '../pages/foundation/hyper_size_scheme_page.dart';
 import '../pages/foundation/hyper_state_value_page.dart';
@@ -346,6 +348,13 @@ final List<GallerySection> gallerySections = [
     title: '选择控件',
     items: [
       GalleryItem(
+        id: 'hyper-dropdown',
+        title: 'HyperDropdown',
+        description: '自定义内容下拉面板，支持分组与多级筛选。',
+        icon: Icons.arrow_drop_down_circle_outlined,
+        builder: (_) => const HyperDropdownPage(),
+      ),
+      GalleryItem(
         id: 'hyper-color-picker',
         title: 'HyperColorPicker',
         description: '色轮、明度、透明度与 HEX 输入，支持自适应选色面板。',
@@ -608,6 +617,19 @@ final List<GallerySection> gallerySections = [
         icon: Icons.info_outline,
         hasStyleOverrides: true,
         builder: (_) => const HyperTooltipPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-line',
+        title: 'HyperLine',
+        description: '分割线与边框共用的实线、虚线、点线样式。',
+        icon: Icons.line_style,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperLinePage(),
       ),
     ],
   ),

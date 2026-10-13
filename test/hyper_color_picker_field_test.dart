@@ -20,6 +20,7 @@ void main() {
               child: Scaffold(
                 body: HyperColorPickerField(
                   value: Colors.blue,
+                  recommendedColors: const [Colors.white],
                   onChanged: (_) => changes++,
                 ),
               ),
@@ -30,6 +31,12 @@ void main() {
       await tester.tap(find.byType(HyperButton).first);
       await tester.pumpAndSettle();
       expect(find.byType(HyperColorPicker), findsOneWidget);
+      expect(
+        tester
+            .widget<HyperColorPicker>(find.byType(HyperColorPicker))
+            .recommendedColors,
+        const [Colors.white],
+      );
       expect(
         find.byType(HyperBottomSheet),
         device == HyperDeviceType.watch ? findsNothing : findsOneWidget,
@@ -123,6 +130,7 @@ void main() {
                     alignment: Alignment.topLeft,
                     child: HyperColorPickerField(
                       presentation: HyperSelectPresentation.anchored,
+                      recommendedColors: const [Colors.white],
                       value: color,
                       onChanged: (value) => setState(() => color = value),
                     ),
@@ -141,7 +149,11 @@ void main() {
     expect(defaultSurface.style!.material, isNotNull);
     expect(defaultSurface.style!.material!.boxShadow, isNotEmpty);
     final before = tester.getRect(find.byType(HyperColorPicker));
-    await tester.tap(find.byTooltip('纯白'));
+    await tester.tap(
+      find.byWidgetPredicate(
+        (w) => w is HyperIconButton && w.tooltip == '#FFFFFFFF',
+      ),
+    );
     await tester.pumpAndSettle();
     expect(color, const Color(0xFFFFFFFF));
     expect(

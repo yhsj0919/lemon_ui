@@ -33,6 +33,7 @@ class HyperColorPickerField extends StatefulWidget {
     this.pickerStyle,
     this.buttonStyle,
     this.panelStyle,
+    this.recommendedColors = const [],
     this.placement = HyperOverlayPlacement.bottomStart,
     this.transitionBuilder,
     this.presentation = HyperSelectPresentation.adaptive,
@@ -44,6 +45,7 @@ class HyperColorPickerField extends StatefulWidget {
   final HyperColorPickerStyle? pickerStyle;
   final HyperButtonStyle? buttonStyle;
   final HyperCardStyle? panelStyle;
+  final List<Color> recommendedColors;
   final HyperOverlayPlacement placement;
   final HyperOverlayTransitionBuilder? transitionBuilder;
   final HyperSelectPresentation presentation;
@@ -93,6 +95,7 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 HyperColorPicker(
+                  recommendedColors: widget.recommendedColors,
                   value: draft,
                   showAlpha: widget.showAlpha,
                   style: widget.pickerStyle,
@@ -203,6 +206,7 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
           ),
           child: SingleChildScrollView(
             child: HyperColorPicker(
+              recommendedColors: widget.recommendedColors,
               value: widget.value,
               onChanged: _enabled ? widget.onChanged : null,
               showAlpha: widget.showAlpha,

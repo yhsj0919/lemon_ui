@@ -38,6 +38,7 @@ class HyperSelectionTags extends MultiChildRenderObjectWidget {
     required Widget Function(int count) overflowBuilder,
     required this.spacing,
     required this.direction,
+    this.minimumTagWidth = 0,
   }) : count = tags.length,
        super(
          children: [
@@ -45,18 +46,24 @@ class HyperSelectionTags extends MultiChildRenderObjectWidget {
            for (var i = 1; i <= tags.length; i++) overflowBuilder(i),
          ],
        );
+  final double minimumTagWidth;
   final int count;
   final double spacing;
   final TextDirection direction;
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _TagsRender(count, spacing, direction);
+      _TagsRender(count, spacing, direction, minimumTagWidth);
   @override
   void updateRenderObject(
     BuildContext context,
     covariant RenderObject renderObject,
   ) {
-    (renderObject as _TagsRender).update(count, spacing, direction);
+    (renderObject as _TagsRender).update(
+      count,
+      spacing,
+      direction,
+      minimumTagWidth,
+    );
   }
 }
 
@@ -66,15 +73,30 @@ class _TagsRender extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TagParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TagParentData> {
-  _TagsRender(this._count, this._spacing, this._direction);
+  _TagsRender(
+    this._count,
+    this._spacing,
+    this._direction,
+    this._minimumTagWidth,
+  );
+  double _minimumTagWidth;
   int _count;
   double _spacing;
   TextDirection _direction;
   final _visible = <RenderBox>[];
-  void update(int count, double spacing, TextDirection direction) {
-    if (_count == count && _spacing == spacing && _direction == direction) {
+  void update(
+    int count,
+    double spacing,
+    TextDirection direction,
+    double minimumTagWidth,
+  ) {
+    if (_minimumTagWidth == minimumTagWidth &&
+        _count == count &&
+        _spacing == spacing &&
+        _direction == direction) {
       return;
     }
+    _minimumTagWidth = minimumTagWidth;
     _count = count;
     _spacing = spacing;
     _direction = direction;
@@ -105,12 +127,27 @@ class _TagsRender extends RenderBox
       for (final child in _children)
         child.getDryLayout(BoxConstraints(maxWidth: constraints.maxWidth)),
     ];
-    final visible = hyperVisibleSelectionCount(
+    var visible = hyperVisibleSelectionCount(
       [for (var i = 0; i < _count; i++) dimensions[i].width],
       {for (var n = 1; n <= _count; n++) n: dimensions[_count + n - 1].width},
       constraints.maxWidth,
       _spacing,
     );
+    if (visible == 0 && _count > 1) {
+      final budget =
+          constraints.maxWidth -
+          dimensions[_count + _count - 2].width -
+          _spacing;
+      final minimum = _minimumTagWidth > 0
+          ? _minimumTagWidth
+          : _children.first.getMinIntrinsicWidth(double.infinity);
+      if (budget > 0 && budget >= minimum) {
+        dimensions[0] = _children.first.getDryLayout(
+          BoxConstraints(maxWidth: budget),
+        );
+        visible = 1;
+      }
+    }
     final shown = [
       ...dimensions.take(visible),
       if (visible < _count) dimensions[_count + _count - visible - 1],
@@ -140,12 +177,25 @@ class _TagsRender extends RenderBox
     final counters = {
       for (var n = 1; n <= _count; n++) n: children[_count + n - 1].size.width,
     };
-    final visible = hyperVisibleSelectionCount(
+    var visible = hyperVisibleSelectionCount(
       widths,
       counters,
       constraints.maxWidth,
       _spacing,
     );
+    if (visible == 0 && _count > 1) {
+      final budget = constraints.maxWidth - counters[_count - 1]! - _spacing;
+      final minimum = _minimumTagWidth > 0
+          ? _minimumTagWidth
+          : children.first.getMinIntrinsicWidth(double.infinity);
+      if (budget > 0 && budget >= minimum) {
+        children.first.layout(
+          BoxConstraints(maxWidth: budget),
+          parentUsesSize: true,
+        );
+        visible = 1;
+      }
+    }
     _visible.clear();
     _visible.addAll(children.take(visible));
     if (visible < _count) {

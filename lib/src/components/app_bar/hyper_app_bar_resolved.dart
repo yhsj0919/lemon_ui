@@ -80,7 +80,13 @@ final class HyperAppBarResolved {
                 ),
               )
             : null);
-    var recipe = materialTheme.resolveMaterial(material: selectedMaterial);
+    var recipe = materialTheme.resolveMaterial(
+      material: selectedMaterial,
+      semanticBackground:
+          instanceStyle?.material == null && themedStyle?.material == null
+          ? HyperFill.color(explicitBackground ?? theme.colors.background)
+          : null,
+    );
     if (recipe != null && explicitBackground != null) {
       recipe = recipe.copyWith(background: HyperFill.color(explicitBackground));
     }

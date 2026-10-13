@@ -25,7 +25,7 @@ class _HyperTagPageState extends State<HyperTagPage> {
         children: [
           const HyperText('HyperTag', variant: HyperTextVariant.pageTitle),
           SizedBox(height: sizes.compactSectionSpacing),
-          const HyperText('轻量分类与状态展示；点击和选择行为由后续 Chip 提供。'),
+          const HyperText('轻量分类与状态展示；点击和选择行为由 Chip 提供。'),
           SizedBox(height: sizes.sectionSpacing),
           DemoSection(
             title: '基础状态',
@@ -42,6 +42,26 @@ class _HyperTagPageState extends State<HyperTagPage> {
                     HyperTag(label: '不可用', enabled: false),
                   ],
                 ),
+              ],
+            ),
+          ),
+          DemoSection(
+            title: '配色样式（实例 Style 覆盖）',
+            child: Wrap(
+              spacing: sizes.compactSectionSpacing,
+              runSpacing: sizes.compactSectionSpacing,
+              children: [
+                for (final variant in HyperTagColorVariant.values)
+                  HyperTag(
+                    label: switch (variant) {
+                      HyperTagColorVariant.neutral => '中性',
+                      HyperTagColorVariant.soft => '浅色',
+                      HyperTagColorVariant.filled => '实色',
+                      HyperTagColorVariant.outlined => '描边',
+                      HyperTagColorVariant.text => '无底色',
+                    },
+                    style: HyperTagStyle(colorVariant: variant),
+                  ),
               ],
             ),
           ),

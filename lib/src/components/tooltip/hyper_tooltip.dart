@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../../theme/color/hyper_color_scheme.dart';
 import '../card/hyper_card.dart';
 import '../card/hyper_card_style.dart';
-import '../card/hyper_card_theme.dart';
+import '../menu/hyper_menu_surface.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 import '../overlay/hyper_overlay_material.dart';
+
+import 'hyper_tooltip_theme.dart';
+export 'hyper_tooltip_theme.dart';
 
 /// 悬停、获得焦点或长按时显示简短说明。
 ///
@@ -22,6 +26,9 @@ class HyperTooltip extends StatefulWidget {
     this.exitDuration = const Duration(milliseconds: 100),
     this.showDuration = const Duration(milliseconds: 800),
     this.transitionBuilder,
+    this.appearance,
+    this.style,
+    this.foregroundColor,
   });
 
   final String message;
@@ -33,6 +40,9 @@ class HyperTooltip extends StatefulWidget {
   /// 长按松开后，提示继续显示的时间。
   final Duration showDuration;
   final HyperOverlayTransitionBuilder? transitionBuilder;
+  final HyperTooltipAppearance? appearance;
+  final Color? foregroundColor;
+  final HyperCardStyle? style;
 
   @override
   State<HyperTooltip> createState() => _HyperTooltipState();
@@ -93,6 +103,32 @@ class _HyperTooltipState extends State<HyperTooltip> {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
+    final tooltipTheme = HyperTooltipTheme.of(context);
+    final appearance =
+        widget.appearance ??
+        tooltipTheme.appearance ??
+        HyperTooltipAppearance.dark;
+    final colors = appearance == HyperTooltipAppearance.dark
+        ? HyperColorScheme.dark(seedColor: theme.colors.primary)
+        : theme.colors;
+    final surface = resolveHyperMenuSurface(
+      context,
+      radius: sizes.menu.itemRadius,
+      padding: EdgeInsets.symmetric(
+        horizontal: sizes.menu.padding,
+        vertical: sizes.menu.padding / 2,
+      ),
+      style:
+          (appearance == HyperTooltipAppearance.dark
+                  ? HyperCardStyle(
+                      material: HyperOverlayMaterial.fallbackFor(
+                        colors: colors,
+                      ),
+                    )
+                  : HyperCardStyle())
+              .merge(tooltipTheme.style)
+              .merge(widget.style),
+    );
     return HyperAnchoredOverlay(
       trigger: HyperOverlayTrigger.manual,
       isOpen: _open,
@@ -132,23 +168,14 @@ class _HyperTooltipState extends State<HyperTooltip> {
       ),
       overlayBuilder: (context, close) => IgnorePointer(
         child: HyperCard(
-          style: HyperCardStyle(
-            material: HyperOverlayMaterial.fallback(
-              context,
-              componentMaterial: HyperCardTheme.of(context).style?.material,
-              hasExplicitBackground:
-                  HyperCardTheme.of(context).style?.background != null,
-            ),
-            borderRadius: BorderRadius.circular(sizes.menu.itemRadius),
-            padding: EdgeInsets.symmetric(
-              horizontal: sizes.menu.padding,
-              vertical: sizes.menu.padding / 2,
-            ),
-          ),
+          style: surface,
           child: Text(
             widget.message,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colors.textPrimary,
+              color:
+                  widget.foregroundColor ??
+                  tooltipTheme.foregroundColor ??
+                  colors.textPrimary,
             ),
           ),
         ),

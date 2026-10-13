@@ -155,6 +155,7 @@ class _HyperLoadingOverlayState extends State<HyperLoadingOverlay> {
           )
         : HyperMaterialSurface(
             material: _style.material,
+            semanticBackground: _style.background,
             quality: _style.materialQuality,
             reduceTransparency: _style.reduceTransparency,
             borderRadius: _style.borderRadius,

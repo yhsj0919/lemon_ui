@@ -126,6 +126,7 @@ class HyperDialog extends StatelessWidget {
     if (resolved.material != null) {
       surface = HyperMaterialSurface(
         material: resolved.material,
+        semanticBackground: resolved.background,
         borderRadius: resolved.borderRadius,
         clipBehavior: resolved.clipBehavior!,
         child: surface,

@@ -4,7 +4,7 @@ import 'package:lemon_ui/lemon_ui.dart';
 import '../gallery/gallery_registry.dart';
 import '../gallery/gallery_item.dart';
 
-/// 两层 Hyper 标签导航；页面受控，每个分类记住上次选择。
+/// 分类只展开列表，点击具体组件后才切换受控页面。
 class EditorComponentNavigation extends StatefulWidget {
   const EditorComponentNavigation({
     super.key,
@@ -21,9 +21,8 @@ class EditorComponentNavigation extends StatefulWidget {
 class _EditorComponentNavigationState extends State<EditorComponentNavigation>
     with TickerProviderStateMixin {
   TabController? _categoryController;
-  final _componentControllers = <TabController>[];
   Duration? _duration;
-  final Map<int, String> _lastSelected = {};
+  int? _browsingCategory;
   static final _categoryDefinitions = [
     (label: '未确认', icon: Icons.pending_outlined, sections: ['未确认']),
     (label: '基础', icon: Icons.tune, sections: ['基础能力', '交互基础']),
@@ -59,7 +58,7 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
       if (_categories[category].sections.contains(section.title))
         ...section.items,
   ];
-  int get _category => widget.page == 'all'
+  int get _pageCategory => widget.page == 'all'
       ? -1
       : _categories.indexWhere(
           (category) => gallerySections.any(
@@ -68,20 +67,11 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
                 section.items.any((item) => item.id == widget.page),
           ),
         );
-  void _remember() {
-    if (_category >= 0) _lastSelected[_category] = widget.page;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _remember();
-  }
-
+  int get _category => _browsingCategory ?? _pageCategory;
   @override
   void didUpdateWidget(EditorComponentNavigation oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _remember();
+    if (oldWidget.page != widget.page) _browsingCategory = null;
     _syncControllers();
   }
 
@@ -100,20 +90,6 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
         initialIndex: _category + 1,
         animationDuration: duration,
       );
-      for (var index = 0; index < _categories.length; index++) {
-        final items = _items(index);
-        final selected = items.indexWhere(
-          (item) => item.id == (_lastSelected[index] ?? widget.page),
-        );
-        _componentControllers.add(
-          TabController(
-            length: items.length,
-            vsync: this,
-            initialIndex: selected < 0 ? 0 : selected,
-            animationDuration: duration,
-          ),
-        );
-      }
     }
   }
 
@@ -124,25 +100,10 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
       duration: _duration,
       curve: curve,
     );
-    if (_category >= 0 && _componentControllers.isNotEmpty) {
-      final selected = _items(_category)
-          .indexWhere((item) => item.id == widget.page);
-      if (selected >= 0) {
-        _componentControllers[_category].animateTo(
-          selected,
-          duration: _duration,
-          curve: curve,
-        );
-      }
-    }
   }
 
   void _disposeControllers() {
     _categoryController?.dispose();
-    for (final controller in _componentControllers) {
-      controller.dispose();
-    }
-    _componentControllers.clear();
   }
 
   @override
@@ -163,31 +124,6 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
         ],
       ),
     );
-  }
-
-  double _componentTabWidth(BuildContext context, List<GalleryItem> items) {
-    final theme = HyperTheme.of(context);
-    final sizes = HyperTheme.sizesOf(context);
-    var width = 0.0;
-    for (final item in items) {
-      final painter = TextPainter(
-        text: TextSpan(
-          text: _label(item.id),
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontSize: theme.typography.control,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
-      if (painter.width > width) width = painter.width;
-      painter.dispose();
-    }
-    return width +
-        sizes.menu.iconSize +
-        sizes.menu.iconSpacing +
-        sizes.controlPadding.horizontal;
   }
 
   @override
@@ -238,13 +174,12 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
                   ],
                   onTap: (index) {
                     if (index == 0) {
+                      setState(() => _browsingCategory = null);
                       widget.onSelected('all');
                       return;
                     }
                     final target = index - 1;
-                    widget.onSelected(
-                      _lastSelected[target] ?? _items(target).first.id,
-                    );
+                    setState(() => _browsingCategory = target);
                   },
                 ),
               ),
@@ -253,18 +188,23 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
         ),
         if (items.isNotEmpty) ...[
           SizedBox(height: HyperTheme.sizesOf(context).overlaySpacing),
-          HyperTabBar.separated(
-            key: ValueKey(category),
-            controller: _componentControllers[category],
-            isScrollable: true,
-            tabs: [
-              for (final item in items)
-                SizedBox(
-                  width: _componentTabWidth(context, items),
-                  child: _tab(context, _label(item.id), item.icon),
-                ),
-            ],
-            onTap: (index) => widget.onSelected(items[index].id),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final item in items)
+                  HyperButton.ghost(
+                    onPressed: () => widget.onSelected(item.id),
+                    style: HyperButtonStyle(
+                      foregroundColor: widget.page == item.id
+                          ? HyperTheme.of(context).colors.primary
+                          : HyperTheme.of(context).colors.textPrimary,
+                    ),
+                    icon: Icon(item.icon),
+                    label: Text(_label(item.id)),
+                  ),
+              ],
+            ),
           ),
           SizedBox(height: HyperTheme.sizesOf(context).overlaySpacing),
         ],
@@ -307,6 +247,7 @@ String _label(String id) => switch (id) {
   'hyper-avatar' => '头像',
   'hyper-tag' => '标签',
   'hyper-divider' => '分隔线',
+  'hyper-line' => '线条样式',
   'hyper-list-tile' => '列表项',
   'hyper-anchored-overlay' => '锚定浮层',
   'hyper-pressable' => '按压交互',

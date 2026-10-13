@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../foundation/hyper_line.dart';
+import '../../foundation/hyper_fill.dart';
+
 import '../../theme/core/hyper_theme.dart';
 import 'hyper_divider_style.dart';
 import 'hyper_divider_theme.dart';
@@ -10,6 +13,7 @@ class HyperDivider extends StatelessWidget {
     super.key,
     this.child,
     this.style,
+    this.line,
     this.color,
     this.gradient,
     this.thickness,
@@ -27,6 +31,7 @@ class HyperDivider extends StatelessWidget {
     super.key,
     this.child,
     this.style,
+    this.line,
     this.color,
     this.gradient,
     this.thickness,
@@ -41,6 +46,9 @@ class HyperDivider extends StatelessWidget {
 
   /// 当前实例的样式，优先级高于全局和局部主题。
   final HyperDividerStyle? style;
+
+  /// 与组件边框共用的线条样式，直接属性优先于它。
+  final HyperLine? line;
 
   /// 文字、图标或任意自定义内容。
   final Widget? child;
@@ -109,7 +117,32 @@ class HyperDivider extends StatelessWidget {
     final resolvedIndent = indent ?? resolved.indent!;
     final resolvedEndIndent = endIndent ?? resolved.endIndent!;
 
+    final baseLine =
+        line ??
+        resolved.line ??
+        HyperLine(
+          fill: resolved.gradient == null
+              ? HyperFill.color(resolved.color!)
+              : HyperFill.gradient(resolved.gradient!),
+          thickness: resolvedThickness,
+          pattern: resolved.pattern!,
+          dashLength: resolved.dashLength!,
+          gap: resolved.gap!,
+          radius: resolved.radius!,
+        );
     final target = resolved.copyWith(
+      line: baseLine.copyWith(
+        fill: gradient != null
+            ? HyperFill.gradient(gradient!)
+            : color != null
+            ? HyperFill.color(color!)
+            : null,
+        thickness: thickness,
+        pattern: pattern,
+        dashLength: dashLength,
+        gap: gap,
+        radius: radius,
+      ),
       thickness: resolvedThickness,
       length: resolvedLength,
       indent: resolvedIndent,
@@ -135,19 +168,10 @@ class HyperDivider extends StatelessWidget {
   Widget _layout(BuildContext context, HyperDividerStyle current) {
     Widget line([double? extent]) => ExcludeSemantics(
       child: CustomPaint(
-        painter: _HyperDividerPainter(
-          axis: axis,
-          color: current.color!,
-          gradient: current.gradient,
-          thickness: current.thickness!,
-          radius: current.radius!,
-          pattern: current.pattern!,
-          dashLength: current.dashLength!,
-          gap: current.gap!,
-        ),
+        painter: _HyperDividerPainter(axis: axis, line: current.line!),
         size: axis == Axis.horizontal
-            ? Size(extent ?? double.infinity, current.thickness!)
-            : Size(current.thickness!, extent ?? double.infinity),
+            ? Size(extent ?? double.infinity, current.line!.thickness)
+            : Size(current.line!.thickness, extent ?? double.infinity),
       ),
     );
     Widget result;
@@ -210,29 +234,23 @@ class _DividerTween extends Tween<HyperDividerStyle> {
 }
 
 class _HyperDividerPainter extends CustomPainter {
-  const _HyperDividerPainter({
-    required this.axis,
-    required this.color,
-    required this.gradient,
-    required this.thickness,
-    required this.radius,
-    required this.pattern,
-    required this.dashLength,
-    required this.gap,
-  });
+  const _HyperDividerPainter({required this.axis, required this.line});
 
   final Axis axis;
-  final Color color;
-  final Gradient? gradient;
-  final double thickness;
-  final double radius;
-  final HyperDividerPattern pattern;
-  final double dashLength;
-  final double gap;
+  final HyperLine line;
+  Color get color => line.fill.gradient != null
+      ? const Color(0xffffffff)
+      : line.fill.color ?? const Color(0x00000000);
+  Gradient? get gradient => line.fill.gradient;
+  double get thickness => line.thickness;
+  double get radius => line.radius;
+  HyperDividerPattern get pattern => line.pattern;
+  double get dashLength => line.dashLength;
+  double get gap => line.gap;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (!size.isFinite || size.isEmpty || thickness <= 0) return;
+    if (!size.isFinite || size.isEmpty || line.isNone) return;
     final rect = Offset.zero & size;
     canvas.save();
     canvas.clipRect(rect);
@@ -249,22 +267,8 @@ class _HyperDividerPainter extends CustomPainter {
       return;
     }
 
-    final segmentLength = pattern == HyperDividerPattern.dotted
-        ? 0.0
-        : dashLength;
-    final step =
-        (pattern == HyperDividerPattern.dotted ? thickness : dashLength) + gap;
-    for (
-      var start = 0.0;
-      start <= extent;
-      start += step > 0 ? step : extent + 1
-    ) {
-      _drawSegment(
-        canvas,
-        paint,
-        start,
-        (start + segmentLength).clamp(0, extent),
-      );
+    for (final segment in line.segments(extent)) {
+      _drawSegment(canvas, paint, segment.start, segment.end);
     }
     canvas.restore();
   }

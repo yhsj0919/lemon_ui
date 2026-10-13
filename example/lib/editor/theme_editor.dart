@@ -1,5 +1,10 @@
+import 'editor_tag_fields.dart';
+import 'editor_chip_fields.dart';
+import 'editor_select_fields.dart';
+import 'editor_text_field_fields.dart';
 import 'editor_global_fields.dart';
 import 'editor_property_help.dart';
+import 'editor_button_fields.dart';
 
 import 'dart:convert';
 import 'dart:ui' show AppExitResponse;
@@ -39,26 +44,77 @@ class _ThemeEditorState extends State<ThemeEditor> {
   set _page(String value) => _selection.page.value = value;
   double _textScale = 1;
   String? _gestureStart;
+  String _tagState = 'common';
+  String _tagVariant = 'common';
+  String _chipState = 'common';
+  String _buttonState = 'common';
+  String _fieldState = 'common';
+  String _selectAnchorState = 'common';
+  String _selectPanelState = 'common';
+  String get _selectState =>
+      _selectSurfaceAnchor ? _selectAnchorState : _selectPanelState;
+  bool _selectSurfaceAnchor = true;
+  HyperButtonVariant? _buttonVariant;
+  HyperButtonSizeVariant _buttonSizeVariant = HyperButtonSizeVariant.medium;
   late final AppLifecycleListener _lifecycle;
-  bool get _dirty => _saved != _document.encode();
+  HyperThemeData? _resolvedLight, _resolvedDark;
+  String? _encodedDocument;
+  bool get _dirty => _saved != (_encodedDocument ??= _document.encode());
+
+  HyperThemeData _resolveTheme(bool dark) => dark
+      ? (_resolvedDark ??= _document.resolve(true))
+      : (_resolvedLight ??= _document.resolve(false));
+
+  void _updateState(VoidCallback change) {
+    setState(() {
+      change();
+      _resolvedLight = _resolvedDark = null;
+      _encodedDocument = null;
+    });
+  }
+
   EditorMode get _mode => _document.mode(_dark);
   EditorDevice get _spec => _document.device(_device);
   EditorComponent get _appearance => switch (_component) {
-    'button' => _mode.button,
+    'button' =>
+      _buttonVariant == null
+          ? _mode.button
+          : _mode.buttonVariants.forVariant(_buttonVariant!),
+    'tag' =>
+      _tagState == 'disabled'
+          ? _mode.tagDisabled
+          : _tagVariant == 'emphasized'
+          ? _mode.tagEmphasized
+          : _mode.tag,
+    'chip' => switch (_chipState) {
+      'selected' => _mode.chipSelected,
+      'hovered' => _mode.chipHovered,
+      'focused' => _mode.chipFocused,
+      'pressed' => _mode.chipPressed,
+      'disabled' => _mode.chipDisabled,
+      _ => _mode.chip,
+    },
+    'select' => _selectSurfaceAnchor ? _mode.selectAnchor : _mode.select,
     'card' => _mode.card,
     'field' => _mode.field,
     _ => _mode.menu,
   };
   static const _components = {
     'button': 'Button',
+    'tag': 'Tag',
+    'chip': 'Chip',
     'card': 'Card',
     'field': 'TextField',
+    'select': 'Select',
     'menu': 'Menu',
   };
   static const _pages = {
     'button': 'hyper-button',
+    'tag': 'hyper-tag',
+    'chip': 'hyper-chip',
     'card': 'hyper-card',
     'field': 'hyper-text-field',
+    'select': 'hyper-select-fields',
     'menu': 'hyper-menu',
   };
   static const _devices = {
@@ -91,7 +147,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     if (!mounted) return;
     if (source != null) {
       try {
-        setState(
+        _updateState(
           () => _library = (jsonDecode(source) as Map<String, dynamic>)
               .cast<String, String>(),
         );
@@ -102,8 +158,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
   }
 
   void _change(VoidCallback change) {
+    if (_gestureStart != null) {
+      _updateState(change);
+      return;
+    }
     final before = _document.encode();
-    setState(change);
+    _updateState(change);
     if (_document.encode() != before && _gestureStart == null) {
       _undo.add(before);
       _redo.clear();
@@ -114,7 +174,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     final before = _gestureStart;
     _gestureStart = null;
     if (before != null && before != _document.encode()) {
-      setState(() {
+      _updateState(() {
         _undo.add(before);
         _redo.clear();
       });
@@ -124,7 +184,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   void _history(bool redo) {
     final source = redo ? _redo : _undo, target = redo ? _undo : _redo;
     if (source.isEmpty) return;
-    setState(() {
+    _updateState(() {
       target.add(_document.encode());
       _document = EditorThemeDocument.decode(source.removeLast());
     });
@@ -167,7 +227,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       );
       if (!success) throw StateError('写入失败');
       if (!mounted) return false;
-      setState(() {
+      _updateState(() {
         _document.name = name;
         _saved = _document.encode();
         _library = library;
@@ -206,7 +266,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   }
 
   void _replace(EditorThemeDocument document) {
-    setState(() {
+    _updateState(() {
       _document = document;
       _saved = document.encode();
       _undo.clear();
@@ -222,25 +282,72 @@ class _ThemeEditorState extends State<ThemeEditor> {
     }
     final name = await showHyperDialog<String>(
       context: context,
-      builder: (context) => HyperDialog(
-        title: const Text('主题库'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final name in _library.keys)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: HyperButton.tonal(
-                  onPressed: () => Navigator.pop(context, name),
-                  child: Text(name),
+      builder: (context) => StatefulBuilder(
+        builder: (context, refresh) => HyperDialog(
+          title: const Text('主题库'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_library.isEmpty) const HyperText('还没有保存的主题'),
+              for (final name in _library.keys)
+                HyperListTile(
+                  title: Text(name),
+                  leading: const Icon(Icons.palette_outlined),
+                  onTap: () => Navigator.pop(context, name),
+                  trailing: HyperIconButton.ghost(
+                    tooltip: '删除主题 $name',
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () {
+                      _deleteLibraryTheme(name).then((deleted) {
+                        if (deleted && context.mounted) refresh(() {});
+                      });
+                    },
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
     if (name != null && mounted) {
       _replace(EditorThemeDocument.decode(_library[name]!));
+    }
+  }
+
+  Future<bool> _deleteLibraryTheme(String name) async {
+    final confirmed = await showHyperDialog<bool>(
+      context: context,
+      builder: (dialogContext) => HyperDialog(
+        title: const Text('删除主题'),
+        content: Text('删除主题库中的“$name”？当前编辑内容和启动主题设置会保留。'),
+        actions: [
+          HyperButton.ghost(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('取消'),
+          ),
+          HyperButton.filled(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return false;
+    final library = {..._library}..remove(name);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!await prefs.setString('theme-editor-library', jsonEncode(library))) {
+        throw StateError('写入失败');
+      }
+      if (!mounted) return false;
+      _updateState(() {
+        _library = library;
+        if (_document.name == name) _saved = '';
+      });
+      return true;
+    } catch (e) {
+      _notice('删除失败：$e');
+      return false;
     }
   }
 
@@ -257,7 +364,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       );
       if (mounted) {
         _replace(document);
-        setState(() => _saved = ''); // 导入后需要显式保存到本地主题库。
+        _updateState(() => _saved = ''); // 导入后需要显式保存到本地主题库。
       }
     } catch (e) {
       _notice('导入失败：$e');
@@ -332,14 +439,14 @@ class _ThemeEditorState extends State<ThemeEditor> {
                             spacing: 8,
                             children: [
                               HyperButton.ghost(
-                                onPressed: () => setState(() {
+                                onPressed: () => _updateState(() {
                                   _left = !_left;
                                   if (_left) _right = false;
                                 }),
                                 child: const Text('全局工作区'),
                               ),
                               HyperButton.ghost(
-                                onPressed: () => setState(() {
+                                onPressed: () => _updateState(() {
                                   _right = !_right;
                                   if (_right) _left = false;
                                 }),
@@ -395,47 +502,127 @@ class _ThemeEditorState extends State<ThemeEditor> {
   );
 
   Widget _toolbar() => Padding(
-    padding: const EdgeInsets.all(12),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        HyperText('主题工作室 · ${_document.name}${_dirty ? ' • 未保存' : ''}'),
-        HyperButton.ghost(
-          onPressed: () async {
-            if (await _canReplace() && mounted) {
-              _replace(EditorThemeDocument());
-            }
-          },
-          child: const Text('新建'),
-        ),
-        HyperButton.ghost(onPressed: _openLibrary, child: const Text('主题库')),
-        HyperButton.filled(onPressed: () => _save(), child: const Text('保存')),
-        HyperButton.ghost(
-          onPressed: () => _save(asNew: true),
-          child: const Text('另存为'),
-        ),
-        HyperButton.ghost(onPressed: _import, child: const Text('导入')),
-        HyperButton.ghost(onPressed: _export, child: const Text('导出 JSON')),
-        HyperButton.ghost(onPressed: _setStartup, child: const Text('下次启动使用')),
-        HyperIconButton.ghost(
-          tooltip: '撤销',
-          onPressed: _undo.isEmpty ? null : () => _history(false),
-          icon: const Icon(Icons.undo),
-        ),
-        HyperIconButton.ghost(
-          tooltip: '重做',
-          onPressed: _redo.isEmpty ? null : () => _history(true),
-          icon: const Icon(Icons.redo),
-        ),
-      ],
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        Widget action(
+          String label,
+          IconData icon,
+          VoidCallback? pressed, {
+          bool primary = false,
+        }) => HyperTooltip(
+          message: label,
+          child: primary
+              ? HyperButton.filled(
+                  label: Text(label),
+                  icon: Icon(icon),
+                  onPressed: pressed,
+                )
+              : HyperButton.tonal(
+                  label: Text(label),
+                  icon: Icon(icon),
+                  onPressed: pressed,
+                ),
+        );
+        Widget group(List<Widget> children) =>
+            Wrap(spacing: 6, runSpacing: 8, children: children);
+        final title = HyperTooltip(
+          message: '主题库',
+          child: HyperButton.ghost(
+            onPressed: () {
+              _openLibrary();
+            },
+            style: HyperButtonStyle(alignment: Alignment.centerLeft),
+            icon: const Icon(Icons.expand_more),
+            iconAlignment: HyperButtonIconAlignment.end,
+            label: HyperText(
+              '主题工作室 · ${_document.name}${_dirty ? ' • 未保存' : ''}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+        final leftActions = Wrap(
+          spacing: 16,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            title,
+            group([
+              action('新建', Icons.note_add_outlined, () {
+                _newTheme();
+              }),
+            ]),
+            group([
+              action(
+                '撤销',
+                Icons.undo,
+                _undo.isEmpty ? null : () => _history(false),
+              ),
+              action(
+                '重做',
+                Icons.redo,
+                _redo.isEmpty ? null : () => _history(true),
+              ),
+            ]),
+          ],
+        );
+        final rightActions = Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 16,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            group([
+              action('导入', Icons.file_upload_outlined, () {
+                _import();
+              }),
+              action('导出 JSON', Icons.file_download_outlined, () {
+                _export();
+              }),
+            ]),
+            group([
+              action('另存为', Icons.save_as_outlined, () {
+                _save(asNew: true);
+              }),
+              action('下次启动使用', Icons.launch_outlined, () {
+                _setStartup();
+              }),
+              action('保存', Icons.save_outlined, () {
+                _save();
+              }, primary: true),
+            ]),
+          ],
+        );
+        if (constraints.maxWidth < 1200) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              leftActions,
+              const SizedBox(height: 12),
+              Align(alignment: Alignment.centerRight, child: rightActions),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: leftActions),
+            const SizedBox(width: 24),
+            Expanded(child: rightActions),
+          ],
+        );
+      },
     ),
   );
+
+  Future<void> _newTheme() async {
+    if (await _canReplace() && mounted) _replace(EditorThemeDocument());
+  }
 
   Widget _panel(String title, List<Widget> children) => ColoredBox(
     color: HyperTheme.of(context).colors.surface,
     child: ListView(
+      key: ValueKey('editor-panel-$title'),
       padding: const EdgeInsets.all(16),
       children: [
         HyperText(title, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -457,11 +644,20 @@ class _ThemeEditorState extends State<ThemeEditor> {
     Map<T, String> options,
     ValueChanged<T> changed,
   ) => Padding(
+    key: ValueKey('editor-select-$label'),
     padding: const EdgeInsets.only(bottom: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Tooltip(message: editorPropertyHelp(label), child: HyperText(label)),
+        HyperTooltip(
+          message: editorPropertyHelp(label),
+          child: Row(
+            children: [
+              Expanded(child: HyperText(label)),
+              const Icon(Icons.info_outline, size: 14),
+            ],
+          ),
+        ),
         const SizedBox(height: 6),
         HyperSelect<T>(
           value: value,
@@ -485,117 +681,101 @@ class _ThemeEditorState extends State<ThemeEditor> {
     VoidCallback reset,
     bool overridden, {
     bool wholeNumbers = true,
-  }) => Column(
+  }) => Padding(
     key: ValueKey('editor-number-$label'),
-    children: [
-      Row(
-        children: [
-          Expanded(
-            child: Tooltip(
-              message: editorPropertyHelp(label),
-              child: HyperText(
-                '$label  ${value.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: HyperTooltip(
+                message: editorPropertyHelp(label),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: HyperText(
+                        '$label  ${value.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+                      ),
+                    ),
+                    const Icon(Icons.info_outline, size: 14),
+                  ],
+                ),
               ),
             ),
-          ),
-          HyperIconButton.ghost(
-            tooltip: overridden ? '恢复继承' : '继承默认',
-            onPressed: overridden ? () => _change(reset) : null,
-            icon: Icon(overridden ? Icons.restart_alt : Icons.link, size: 16),
-          ),
-        ],
-      ),
-      HyperSlider(
-        value: value.clamp(min, max),
-        min: min,
-        max: max,
-        divisions: wholeNumbers ? (max - min).round() : null,
-        onChangeStart: (_) => _gestureStart = _document.encode(),
-        onChangeEnd: (_) => _endGesture(),
-        onChanged: (value) => _change(
-          () => changed(wholeNumbers ? value.roundToDouble() : value),
+            HyperIconButton.ghost(
+              tooltip: overridden ? '恢复继承' : '继承默认',
+              style: HyperIconButtonStyle(size: 24, minimumTapTargetSize: 24),
+              onPressed: overridden ? () => _change(reset) : null,
+              icon: Icon(overridden ? Icons.restart_alt : Icons.link, size: 16),
+            ),
+          ],
         ),
-      ),
-    ],
+        const SizedBox(height: 6),
+        HyperSlider(
+          value: value.clamp(min, max),
+          min: min,
+          max: max,
+          divisions: wholeNumbers ? (max - min).round() : null,
+          onChangeStart: (_) => _gestureStart = _document.encode(),
+          onChangeEnd: (_) => _endGesture(),
+          onChanged: (value) => _change(
+            () => changed(wholeNumbers ? value.roundToDouble() : value),
+          ),
+        ),
+      ],
+    ),
   );
-  Future<Color?> _pickColor(String title, Color initial) =>
-      showHyperColorPickerDialog(
-        context: context,
-        initialColor: initial,
-        title: Text(title),
-      );
-
   Widget _color(
     String label,
     EditorColor? color,
-    ValueChanged<EditorColor?> changed,
-  ) {
-    final colors = _document.resolve(_dark).colors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _select(
-          label,
-          color?.semantic ?? (color == null ? 'inherit' : 'custom'),
-          {
-            'inherit': '恢复默认',
-            'primary': '预设 · 主色',
-            'surface': '预设 · 表面',
-            'textPrimary': '预设 · 正文',
-            'outline': '预设 · 边框',
-            'custom': '自定义 ARGB',
-          },
-          (value) async {
-            if (value == 'custom') {
-              final picked = await _pickColor(
-                label,
-                color?.resolve(colors) ?? colors.primary,
-              );
-              if (picked != null && mounted) {
-                _change(() => changed(EditorColor(argb: picked.toARGB32())));
-              }
-            } else {
-              _change(
-                () => changed(
-                  value == 'inherit' ? null : EditorColor(semantic: value),
-                ),
-              );
-            }
-          },
-        ),
-        if (color?.argb != null)
-          HyperColorPickerField(
-            value: color!.resolve(colors),
-            onChanged: (value) =>
-                _change(() => changed(EditorColor(argb: value.toARGB32()))),
-          )
-        else if (color != null)
-          Container(
-            height: 12,
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: color.resolve(colors),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        Wrap(
-          spacing: 4,
-          children: [
-            for (final entry in const <String, int>{
-              '蓝色': 0xff3482ff,
-              '橙色': 0xffff6900,
-              '紫色': 0xff7e57c2,
-              '绿色': 0xff2e7d32,
-            }.entries)
-              HyperIconButton.ghost(
-                tooltip: '使用${entry.key}',
-                icon: Icon(Icons.circle, color: Color(entry.value)),
-                onPressed: () =>
-                    _change(() => changed(EditorColor(argb: entry.value))),
-              ),
-          ],
-        ),
-      ],
+    ValueChanged<EditorColor?> changed, {
+    Color? inheritedColor,
+  }) {
+    final theme = _resolveTheme(_dark);
+    final colors = theme.colors;
+    final inherited = switch (label) {
+      '前景' =>
+        _component == 'button' &&
+                (_buttonVariant == null ||
+                    _buttonVariant == HyperButtonVariant.filled ||
+                    _buttonVariant == HyperButtonVariant.gradient)
+            ? colors.onPrimary
+            : colors.textPrimary,
+      '材质边框' => colors.outline,
+      '材质染色' => colors.surface.withValues(alpha: .06),
+      '材质背景' => colors.surface,
+      '背景' => switch (_component) {
+        'button' =>
+          theme.buttonTheme
+                  .resolve(_buttonVariant ?? HyperButtonVariant.filled)
+                  .background
+                  ?.color ??
+              (_buttonVariant == HyperButtonVariant.filled ||
+                      _buttonVariant == HyperButtonVariant.gradient
+                  ? colors.primary
+                  : _buttonVariant == HyperButtonVariant.tonal
+                  ? colors.surface
+                  : Colors.transparent),
+        'field' =>
+          theme.textFieldTheme.style.background?.color ?? colors.surfaceMuted,
+        'select' =>
+          _componentFill(theme)?.color ??
+              (_selectSurfaceAnchor
+                  ? Colors.transparent
+                  : colors.surfaceElevated),
+        'chip' || 'tag' => _componentFill(theme)?.color ?? colors.surfaceMuted,
+        'card' => theme.cardTheme.style?.background?.color ?? colors.surface,
+        _ => colors.surfaceElevated,
+      },
+      _ => colors.primary,
+    };
+    return _semanticColor(
+      label,
+      color?.resolve(colors) ?? inheritedColor ?? inherited,
+      color?.resolve(colors),
+      (value) =>
+          changed(value == null ? null : EditorColor(argb: value.toARGB32())),
     );
   }
 
@@ -606,13 +786,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
     ValueChanged<Color?> changed,
   ) => Padding(
     key: ValueKey('editor-color-$label'),
-    padding: const EdgeInsets.only(bottom: 8),
+    padding: const EdgeInsets.only(bottom: 12),
     child: Row(
       children: [
         Expanded(
           flex: 4,
-          child: Tooltip(
-            triggerMode: TooltipTriggerMode.tap,
+          child: HyperTooltip(
             message: '$label\n${editorPropertyHelp(label)}',
             child: Row(
               children: [
@@ -665,7 +844,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   );
 
   Widget _globalPanel() {
-    final theme = _document.resolve(_dark),
+    final theme = _resolveTheme(_dark),
         typo = theme.typographyTheme.resolve(_device);
     return _panel('全局工作区', [
       const HyperText('编辑设备'),
@@ -698,7 +877,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                 ),
               ],
               selected: {_device},
-              onSelectionChanged: (value) => setState(() {
+              onSelectionChanged: (value) => _updateState(() {
                 _device = value.single;
                 _landscape = _device == HyperDeviceType.desktop;
               }),
@@ -707,7 +886,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           const SizedBox(width: 8),
           HyperIconButton.outlined(
             tooltip: _landscape ? '当前横屏，切换竖屏' : '当前竖屏，切换横屏',
-            onPressed: () => setState(() => _landscape = !_landscape),
+            onPressed: () => _updateState(() => _landscape = !_landscape),
             icon: Icon(
               _landscape
                   ? Icons.stay_current_landscape
@@ -733,30 +912,15 @@ class _ThemeEditorState extends State<ThemeEditor> {
           ),
         ],
         selected: {_dark},
-        onSelectionChanged: (value) => setState(() => _dark = value.single),
+        onSelectionChanged: (value) => _updateState(() => _dark = value.single),
       ),
-      _heading('文字缩放'),
-      HyperSegmentedButton<double>(
-        expanded: true,
-        segments: const [
-          HyperSegment(value: 1.0, label: '1.0×'),
-          HyperSegment(value: 1.3, label: '1.3×'),
-          HyperSegment(value: 2.0, label: '2.0×'),
-        ],
-        selected: {_textScale},
-        onSelectionChanged: (value) =>
-            setState(() => _textScale = value.single),
-      ),
-      const HyperText('当前方案独立编辑；尺寸与字阶属于当前设备。'),
-      _heading('基础配色'),
+      _heading('主题与强调色'),
       _semanticColor(
-        '生成基础配色',
+        '主题色',
         Color(_mode.seed ?? 0xff3482ff),
         _mode.seed == null ? null : Color(_mode.seed!),
         (value) => _mode.seed = value?.toARGB32(),
       ),
-      const HyperText('生成整套基础颜色，已单独修改的语义颜色保留。'),
-      _heading('语义颜色 · 当前明暗方案'),
       _semanticColor(
         'primary',
         theme.colors.primary,
@@ -781,132 +945,20 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.palette.onPrimaryContainer,
         (value) => _mode.palette.onPrimaryContainer = value,
       ),
-      _semanticColor(
-        'background',
-        theme.colors.background,
-        _mode.palette.background,
-        (value) => _mode.palette.background = value,
+      const HyperText('根据主题色生成基础配色，已单独修改的颜色保持不变。'),
+      _heading('文字缩放'),
+      HyperSegmentedButton<double>(
+        expanded: true,
+        segments: const [
+          HyperSegment(value: 1.0, label: '1.0×'),
+          HyperSegment(value: 1.3, label: '1.3×'),
+          HyperSegment(value: 2.0, label: '2.0×'),
+        ],
+        selected: {_textScale},
+        onSelectionChanged: (value) =>
+            _updateState(() => _textScale = value.single),
       ),
-      _semanticColor(
-        'onBackground',
-        theme.colors.onBackground,
-        _mode.palette.onBackground,
-        (value) => _mode.palette.onBackground = value,
-      ),
-      _semanticColor(
-        'surface',
-        theme.colors.surface,
-        _mode.palette.surface,
-        (value) => _mode.palette.surface = value,
-      ),
-      _semanticColor(
-        'onSurface',
-        theme.colors.onSurface,
-        _mode.palette.onSurface,
-        (value) => _mode.palette.onSurface = value,
-      ),
-      _semanticColor(
-        'surfaceElevated',
-        theme.colors.surfaceElevated,
-        _mode.palette.surfaceElevated,
-        (value) => _mode.palette.surfaceElevated = value,
-      ),
-      _semanticColor(
-        'onSurfaceElevated',
-        theme.colors.onSurfaceElevated,
-        _mode.palette.onSurfaceElevated,
-        (value) => _mode.palette.onSurfaceElevated = value,
-      ),
-      _semanticColor(
-        'surfaceMuted',
-        theme.colors.surfaceMuted,
-        _mode.palette.surfaceMuted,
-        (value) => _mode.palette.surfaceMuted = value,
-      ),
-      _semanticColor(
-        'onSurfaceMuted',
-        theme.colors.onSurfaceMuted,
-        _mode.palette.onSurfaceMuted,
-        (value) => _mode.palette.onSurfaceMuted = value,
-      ),
-      _semanticColor(
-        'textPrimary',
-        theme.colors.textPrimary,
-        _mode.palette.textPrimary,
-        (value) => _mode.palette.textPrimary = value,
-      ),
-      _semanticColor(
-        'textSecondary',
-        theme.colors.textSecondary,
-        _mode.palette.textSecondary,
-        (value) => _mode.palette.textSecondary = value,
-      ),
-      _semanticColor(
-        'textTertiary',
-        theme.colors.textTertiary,
-        _mode.palette.textTertiary,
-        (value) => _mode.palette.textTertiary = value,
-      ),
-      _semanticColor(
-        'outline',
-        theme.colors.outline,
-        _mode.palette.outline,
-        (value) => _mode.palette.outline = value,
-      ),
-      _semanticColor(
-        'disabled',
-        theme.colors.disabled,
-        _mode.palette.disabled,
-        (value) => _mode.palette.disabled = value,
-      ),
-      _semanticColor(
-        'stateLayer',
-        theme.colors.stateLayer,
-        _mode.palette.stateLayer,
-        (value) => _mode.palette.stateLayer = value,
-      ),
-      _semanticColor(
-        'scrim',
-        theme.colors.scrim,
-        _mode.palette.scrim,
-        (value) => _mode.palette.scrim = value,
-      ),
-      _semanticColor(
-        'error',
-        theme.colors.error,
-        _mode.palette.error,
-        (value) => _mode.palette.error = value,
-      ),
-      _semanticColor(
-        'onError',
-        theme.colors.onError,
-        _mode.palette.onError,
-        (value) => _mode.palette.onError = value,
-      ),
-      _semanticColor(
-        'success',
-        theme.colors.success,
-        _mode.palette.success,
-        (value) => _mode.palette.success = value,
-      ),
-      _semanticColor(
-        'onSuccess',
-        theme.colors.onSuccess,
-        _mode.palette.onSuccess,
-        (value) => _mode.palette.onSuccess = value,
-      ),
-      _semanticColor(
-        'warning',
-        theme.colors.warning,
-        _mode.palette.warning,
-        (value) => _mode.palette.warning = value,
-      ),
-      _semanticColor(
-        'onWarning',
-        theme.colors.onWarning,
-        _mode.palette.onWarning,
-        (value) => _mode.palette.onWarning = value,
-      ),
+      const HyperText('当前方案独立编辑；尺寸与字阶属于当前设备。'),
       _heading('字体'),
       HyperTextField(
         key: ValueKey('font/$_dark/${_mode.fontFamily}'),
@@ -1095,7 +1147,54 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _spec.typography.caption != null,
         wholeNumbers: true,
       ),
-      _heading('公共尺寸 · ${_devices[_device]}'),
+      _heading('文字语义颜色'),
+      _semanticColor(
+        'textPrimary',
+        theme.colors.textPrimary,
+        _mode.palette.textPrimary,
+        (value) => _mode.palette.textPrimary = value,
+      ),
+      _semanticColor(
+        'textSecondary',
+        theme.colors.textSecondary,
+        _mode.palette.textSecondary,
+        (value) => _mode.palette.textSecondary = value,
+      ),
+      _semanticColor(
+        'textTertiary',
+        theme.colors.textTertiary,
+        _mode.palette.textTertiary,
+        (value) => _mode.palette.textTertiary = value,
+      ),
+      _heading('页面布局'),
+      _number(
+        '页面水平留白',
+        theme.sizes.resolve(_device).pageHorizontalPadding,
+        0,
+        200,
+        (v) => _spec.layout.pageHorizontalPadding = v,
+        () => _spec.layout.pageHorizontalPadding = null,
+        _spec.layout.pageHorizontalPadding != null,
+      ),
+      _number(
+        '紧凑章节间距',
+        theme.sizes.resolve(_device).compactSectionSpacing,
+        0,
+        200,
+        (v) => _spec.layout.compactSectionSpacing = v,
+        () => _spec.layout.compactSectionSpacing = null,
+        _spec.layout.compactSectionSpacing != null,
+      ),
+      _number(
+        '章节间距',
+        theme.sizes.resolve(_device).sectionSpacing,
+        0,
+        200,
+        (v) => _spec.layout.sectionSpacing = v,
+        () => _spec.layout.sectionSpacing = null,
+        _spec.layout.sectionSpacing != null,
+      ),
+      _heading('导航与工具栏'),
       _number(
         '导航项间距',
         theme.sizes.resolve(_device).navigationItemSpacing,
@@ -1105,6 +1204,34 @@ class _ThemeEditorState extends State<ThemeEditor> {
         () => _spec.layout.navigationItemSpacing = null,
         _spec.layout.navigationItemSpacing != null,
       ),
+      _number(
+        '紧凑工具栏高度',
+        theme.sizes.resolve(_device).toolbarCompactHeight,
+        0,
+        200,
+        (v) => _spec.layout.toolbarCompactHeight = v,
+        () => _spec.layout.toolbarCompactHeight = null,
+        _spec.layout.toolbarCompactHeight != null,
+      ),
+      _number(
+        '工具栏高度',
+        theme.sizes.resolve(_device).toolbarHeight,
+        0,
+        200,
+        (v) => _spec.layout.toolbarHeight = v,
+        () => _spec.layout.toolbarHeight = null,
+        _spec.layout.toolbarHeight != null,
+      ),
+      _number(
+        '强调工具栏高度',
+        theme.sizes.resolve(_device).toolbarEmphasizedHeight,
+        0,
+        200,
+        (v) => _spec.layout.toolbarEmphasizedHeight = v,
+        () => _spec.layout.toolbarEmphasizedHeight = null,
+        _spec.layout.toolbarEmphasizedHeight != null,
+      ),
+      _heading('控件布局与触控'),
       _number(
         '特小控件高度',
         theme.sizes.resolve(_device).controlHeightXs,
@@ -1160,106 +1287,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _spec.layout.minimumInteractiveDimension != null,
       ),
       _number(
-        '控件圆角',
-        theme.sizes.resolve(_device).controlRadius,
-        0,
-        200,
-        (v) => _spec.layout.controlRadius = v,
-        () => _spec.layout.controlRadius = null,
-        _spec.layout.controlRadius != null,
-      ),
-      _number(
-        '表面圆角',
-        theme.sizes.resolve(_device).surfaceRadius,
-        0,
-        200,
-        (v) => _spec.layout.surfaceRadius = v,
-        () => _spec.layout.surfaceRadius = null,
-        _spec.layout.surfaceRadius != null,
-      ),
-      _number(
-        '浮层圆角',
-        theme.sizes.resolve(_device).overlayRadius,
-        0,
-        200,
-        (v) => _spec.layout.overlayRadius = v,
-        () => _spec.layout.overlayRadius = null,
-        _spec.layout.overlayRadius != null,
-      ),
-      _number(
-        '浮层间距',
-        theme.sizes.resolve(_device).overlaySpacing,
-        0,
-        200,
-        (v) => _spec.layout.overlaySpacing = v,
-        () => _spec.layout.overlaySpacing = null,
-        _spec.layout.overlaySpacing != null,
-      ),
-      _number(
-        '页面水平留白',
-        theme.sizes.resolve(_device).pageHorizontalPadding,
-        0,
-        200,
-        (v) => _spec.layout.pageHorizontalPadding = v,
-        () => _spec.layout.pageHorizontalPadding = null,
-        _spec.layout.pageHorizontalPadding != null,
-      ),
-      _number(
-        '紧凑章节间距',
-        theme.sizes.resolve(_device).compactSectionSpacing,
-        0,
-        200,
-        (v) => _spec.layout.compactSectionSpacing = v,
-        () => _spec.layout.compactSectionSpacing = null,
-        _spec.layout.compactSectionSpacing != null,
-      ),
-      _number(
-        '章节间距',
-        theme.sizes.resolve(_device).sectionSpacing,
-        0,
-        200,
-        (v) => _spec.layout.sectionSpacing = v,
-        () => _spec.layout.sectionSpacing = null,
-        _spec.layout.sectionSpacing != null,
-      ),
-      _number(
-        '紧凑工具栏高度',
-        theme.sizes.resolve(_device).toolbarCompactHeight,
-        0,
-        200,
-        (v) => _spec.layout.toolbarCompactHeight = v,
-        () => _spec.layout.toolbarCompactHeight = null,
-        _spec.layout.toolbarCompactHeight != null,
-      ),
-      _number(
-        '工具栏高度',
-        theme.sizes.resolve(_device).toolbarHeight,
-        0,
-        200,
-        (v) => _spec.layout.toolbarHeight = v,
-        () => _spec.layout.toolbarHeight = null,
-        _spec.layout.toolbarHeight != null,
-      ),
-      _number(
-        '强调工具栏高度',
-        theme.sizes.resolve(_device).toolbarEmphasizedHeight,
-        0,
-        200,
-        (v) => _spec.layout.toolbarEmphasizedHeight = v,
-        () => _spec.layout.toolbarEmphasizedHeight = null,
-        _spec.layout.toolbarEmphasizedHeight != null,
-      ),
-      _number(
-        '图标尺寸',
-        theme.sizes.resolve(_device).iconSize,
-        0,
-        200,
-        (v) => _spec.layout.iconSize = v,
-        () => _spec.layout.iconSize = null,
-        _spec.layout.iconSize != null,
-      ),
-      _heading('控件内边距'),
-      _number(
         '左',
         theme.sizes
             .resolve(_device)
@@ -1311,7 +1338,112 @@ class _ThemeEditorState extends State<ThemeEditor> {
         () => _spec.layout.paddingBottom = null,
         _spec.layout.paddingBottom != null,
       ),
-      _heading('动效与对比度'),
+      _heading('图标'),
+      _number(
+        '图标尺寸',
+        theme.sizes.resolve(_device).iconSize,
+        0,
+        200,
+        (v) => _spec.layout.iconSize = v,
+        () => _spec.layout.iconSize = null,
+        _spec.layout.iconSize != null,
+      ),
+      _heading('禁用状态'),
+      _semanticColor(
+        'disabled',
+        theme.colors.disabled,
+        _mode.palette.disabled,
+        (value) => _mode.palette.disabled = value,
+      ),
+      _heading('交互状态'),
+      _semanticColor(
+        'stateLayer',
+        theme.colors.stateLayer,
+        _mode.palette.stateLayer,
+        (value) => _mode.palette.stateLayer = value,
+      ),
+      _heading('错误状态'),
+      _semanticColor(
+        'error',
+        theme.colors.error,
+        _mode.palette.error,
+        (value) => _mode.palette.error = value,
+      ),
+      _semanticColor(
+        'onError',
+        theme.colors.onError,
+        _mode.palette.onError,
+        (value) => _mode.palette.onError = value,
+      ),
+      _heading('成功状态'),
+      _semanticColor(
+        'success',
+        theme.colors.success,
+        _mode.palette.success,
+        (value) => _mode.palette.success = value,
+      ),
+      _semanticColor(
+        'onSuccess',
+        theme.colors.onSuccess,
+        _mode.palette.onSuccess,
+        (value) => _mode.palette.onSuccess = value,
+      ),
+      _heading('警告状态'),
+      _semanticColor(
+        'warning',
+        theme.colors.warning,
+        _mode.palette.warning,
+        (value) => _mode.palette.warning = value,
+      ),
+      _semanticColor(
+        'onWarning',
+        theme.colors.onWarning,
+        _mode.palette.onWarning,
+        (value) => _mode.palette.onWarning = value,
+      ),
+      _heading('前景对比度'),
+      _select(
+        '前景反色策略',
+        _mode.behavior.contrastMode?.name ?? 'inherit',
+        {
+          'inherit': '继承默认',
+          for (final v in HyperContrastMode.values)
+            v.name: switch (v) {
+              HyperContrastMode.standard => '标准',
+              HyperContrastMode.adaptive => '自适应',
+              HyperContrastMode.inverted => '反色',
+            },
+        },
+        (v) => _change(
+          () => _mode.behavior.contrastMode = v == 'inherit'
+              ? null
+              : HyperContrastMode.values.byName(v),
+        ),
+      ),
+      _number(
+        '最低对比度',
+        _mode.behavior.minimumContrastRatio ??
+            theme.contrastTheme.minimumContrastRatio,
+        1,
+        21,
+        (v) => _mode.behavior.minimumContrastRatio = v,
+        () => _mode.behavior.minimumContrastRatio = null,
+        _mode.behavior.minimumContrastRatio != null,
+        wholeNumbers: false,
+      ),
+      _semanticColor(
+        '浅色前景',
+        theme.contrastTheme.lightForeground,
+        _mode.behavior.lightForeground,
+        (v) => _mode.behavior.lightForeground = v,
+      ),
+      _semanticColor(
+        '深色前景',
+        theme.contrastTheme.darkForeground,
+        _mode.behavior.darkForeground,
+        (v) => _mode.behavior.darkForeground = v,
+      ),
+      _heading('快速动效'),
       _number(
         '快速时长（毫秒）',
         _mode.behavior.fastDuration ??
@@ -1323,6 +1455,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.behavior.fastDuration != null,
         wholeNumbers: true,
       ),
+      _select(
+        '快速曲线',
+        _mode.behavior.fastCurve?.name ?? 'inherit',
+        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
+        (v) => _change(
+          () => _mode.behavior.fastCurve = v == 'inherit'
+              ? null
+              : EditorCurve.values.byName(v),
+        ),
+      ),
+      _heading('标准动效'),
       _number(
         '标准时长（毫秒）',
         _mode.behavior.standardDuration ??
@@ -1334,6 +1477,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.behavior.standardDuration != null,
         wholeNumbers: true,
       ),
+      _select(
+        '标准曲线',
+        _mode.behavior.standardCurve?.name ?? 'inherit',
+        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
+        (v) => _change(
+          () => _mode.behavior.standardCurve = v == 'inherit'
+              ? null
+              : EditorCurve.values.byName(v),
+        ),
+      ),
+      _heading('强调动效'),
       _number(
         '强调时长（毫秒）',
         _mode.behavior.emphasizedDuration ??
@@ -1345,6 +1499,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.behavior.emphasizedDuration != null,
         wholeNumbers: true,
       ),
+      _select(
+        '强调曲线',
+        _mode.behavior.emphasizedCurve?.name ?? 'inherit',
+        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
+        (v) => _change(
+          () => _mode.behavior.emphasizedCurve = v == 'inherit'
+              ? null
+              : EditorCurve.values.byName(v),
+        ),
+      ),
+      _heading('弹簧动效'),
       _number(
         '弹簧质量',
         _mode.behavior.springMass ?? theme.motion.spring.mass,
@@ -1375,59 +1540,109 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.behavior.springDamping != null,
         wholeNumbers: false,
       ),
-      _number(
-        '材质淡入阶段占比',
-        _mode.behavior.transitionFadeFraction ??
-            theme.materialTheme.transitionFadeFraction ??
-            .6,
-        0.01,
-        0.99,
-        (v) => _mode.behavior.transitionFadeFraction = v,
-        () => _mode.behavior.transitionFadeFraction = null,
-        _mode.behavior.transitionFadeFraction != null,
-        wholeNumbers: false,
+      _heading('页面背景'),
+      _semanticColor(
+        'background',
+        theme.colors.background,
+        _mode.palette.background,
+        (value) => _mode.palette.background = value,
+      ),
+      _semanticColor(
+        'onBackground',
+        theme.colors.onBackground,
+        _mode.palette.onBackground,
+        (value) => _mode.palette.onBackground = value,
+      ),
+      _heading('普通表面'),
+      _semanticColor(
+        'surface',
+        theme.colors.surface,
+        _mode.palette.surface,
+        (value) => _mode.palette.surface = value,
+      ),
+      _semanticColor(
+        'onSurface',
+        theme.colors.onSurface,
+        _mode.palette.onSurface,
+        (value) => _mode.palette.onSurface = value,
       ),
       _number(
-        '最低对比度',
-        _mode.behavior.minimumContrastRatio ??
-            theme.contrastTheme.minimumContrastRatio,
-        1,
-        21,
-        (v) => _mode.behavior.minimumContrastRatio = v,
-        () => _mode.behavior.minimumContrastRatio = null,
-        _mode.behavior.minimumContrastRatio != null,
-        wholeNumbers: false,
+        '表面圆角',
+        theme.sizes.resolve(_device).surfaceRadius,
+        0,
+        200,
+        (v) => _spec.layout.surfaceRadius = v,
+        () => _spec.layout.surfaceRadius = null,
+        _spec.layout.surfaceRadius != null,
       ),
-      _select(
-        '快速曲线',
-        _mode.behavior.fastCurve?.name ?? 'inherit',
-        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
-        (v) => _change(
-          () => _mode.behavior.fastCurve = v == 'inherit'
-              ? null
-              : EditorCurve.values.byName(v),
-        ),
+      _heading('抬升表面'),
+      _semanticColor(
+        'surfaceElevated',
+        theme.colors.surfaceElevated,
+        _mode.palette.surfaceElevated,
+        (value) => _mode.palette.surfaceElevated = value,
       ),
-      _select(
-        '标准曲线',
-        _mode.behavior.standardCurve?.name ?? 'inherit',
-        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
-        (v) => _change(
-          () => _mode.behavior.standardCurve = v == 'inherit'
-              ? null
-              : EditorCurve.values.byName(v),
-        ),
+      _semanticColor(
+        'onSurfaceElevated',
+        theme.colors.onSurfaceElevated,
+        _mode.palette.onSurfaceElevated,
+        (value) => _mode.palette.onSurfaceElevated = value,
       ),
-      _select(
-        '强调曲线',
-        _mode.behavior.emphasizedCurve?.name ?? 'inherit',
-        {'inherit': '继承默认', for (final v in EditorCurve.values) v.name: v.name},
-        (v) => _change(
-          () => _mode.behavior.emphasizedCurve = v == 'inherit'
-              ? null
-              : EditorCurve.values.byName(v),
-        ),
+      _heading('弱化表面'),
+      _semanticColor(
+        'surfaceMuted',
+        theme.colors.surfaceMuted,
+        _mode.palette.surfaceMuted,
+        (value) => _mode.palette.surfaceMuted = value,
       ),
+      _semanticColor(
+        'onSurfaceMuted',
+        theme.colors.onSurfaceMuted,
+        _mode.palette.onSurfaceMuted,
+        (value) => _mode.palette.onSurfaceMuted = value,
+      ),
+      _heading('控件轮廓'),
+      _number(
+        '控件圆角',
+        theme.sizes.resolve(_device).controlRadius,
+        0,
+        200,
+        (v) => _spec.layout.controlRadius = v,
+        () => _spec.layout.controlRadius = null,
+        _spec.layout.controlRadius != null,
+      ),
+      _semanticColor(
+        'outline',
+        theme.colors.outline,
+        _mode.palette.outline,
+        (value) => _mode.palette.outline = value,
+      ),
+      _heading('浮层表面'),
+      _number(
+        '浮层圆角',
+        theme.sizes.resolve(_device).overlayRadius,
+        0,
+        200,
+        (v) => _spec.layout.overlayRadius = v,
+        () => _spec.layout.overlayRadius = null,
+        _spec.layout.overlayRadius != null,
+      ),
+      _number(
+        '浮层间距',
+        theme.sizes.resolve(_device).overlaySpacing,
+        0,
+        200,
+        (v) => _spec.layout.overlaySpacing = v,
+        () => _spec.layout.overlaySpacing = null,
+        _spec.layout.overlaySpacing != null,
+      ),
+      _semanticColor(
+        'scrim',
+        theme.colors.scrim,
+        _mode.palette.scrim,
+        (value) => _mode.palette.scrim = value,
+      ),
+      _heading('材质质量与降级'),
       _select(
         '材质质量',
         _mode.behavior.quality?.name ?? 'inherit',
@@ -1443,24 +1658,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         ),
       ),
       _select(
-        '前景反色策略',
-        _mode.behavior.contrastMode?.name ?? 'inherit',
-        {
-          'inherit': '继承默认',
-          for (final v in HyperContrastMode.values)
-            v.name: switch (v) {
-              HyperContrastMode.standard => '标准',
-              HyperContrastMode.adaptive => '自适应',
-              HyperContrastMode.inverted => '反色',
-            },
-        },
-        (v) => _change(
-          () => _mode.behavior.contrastMode = v == 'inherit'
-              ? null
-              : HyperContrastMode.values.byName(v),
-        ),
-      ),
-      _select(
         '减少透明度',
         _mode.behavior.reduceTransparency?.toString() ?? 'inherit',
         const {'inherit': '继承默认', 'true': '开启', 'false': '关闭'},
@@ -1470,17 +1667,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
               : v == 'true',
         ),
       ),
-      _semanticColor(
-        '浅色前景',
-        theme.contrastTheme.lightForeground,
-        _mode.behavior.lightForeground,
-        (v) => _mode.behavior.lightForeground = v,
-      ),
-      _semanticColor(
-        '深色前景',
-        theme.contrastTheme.darkForeground,
-        _mode.behavior.darkForeground,
-        (v) => _mode.behavior.darkForeground = v,
+      _number(
+        '材质淡入阶段占比',
+        _mode.behavior.transitionFadeFraction ??
+            theme.materialTheme.transitionFadeFraction ??
+            .6,
+        0.01,
+        0.99,
+        (v) => _mode.behavior.transitionFadeFraction = v,
+        () => _mode.behavior.transitionFadeFraction = null,
+        _mode.behavior.transitionFadeFraction != null,
+        wholeNumbers: false,
       ),
       _heading('背景材质'),
       _select(
@@ -1566,7 +1763,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
         },
         () => _mode.materialBorderWidth = null,
         _mode.materialBorderWidth != null,
-        wholeNumbers: false,
+        wholeNumbers: true,
       ),
       _heading('材质阴影'),
       Wrap(
@@ -1605,67 +1802,218 @@ class _ThemeEditorState extends State<ThemeEditor> {
   Widget _componentPanel() => Obx(_buildComponentPanel);
 
   Widget _buildComponentPanel() {
-    final s = _document.resolve(_dark).sizes.resolve(_device), a = _appearance;
-    return _panel('组件工作区', [
-      Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final entry in _components.entries)
-            HyperButton.tonal(
-              onPressed: entry.key == _component
-                  ? null
-                  : () => rxBatch(() {
-                      _component = entry.key;
-                      if (_page != 'all') _page = _pages[entry.key]!;
-                    }),
-              child: Text(entry.value),
-            ),
-        ],
-      ),
-      HyperText('${_devices[_device]}尺寸 · ${_dark ? '暗色' : '亮色'}外观'),
-      HyperButton.ghost(
-        onPressed: () => _change(() {
-          a.background = null;
-          a.foreground = null;
-          a.shadows = null;
-          switch (_component) {
-            case 'button':
-              _spec.buttonHeight = null;
-              _spec.buttonRadius = null;
-            case 'card':
-              _spec.cardRadius = null;
-            case 'field':
-              _spec.fieldHeight = null;
-              _spec.fieldRadius = null;
-            case 'menu':
-              _spec.menuHeight = null;
-              _spec.menuRadius = null;
-          }
-        }),
-        child: const Text('重置当前组件'),
-      ),
-      _heading('尺寸'),
-      if (_component == 'button') ...[
-        _number(
-          '中号高度',
-          s.button.minimumSize.height,
-          20,
-          100,
-          (v) => _spec.buttonHeight = v,
-          () => _spec.buttonHeight = null,
-          _spec.buttonHeight != null,
+    final supported = _components.containsKey(_component);
+    if (!supported) {
+      final item = gallerySections
+          .expand((section) => section.items)
+          .where((item) => item.id == _page)
+          .firstOrNull;
+      return _panel('组件工作区', [
+        HyperText(
+          item?.title ?? '完整 Demo',
+          style: HyperTheme.of(context).textTheme.titleLarge,
         ),
-        _number(
-          '圆角',
-          s.button.radius,
-          0,
-          60,
-          (v) => _spec.buttonRadius = v,
-          () => _spec.buttonRadius = null,
-          _spec.buttonRadius != null,
+        const SizedBox(height: 12),
+        const HyperText('暂不支持编辑'),
+      ]);
+    }
+    final s = _resolveTheme(_dark).sizes.resolve(_device), a = _appearance;
+    return _panel('组件工作区', [
+      HyperText(
+        _components[_component]!,
+        style: HyperTheme.of(context).textTheme.titleLarge,
+      ),
+      const SizedBox(height: 12),
+      HyperText('${_devices[_device]}尺寸 · ${_dark ? '暗色' : '亮色'}外观'),
+      if (_component == 'select') ...[
+        KeyedSubtree(
+          key: const ValueKey('editor-select-surface'),
+          child: _select('编辑对象', _selectSurfaceAnchor, const {
+            true: '触发器',
+            false: '选项面板',
+          }, (value) => _updateState(() => _selectSurfaceAnchor = value)),
+        ),
+        KeyedSubtree(
+          key: const ValueKey('editor-select-state'),
+          child: _select(
+            '状态覆盖',
+            _selectState,
+            _selectSurfaceAnchor
+                ? const {
+                    'common': '通用（所有状态）',
+                    'hovered': '悬停',
+                    'focused': '聚焦',
+                    'pressed': '按下',
+                    'disabled': '禁用',
+                  }
+                : const {
+                    'common': '通用（所有状态）',
+                    'selected': '选中',
+                    'active': '活动（悬停 / 键盘）',
+                    'disabled': '禁用',
+                  },
+            (value) => _updateState(() {
+              if (_selectSurfaceAnchor) {
+                _selectAnchorState = value;
+              } else {
+                _selectPanelState = value;
+              }
+            }),
+          ),
         ),
       ],
+      if (_component == 'field')
+        KeyedSubtree(
+          key: const ValueKey('editor-field-state'),
+          child: _select('状态覆盖', _fieldState, const {
+            'common': '通用（所有状态）',
+            'hovered': '悬停',
+            'focused': '聚焦',
+            'error': '错误',
+            'disabled': '禁用',
+          }, (value) => _updateState(() => _fieldState = value)),
+        ),
+      if (_component == 'tag') ...[
+        KeyedSubtree(
+          key: const ValueKey('editor-tag-variant'),
+          child: _select('外观变体', _tagVariant, const {
+            'common': '通用（所有变体）',
+            'emphasized': '强调',
+          }, (value) => _updateState(() => _tagVariant = value)),
+        ),
+        KeyedSubtree(
+          key: const ValueKey('editor-tag-state'),
+          child: _select('状态覆盖', _tagState, const {
+            'common': '通用',
+            'disabled': '禁用（所有变体）',
+          }, (value) => _updateState(() => _tagState = value)),
+        ),
+      ],
+      if (_component == 'button') ...[
+        KeyedSubtree(
+          key: const ValueKey('editor-button-variant'),
+          child: _select(
+            '外观变体',
+            _buttonVariant?.name ?? 'common',
+            {
+              'common': '通用（所有变体）',
+              for (final variant in HyperButtonVariant.values)
+                variant.name: variant.name,
+            },
+            (value) => _updateState(() {
+              _buttonVariant = value == 'common'
+                  ? null
+                  : HyperButtonVariant.values.byName(value);
+            }),
+          ),
+        ),
+        const SizedBox(height: 12),
+        HyperText(
+          _buttonVariant == null
+              ? '通用属性由各变体继承；尺寸按当前设备和大小档位保存。'
+              : '只编辑当前变体的外观与状态；通用尺寸请切换到“通用”设置。',
+        ),
+      ],
+      if (_component == 'button') ...[
+        KeyedSubtree(
+          key: const ValueKey('editor-button-state'),
+          child: _select('状态覆盖', _buttonState, const {
+            'common': '通用（所有状态）',
+            'hovered': '悬停',
+            'focused': '聚焦',
+            'pressed': '按下',
+            'disabled': '禁用',
+          }, (value) => _updateState(() => _buttonState = value)),
+        ),
+        const HyperText('在当前外观变体内编辑所选状态；通用设置由各状态继承。'),
+      ],
+      HyperButton.ghost(
+        onPressed: () => _change(() {
+          if (_component == 'button' && _buttonState != 'common') {
+            _resetButtonState(a);
+            return;
+          }
+          if (_component == 'field' && _fieldState != 'common') {
+            _resetFieldState(a);
+            return;
+          }
+          if (_component == 'select' && _selectState != 'common') {
+            _resetSelectState();
+            return;
+          }
+          if (_component == 'select') {
+            _resetSelectObject();
+            return;
+          }
+          a.background = null;
+          a.fillKind = null;
+          a.gradient = null;
+          a.border = EditorBorder();
+          a.foreground = null;
+          a.shadows = null;
+          a.focusedShadow.shadows = null;
+          a.hoveredShadow.shadows = null;
+          a.pressedShadow.shadows = null;
+          a.disabledShadow.shadows = null;
+          a.buttonStyle = EditorButtonVisual();
+          a.textFieldStyle = EditorTextFieldVisual();
+          a.selectStyle = EditorSelectVisual();
+          a.tagStyle = EditorTagVisual();
+          if (_component == 'tag' &&
+              _tagState == 'common' &&
+              _tagVariant == 'common') {
+            _spec.tagMetrics = EditorTagMetrics();
+          }
+          a.chipStyle = EditorChipVisual();
+          if (_component == 'chip' && _chipState == 'common') {
+            _spec.chipMetrics = EditorChipMetrics();
+          }
+          if (_component == 'select') {
+            _spec.selectMetrics = EditorSelectMetrics();
+          }
+          if (_component != 'button' || _buttonVariant == null) {
+            switch (_component) {
+              case 'button':
+                _spec.buttonMetrics = EditorButtonMetrics();
+                _spec.buttonHeight = null;
+                _spec.buttonRadius = null;
+              case 'card':
+                _spec.cardRadius = null;
+              case 'field':
+                _spec.textFieldMetrics = EditorTextFieldMetrics();
+                _spec.fieldHeight = null;
+                _spec.fieldRadius = null;
+              case 'menu':
+                _spec.menuHeight = null;
+                _spec.menuRadius = null;
+            }
+          }
+        }),
+        child: Text(
+          (_component == 'button' && _buttonState != 'common') ||
+                  (_component == 'tag' && _tagState != 'common') ||
+                  (_component == 'field' && _fieldState != 'common') ||
+                  (_component == 'select' && _selectState != 'common')
+              ? '重置当前状态'
+              : (_component == 'button' && _buttonVariant != null) ||
+                    (_component == 'tag' && _tagVariant != 'common')
+              ? '重置当前变体'
+              : _component == 'select'
+              ? '重置当前对象'
+              : '重置当前组件',
+        ),
+      ),
+      if (_component != 'field' &&
+          _component != 'select' &&
+          _component != 'chip' &&
+          _component != 'tag' &&
+          (_component != 'button' ||
+              (_buttonVariant == null && _buttonState == 'common')))
+        _heading('尺寸'),
+      if (_component == 'button' &&
+          _buttonVariant == null &&
+          _buttonState == 'common')
+        ..._buttonSizeProperties(s),
       if (_component == 'card')
         _number(
           '圆角',
@@ -1676,26 +2024,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           () => _spec.cardRadius = null,
           _spec.cardRadius != null,
         ),
-      if (_component == 'field') ...[
-        _number(
-          '最小高度',
-          s.textField.minimumHeight,
-          20,
-          100,
-          (v) => _spec.fieldHeight = v,
-          () => _spec.fieldHeight = null,
-          _spec.fieldHeight != null,
-        ),
-        _number(
-          '圆角',
-          s.textField.radius,
-          0,
-          60,
-          (v) => _spec.fieldRadius = v,
-          () => _spec.fieldRadius = null,
-          _spec.fieldRadius != null,
-        ),
-      ],
+      if (_component == 'field') ..._textFieldProperties(s, a),
       if (_component == 'menu') ...[
         _number(
           '菜单行高',
@@ -1716,38 +2045,2322 @@ class _ThemeEditorState extends State<ThemeEditor> {
           _spec.menuRadius != null,
         ),
       ],
-      _heading('通用外观'),
-      _color('背景', a.background, (value) => a.background = value),
-      _color('前景', a.foreground, (value) => a.foreground = value),
-      _heading('彩色阴影'),
+      if (_component == 'tag') ..._tagProperties(s, a),
+      if (_component == 'chip') ..._chipProperties(s, a),
+      if (_component == 'select') ..._selectProperties(s),
+      if (_component == 'button') ..._buttonProperties(s, a),
+      if (_component != 'field' &&
+          (_component != 'button' || _buttonState == 'common') &&
+          (_component != 'select' || _selectState == 'common')) ...[
+        if (_component == 'button' && _buttonVariant == null) ...[
+          _heading('按钮表面'),
+          _number(
+            '圆角',
+            s.button.radius,
+            0,
+            60,
+            (v) => _spec.buttonRadius = v,
+            () => _spec.buttonRadius = null,
+            _spec.buttonRadius != null,
+          ),
+        ],
+        if (_component == 'select' && !_selectSurfaceAnchor) ...[
+          _number(
+            '面板圆角',
+            _spec.selectMetrics.surfaceRadius ?? s.menu.surfaceRadius,
+            0,
+            60,
+            (v) => _spec.selectMetrics.surfaceRadius = v,
+            () => _spec.selectMetrics.surfaceRadius = null,
+            _spec.selectMetrics.surfaceRadius != null,
+          ),
+          _number(
+            '选项圆角',
+            _spec.selectMetrics.itemRadius ?? s.menu.itemRadius,
+            0,
+            60,
+            (v) => _spec.selectMetrics.itemRadius = v,
+            () => _spec.selectMetrics.itemRadius = null,
+            _spec.selectMetrics.itemRadius != null,
+          ),
+        ],
+        _heading(
+          _component == 'button' && _buttonVariant != null ? '变体外观' : '通用外观',
+        ),
+        ..._backgroundProperties(a),
+        if (_component != 'chip' && _component != 'tag')
+          ..._borderProperties(a),
+        if (_component != 'chip' &&
+            _component != 'tag' &&
+            _component != 'button' &&
+            !(_component == 'select' && _selectSurfaceAnchor))
+          _color('前景', a.foreground, (value) => a.foreground = value),
+        _heading('彩色阴影'),
+        Wrap(
+          spacing: 8,
+          children: [
+            HyperButton.ghost(
+              onPressed: () => _change(() => a.shadows = null),
+              child: const Text('恢复默认'),
+            ),
+            HyperButton.ghost(
+              onPressed: () => _change(() => a.shadows = []),
+              child: const Text('无阴影'),
+            ),
+            HyperButton.tonal(
+              onPressed: () =>
+                  _change(() => a.shadows = [...?a.shadows, EditorShadow()]),
+              child: const Text('添加'),
+            ),
+          ],
+        ),
+        if (a.shadows == null) const HyperText('继承组件默认阴影'),
+        for (var i = 0; i < (a.shadows?.length ?? 0); i++) _shadow(i),
+      ],
+      if ((_component == 'field' && _fieldState == 'focused') ||
+          (_component == 'button' && _buttonState == 'focused') ||
+          (_component == 'select' &&
+              _selectSurfaceAnchor &&
+              _selectState == 'focused'))
+        ..._focusedShadowProperties(a),
+      if (_component == 'button' ||
+          (_component == 'select' && _selectSurfaceAnchor)) ...[
+        if ((_component == 'button' && _buttonState == 'hovered') ||
+            (_component == 'select' && _selectState == 'hovered'))
+          ..._focusedShadowProperties(
+            a,
+            stateTarget: a.hoveredShadow,
+            label: '悬停阴影',
+          ),
+        if ((_component == 'button' && _buttonState == 'pressed') ||
+            (_component == 'select' && _selectState == 'pressed'))
+          ..._focusedShadowProperties(
+            a,
+            stateTarget: a.pressedShadow,
+            label: '按下阴影',
+          ),
+        if ((_component == 'button' && _buttonState == 'disabled') ||
+            (_component == 'select' && _selectState == 'disabled'))
+          ..._focusedShadowProperties(
+            a,
+            stateTarget: a.disabledShadow,
+            label: '禁用阴影',
+          ),
+      ],
+      _heading('编辑范围'),
+      HyperText(switch (_component) {
+        'button' => '编辑按钮通用样式或当前变体：文字、图标、加载进度、禁用与交互状态、位移缩放、背景、边框及状态阴影。尺寸按当前设备和大小档位保存，外观按亮暗方案保存；未覆盖项继续继承。',
+        'field' => '编辑输入框布局、输入与占位文字、标签、计数、图标、光标、错误提示、各状态边框及聚焦阴影。尺寸按当前设备保存，外观按亮暗方案保存；局部主题和实例覆盖以 Demo 标记为准。',
+        'select' => '编辑 Select 的触发按钮、箭头、选项文字与状态、搜索、面板和表面；共用属性同时作用于 Autocomplete；箭头仅适用于 Select。尺寸按当前设备保存，外观按亮暗方案保存。顶部可切换触发器与选项面板，完整 Demo 中的局部及实例覆盖不被强制替换。',
+        'tag' =>
+          '编辑标签的布局、文字、图标、配色、减淡比例、背景、边框和阴影。尺寸按设备保存；外观按亮暗方案保存，禁用覆盖由所有变体共用。',
+        'chip' => '编辑 Chip 的通用、选中、悬停、聚焦、按下和禁用样式。尺寸按设备保存；文字、图标、删除与状态按对象分组，表面配置置底。多选摘要会显式覆盖标签紧凑高度。',
+        'card' => '编辑卡片圆角、背景、边框、前景和阴影；未覆盖项继续继承。',
+        _ => '编辑菜单行高、圆角、表面、前景和阴影；未覆盖项继续继承。',
+      }),
+    ]);
+  }
+
+  List<Widget> _tagProperties(HyperSizeScheme s, EditorComponent a) {
+    final m = _spec.tagMetrics, v = a.tagStyle, theme = _resolveTheme(_dark);
+    final palette = theme.tagTheme.style
+        .merge(_tagVariant == 'emphasized' ? theme.tagTheme.emphasized : null)
+        .merge(_tagState == 'disabled' ? theme.tagTheme.disabled : null)
+        .resolvePalette(theme.colors, theme.contrastTheme);
+    return [
+      if (_tagState == 'common' && _tagVariant == 'common') ...[
+        _heading('标签布局'),
+        _number(
+          '标签高度',
+          s.tag.height,
+          0,
+          120,
+          (value) => m.height = value,
+          () => m.height = null,
+          m.height != null,
+        ),
+        _number(
+          '标签水平内边距',
+          s.tag.horizontalPadding,
+          0,
+          120,
+          (value) => m.horizontalPadding = value,
+          () => m.horizontalPadding = null,
+          m.horizontalPadding != null,
+        ),
+        _number(
+          '图标尺寸',
+          s.tag.iconSize,
+          0,
+          120,
+          (value) => m.iconSize = value,
+          () => m.iconSize = null,
+          m.iconSize != null,
+        ),
+        _number(
+          '图标间距',
+          s.tag.iconSpacing,
+          0,
+          120,
+          (value) => m.iconSpacing = value,
+          () => m.iconSpacing = null,
+          m.iconSpacing != null,
+        ),
+      ],
+      _heading('标签文字与图标'),
+      _number(
+        '标签字号',
+        v.fontSize ?? theme.textTheme.labelMedium?.fontSize ?? 12,
+        8,
+        64,
+        (value) => v.fontSize = value,
+        () => v.fontSize = null,
+        v.fontSize != null,
+      ),
+      _color(
+        '标签文字颜色',
+        v.foreground,
+        (value) => v.foreground = value,
+        inheritedColor: palette.foregroundColor ?? theme.colors.textSecondary,
+      ),
+      _number(
+        '标签过渡时长（毫秒）',
+        v.durationMilliseconds ??
+            theme.motion.fastDuration.inMilliseconds.toDouble(),
+        0,
+        5000,
+        (value) => v.durationMilliseconds = value,
+        () => v.durationMilliseconds = null,
+        v.durationMilliseconds != null,
+      ),
+      _heading('标签配色'),
+      _select(
+        '外观配色',
+        v.colorVariant ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'neutral': '中性',
+          'soft': '浅色',
+          'filled': '实色',
+          'outlined': '描边',
+          'text': '无底色',
+        },
+        (value) =>
+            _change(() => v.colorVariant = value == 'inherit' ? null : value),
+      ),
+      _color(
+        '标签基色',
+        v.baseColor,
+        (value) => v.baseColor = value,
+        inheritedColor: theme.colors.primary,
+      ),
+      if (v.colorVariant == 'filled')
+        _select(
+          '实色前景策略',
+          v.foregroundMode ?? 'inherit',
+          const {'inherit': '继承默认', 'automatic': '自动对比色', 'white': '白色'},
+          (value) => _change(
+            () => v.foregroundMode = value == 'inherit' ? null : value,
+          ),
+        ),
+      _number(
+        '背景减淡比例',
+        (v.backgroundFade ?? (v.colorVariant == 'soft' ? .88 : 0)) * 100,
+        0,
+        100,
+        (value) => v.backgroundFade = value / 100,
+        () => v.backgroundFade = null,
+        v.backgroundFade != null,
+      ),
+      _number(
+        '边框减淡比例',
+        (v.borderFade ?? (v.colorVariant == 'soft' ? .65 : 0)) * 100,
+        0,
+        100,
+        (value) => v.borderFade = value / 100,
+        () => v.borderFade = null,
+        v.borderFade != null,
+      ),
+      _number(
+        '文字减淡比例',
+        (v.foregroundFade ?? 0) * 100,
+        0,
+        100,
+        (value) => v.foregroundFade = value / 100,
+        () => v.foregroundFade = null,
+        v.foregroundFade != null,
+      ),
+
+      _heading('标签表面'),
+      if (_tagState == 'common' && _tagVariant == 'common')
+        _number(
+          '标签圆角',
+          s.tag.radius,
+          0,
+          60,
+          (value) => m.radius = value,
+          () => m.radius = null,
+          m.radius != null,
+        ),
+      ..._borderProperties(
+        a,
+        label: '标签边框',
+        inheritedColor: palette.borderColor,
+      ),
+    ];
+  }
+
+  List<Widget> _chipProperties(HyperSizeScheme s, EditorComponent a) {
+    final m = _spec.chipMetrics, v = a.chipStyle, theme = _resolveTheme(_dark);
+    final palette = theme.chipTheme
+        .resolve({
+          if (_chipState != 'common')
+            HyperControlState.values.byName(_chipState),
+        })
+        .resolvePalette(theme.colors, theme.contrastTheme);
+    return [
+      KeyedSubtree(
+        key: const ValueKey('editor-chip-state'),
+        child: _select('状态覆盖', _chipState, const {
+          'common': '通用（所有状态）',
+          'selected': '选中',
+          'hovered': '悬停',
+          'focused': '聚焦',
+          'pressed': '按下',
+          'disabled': '禁用',
+        }, (value) => _updateState(() => _chipState = value)),
+      ),
+      const HyperText('通用设置由所有状态继承；选择状态后，仅编辑该状态的覆盖项。配色样式属于外观，不代表选中或按下状态。'),
+      if (_chipState == 'common') ...[
+        _heading('标签布局'),
+        _number(
+          '标签高度',
+          s.chip.height,
+          0,
+          120,
+          (value) => m.height = value,
+          () => m.height = null,
+          m.height != null,
+        ),
+        _number(
+          '标签水平内边距',
+          s.chip.horizontalPadding,
+          0,
+          120,
+          (value) => m.horizontalPadding = value,
+          () => m.horizontalPadding = null,
+          m.horizontalPadding != null,
+        ),
+      ],
+      if (_chipState == 'common') ...[
+        _heading('图标与头像'),
+        _number(
+          '标签图标尺寸',
+          s.chip.iconSize,
+          0,
+          120,
+          (value) => m.iconSize = value,
+          () => m.iconSize = null,
+          m.iconSize != null,
+        ),
+        _number(
+          '标签图标间距',
+          s.chip.iconSpacing,
+          0,
+          120,
+          (value) => m.iconSpacing = value,
+          () => m.iconSpacing = null,
+          m.iconSpacing != null,
+        ),
+        _number(
+          '头像尺寸',
+          s.chip.avatarSize,
+          0,
+          120,
+          (value) => m.avatarSize = value,
+          () => m.avatarSize = null,
+          m.avatarSize != null,
+        ),
+      ],
+      if (_chipState == 'common') ...[
+        _heading('删除操作'),
+        _number(
+          '删除图标尺寸',
+          s.chip.deleteIconSize,
+          0,
+          120,
+          (value) => m.deleteIconSize = value,
+          () => m.deleteIconSize = null,
+          m.deleteIconSize != null,
+        ),
+        _number(
+          '删除区域宽度',
+          s.chip.deleteTargetWidth,
+          0,
+          120,
+          (value) => m.deleteTargetWidth = value,
+          () => m.deleteTargetWidth = null,
+          m.deleteTargetWidth != null,
+        ),
+      ],
+      _heading('文字'),
+      _number(
+        '标签字号',
+        v.fontSize ?? theme.textTheme.labelMedium?.fontSize ?? 12,
+        8,
+        64,
+        (value) => v.fontSize = value,
+        () => v.fontSize = null,
+        v.fontSize != null,
+      ),
+      _color(
+        '标签前景',
+        v.foreground,
+        (value) => v.foreground = value,
+        inheritedColor: palette.foregroundColor ?? theme.colors.textSecondary,
+      ),
+      _heading('头像与选中标记'),
+      _select(
+        '显示标签选中标记',
+        v.showCheckmark?.toString() ?? 'inherit',
+        const {'inherit': '继承默认', 'true': '显示', 'false': '隐藏'},
+        (value) => _change(
+          () => v.showCheckmark = value == 'inherit' ? null : value == 'true',
+        ),
+      ),
+      _select(
+        '标签选中标记位置',
+        v.checkPlacement ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'leading': '文字前',
+          'avatarOverlay': '头像叠加',
+          'avatarReplacement': '替换头像',
+        },
+        (value) =>
+            _change(() => v.checkPlacement = value == 'inherit' ? null : value),
+      ),
+      _select(
+        '标签选中图标',
+        v.checkIcon ?? 'inherit',
+        const {'inherit': '继承默认', 'check': '对勾', 'star': '星形'},
+        (value) =>
+            _change(() => v.checkIcon = value == 'inherit' ? null : value),
+      ),
+      _heading('删除操作图标'),
+      _select(
+        '标签删除图标',
+        v.deleteIcon ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'close': '关闭',
+          'cancel': '圆形关闭',
+          'delete': '删除',
+        },
+        (value) =>
+            _change(() => v.deleteIcon = value == 'inherit' ? null : value),
+      ),
+      _number(
+        '头像透明度',
+        v.avatarOpacity ?? 1,
+        0,
+        1,
+        (value) => v.avatarOpacity = value,
+        () => v.avatarOpacity = null,
+        v.avatarOpacity != null,
+        wholeNumbers: false,
+      ),
+      _number(
+        '选中图标缩放',
+        v.checkmarkScale ?? 1,
+        0,
+        3,
+        (value) => v.checkmarkScale = value,
+        () => v.checkmarkScale = null,
+        v.checkmarkScale != null,
+        wholeNumbers: false,
+      ),
+      _number(
+        '标签过渡时长（毫秒）',
+        v.durationMilliseconds ??
+            theme.motion.fastDuration.inMilliseconds.toDouble(),
+        0,
+        5000,
+        (value) => v.durationMilliseconds = value,
+        () => v.durationMilliseconds = null,
+        v.durationMilliseconds != null,
+        wholeNumbers: false,
+      ),
+      _color(
+        '选中图标颜色',
+        v.checkColor,
+        (value) => v.checkColor = value,
+        inheritedColor: theme.colors.primary,
+      ),
+      _color(
+        '选中头像颜色',
+        v.avatarColor,
+        (value) => v.avatarColor = value,
+        inheritedColor: theme.colors.primaryContainer,
+      ),
+      _color(
+        '标签叠加色',
+        v.overlay,
+        (value) => v.overlay = value,
+        inheritedColor: theme.colors.stateLayer,
+      ),
+      _heading('标签配色'),
+      _select(
+        '外观配色',
+        v.colorVariant ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'neutral': '中性',
+          'soft': '浅色',
+          'filled': '实色',
+          'outlined': '描边',
+          'text': '无底色',
+        },
+        (value) =>
+            _change(() => v.colorVariant = value == 'inherit' ? null : value),
+      ),
+      _color(
+        '标签基色',
+        v.baseColor,
+        (value) => v.baseColor = value,
+        inheritedColor: theme.colors.primary,
+      ),
+      if (v.colorVariant == 'filled')
+        _select(
+          '实色前景策略',
+          v.foregroundMode ?? 'inherit',
+          const {'inherit': '继承默认', 'automatic': '自动对比色', 'white': '白色'},
+          (value) => _change(
+            () => v.foregroundMode = value == 'inherit' ? null : value,
+          ),
+        ),
+      _number(
+        '背景减淡比例',
+        (v.backgroundFade ?? (v.colorVariant == 'soft' ? .88 : 0)) * 100,
+        0,
+        100,
+        (value) => v.backgroundFade = value / 100,
+        () => v.backgroundFade = null,
+        v.backgroundFade != null,
+      ),
+      _number(
+        '边框减淡比例',
+        (v.borderFade ?? (v.colorVariant == 'soft' ? .65 : 0)) * 100,
+        0,
+        100,
+        (value) => v.borderFade = value / 100,
+        () => v.borderFade = null,
+        v.borderFade != null,
+      ),
+      _number(
+        '文字减淡比例',
+        (v.foregroundFade ?? 0) * 100,
+        0,
+        100,
+        (value) => v.foregroundFade = value / 100,
+        () => v.foregroundFade = null,
+        v.foregroundFade != null,
+      ),
+      _heading('标签表面'),
+      if (_chipState == 'common')
+        _number(
+          '标签圆角',
+          s.chip.radius,
+          0,
+          60,
+          (value) => m.radius = value,
+          () => m.radius = null,
+          m.radius != null,
+        ),
+      ..._borderProperties(a, label: '标签边框'),
+    ];
+  }
+
+  List<Widget> _selectTriggerProperties(HyperSizeScheme s) {
+    final a = _mode.selectAnchor,
+        m = _spec.selectMetrics,
+        v = _mode.selectAnchor.buttonStyle;
+    final theme = _resolveTheme(_dark);
+    return [
+      if (_selectState == 'common') ...[
+        _number(
+          '触发最小高度',
+          m.minimumHeight ?? (s.textField.minimumHeight),
+          0,
+          200,
+          (value) => m.minimumHeight = value,
+          () => m.minimumHeight = null,
+          m.minimumHeight != null,
+        ),
+        _number(
+          '触发水平内边距',
+          m.paddingHorizontal ??
+              (s.button.padding.resolve(TextDirection.ltr).left),
+          0,
+          200,
+          (value) => m.paddingHorizontal = value,
+          () => m.paddingHorizontal = null,
+          m.paddingHorizontal != null,
+        ),
+        _number(
+          '触发垂直内边距',
+          m.paddingVertical ??
+              (s.button.padding.resolve(TextDirection.ltr).top),
+          0,
+          200,
+          (value) => m.paddingVertical = value,
+          () => m.paddingVertical = null,
+          m.paddingVertical != null,
+        ),
+        _number(
+          '触发最小命中尺寸',
+          m.minimumTapTargetSize ?? (s.minimumInteractiveDimension),
+          0,
+          200,
+          (value) => m.minimumTapTargetSize = value,
+          () => m.minimumTapTargetSize = null,
+          m.minimumTapTargetSize != null,
+        ),
+        _color(
+          '触发文字颜色',
+          a.foreground,
+          (value) => a.foreground = value,
+          inheritedColor: theme.colors.textPrimary,
+        ),
+        _number(
+          '触发圆角',
+          _spec.selectMetrics.radius ?? s.button.radius,
+          0,
+          60,
+          (value) => _spec.selectMetrics.radius = value,
+          () => _spec.selectMetrics.radius = null,
+          _spec.selectMetrics.radius != null,
+        ),
+      ],
+      if (_selectState == 'disabled') ...[
+        _heading('触发禁用状态'),
+        _color(
+          '触发禁用背景',
+          v.disabledBackground,
+          (value) => v.disabledBackground = value,
+          inheritedColor: theme.colors.surfaceMuted,
+        ),
+        _color(
+          '触发禁用前景',
+          v.disabledForeground,
+          (value) => v.disabledForeground = value,
+          inheritedColor: theme.colors.disabled,
+        ),
+      ],
+      if (_selectState != 'disabled') _heading('触发交互反馈 · 下拉专属'),
+      const HyperText('状态叠加色与透明度用于下拉按钮；自动填充使用输入框的焦点与边框状态。'),
+      if (_selectState == 'common') ...[
+        _color(
+          '触发交互叠加色',
+          v.overlay,
+          (value) => v.overlay = value,
+          inheritedColor: theme.colors.stateLayer,
+        ),
+      ],
+      if (_selectState == 'hovered') ...[
+        _number(
+          '触发悬停叠加',
+          v.hoverOpacity ?? (s.button.hoverOverlayOpacity),
+          0,
+          1,
+          (value) => v.hoverOpacity = value,
+          () => v.hoverOpacity = null,
+          v.hoverOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_selectState == 'focused') ...[
+        _number(
+          '触发聚焦叠加',
+          v.focusOpacity ?? (s.button.focusOverlayOpacity),
+          0,
+          1,
+          (value) => v.focusOpacity = value,
+          () => v.focusOpacity = null,
+          v.focusOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_selectState == 'pressed') ...[
+        _number(
+          '触发按下叠加',
+          v.pressOpacity ?? (s.button.pressOverlayOpacity),
+          0,
+          1,
+          (value) => v.pressOpacity = value,
+          () => v.pressOpacity = null,
+          v.pressOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (['hovered', 'focused', 'pressed'].contains(_selectState))
+        _heading('触发交互变换'),
+      if (_selectState == 'hovered') ...[
+        _number(
+          '触发悬停水平位移',
+          v.hoveredOffsetX ?? 0,
+          -20,
+          20,
+          (value) => v.hoveredOffsetX = value,
+          () => v.hoveredOffsetX = null,
+          v.hoveredOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发悬停垂直位移',
+          v.hoveredOffsetY ?? 0,
+          -20,
+          20,
+          (value) => v.hoveredOffsetY = value,
+          () => v.hoveredOffsetY = null,
+          v.hoveredOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发悬停缩放',
+          v.hoveredScale ?? 1,
+          .5,
+          1.5,
+          (value) => v.hoveredScale = value,
+          () => v.hoveredScale = null,
+          v.hoveredScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_selectState == 'focused') ...[
+        _number(
+          '触发聚焦水平位移',
+          v.focusedOffsetX ?? 0,
+          -20,
+          20,
+          (value) => v.focusedOffsetX = value,
+          () => v.focusedOffsetX = null,
+          v.focusedOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发聚焦垂直位移',
+          v.focusedOffsetY ?? 0,
+          -20,
+          20,
+          (value) => v.focusedOffsetY = value,
+          () => v.focusedOffsetY = null,
+          v.focusedOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发聚焦缩放',
+          v.focusedScale ?? 1,
+          .5,
+          1.5,
+          (value) => v.focusedScale = value,
+          () => v.focusedScale = null,
+          v.focusedScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_selectState == 'pressed') ...[
+        _number(
+          '触发按下水平位移',
+          v.pressedOffsetX ?? 0,
+          -20,
+          20,
+          (value) => v.pressedOffsetX = value,
+          () => v.pressedOffsetX = null,
+          v.pressedOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发按下垂直位移',
+          v.pressedOffsetY ?? 0,
+          -20,
+          20,
+          (value) => v.pressedOffsetY = value,
+          () => v.pressedOffsetY = null,
+          v.pressedOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '触发按下缩放',
+          v.pressedScale ?? 1,
+          .5,
+          1.5,
+          (value) => v.pressedScale = value,
+          () => v.pressedScale = null,
+          v.pressedScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_selectState == 'common') ...[
+        _heading('触发动效'),
+        _number(
+          '触发过渡时长（毫秒）',
+          v.animationMilliseconds ??
+              theme.motion.fastDuration.inMilliseconds.toDouble(),
+          0,
+          5000,
+          (value) => v.animationMilliseconds = value,
+          () => v.animationMilliseconds = null,
+          v.animationMilliseconds != null,
+        ),
+      ],
+    ];
+  }
+
+  List<Widget> _selectProperties(HyperSizeScheme s) {
+    final m = _spec.selectMetrics, v = _mode.select.selectStyle;
+    final theme = _resolveTheme(_dark),
+        style = _resolveTheme(_dark).selectTheme.style;
+    return [
+      if (_selectSurfaceAnchor) ...[
+        if (_selectState == 'common') ...[
+          _heading('触发按钮'),
+          _number(
+            '选择器宽度',
+            s.select.width,
+            0,
+            1000,
+            (value) => m.width = value,
+            () => m.width = null,
+            m.width != null,
+          ),
+          _number(
+            '触发文字字号',
+            v.labelFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
+            8,
+            64,
+            (value) => v.labelFontSize = value,
+            () => v.labelFontSize = null,
+            v.labelFontSize != null,
+          ),
+        ],
+        ..._selectTriggerProperties(s),
+        if (_selectState == 'common') ...[
+          _heading('箭头'),
+          _number(
+            '箭头尺寸',
+            s.select.arrowSize,
+            0,
+            1000,
+            (value) => m.arrowSize = value,
+            () => m.arrowSize = null,
+            m.arrowSize != null,
+          ),
+          _number(
+            '箭头间距',
+            s.select.arrowSpacing,
+            0,
+            1000,
+            (value) => m.arrowSpacing = value,
+            () => m.arrowSpacing = null,
+            m.arrowSpacing != null,
+          ),
+          _color(
+            '箭头颜色',
+            v.arrowColor,
+            (value) => v.arrowColor = value,
+            inheritedColor: style?.arrowColor ?? theme.colors.textSecondary,
+          ),
+        ],
+        if (_selectState == 'disabled') ...[
+          _color(
+            '禁用箭头颜色',
+            v.disabledArrowColor,
+            (value) => v.disabledArrowColor = value,
+            inheritedColor: style?.disabledArrowColor ?? theme.colors.disabled,
+          ),
+        ],
+        if (_selectState == 'common') ...[
+          _heading('多选标签'),
+          _number(
+            '标签间距',
+            s.selection.chipSpacing,
+            0,
+            1000,
+            (value) => m.chipSpacing = value,
+            () => m.chipSpacing = null,
+            m.chipSpacing != null,
+          ),
+          _number(
+            '最小输入宽度',
+            s.selection.minimumInputWidth,
+            0,
+            1000,
+            (value) => m.minimumInputWidth = value,
+            () => m.minimumInputWidth = null,
+            m.minimumInputWidth != null,
+          ),
+        ],
+      ] else ...[
+        if (_selectState == 'common') ...[
+          _heading('选项布局'),
+          _number(
+            '选项最小高度',
+            m.itemHeight ?? (s.menu.itemHeight),
+            0,
+            200,
+            (value) => m.itemHeight = value,
+            () => m.itemHeight = null,
+            m.itemHeight != null,
+          ),
+          _number(
+            '选项内边距',
+            m.itemPadding ?? (s.menu.padding),
+            0,
+            200,
+            (value) => m.itemPadding = value,
+            () => m.itemPadding = null,
+            m.itemPadding != null,
+          ),
+          _number(
+            '选项间距',
+            m.itemSpacing ?? (s.menu.itemSpacing ?? s.navigationItemSpacing),
+            0,
+            200,
+            (value) => m.itemSpacing = value,
+            () => m.itemSpacing = null,
+            m.itemSpacing != null,
+          ),
+        ],
+        if (_selectState == 'selected') ...[
+          _heading('选中图标'),
+          _select(
+            '显示选中对勾',
+            v.showCheckmark?.toString() ?? 'inherit',
+            const {'inherit': '继承默认', 'true': '显示', 'false': '隐藏'},
+            (value) => _change(
+              () =>
+                  v.showCheckmark = value == 'inherit' ? null : value == 'true',
+            ),
+          ),
+          _select(
+            '选中图标位置',
+            v.checkPlacement ?? 'inherit',
+            const {'inherit': '继承默认', 'leading': '前面', 'trailing': '后面'},
+            (value) => _change(
+              () => v.checkPlacement = value == 'inherit' ? null : value,
+            ),
+          ),
+          _select(
+            '选中图标',
+            v.checkIcon ?? 'inherit',
+            const {
+              'inherit': '继承默认',
+              'check': '对勾',
+              'doneAll': '双对勾',
+              'radio': '圆形选中',
+              'star': '星形',
+            },
+            (value) =>
+                _change(() => v.checkIcon = value == 'inherit' ? null : value),
+          ),
+          _color(
+            '选中图标颜色',
+            v.checkColor,
+            (value) => v.checkColor = value,
+            inheritedColor:
+                v.selectedForegroundColor?.resolve(theme.colors) ??
+                theme.colors.textPrimary,
+          ),
+          _number(
+            '选中图标尺寸',
+            v.checkSize ?? s.menu.iconSize,
+            0,
+            80,
+            (value) => v.checkSize = value,
+            () => v.checkSize = null,
+            v.checkSize != null,
+          ),
+          _number(
+            '选中图标间距',
+            v.checkSpacing ?? s.menu.iconSpacing,
+            0,
+            80,
+            (value) => v.checkSpacing = value,
+            () => v.checkSpacing = null,
+            v.checkSpacing != null,
+          ),
+          const HyperText('隐藏对勾时保留选中配色，同时移除图标占位。'),
+        ],
+        if (_selectState == 'common') ...[
+          _heading('选项文字'),
+          _number(
+            '选项字号',
+            v.optionFontSize ??
+                theme.typographyTheme.resolve(_device).listTitle,
+            8,
+            64,
+            (value) => v.optionFontSize = value,
+            () => v.optionFontSize = null,
+            v.optionFontSize != null,
+          ),
+          _color(
+            '选项颜色',
+            v.optionForegroundColor,
+            (value) => v.optionForegroundColor = value,
+            inheritedColor: theme.colors.textPrimary,
+          ),
+        ],
+        if (_selectState == 'disabled') ...[
+          _color(
+            '禁用选项颜色',
+            v.disabledOptionColor,
+            (value) => v.disabledOptionColor = value,
+            inheritedColor: theme.colors.disabled,
+          ),
+        ],
+        if (_selectState == 'selected') ...[
+          _color(
+            '选中选项背景',
+            v.selectedBackgroundColor,
+            (value) => v.selectedBackgroundColor = value,
+            inheritedColor: theme.colors.primary.withValues(alpha: .08),
+          ),
+          _color(
+            '选中选项前景',
+            v.selectedForegroundColor,
+            (value) => v.selectedForegroundColor = value,
+            inheritedColor: theme.colors.primary,
+          ),
+        ],
+        if (_selectState == 'active') ...[
+          _color(
+            '活动选项背景',
+            v.activeBackgroundColor,
+            (value) => v.activeBackgroundColor = value,
+            inheritedColor: theme.colors.stateLayer.withValues(alpha: .06),
+          ),
+        ],
+        if (_selectState == 'common') ...[
+          _heading('搜索'),
+          _number(
+            '搜索字号',
+            v.searchFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
+            8,
+            64,
+            (value) => v.searchFontSize = value,
+            () => v.searchFontSize = null,
+            v.searchFontSize != null,
+          ),
+          _number(
+            '搜索防抖（毫秒）',
+            v.searchDebounce ??
+                (theme.motion.standardDuration.inMilliseconds.toDouble()),
+            0,
+            5000,
+            (value) => v.searchDebounce = value,
+            () => v.searchDebounce = null,
+            v.searchDebounce != null,
+          ),
+          _color(
+            '搜索占位颜色',
+            v.searchHintColor,
+            (value) => v.searchHintColor = value,
+            inheritedColor: theme.colors.textTertiary,
+          ),
+          _heading('选项面板'),
+          _number(
+            '面板最大高度',
+            s.selection.maxPanelHeight,
+            0,
+            1000,
+            (value) => m.maxPanelHeight = value,
+            () => m.maxPanelHeight = null,
+            m.maxPanelHeight != null,
+          ),
+          _number(
+            '弹出间距',
+            s.select.popupSpacing ?? s.overlaySpacing,
+            0,
+            1000,
+            (value) => m.popupSpacing = value,
+            () => m.popupSpacing = null,
+            m.popupSpacing != null,
+          ),
+          _heading('状态过渡'),
+          _number(
+            '选择器过渡时长（毫秒）',
+            v.durationMilliseconds ??
+                (theme.motion.fastDuration.inMilliseconds.toDouble()),
+            0,
+            5000,
+            (value) => v.durationMilliseconds = value,
+            () => v.durationMilliseconds = null,
+            v.durationMilliseconds != null,
+          ),
+        ],
+      ],
+    ];
+  }
+
+  List<Widget> _textFieldProperties(HyperSizeScheme s, EditorComponent a) {
+    final m = _spec.textFieldMetrics, v = a.textFieldStyle;
+    final theme = _resolveTheme(_dark);
+    return [
+      if (_fieldState == 'common') ...[
+        _heading('输入框布局'),
+        _number(
+          '最小高度',
+          s.textField.minimumHeight,
+          20,
+          100,
+          (v) => _spec.fieldHeight = v,
+          () => _spec.fieldHeight = null,
+          _spec.fieldHeight != null,
+        ),
+
+        _number(
+          '水平内边距',
+          s.textField.horizontalPadding,
+          0,
+          600,
+          (value) => m.horizontalPadding = value,
+          () => m.horizontalPadding = null,
+          m.horizontalPadding != null,
+        ),
+        _number(
+          '垂直内边距',
+          s.textField.verticalPadding,
+          0,
+          600,
+          (value) => m.verticalPadding = value,
+          () => m.verticalPadding = null,
+          m.verticalPadding != null,
+        ),
+        _heading('输入文字'),
+        _number(
+          '输入字号',
+          v.textFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
+          8,
+          600,
+          (value) => v.textFontSize = value,
+          () => v.textFontSize = null,
+          v.textFontSize != null,
+        ),
+        _color('前景', a.foreground, (value) => a.foreground = value),
+        _heading('占位文字'),
+        _number(
+          '占位字号',
+          v.hintFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
+          8,
+          600,
+          (value) => v.hintFontSize = value,
+          () => v.hintFontSize = null,
+          v.hintFontSize != null,
+        ),
+        _color(
+          '占位文字颜色',
+          v.hintColor,
+          (value) => v.hintColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.hintStyle?.color ??
+              theme.colors.textTertiary,
+        ),
+        _heading('标签'),
+        _number(
+          '标签字号',
+          v.labelFontSize ?? (theme.textTheme.labelMedium?.fontSize ?? 12),
+          8,
+          600,
+          (value) => v.labelFontSize = value,
+          () => v.labelFontSize = null,
+          v.labelFontSize != null,
+        ),
+        _color(
+          '标签颜色',
+          v.labelColor,
+          (value) => v.labelColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.labelStyle?.color ??
+              theme.colors.textSecondary,
+        ),
+        _number(
+          '标签间距',
+          s.textField.labelGap,
+          0,
+          600,
+          (value) => m.labelGap = value,
+          () => m.labelGap = null,
+          m.labelGap != null,
+        ),
+        _heading('字数计数'),
+        _number(
+          '计数字号',
+          v.counterFontSize ?? (theme.textTheme.labelSmall?.fontSize ?? 11),
+          8,
+          600,
+          (value) => v.counterFontSize = value,
+          () => v.counterFontSize = null,
+          v.counterFontSize != null,
+        ),
+        _color(
+          '计数颜色',
+          v.counterColor,
+          (value) => v.counterColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.counterStyle?.color ??
+              theme.colors.textSecondary,
+        ),
+        _heading('图标与操作区'),
+        _number(
+          '图标尺寸',
+          s.textField.iconSize,
+          0,
+          600,
+          (value) => m.iconSize = value,
+          () => m.iconSize = null,
+          m.iconSize != null,
+        ),
+        _color(
+          '图标颜色',
+          v.iconColor,
+          (value) => v.iconColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.iconColor ??
+              theme.colors.textSecondary,
+        ),
+        _number(
+          '操作区宽度',
+          s.textField.actionWidth,
+          0,
+          600,
+          (value) => m.actionWidth = value,
+          () => m.actionWidth = null,
+          m.actionWidth != null,
+        ),
+        _heading('光标'),
+        _color(
+          '光标颜色',
+          v.cursorColor,
+          (value) => v.cursorColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.cursorColor ?? theme.colors.primary,
+        ),
+        _number(
+          '光标宽度',
+          v.cursorWidth ?? (theme.textFieldTheme.style.cursorWidth ?? 2),
+          0,
+          600,
+          (value) => v.cursorWidth = value,
+          () => v.cursorWidth = null,
+          v.cursorWidth != null,
+        ),
+        _number(
+          '光标圆角',
+          v.cursorRadius ?? (theme.textFieldTheme.style.cursorRadius?.x ?? 1),
+          0,
+          600,
+          (value) => v.cursorRadius = value,
+          () => v.cursorRadius = null,
+          v.cursorRadius != null,
+        ),
+      ],
+      if (_fieldState == 'error') ...[
+        _heading('错误提示'),
+        _color(
+          '错误图标颜色',
+          v.errorIconColor,
+          (value) => v.errorIconColor = value,
+          inheritedColor:
+              theme.textFieldTheme.style.errorIconColor ?? theme.colors.error,
+        ),
+        _number(
+          '错误浮层最大宽度',
+          s.textField.errorMaxWidth,
+          0,
+          600,
+          (value) => m.errorMaxWidth = value,
+          () => m.errorMaxWidth = null,
+          m.errorMaxWidth != null,
+        ),
+      ],
+      if (_fieldState == 'disabled') ...[
+        _heading('禁用状态'),
+        _color(
+          '禁用前景颜色',
+          v.disabledForegroundColor,
+          (value) => v.disabledForegroundColor = value,
+          inheritedColor:
+              theme.textFieldTheme.disabled.foregroundColor ??
+              theme.colors.disabled,
+        ),
+      ],
+      if (_fieldState == 'common') ...[
+        _heading('状态过渡'),
+        _number(
+          '状态过渡时长（毫秒）',
+          v.durationMilliseconds ??
+              (theme.motion.fastDuration.inMilliseconds.toDouble()),
+          0,
+          5000,
+          (value) => v.durationMilliseconds = value,
+          () => v.durationMilliseconds = null,
+          v.durationMilliseconds != null,
+        ),
+        _heading('输入框表面'),
+        _number(
+          '圆角',
+          s.textField.radius,
+          0,
+          60,
+          (v) => _spec.fieldRadius = v,
+          () => _spec.fieldRadius = null,
+          _spec.fieldRadius != null,
+        ),
+        ..._backgroundProperties(a),
+        _heading('彩色阴影'),
+        Wrap(
+          spacing: 8,
+          children: [
+            HyperButton.ghost(
+              onPressed: () => _change(() => a.shadows = null),
+              child: const Text('恢复默认'),
+            ),
+            HyperButton.ghost(
+              onPressed: () => _change(() => a.shadows = []),
+              child: const Text('无阴影'),
+            ),
+            HyperButton.tonal(
+              onPressed: () =>
+                  _change(() => a.shadows = [...?a.shadows, EditorShadow()]),
+              child: const Text('添加'),
+            ),
+          ],
+        ),
+        if (a.shadows == null) const HyperText('继承组件默认阴影'),
+        for (var i = 0; i < (a.shadows?.length ?? 0); i++) _shadow(i),
+      ],
+      ..._textFieldBorderProperties(a),
+    ];
+  }
+
+  HyperFill? _componentFill(HyperThemeData theme) => switch (_component) {
+    'button' =>
+      theme.buttonTheme
+          .resolve(_buttonVariant ?? HyperButtonVariant.filled)
+          .background,
+    'card' => theme.cardTheme.style?.background,
+    'tag' =>
+      resolveEditorTag(
+            _appearance,
+            theme.colors,
+            theme.contrastTheme,
+          ).resolvePalette(theme.colors, theme.contrastTheme).background ??
+          HyperFill.color(theme.colors.surfaceMuted),
+    'chip' =>
+      resolveEditorChip(
+            _appearance,
+            theme.colors,
+          ).resolvePalette(theme.colors, theme.contrastTheme).background ??
+          HyperFill.color(theme.colors.surfaceMuted),
+    'field' => theme.textFieldTheme.style.background,
+    'select' =>
+      _selectSurfaceAnchor
+          ? theme.selectTheme.style?.buttonStyle?.background ??
+                const HyperFill.none()
+          : theme.selectTheme.style?.selectionStyle?.surfaceStyle?.background,
+    _ => theme.menuTheme.style?.surfaceStyle?.background,
+  };
+
+  List<Widget> _backgroundProperties(EditorComponent a) {
+    final fill = _componentFill(_resolveTheme(_dark));
+    final current =
+        a.fillKind ??
+        (a.gradient != null ||
+                a.buttonStyle.gradient != null ||
+                fill?.gradient != null ||
+                (_component == 'button' &&
+                    _buttonVariant == HyperButtonVariant.gradient)
+            ? EditorFillKind.gradient
+            : fill?.isNone == true
+            ? EditorFillKind.none
+            : EditorFillKind.solid);
+    return [
+      _select(
+        '背景类型',
+        a.fillKind?.name ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'solid': '纯色',
+          'gradient': '渐变',
+          'none': '无填充',
+        },
+        (v) => _change(() {
+          a.fillKind = v == 'inherit' ? null : EditorFillKind.values.byName(v);
+          a.buttonStyle.gradient = null;
+          if (v == 'gradient') {
+            a.gradient ??= EditorGradient(
+              colors: [
+                const EditorColor(semantic: 'primary'),
+                const EditorColor(semantic: 'surface'),
+              ],
+              stops: [0, 1],
+            );
+          }
+          if (v == 'solid') {
+            a.background ??= EditorColor(
+              argb:
+                  (fill?.color ??
+                          (_component == 'button'
+                              ? _resolveTheme(_dark).colors.primary
+                              : _resolveTheme(_dark).colors.surface))
+                      .toARGB32(),
+            );
+          }
+          if (v == 'inherit') {
+            a.background = null;
+            a.gradient = null;
+          }
+        }),
+      ),
+      if (current == EditorFillKind.gradient) ..._gradientProperties(a),
+      if (current == EditorFillKind.solid)
+        _color(
+          _component == 'button' && _buttonVariant == null && a.fillKind == null
+              ? '通用强调色'
+              : '背景',
+          a.background,
+          (v) => a.background = v,
+        ),
+    ];
+  }
+
+  List<Widget> _textFieldBorderProperties(EditorComponent a) {
+    final v = a.textFieldStyle;
+    final colors = _resolveTheme(_dark).colors;
+    return [
+      const HyperText('聚焦表示点击输入框或通过键盘获得焦点；错误优先于聚焦，禁用最后覆盖。未配置项继承默认边框形态。'),
+      if (_fieldState == 'common') ..._borderProperties(a, label: '默认边框'),
+      if (_fieldState == 'hovered')
+        ..._borderProperties(
+          a,
+          stateBorder: v.hoveredBorder,
+          label: '悬停边框',
+          inheritedColor:
+              v.hoverBorderColor?.resolve(colors) ?? colors.textSecondary,
+          reset: () {
+            v.hoveredBorder = EditorBorder();
+            v.hoverBorderColor = null;
+          },
+        ),
+      if (_fieldState == 'focused')
+        ..._borderProperties(
+          a,
+          stateBorder: v.focusedBorder,
+          label: '聚焦边框',
+          inheritedColor: v.focusBorderColor?.resolve(colors) ?? colors.primary,
+          reset: () {
+            v.focusedBorder = EditorBorder();
+            v.focusBorderColor = null;
+          },
+        ),
+      if (_fieldState == 'error')
+        ..._borderProperties(
+          a,
+          stateBorder: v.errorBorder,
+          label: '错误边框',
+          inheritedColor: v.errorBorderColor?.resolve(colors) ?? colors.error,
+          reset: () {
+            v.errorBorder = EditorBorder();
+            v.errorBorderColor = null;
+          },
+        ),
+      if (_fieldState == 'disabled')
+        ..._borderProperties(
+          a,
+          stateBorder: v.disabledBorder,
+          label: '禁用边框',
+          reset: () {
+            v.disabledBorder = EditorBorder();
+          },
+        ),
+    ];
+  }
+
+  List<Widget> _borderProperties(
+    EditorComponent a, {
+    EditorBorder? stateBorder,
+    String label = '边框',
+    Color? inheritedColor,
+    VoidCallback? reset,
+  }) {
+    final border = stateBorder ?? a.border;
+    final colors = _resolveTheme(_dark).colors;
+    final legacyColor = switch (_component) {
+      'button' => a.buttonStyle.borderColor,
+      'chip' => a.chipStyle.borderColor,
+      _ => null,
+    };
+    final legacyWidth = switch (_component) {
+      'button' => a.buttonStyle.borderWidth,
+      'chip' => a.chipStyle.borderWidth,
+      _ => null,
+    };
+    return [
+      _heading(label),
+      _select(
+        '$label类型',
+        border.kind?.name ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'solid': '实线',
+          'dashed': '虚线',
+          'dotted': '点线',
+          'none': '无边框',
+        },
+        (v) => _change(() {
+          if (v == 'inherit') {
+            if (reset != null) {
+              reset();
+            } else {
+              a.border = EditorBorder();
+            }
+            if (_component == 'button') {
+              a.buttonStyle.borderWidth = null;
+              a.buttonStyle.borderColor = null;
+            } else if (_component == 'chip') {
+              a.chipStyle.borderWidth = null;
+              a.chipStyle.borderColor = null;
+            }
+          } else {
+            border.kind = EditorBorderKind.values.byName(v);
+          }
+        }),
+      ),
+      if (border.kind != null && border.kind != EditorBorderKind.none) ...[
+        _semanticColor(
+          '$label颜色',
+          (border.color ?? legacyColor)?.resolve(colors) ??
+              inheritedColor ??
+              colors.outline,
+          border.color?.resolve(colors),
+          (v) =>
+              border.color = v == null ? null : EditorColor(argb: v.toARGB32()),
+        ),
+        _number(
+          '$label宽度',
+          border.width ??
+              legacyWidth ??
+              (stateBorder == null ? null : a.border.width) ??
+              1,
+          0,
+          10,
+          (v) => border.width = v,
+          () => border.width = null,
+          border.width != null,
+          wholeNumbers: true,
+        ),
+        if (border.kind == EditorBorderKind.dashed ||
+            border.kind == EditorBorderKind.dotted) ...[
+          if (border.kind == EditorBorderKind.dashed)
+            _number(
+              label == '边框' ? '虚线长度' : '$label虚线长度',
+              border.dashLength ?? 6,
+              1,
+              30,
+              (v) => border.dashLength = v,
+              () => border.dashLength = null,
+              border.dashLength != null,
+              wholeNumbers: true,
+            ),
+          _number(
+            label == '边框' ? '虚线间隔' : '$label虚线间隔',
+            border.gapLength ?? 4,
+            1,
+            30,
+            (v) => border.gapLength = v,
+            () => border.gapLength = null,
+            border.gapLength != null,
+            wholeNumbers: true,
+          ),
+        ],
+      ],
+    ];
+  }
+
+  List<Widget> _gradientProperties(EditorComponent appearance) {
+    final theme = _resolveTheme(_dark);
+    final inherited = _componentFill(theme)?.gradient;
+    final baseColors =
+        inherited?.colors ??
+        [
+          theme.colors.primary,
+          Color.lerp(theme.colors.primary, theme.colors.error, .45)!,
+        ];
+    final gradient =
+        appearance.gradient ??
+        appearance.buttonStyle.gradient ??
+        (inherited == null ? null : EditorGradient.fromGradient(inherited)) ??
+        EditorGradient(
+          colors: baseColors
+              .map((c) => EditorColor(argb: c.toARGB32()))
+              .toList(),
+          stops:
+              inherited?.stops ??
+              List.generate(
+                baseColors.length,
+                (i) => i / (baseColors.length - 1),
+              ),
+        );
+    void edit(void Function(EditorGradient) change) {
+      final next = EditorGradient.fromJson(gradient.toJson());
+      change(next);
+      appearance.gradient = next;
+      appearance.fillKind = EditorFillKind.gradient;
+      appearance.buttonStyle.gradient = null;
+    }
+
+    return [
+      Row(
+        children: [
+          const Expanded(child: HyperText('渐变背景')),
+          HyperIconButton.ghost(
+            tooltip: '恢复继承',
+            icon: const Icon(Icons.restart_alt),
+            onPressed:
+                appearance.gradient == null &&
+                    appearance.buttonStyle.gradient == null
+                ? null
+                : () => _change(() {
+                    appearance.gradient = null;
+                    appearance.buttonStyle.gradient = null;
+                    appearance.fillKind = null;
+                  }),
+          ),
+          HyperIconButton.ghost(
+            tooltip: '添加颜色节点',
+            icon: const Icon(Icons.add),
+            onPressed: () => _change(
+              () => edit((g) {
+                final index = g.stops.length - 1;
+                g.colors.insert(
+                  index,
+                  EditorColor(
+                    argb: Color.lerp(
+                      g.colors[index - 1].resolve(theme.colors),
+                      g.colors[index].resolve(theme.colors),
+                      .5,
+                    )!.toARGB32(),
+                  ),
+                );
+                g.stops.insert(
+                  index,
+                  (g.stops[index - 1] + g.stops[index]) / 2,
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+      _select(
+        '渐变类型',
+        gradient.kind.name,
+        const {'linear': '线性', 'radial': '径向', 'sweep': '扫描'},
+        (v) => _change(
+          () => edit((g) => g.kind = EditorGradientKind.values.byName(v)),
+        ),
+      ),
+      if (gradient.kind == EditorGradientKind.linear)
+        _number(
+          '渐变方向（度）',
+          gradient.angle,
+          0,
+          360,
+          (v) => edit((g) => g.angle = v),
+          () => edit((g) => g.angle = 0),
+          appearance.gradient != null ||
+              appearance.buttonStyle.gradient != null,
+          wholeNumbers: true,
+        ),
+      if (gradient.kind != EditorGradientKind.linear) ...[
+        _number(
+          '渐变中心 X',
+          gradient.centerX,
+          -1,
+          1,
+          (v) => edit((g) => g.centerX = v),
+          () => edit((g) => g.centerX = 0),
+          gradient.centerX != 0,
+          wholeNumbers: false,
+        ),
+        _number(
+          '渐变中心 Y',
+          gradient.centerY,
+          -1,
+          1,
+          (v) => edit((g) => g.centerY = v),
+          () => edit((g) => g.centerY = 0),
+          gradient.centerY != 0,
+          wholeNumbers: false,
+        ),
+      ],
+      if (gradient.kind == EditorGradientKind.radial)
+        _number(
+          '渐变半径',
+          gradient.radius,
+          .01,
+          2,
+          (v) => edit((g) => g.radius = v),
+          () => edit((g) => g.radius = .5),
+          gradient.radius != .5,
+          wholeNumbers: false,
+        ),
+      if (gradient.kind == EditorGradientKind.sweep) ...[
+        _number(
+          '扫描起始角（度）',
+          gradient.startAngle,
+          0,
+          (gradient.endAngle - .1).clamp(0.0, 360.0).toDouble(),
+          (v) => edit((g) => g.startAngle = v),
+          () => edit((g) => g.startAngle = 0),
+          gradient.startAngle != 0,
+          wholeNumbers: false,
+        ),
+        _number(
+          '扫描终止角（度）',
+          gradient.endAngle,
+          (gradient.startAngle + .1).clamp(0.0, 360.0).toDouble(),
+          360,
+          (v) => edit((g) => g.endAngle = v),
+          () => edit((g) => g.endAngle = 360),
+          gradient.endAngle != 360,
+          wholeNumbers: false,
+        ),
+        _number(
+          '扫描旋转（度）',
+          gradient.angle,
+          0,
+          360,
+          (v) => edit((g) => g.angle = v),
+          () => edit((g) => g.angle = 0),
+          gradient.angle != 0,
+          wholeNumbers: true,
+        ),
+      ],
+      for (var i = 0; i < gradient.colors.length; i++) ...[
+        Row(
+          children: [
+            Expanded(
+              child: _semanticColor(
+                '渐变节点 ${i + 1}',
+                gradient.colors[i].resolve(theme.colors),
+                gradient.colors[i].resolve(theme.colors),
+                (c) => edit(
+                  (g) => g.colors[i] = c == null
+                      ? const EditorColor(semantic: 'primary')
+                      : EditorColor(argb: c.toARGB32()),
+                ),
+              ),
+            ),
+            HyperIconButton.ghost(
+              tooltip: '删除颜色节点',
+              icon: const Icon(Icons.remove),
+              onPressed: gradient.colors.length <= 2
+                  ? null
+                  : () => _change(
+                      () => edit((g) {
+                        g.colors.removeAt(i);
+                        g.stops.removeAt(i);
+                      }),
+                    ),
+            ),
+          ],
+        ),
+        if ((i == 0 ? 0.0 : gradient.stops[i - 1]) <
+            (i == gradient.stops.length - 1 ? 1.0 : gradient.stops[i + 1]))
+          _number(
+            '节点 ${i + 1} 位置',
+            gradient.stops[i],
+            i == 0 ? 0 : gradient.stops[i - 1],
+            i == gradient.stops.length - 1 ? 1 : gradient.stops[i + 1],
+            (v) => edit((g) => g.stops[i] = v),
+            () => edit((g) => g.stops[i] = i == 0 ? 0 : gradient.stops[i - 1]),
+            appearance.gradient != null ||
+                appearance.buttonStyle.gradient != null,
+            wholeNumbers: false,
+          ),
+      ],
+    ];
+  }
+
+  List<Widget> _buttonSizeProperties(HyperSizeScheme s) {
+    final metrics = _spec.buttonMetrics;
+    final size = _buttonSizeVariant;
+    final minimumWidth = switch (size) {
+      HyperButtonSizeVariant.small => metrics.smallMinimumWidth,
+      HyperButtonSizeVariant.medium => metrics.minimumWidth,
+      HyperButtonSizeVariant.large => metrics.largeMinimumWidth,
+    };
+    final height = switch (size) {
+      HyperButtonSizeVariant.small => metrics.smallHeight,
+      HyperButtonSizeVariant.medium => _spec.buttonHeight,
+      HyperButtonSizeVariant.large => metrics.largeHeight,
+    };
+    final horizontal = switch (size) {
+      HyperButtonSizeVariant.small => metrics.smallPaddingHorizontal,
+      HyperButtonSizeVariant.medium => metrics.paddingHorizontal,
+      HyperButtonSizeVariant.large => metrics.largePaddingHorizontal,
+    };
+    final vertical = switch (size) {
+      HyperButtonSizeVariant.small => metrics.smallPaddingVertical,
+      HyperButtonSizeVariant.medium => metrics.paddingVertical,
+      HyperButtonSizeVariant.large => metrics.largePaddingVertical,
+    };
+    final width = switch (size) {
+      HyperButtonSizeVariant.small => metrics.smallWidth,
+      HyperButtonSizeVariant.medium => metrics.width,
+      HyperButtonSizeVariant.large => metrics.largeWidth,
+    };
+    void setMinimumWidth(double? value) {
+      switch (size) {
+        case HyperButtonSizeVariant.small:
+          metrics.smallMinimumWidth = value;
+        case HyperButtonSizeVariant.medium:
+          metrics.minimumWidth = value;
+        case HyperButtonSizeVariant.large:
+          metrics.largeMinimumWidth = value;
+      }
+    }
+
+    void setHeight(double? value) {
+      switch (size) {
+        case HyperButtonSizeVariant.small:
+          metrics.smallHeight = value;
+        case HyperButtonSizeVariant.medium:
+          _spec.buttonHeight = value;
+        case HyperButtonSizeVariant.large:
+          metrics.largeHeight = value;
+      }
+    }
+
+    void setHorizontal(double? value) {
+      switch (size) {
+        case HyperButtonSizeVariant.small:
+          metrics.smallPaddingHorizontal = value;
+        case HyperButtonSizeVariant.medium:
+          metrics.paddingHorizontal = value;
+        case HyperButtonSizeVariant.large:
+          metrics.largePaddingHorizontal = value;
+      }
+    }
+
+    void setVertical(double? value) {
+      switch (size) {
+        case HyperButtonSizeVariant.small:
+          metrics.smallPaddingVertical = value;
+        case HyperButtonSizeVariant.medium:
+          metrics.paddingVertical = value;
+        case HyperButtonSizeVariant.large:
+          metrics.largePaddingVertical = value;
+      }
+    }
+
+    void setWidth(double? value) {
+      switch (size) {
+        case HyperButtonSizeVariant.small:
+          metrics.smallWidth = value;
+        case HyperButtonSizeVariant.medium:
+          metrics.width = value;
+        case HyperButtonSizeVariant.large:
+          metrics.largeWidth = value;
+      }
+    }
+
+    final padding = s.button.paddingFor(size).resolve(TextDirection.ltr);
+    return [
+      HyperSegmentedButton<HyperButtonSizeVariant>(
+        key: const ValueKey('editor-button-size'),
+        expanded: true,
+        segments: const [
+          HyperSegment(value: HyperButtonSizeVariant.small, label: '小'),
+          HyperSegment(value: HyperButtonSizeVariant.medium, label: '中'),
+          HyperSegment(value: HyperButtonSizeVariant.large, label: '大'),
+        ],
+        selected: {size},
+        onSelectionChanged: (v) =>
+            _updateState(() => _buttonSizeVariant = v.single),
+      ),
+      const SizedBox(height: 12),
+      const HyperText('以下规格按当前设备和尺寸档位保存，所有按钮外观变体共用。'),
+      _number(
+        '最小高度',
+        height ?? s.button.heightFor(size),
+        20,
+        160,
+        setHeight,
+        () => setHeight(null),
+        height != null,
+      ),
+      _number(
+        '最小宽度',
+        minimumWidth ?? s.button.minimumWidthFor(size),
+        0,
+        300,
+        setMinimumWidth,
+        () => setMinimumWidth(null),
+        minimumWidth != null,
+      ),
+      _select(
+        '宽度模式',
+        width == null ? 'auto' : 'fixed',
+        const {'auto': '随内容自适应', 'fixed': '固定宽度'},
+        (v) => _change(
+          () => setWidth(v == 'auto' ? null : s.button.minimumWidthFor(size)),
+        ),
+      ),
+      if (width != null)
+        _number('固定宽度', width, 0, 600, setWidth, () => setWidth(null), true),
+      _number(
+        '水平内边距',
+        horizontal ?? padding.left,
+        0,
+        80,
+        setHorizontal,
+        () => setHorizontal(null),
+        horizontal != null,
+      ),
+      _number(
+        '垂直内边距',
+        vertical ?? padding.top,
+        0,
+        80,
+        setVertical,
+        () => setVertical(null),
+        vertical != null,
+      ),
+      _heading('图标'),
+
+      _number(
+        'iconSize',
+        metrics.iconSize ?? s.button.iconSize,
+        8,
+        80,
+        (v) => metrics.iconSize = v,
+        () => metrics.iconSize = null,
+        metrics.iconSize != null,
+      ),
+      _number(
+        'iconSpacing',
+        metrics.iconSpacing ?? s.button.iconSpacing,
+        0,
+        40,
+        (v) => metrics.iconSpacing = v,
+        () => metrics.iconSpacing = null,
+        metrics.iconSpacing != null,
+      ),
+    ];
+  }
+
+  void _resetFieldState(EditorComponent a) {
+    final v = a.textFieldStyle;
+    switch (_fieldState) {
+      case 'hovered':
+        v.hoveredBorder = EditorBorder();
+        v.hoverBorderColor = null;
+      case 'focused':
+        v.focusedBorder = EditorBorder();
+        v.focusBorderColor = null;
+        a.focusedShadow.shadows = null;
+      case 'error':
+        v.errorBorder = EditorBorder();
+        v.errorBorderColor = v.errorIconColor = null;
+        _spec.textFieldMetrics.errorMaxWidth = null;
+      case 'disabled':
+        v.disabledBorder = EditorBorder();
+        v.disabledForegroundColor = null;
+    }
+  }
+
+  void _resetSelectObject() {
+    final a = _appearance,
+        m = _spec.selectMetrics,
+        v = _mode.select.selectStyle;
+    a.background = a.foreground = null;
+    a.fillKind = null;
+    a.gradient = null;
+    a.border = EditorBorder();
+    a.shadows = null;
+    if (_selectSurfaceAnchor) {
+      a.buttonStyle = EditorButtonVisual();
+      a.hoveredShadow.shadows = a.focusedShadow.shadows =
+          a.pressedShadow.shadows = a.disabledShadow.shadows = null;
+      v.arrowColor = v.disabledArrowColor = null;
+      v.labelFontSize = null;
+      m.minimumHeight = m.minimumTapTargetSize = m.radius =
+          m.paddingHorizontal = m.paddingVertical = m.width = m.arrowSize =
+              m.arrowSpacing = m.chipSpacing = m.minimumInputWidth = null;
+    } else {
+      _mode.select.selectStyle = EditorSelectVisual()
+        ..arrowColor = v.arrowColor
+        ..disabledArrowColor = v.disabledArrowColor
+        ..labelFontSize = v.labelFontSize;
+      m.itemHeight = m.itemPadding = m.itemSpacing = m.itemRadius =
+          m.surfaceRadius = m.maxPanelHeight = m.popupSpacing = null;
+    }
+  }
+
+  void _resetSelectState() {
+    if (_selectSurfaceAnchor) {
+      _resetButtonState(_mode.selectAnchor, state: _selectState);
+      if (_selectState == 'disabled') {
+        _mode.select.selectStyle.disabledArrowColor = null;
+      }
+    } else {
+      final v = _mode.select.selectStyle;
+      switch (_selectState) {
+        case 'selected':
+          v.showCheckmark = null;
+          v.checkPlacement = v.checkIcon = null;
+          v.checkColor = v.selectedBackgroundColor = v.selectedForegroundColor =
+              null;
+          v.checkSize = v.checkSpacing = null;
+        case 'active':
+          v.activeBackgroundColor = null;
+        case 'disabled':
+          v.disabledOptionColor = null;
+      }
+    }
+  }
+
+  void _resetButtonState(EditorComponent a, {String? state}) {
+    final v = a.buttonStyle;
+    switch (state ?? _buttonState) {
+      case 'hovered':
+        v.hoverOpacity = null;
+        v.hoveredOffsetX = v.hoveredOffsetY = v.hoveredScale = null;
+        a.hoveredShadow.shadows = null;
+      case 'focused':
+        v.focusOpacity = null;
+        v.focusedOffsetX = v.focusedOffsetY = v.focusedScale = null;
+        a.focusedShadow.shadows = null;
+      case 'pressed':
+        v.pressOpacity = null;
+        v.pressedOffsetX = v.pressedOffsetY = v.pressedScale = null;
+        a.pressedShadow.shadows = null;
+      case 'disabled':
+        v.disabledBackground = v.disabledForeground = null;
+        a.disabledShadow.shadows = null;
+    }
+  }
+
+  List<Widget> _buttonProperties(
+    HyperSizeScheme s,
+    EditorComponent appearance,
+  ) {
+    final theme = _resolveTheme(_dark);
+    final resolved = theme.buttonTheme.resolve(
+      _buttonVariant ?? HyperButtonVariant.filled,
+    );
+    final visual = appearance.buttonStyle;
+    Widget color(
+      String name,
+      EditorColor? override,
+      Color inherited,
+      ValueChanged<EditorColor?> changed,
+    ) => _semanticColor(
+      name,
+      override?.resolve(theme.colors) ?? inherited,
+      override?.resolve(theme.colors),
+      (value) =>
+          changed(value == null ? null : EditorColor(argb: value.toARGB32())),
+    );
+    return [
+      if (_buttonState == 'common') ...[
+        _heading('按钮文字'),
+        _color(
+          '前景',
+          appearance.foreground,
+          (value) => appearance.foreground = value,
+        ),
+      ],
+      if (_buttonState == 'disabled') ...[
+        _heading('禁用状态'),
+        color(
+          'disabledBackground',
+          visual.disabledBackground,
+          resolved.disabledBackground?.color ??
+              theme.colors.primary.withValues(alpha: .35),
+          (v) => visual.disabledBackground = v,
+        ),
+        color(
+          'disabledForegroundColor',
+          visual.disabledForeground,
+          resolved.disabledForegroundColor ?? theme.colors.disabled,
+          (v) => visual.disabledForeground = v,
+        ),
+      ],
+      if (_buttonState != 'disabled') _heading('交互反馈'),
+      if (_buttonState == 'common') ...[
+        color(
+          'overlayColor',
+          visual.overlay,
+          resolved.overlayColor ?? theme.colors.stateLayer,
+          (v) => visual.overlay = v,
+        ),
+      ],
+      if (_buttonState == 'hovered') ...[
+        _number(
+          'hoverOverlayOpacity',
+          visual.hoverOpacity ??
+              resolved.hoverOverlayOpacity ??
+              s.button.hoverOverlayOpacity,
+          0,
+          1,
+          (v) => visual.hoverOpacity = v,
+          () => visual.hoverOpacity = null,
+          visual.hoverOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'focused') ...[
+        _number(
+          'focusOverlayOpacity',
+          visual.focusOpacity ??
+              resolved.focusOverlayOpacity ??
+              s.button.focusOverlayOpacity,
+          0,
+          1,
+          (v) => visual.focusOpacity = v,
+          () => visual.focusOpacity = null,
+          visual.focusOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'pressed') ...[
+        _number(
+          'pressOverlayOpacity',
+          visual.pressOpacity ??
+              resolved.pressOverlayOpacity ??
+              s.button.pressOverlayOpacity,
+          0,
+          1,
+          (v) => visual.pressOpacity = v,
+          () => visual.pressOpacity = null,
+          visual.pressOpacity != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'common') ...[
+        _heading('加载进度'),
+        if (_buttonVariant == null)
+          _number(
+            'progressSize',
+            _spec.buttonMetrics.progressSize ?? s.button.progressSize,
+            8,
+            80,
+            (v) => _spec.buttonMetrics.progressSize = v,
+            () => _spec.buttonMetrics.progressSize = null,
+            _spec.buttonMetrics.progressSize != null,
+          ),
+        color(
+          'progressColor',
+          visual.progressColor,
+          resolved.progressColor ??
+              resolved.foregroundColor ??
+              theme.colors.onPrimary,
+          (v) => visual.progressColor = v,
+        ),
+        color(
+          'progressTrackColor',
+          visual.progressTrackColor,
+          resolved.progressTrackColor ??
+              (resolved.foregroundColor ?? theme.colors.onPrimary).withValues(
+                alpha: .24,
+              ),
+          (v) => visual.progressTrackColor = v,
+        ),
+        _number(
+          'progressThickness',
+          visual.progressThickness ?? resolved.progressThickness ?? 2,
+          1,
+          10,
+          (v) => visual.progressThickness = v,
+          () => visual.progressThickness = null,
+          visual.progressThickness != null,
+          wholeNumbers: true,
+        ),
+      ],
+      if (['hovered', 'focused', 'pressed'].contains(_buttonState)) ...[
+        _heading('交互变换'),
+        const HyperText('默认不启用；水平正值向右，垂直正值向下；缩放 1 为原尺寸。变换不改变布局与命中区域，减少动画时不启用。'),
+      ],
+      if (_buttonState == 'hovered') ...[
+        _heading('悬停变换'),
+        _number(
+          '悬停水平位移',
+          visual.hoveredOffsetX ?? 0,
+          -20,
+          20,
+          (v) => visual.hoveredOffsetX = v,
+          () => visual.hoveredOffsetX = null,
+          visual.hoveredOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '悬停垂直位移',
+          visual.hoveredOffsetY ?? 0,
+          -20,
+          20,
+          (v) => visual.hoveredOffsetY = v,
+          () => visual.hoveredOffsetY = null,
+          visual.hoveredOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '悬停缩放',
+          visual.hoveredScale ?? 1,
+          .5,
+          1.5,
+          (v) => visual.hoveredScale = v,
+          () => visual.hoveredScale = null,
+          visual.hoveredScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'focused') ...[
+        _heading('聚焦变换'),
+        _number(
+          '聚焦水平位移',
+          visual.focusedOffsetX ?? 0,
+          -20,
+          20,
+          (v) => visual.focusedOffsetX = v,
+          () => visual.focusedOffsetX = null,
+          visual.focusedOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '聚焦垂直位移',
+          visual.focusedOffsetY ?? 0,
+          -20,
+          20,
+          (v) => visual.focusedOffsetY = v,
+          () => visual.focusedOffsetY = null,
+          visual.focusedOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '聚焦缩放',
+          visual.focusedScale ?? 1,
+          .5,
+          1.5,
+          (v) => visual.focusedScale = v,
+          () => visual.focusedScale = null,
+          visual.focusedScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'pressed') ...[
+        _heading('按下变换'),
+        _number(
+          '按下水平位移',
+          visual.pressedOffsetX ?? 0,
+          -20,
+          20,
+          (v) => visual.pressedOffsetX = v,
+          () => visual.pressedOffsetX = null,
+          visual.pressedOffsetX != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '按下垂直位移',
+          visual.pressedOffsetY ?? 0,
+          -20,
+          20,
+          (v) => visual.pressedOffsetY = v,
+          () => visual.pressedOffsetY = null,
+          visual.pressedOffsetY != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '按下缩放',
+          visual.pressedScale ?? 1,
+          .5,
+          1.5,
+          (v) => visual.pressedScale = v,
+          () => visual.pressedScale = null,
+          visual.pressedScale != null,
+          wholeNumbers: false,
+        ),
+      ],
+      if (_buttonState == 'common') ...[
+        _heading('状态过渡'),
+        _number(
+          'animationDuration（毫秒）',
+          visual.animationMilliseconds ??
+              resolved.animationDuration?.inMilliseconds.toDouble() ??
+              theme.motion.fastDuration.inMilliseconds.toDouble(),
+          0,
+          2000,
+          (v) => visual.animationMilliseconds = v,
+          () => visual.animationMilliseconds = null,
+          visual.animationMilliseconds != null,
+          wholeNumbers: true,
+        ),
+      ],
+    ];
+  }
+
+  List<Widget> _focusedShadowProperties(
+    EditorComponent a, {
+    EditorComponentShadow? stateTarget,
+    String label = '聚焦阴影 / 焦点环',
+  }) {
+    final target = stateTarget ?? a.focusedShadow;
+    return [
+      _heading(label),
+      HyperText(
+        stateTarget == null
+            ? '仅获得焦点时显示；零偏移、零模糊和正扩散可绘制焦点环。该配置替换聚焦时的普通阴影。'
+            : '仅在当前状态显示；未覆盖时继承普通阴影，空列表关闭当前状态阴影。',
+      ),
       Wrap(
         spacing: 8,
         children: [
           HyperButton.ghost(
-            onPressed: () => _change(() => a.shadows = null),
-            child: const Text('恢复默认'),
+            onPressed: () => _change(() => target.shadows = null),
+            child: const Text('继承普通阴影'),
           ),
           HyperButton.ghost(
-            onPressed: () => _change(() => a.shadows = []),
-            child: const Text('无阴影'),
+            onPressed: () => _change(() => target.shadows = []),
+            child: const Text('关闭阴影'),
           ),
           HyperButton.tonal(
-            onPressed: () =>
-                _change(() => a.shadows = [...?a.shadows, EditorShadow()]),
-            child: const Text('添加'),
+            onPressed: () => _change(
+              () => target.shadows = [
+                ...?target.shadows,
+                EditorShadow(opacity: .5, dx: 0, dy: 0, blur: 0, spread: 3),
+              ],
+            ),
+            child: Text(stateTarget == null ? '添加焦点环' : '添加阴影'),
           ),
         ],
       ),
-      if (a.shadows == null) const HyperText('继承组件默认阴影'),
-      for (var i = 0; i < (a.shadows?.length ?? 0); i++) _shadow(i),
-      _heading('编辑范围'),
-      const HyperText('本版编辑通用外观与当前端尺寸；状态与变体仍沿用组件默认配方。所有同类预览组件同步更新。'),
-    ]);
+      for (var i = 0; i < (target.shadows?.length ?? 0); i++)
+        _shadow(i, shadowTarget: target),
+    ];
   }
 
-  Widget _shadow(int index, {EditorComponent? target}) {
+  Widget _shadow(
+    int index, {
+    EditorComponent? target,
+    EditorComponentShadow? shadowTarget,
+  }) {
     final appearance = target ?? _appearance;
-    final s = appearance.shadows![index];
+    final shadows = shadowTarget == null
+        ? appearance.shadows!
+        : shadowTarget.shadows!;
+    final s = shadows[index];
     return Column(
       children: [
         Row(
@@ -1755,11 +4368,14 @@ class _ThemeEditorState extends State<ThemeEditor> {
             Expanded(child: HyperText('第 ${index + 1} 层')),
             HyperIconButton.ghost(
               tooltip: '删除阴影',
-              onPressed: () => _change(
-                () =>
-                    appearance.shadows = [...appearance.shadows!]
-                      ..removeAt(index),
-              ),
+              onPressed: () => _change(() {
+                final next = [...shadows]..removeAt(index);
+                if (shadowTarget == null) {
+                  appearance.shadows = next;
+                } else {
+                  shadowTarget.shadows = next;
+                }
+              }),
               icon: const Icon(Icons.delete_outline),
             ),
           ],
@@ -1804,7 +4420,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   }
 
   Widget _preview() {
-    final theme = _document.resolve(_dark);
+    final theme = _resolveTheme(_dark);
     return Column(
       children: [
         Obx(
@@ -1812,6 +4428,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
             page: _page,
             onSelected: (value) => rxBatch(() {
               _page = value;
+              _component =
+                  _pages.entries
+                      .where((entry) => entry.value == value)
+                      .firstOrNull
+                      ?.key ??
+                  value;
+              if (value == 'hyper-dropdown') _component = 'select';
               for (final entry in _pages.entries) {
                 if (entry.value == value) _component = entry.key;
               }

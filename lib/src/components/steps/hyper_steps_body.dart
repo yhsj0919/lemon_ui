@@ -168,6 +168,7 @@ class HyperStepsBody extends StatelessWidget {
       if (s.material != null) {
         marker = HyperMaterialSurface(
           material: s.material,
+          semanticBackground: s.nodeFill,
           quality: s.materialQuality,
           reduceTransparency: s.reduceTransparency,
           borderRadius: s.nodeBorderRadius,

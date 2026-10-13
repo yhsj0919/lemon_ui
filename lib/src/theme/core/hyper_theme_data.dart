@@ -1,3 +1,4 @@
+import '../../components/tooltip/hyper_tooltip_theme.dart';
 import '../../components/top_navigation/hyper_top_navigation_theme.dart';
 import '../../components/color_picker/hyper_color_picker_theme.dart';
 import '../../components/select/hyper_selection_theme.dart';
@@ -141,6 +142,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.chipTheme = const HyperChipThemeData(),
     this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
+    this.tooltipTheme = const HyperTooltipThemeData(),
     this.iconTheme = const HyperIconThemeData(),
     this.dividerTheme = const HyperDividerThemeData(),
     this.progressTheme = const HyperProgressThemeData(),
@@ -410,6 +412,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperIconButtonThemeData iconButtonTheme;
 
   /// 全局基础图标主题，不与图标按钮主题共用。
+  final HyperTooltipThemeData tooltipTheme;
   final HyperIconThemeData iconTheme;
 
   /// 全局分隔线主题，不直接复用 Material DividerTheme。
@@ -544,6 +547,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperChipThemeData? chipTheme,
     HyperWidgetGroupThemeData? widgetGroupTheme,
     HyperIconButtonThemeData? iconButtonTheme,
+    HyperTooltipThemeData? tooltipTheme,
     HyperIconThemeData? iconTheme,
     HyperDividerThemeData? dividerTheme,
     HyperProgressThemeData? progressTheme,
@@ -621,6 +625,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       chipTheme: chipTheme ?? this.chipTheme,
       widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
+      tooltipTheme: tooltipTheme ?? this.tooltipTheme,
       iconTheme: iconTheme ?? this.iconTheme,
       dividerTheme: dividerTheme ?? this.dividerTheme,
       progressTheme: progressTheme ?? this.progressTheme,
@@ -810,6 +815,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.iconButtonTheme,
         t,
       ),
+      tooltipTheme: HyperTooltipThemeData.lerp(
+        tooltipTheme,
+        other.tooltipTheme,
+        t,
+      ),
       iconTheme: HyperIconThemeData.lerp(iconTheme, other.iconTheme, t),
       dividerTheme: HyperDividerThemeData.lerp(
         dividerTheme,
@@ -906,6 +916,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.tagTheme == tagTheme &&
           other.widgetGroupTheme == widgetGroupTheme &&
           other.iconButtonTheme == iconButtonTheme &&
+          other.tooltipTheme == tooltipTheme &&
           other.iconTheme == iconTheme &&
           other.dividerTheme == dividerTheme &&
           other.progressTheme == progressTheme &&
@@ -970,6 +981,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     tagTheme,
     widgetGroupTheme,
     iconButtonTheme,
+    tooltipTheme,
     iconTheme,
     dividerTheme,
     progressTheme,

@@ -407,6 +407,8 @@ final class HyperSizeScheme {
         iconSize: 24,
         button: const HyperButtonSize(
           minimumSize: Size(58, 48),
+          smallMinimumWidth: 58,
+          largeMinimumWidth: 58,
           smallHeight: 48,
           largeHeight: 48,
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -829,6 +831,8 @@ final class HyperSizeScheme {
         iconSize: 28,
         button: const HyperButtonSize(
           minimumSize: Size(64, 44),
+          smallMinimumWidth: 64,
+          largeMinimumWidth: 64,
           smallHeight: 44,
           largeHeight: 44,
           padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -1251,6 +1255,8 @@ final class HyperSizeScheme {
         iconSize: 20,
         button: const HyperButtonSize(
           minimumSize: Size(72, 32),
+          smallMinimumWidth: 72,
+          largeMinimumWidth: 72,
           smallHeight: 24,
           largeHeight: 40,
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1673,6 +1679,8 @@ final class HyperSizeScheme {
         iconSize: 24,
         button: const HyperButtonSize(
           minimumSize: Size(52, 40),
+          smallMinimumWidth: 52,
+          largeMinimumWidth: 52,
           smallHeight: 40,
           largeHeight: 40,
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),

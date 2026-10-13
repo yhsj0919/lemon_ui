@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 
@@ -74,7 +76,7 @@ final class HyperCardStyle {
       overlayColor: Color.lerp(a.overlayColor, b.overlayColor, t),
       border: a.border == null || b.border == null
           ? discrete(a.border, b.border)
-          : BoxBorder.lerp(a.border!, b.border!, t),
+          : lerpHyperBoxBorder(a.border!, b.border!, t),
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
         b.borderRadius,

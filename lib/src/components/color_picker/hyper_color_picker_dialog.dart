@@ -12,6 +12,7 @@ Future<Color?> showHyperColorPickerDialog({
   required Color initialColor,
   Widget? title,
   bool showAlpha = true,
+  List<Color> recommendedColors = const [],
   HyperColorPickerStyle? pickerStyle,
   HyperDialogStyle? dialogStyle,
   String confirmLabel = '确定',
@@ -27,6 +28,7 @@ Future<Color?> showHyperColorPickerDialog({
     initialColor: initialColor,
     title: title,
     showAlpha: showAlpha,
+    recommendedColors: recommendedColors,
     pickerStyle: pickerStyle,
     dialogStyle: dialogStyle,
     confirmLabel: confirmLabel,
@@ -42,6 +44,7 @@ class HyperColorPickerDialog extends StatefulWidget {
     required this.initialColor,
     this.title,
     this.showAlpha = true,
+    this.recommendedColors = const [],
     this.pickerStyle,
     this.dialogStyle,
     this.confirmLabel = '确定',
@@ -50,6 +53,7 @@ class HyperColorPickerDialog extends StatefulWidget {
   final Color initialColor;
   final Widget? title;
   final bool showAlpha;
+  final List<Color> recommendedColors;
   final HyperColorPickerStyle? pickerStyle;
   final HyperDialogStyle? dialogStyle;
   final String confirmLabel, cancelLabel;
@@ -74,6 +78,7 @@ class _HyperColorPickerDialogState extends State<HyperColorPickerDialog> {
     title: widget.title ?? const Text('选择颜色'),
     style: widget.dialogStyle,
     content: HyperColorPicker(
+      recommendedColors: widget.recommendedColors,
       value: _draft,
       showAlpha: widget.showAlpha,
       style: widget.pickerStyle,

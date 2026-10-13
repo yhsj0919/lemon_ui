@@ -179,8 +179,8 @@ class HyperTimeline extends StatelessWidget {
           height: s.nodeSize,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            color: s.nodeFill?.color,
-            gradient: s.nodeFill?.gradient,
+            color: s.material == null ? s.nodeFill?.color : null,
+            gradient: s.material == null ? s.nodeFill?.gradient : null,
             borderRadius: s.nodeBorderRadius,
           ),
           foregroundDecoration: BoxDecoration(
@@ -191,6 +191,7 @@ class HyperTimeline extends StatelessWidget {
         if (s.material != null) {
           node = HyperMaterialSurface(
             material: s.material,
+            semanticBackground: s.nodeFill,
             quality: s.materialQuality,
             reduceTransparency: s.reduceTransparency,
             width: s.nodeSize,

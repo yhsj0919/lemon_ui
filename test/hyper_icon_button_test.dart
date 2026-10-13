@@ -29,7 +29,12 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
     expect(count, 1);
-    expect(find.byTooltip('添加'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperTooltip && widget.message == '添加',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('异步期间显示进度且外部尺寸稳定', (tester) async {

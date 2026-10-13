@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/hyper_surface_material.dart';
+import '../../foundation/hyper_fill.dart';
 import '../core/hyper_theme.dart';
 
 const _unchanged = Object();
@@ -36,8 +37,37 @@ final class HyperMaterialThemeData {
     HyperSurfaceMaterial? material,
     HyperMaterialQuality? quality,
     bool? reduceTransparency,
+    // 继承配方时由消费者传入；显式组件配方不传，保留完整覆盖。
+    HyperFill? semanticBackground,
   }) {
-    final resolved = (material ?? this.material)?.resolve(
+    var recipe = material ?? this.material;
+    if (recipe?.usesBackdrop == true && semanticBackground != null) {
+      if (semanticBackground.isNone) return null;
+      final opacity =
+          recipe!.background?.color?.a ??
+          recipe.background?.gradient?.colors.first.a ??
+          1;
+      HyperFill tinted(double alpha) => semanticBackground.color != null
+          ? HyperFill.color(
+              semanticBackground.color!.withValues(
+                alpha: semanticBackground.color!.a * alpha,
+              ),
+            )
+          : HyperFill.gradient(semanticBackground.gradient!.scale(alpha));
+      final hue =
+          semanticBackground.color ?? semanticBackground.gradient!.colors.first;
+      final fallback =
+          recipe.fallback ??
+          recipe.resolve(quality: HyperMaterialQuality.standard);
+      recipe = recipe.copyWith(
+        background: tinted(opacity),
+        tint: recipe.tint == null
+            ? null
+            : hue.withValues(alpha: recipe.tint!.a * hue.a),
+        fallback: fallback.copyWith(background: tinted(1), tint: null),
+      );
+    }
+    final resolved = recipe?.resolve(
       quality: quality ?? this.quality ?? HyperMaterialQuality.standard,
       reduceTransparency:
           reduceTransparency ?? this.reduceTransparency ?? false,

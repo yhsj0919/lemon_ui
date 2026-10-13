@@ -39,3 +39,10 @@ double resolveHyperTextFieldSuffixPadding({
     ),
   );
 }
+
+/// 尾部操作占内容区高度，不重复叠加输入框的上下留白。
+double resolveHyperTextFieldActionHeight({
+  required double minimumHeight,
+  required double iconSize,
+  required EdgeInsets padding,
+}) => math.max(iconSize, minimumHeight - padding.vertical);

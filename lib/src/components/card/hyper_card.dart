@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -58,7 +60,12 @@ class HyperCard extends StatelessWidget {
     ).merge(cardThemeStyle).merge(style);
     final materialTheme = HyperMaterialTheme.of(context);
     // 组件材质优先于统一材质；未指定时继承全局或子树的材质配方。
-    final material = materialTheme.resolveMaterial(material: resolved.material);
+    final material = materialTheme.resolveMaterial(
+      material: resolved.material,
+      semanticBackground: resolved.material == null
+          ? resolved.background
+          : null,
+    );
     Widget buildVisual(Set<HyperControlState> states) {
       final pressed = states.contains(HyperControlState.pressed);
       final hovered = states.contains(HyperControlState.hovered);
@@ -69,7 +76,7 @@ class HyperCard extends StatelessWidget {
           ? .06
           : 0.0;
       final fill =
-          (resolved.material == null
+          (resolved.material == null && !(material?.usesBackdrop ?? false)
               ? style?.background ?? cardThemeStyle?.background
               : null) ??
           material?.background ??
@@ -91,7 +98,7 @@ class HyperCard extends StatelessWidget {
         child: child ?? const SizedBox.shrink(),
       );
       final shadows = resolved.boxShadow ?? material?.boxShadow;
-      final foregroundDecoration = BoxDecoration(
+      final foregroundDecoration = HyperBoxDecoration(
         color: resolved.overlayColor!.withValues(alpha: overlayAlpha),
         border: border,
         borderRadius: radius,
@@ -109,7 +116,7 @@ class HyperCard extends StatelessWidget {
             sigmaY: material.blurSigmaY,
           ),
           child: DecoratedBox(
-            decoration: BoxDecoration(
+            decoration: HyperBoxDecoration(
               color: fill.color,
               gradient: fill.gradient,
               borderRadius: radius,
@@ -146,7 +153,10 @@ class HyperCard extends StatelessWidget {
         );
         if (shadows case final shadows? when shadows.isNotEmpty) {
           surface = DecoratedBox(
-            decoration: BoxDecoration(borderRadius: radius, boxShadow: shadows),
+            decoration: HyperBoxDecoration(
+              borderRadius: radius,
+              boxShadow: shadows,
+            ),
             child: surface,
           );
         }
@@ -171,7 +181,7 @@ class HyperCard extends StatelessWidget {
           padding: resolved.padding,
           duration: duration,
           curve: resolved.animationCurve!,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: fill.color,
             gradient: fill.gradient,
             borderRadius: radius,

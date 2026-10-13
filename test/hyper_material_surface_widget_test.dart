@@ -166,7 +166,15 @@ void main() {
         find.descendant(
           of: consumer,
           matching: find.byWidgetPredicate(
-            (widget) => widget is ColoredBox && widget.color == recipe.tint,
+            (widget) =>
+                widget is ColoredBox &&
+                widget.color ==
+                    (type == HyperMaterialSurface
+                        ? recipe.tint
+                        : (type == HyperCard
+                                  ? HyperThemeData.light().colors.surface
+                                  : HyperThemeData.light().colors.primary)
+                              .withValues(alpha: recipe.tint!.a)),
           ),
         ),
         findsOneWidget,

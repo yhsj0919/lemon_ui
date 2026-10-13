@@ -24,11 +24,16 @@ class _HyperColorPickerPageState extends State<HyperColorPickerPage> {
       Align(
         alignment: AlignmentDirectional.centerStart,
         child: HyperButton.outlined(
-          child: const Text('打开选色弹窗'),
+          child: const Text('打开选色弹窗（自定义推荐色）'),
           onPressed: () async {
             final color = await showHyperColorPickerDialog(
               context: context,
               initialColor: _color ?? HyperTheme.of(context).colors.primary,
+              recommendedColors: [
+                HyperTheme.of(context).colors.primary,
+                HyperTheme.of(context).colors.error,
+                HyperTheme.of(context).colors.success,
+              ],
             );
             if (color != null && mounted) setState(() => _color = color);
           },

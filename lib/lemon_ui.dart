@@ -1,6 +1,9 @@
 /// Lemon UI 组件库。
 library;
 
+export 'src/foundation/hyper_line.dart';
+export 'src/painting/hyper_dashed_border.dart';
+
 export 'src/adaptive/hyper_text_scale.dart';
 
 export 'src/components/overlay/hyper_navigator_scope.dart';
@@ -267,3 +270,5 @@ export 'src/components/color_picker/hyper_color_picker_field.dart';
 export 'src/components/color_picker/hyper_color_picker_style.dart';
 export 'src/components/color_picker/hyper_color_picker_theme.dart';
 export 'src/theme/size/components/hyper_color_picker_size.dart';
+
+export 'src/components/select/hyper_dropdown.dart';

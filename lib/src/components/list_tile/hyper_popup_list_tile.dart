@@ -1,3 +1,4 @@
+import '../overlay/hyper_live_route_themes.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import '../overlay/hyper_navigator_scope.dart';
@@ -109,19 +110,31 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
         event.logicalKey == LogicalKeyboardKey.arrowUp) {
-      _showOptions();
+      _showOptions(fromKeyboard: true);
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
   }
 
-  void _restoreFocus() {
+  void _restoreFocus({required bool restore}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _enabled) _focusNode.requestFocus();
+      if (!mounted || _open) return;
+      if (restore && _enabled) {
+        _focusNode.requestFocus();
+      } else if (_focusNode.hasFocus) {
+        _focusNode.unfocus();
+      }
     });
   }
 
-  Future<void> _showOptions() async {
+  Future<void> _showOptions({bool fromKeyboard = false}) async {
+    final restore =
+        fromKeyboard ||
+        HardwareKeyboard.instance.logicalKeysPressed.any(
+          (key) =>
+              key == LogicalKeyboardKey.enter ||
+              key == LogicalKeyboardKey.space,
+        );
     final presentation = hyperResolveSelectPresentation(
       widget.presentation,
       HyperTheme.sizesOf(context).deviceType,
@@ -163,7 +176,7 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
       );
       if (mounted) {
         setState(() => _open = false);
-        _restoreFocus();
+        _restoreFocus(restore: restore);
       }
       return;
     }
@@ -264,10 +277,10 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     final bounds = Rect.fromLTRB(
       media.padding.left,
       media.padding.top,
-      math.max(media.padding.left, media.size.width - media.padding.right),
+      math.max(media.padding.left, overlayBox.size.width - media.padding.right),
       math.max(
         media.padding.top,
-        media.size.height -
+        overlayBox.size.height -
             math.max(media.padding.bottom, media.viewInsets.bottom),
       ),
     );
@@ -285,20 +298,30 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     );
     final showBelow = below >= desiredHeight || below >= above;
     final index = await showGeneralDialog<int>(
+      useRootNavigator: HyperNavigatorScope.resolve(context),
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: theme.colors.scrim,
       transitionDuration: duration,
-      pageBuilder: (dialogContext, animation, secondaryAnimation) => Material(
-        type: MaterialType.transparency,
-        child: HyperMenu(
-          items: entries,
-          selectedId: selectedIndex < 0 ? null : '$selectedIndex',
-          style: menuStyle,
-          onSelected: (id) => Navigator.of(dialogContext).pop(int.parse(id)),
-        ),
-      ),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) =>
+          HyperLiveRouteThemes(
+            source: context,
+            destination: Navigator.of(
+              context,
+              rootNavigator: HyperNavigatorScope.resolve(context),
+            ).context,
+            child: Material(
+              type: MaterialType.transparency,
+              child: HyperMenu(
+                items: entries,
+                selectedId: selectedIndex < 0 ? null : '$selectedIndex',
+                style: menuStyle,
+                onSelected: (id) =>
+                    Navigator.of(dialogContext).pop(int.parse(id)),
+              ),
+            ),
+          ),
       transitionBuilder: (dialogContext, animation, secondaryAnimation, child) {
         final custom = widget.transitionBuilder;
         final popup = custom != null
@@ -335,7 +358,7 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
         );
       }
     }
-    _restoreFocus();
+    _restoreFocus(restore: restore);
   }
 
   @override

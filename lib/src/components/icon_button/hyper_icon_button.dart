@@ -3,6 +3,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../tooltip/hyper_tooltip.dart';
+
 import '../../foundation/hyper_control_state.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
@@ -146,8 +148,12 @@ class _HyperIconButtonState extends State<HyperIconButton> {
         .resolve(widget.variant);
     final style = defaults.merge(themedStyle).merge(widget.style);
     final materialTheme = HyperMaterialTheme.of(context);
-    final material = materialTheme.resolveMaterial(material: style.material);
-    final explicitBackground = style.material == null
+    final material = materialTheme.resolveMaterial(
+      material: style.material,
+      semanticBackground: style.material == null ? style.background : null,
+    );
+    final explicitBackground =
+        style.material == null && !(material?.usesBackdrop ?? false)
         ? widget.style?.background ?? themedStyle.background
         : null;
     final enabled = widget.onPressed != null && !_loading;
@@ -192,7 +198,7 @@ class _HyperIconButtonState extends State<HyperIconButton> {
       },
     );
     if (widget.tooltip case final message?) {
-      result = Tooltip(message: message, child: result);
+      result = HyperTooltip(message: message, child: result);
     }
     return result;
   }

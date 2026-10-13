@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:ui' show SemanticsValidationResult;
 
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import '../../interaction/hyper_pressable.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../card/hyper_card.dart';
 import '../card/hyper_card_style.dart';
+import '../menu/hyper_menu_surface.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 import '../surface/hyper_material_surface.dart';
 import 'hyper_text_field_style.dart';
@@ -180,6 +183,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
         labelGap: metrics.labelGap,
         textStyle: theme.textTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w400,
+          height: theme.textTheme.labelLarge?.height ?? 1,
         ),
         hintStyle: theme.textTheme.labelLarge?.copyWith(
           color: theme.colors.textTertiary,
@@ -242,7 +246,12 @@ class _HyperTextFieldState extends State<HyperTextField> {
         contentHeight: contentHeight > resolved.iconSize!
             ? contentHeight
             : resolved.iconSize!,
-        borderWidth: resolved.borderWidth!,
+        borderWidth: resolved.border == null
+            ? resolved.borderWidth!
+            : resolved.border!.dimensions
+                      .resolve(Directionality.of(context))
+                      .vertical /
+                  2,
       );
       resolved = resolved.copyWith(
         minimumHeight: layout.minimumHeight,
@@ -328,7 +337,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
             child: Row(mainAxisSize: MainAxisSize.min, children: actions),
           ),
         );
-        final field = TextField(
+        Widget field = TextField(
           controller: _controller,
           focusNode: _focus,
           enabled: widget.enabled,
@@ -392,11 +401,35 @@ class _HyperTextFieldState extends State<HyperTextField> {
                   ),
             prefixIconConstraints: BoxConstraints(
               minWidth: resolved.actionWidth!,
-              minHeight: resolved.minimumHeight!,
+              minHeight: resolveHyperTextFieldActionHeight(
+                minimumHeight: resolved.minimumHeight!,
+                iconSize: resolved.iconSize!,
+                padding: resolved.padding!.resolve(Directionality.of(context)),
+              ),
             ),
             suffixIcon: suffix,
             suffixIconConstraints: const BoxConstraints(),
-            constraints: BoxConstraints(minHeight: resolved.minimumHeight!),
+          ),
+        );
+        field = ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight:
+                (resolved.minimumHeight! -
+                        (resolved.material == null
+                            ? (resolved.border?.dimensions
+                                      .resolve(Directionality.of(context))
+                                      .vertical ??
+                                  resolved.borderWidth! * 2)
+                            : 0))
+                    .clamp(0.0, double.infinity),
+          ),
+          child: Align(
+            alignment: Alignment(
+              0,
+              resolved.textAlignVertical?.y ?? (widget.maxLines == 1 ? 0 : -1),
+            ),
+            heightFactor: 1,
+            child: field,
           ),
         );
         Widget surface = AnimatedContainer(
@@ -404,27 +437,42 @@ class _HyperTextFieldState extends State<HyperTextField> {
           curve: curve,
           padding: EdgeInsets.zero,
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: resolved.material == null
                 ? resolved.background?.color
                 : null,
             gradient: resolved.material == null
                 ? resolved.background?.gradient
                 : null,
-            border: Border.all(
-              color: resolved.borderColor!,
-              width: resolved.borderWidth!,
-            ),
+            border: resolved.material != null
+                ? null
+                : resolved.border ??
+                      (resolved.borderWidth! <= 0
+                          ? null
+                          : Border.all(
+                              color: resolved.borderColor!,
+                              width: resolved.borderWidth!,
+                            )),
             borderRadius: resolved.borderRadius,
             boxShadow: resolved.boxShadow,
+            outerShadowsOnly: true,
           ),
           child: field,
         );
         if (resolved.material != null) {
           surface = HyperMaterialSurface(
             material: resolved.material,
+            semanticBackground: resolved.background,
             borderRadius: resolved.borderRadius,
             clipBehavior: Clip.antiAlias,
+            border:
+                resolved.border ??
+                (resolved.borderWidth! <= 0
+                    ? const Border()
+                    : Border.all(
+                        color: resolved.borderColor!,
+                        width: resolved.borderWidth!,
+                      )),
             child: surface,
           );
         }
@@ -466,7 +514,11 @@ class _HyperTextFieldState extends State<HyperTextField> {
     bool enabled = true,
   }) => SizedBox(
     width: style.actionWidth,
-    height: style.minimumHeight,
+    height: resolveHyperTextFieldActionHeight(
+      minimumHeight: style.minimumHeight!,
+      iconSize: style.iconSize!,
+      padding: style.padding!.resolve(Directionality.of(context)),
+    ),
     child: IgnorePointer(
       ignoring: !visible || !enabled,
       child: ExcludeSemantics(
@@ -564,7 +616,11 @@ class _ErrorHintState extends State<_ErrorHint> {
     final error = _hasError ? widget.errorText! : _lastError;
     final hint = SizedBox(
       width: style.actionWidth,
-      height: style.minimumHeight,
+      height: resolveHyperTextFieldActionHeight(
+        minimumHeight: style.minimumHeight!,
+        iconSize: style.iconSize!,
+        padding: style.padding!.resolve(Directionality.of(context)),
+      ),
       child: HyperAnchoredOverlay.builder(
         placement: style.errorPlacement ?? HyperOverlayPlacement.bottomEnd,
         transitionBuilder: style.errorTransitionBuilder,
@@ -611,7 +667,14 @@ class _ErrorHintState extends State<_ErrorHint> {
           child:
               widget.errorBuilder?.call(context, error) ??
               HyperCard(
-                style: style.errorPopupStyle,
+                style: resolveHyperMenuSurface(
+                  context,
+                  radius: HyperTheme.sizesOf(context).menu.surfaceRadius,
+                  padding: EdgeInsets.all(
+                    HyperTheme.sizesOf(context).textField.horizontalPadding,
+                  ),
+                  style: style.errorPopupStyle,
+                ),
                 child: Text(error, style: style.errorTextStyle),
               ),
         ),

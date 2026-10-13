@@ -5,7 +5,7 @@ import 'package:lemon_ui_example/editor/editor_component_navigation.dart';
 
 void main() {
   testWidgets('分类导航切换组件和完整 Demo，外部选择同步分类', (tester) async {
-    String page = 'hyper-button';
+    String page = 'all';
     late StateSetter update;
     await tester.pumpWidget(
       MaterialApp(
@@ -27,18 +27,19 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(HyperTabBar), findsNWidgets(2));
+    expect(find.byType(HyperTabBar), findsOneWidget);
     expect(find.byType(HyperTopNavigation), findsNothing);
     await tester.ensureVisible(find.text('容器').first);
     await tester.tap(find.text('容器').first);
     await tester.pumpAndSettle();
-    expect(page, 'hyper-container');
+    expect(page, 'all');
     await tester.ensureVisible(find.text('卡片'));
     await tester.tap(find.text('卡片'));
     await tester.pumpAndSettle();
     expect(page, 'hyper-card');
     await tester.tap(find.text('容器').first);
     await tester.pumpAndSettle();
+    expect(page, 'hyper-card');
     expect(find.byIcon(Icons.check), findsNothing);
     expect(find.text('卡片'), findsOneWidget);
     await tester.tap(find.text('卡片'));
@@ -55,9 +56,8 @@ void main() {
     await tester.ensureVisible(find.text('容器').first);
     await tester.tap(find.text('容器').first);
     await tester.pumpAndSettle();
-    expect(page, 'hyper-card');
+    expect(page, 'all');
     expect(find.text('HyperTextField'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
-

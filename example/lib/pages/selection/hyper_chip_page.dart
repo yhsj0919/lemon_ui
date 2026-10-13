@@ -41,6 +41,24 @@ class _HyperChipPageState extends State<HyperChipPage> {
                 const HyperText('Chip', variant: HyperTextVariant.pageTitle),
                 SizedBox(height: sizes.sectionSpacing),
                 section(
+                  '配色样式（实例 Style 覆盖）',
+                  chips([
+                    for (final variant in HyperChipColorVariant.values)
+                      HyperChip.action(
+                        label: switch (variant) {
+                          HyperChipColorVariant.neutral => '中性',
+                          HyperChipColorVariant.soft => '浅色',
+                          HyperChipColorVariant.filled => '实色',
+                          HyperChipColorVariant.outlined => '描边',
+                          HyperChipColorVariant.text => '无底色',
+                        },
+                        onPressed: () {},
+                        style: HyperChipStyle(colorVariant: variant),
+                      ),
+                  ]),
+                ),
+                SizedBox(height: sizes.sectionSpacing),
+                section(
                   '操作标签',
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

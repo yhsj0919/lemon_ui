@@ -126,7 +126,7 @@ class _HyperSidebarPageState extends State<HyperSidebarPage> {
                       id: 'settings',
                       label: '设置',
                       icon: const HyperIcon(Icons.settings_outlined),
-                      builder: (context, state, defaultItem) => Tooltip(
+                      builder: (context, state, defaultItem) => HyperTooltip(
                         message: '自定义项：${state.selected ? '已选中' : '未选中'}',
                         child: defaultItem,
                       ),

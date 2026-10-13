@@ -175,7 +175,8 @@ class _HyperSkeletonState extends State<HyperSkeleton>
               position: DecorationPosition.foreground,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(radius),
-                border: style.borderColor == null
+                border:
+                    style.borderColor == null || (style.borderWidth ?? 1) <= 0
                     ? null
                     : Border.all(
                         color: style.borderColor!,

@@ -1,9 +1,18 @@
+import '../../foundation/hyper_label_palette.dart';
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
+import '../../painting/hyper_box_decoration.dart';
+import '../../theme/color/hyper_color_scheme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
+
+typedef HyperChipColorVariant = HyperLabelColorVariant;
+
+typedef HyperChipForegroundMode = HyperLabelForegroundMode;
 
 /// 选中对勾位于文字前，或叠加在头像中心。
 enum HyperChipCheckmarkPlacement { leading, avatarOverlay, avatarReplacement }
@@ -11,11 +20,18 @@ enum HyperChipCheckmarkPlacement { leading, avatarOverlay, avatarReplacement }
 @immutable
 final class HyperChipStyle {
   const HyperChipStyle({
+    this.colorVariant,
+    this.baseColor,
+    this.foregroundMode,
+    this.backgroundFade,
+    this.borderFade,
+    this.foregroundFade,
     this.background,
     this.foregroundColor,
     this.overlayColor,
     this.borderColor,
     this.borderWidth,
+    this.boxBorder,
     this.height,
     this.horizontalPadding,
     this.radius,
@@ -40,11 +56,18 @@ final class HyperChipStyle {
     this.curve,
     this.transitionBuilder,
   });
+  final HyperChipColorVariant? colorVariant;
+  final Color? baseColor;
+  final HyperChipForegroundMode? foregroundMode;
+  final double? backgroundFade;
+  final double? borderFade;
+  final double? foregroundFade;
   final HyperFill? background;
   final Color? foregroundColor;
   final Color? overlayColor;
   final Color? borderColor;
   final double? borderWidth;
+  final BoxBorder? boxBorder;
   final double? height;
   final double? horizontalPadding;
   final double? radius;
@@ -68,12 +91,44 @@ final class HyperChipStyle {
   final Duration? duration;
   final Curve? curve;
   final AnimatedSwitcherTransitionBuilder? transitionBuilder;
+
+  /// Produces palette defaults; explicit surface and foreground fields override them.
+  HyperChipStyle resolvePalette(
+    HyperColorScheme colors,
+    HyperContrastThemeData contrast,
+  ) {
+    final palette = resolveHyperLabelPalette(
+      colors: colors,
+      contrast: contrast,
+      colorVariant: colorVariant,
+      baseColor: baseColor,
+      foregroundMode: foregroundMode,
+      backgroundFade: backgroundFade,
+      borderFade: borderFade,
+      foregroundFade: foregroundFade,
+    );
+    if (palette == null) return this;
+    return HyperChipStyle(
+      background: palette.background,
+      foregroundColor: palette.foregroundColor,
+      borderColor: palette.borderColor,
+      borderWidth: palette.borderWidth,
+    ).merge(this);
+  }
+
   HyperChipStyle copyWith({
+    HyperChipColorVariant? colorVariant,
+    Color? baseColor,
+    HyperChipForegroundMode? foregroundMode,
+    double? backgroundFade,
+    double? borderFade,
+    double? foregroundFade,
     HyperFill? background,
     Color? foregroundColor,
     Color? overlayColor,
     Color? borderColor,
     double? borderWidth,
+    BoxBorder? boxBorder,
     double? height,
     double? horizontalPadding,
     double? radius,
@@ -99,11 +154,18 @@ final class HyperChipStyle {
     AnimatedSwitcherTransitionBuilder? transitionBuilder,
   }) => merge(
     HyperChipStyle(
+      colorVariant: colorVariant,
+      baseColor: baseColor,
+      foregroundMode: foregroundMode,
+      backgroundFade: backgroundFade,
+      borderFade: borderFade,
+      foregroundFade: foregroundFade,
       background: background,
       foregroundColor: foregroundColor,
       overlayColor: overlayColor,
       borderColor: borderColor,
       borderWidth: borderWidth,
+      boxBorder: boxBorder,
       height: height,
       horizontalPadding: horizontalPadding,
       radius: radius,
@@ -132,11 +194,18 @@ final class HyperChipStyle {
   HyperChipStyle merge(HyperChipStyle? other) => other == null
       ? this
       : HyperChipStyle(
+          colorVariant: other.colorVariant ?? colorVariant,
+          baseColor: other.baseColor ?? baseColor,
+          foregroundMode: other.foregroundMode ?? foregroundMode,
+          backgroundFade: other.backgroundFade ?? backgroundFade,
+          borderFade: other.borderFade ?? borderFade,
+          foregroundFade: other.foregroundFade ?? foregroundFade,
           background: other.background ?? background,
           foregroundColor: other.foregroundColor ?? foregroundColor,
           overlayColor: other.overlayColor ?? overlayColor,
           borderColor: other.borderColor ?? borderColor,
           borderWidth: other.borderWidth ?? borderWidth,
+          boxBorder: other.boxBorder ?? boxBorder,
           height: other.height ?? height,
           horizontalPadding: other.horizontalPadding ?? horizontalPadding,
           radius: other.radius ?? radius,
@@ -168,12 +237,25 @@ final class HyperChipStyle {
       : t == 1
       ? b
       : HyperChipStyle(
+          colorVariant: t < .5 ? a.colorVariant : b.colorVariant,
+          baseColor: Color.lerp(a.baseColor, b.baseColor, t),
+          foregroundMode: t < .5 ? a.foregroundMode : b.foregroundMode,
+          backgroundFade: a.backgroundFade == null || b.backgroundFade == null
+              ? (t < .5 ? a.backgroundFade : b.backgroundFade)
+              : lerpDouble(a.backgroundFade, b.backgroundFade, t),
+          borderFade: a.borderFade == null || b.borderFade == null
+              ? (t < .5 ? a.borderFade : b.borderFade)
+              : lerpDouble(a.borderFade, b.borderFade, t),
+          foregroundFade: a.foregroundFade == null || b.foregroundFade == null
+              ? (t < .5 ? a.foregroundFade : b.foregroundFade)
+              : lerpDouble(a.foregroundFade, b.foregroundFade, t),
           background: a.background == null || b.background == null
               ? (t < .5 ? a.background : b.background)
               : HyperFill.lerp(a.background!, b.background!, t),
           foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
           overlayColor: Color.lerp(a.overlayColor, b.overlayColor, t),
           borderColor: Color.lerp(a.borderColor, b.borderColor, t),
+          boxBorder: lerpHyperBoxBorder(a.boxBorder, b.boxBorder, t),
           borderWidth: a.borderWidth == null || b.borderWidth == null
               ? (t < .5 ? a.borderWidth : b.borderWidth)
               : lerpDouble(a.borderWidth, b.borderWidth, t),
@@ -250,11 +332,18 @@ final class HyperChipStyle {
   @override
   bool operator ==(Object other) =>
       other is HyperChipStyle &&
+      other.colorVariant == colorVariant &&
+      other.baseColor == baseColor &&
+      other.foregroundMode == foregroundMode &&
+      other.backgroundFade == backgroundFade &&
+      other.borderFade == borderFade &&
+      other.foregroundFade == foregroundFade &&
       other.background == background &&
       other.foregroundColor == foregroundColor &&
       other.overlayColor == overlayColor &&
       other.borderColor == borderColor &&
       other.borderWidth == borderWidth &&
+      other.boxBorder == boxBorder &&
       other.height == height &&
       other.horizontalPadding == horizontalPadding &&
       other.radius == radius &&
@@ -280,11 +369,18 @@ final class HyperChipStyle {
       other.transitionBuilder == transitionBuilder;
   @override
   int get hashCode => Object.hashAll([
+    colorVariant,
+    baseColor,
+    foregroundMode,
+    backgroundFade,
+    borderFade,
+    foregroundFade,
     background,
     foregroundColor,
     overlayColor,
     borderColor,
     borderWidth,
+    boxBorder,
     height,
     horizontalPadding,
     radius,

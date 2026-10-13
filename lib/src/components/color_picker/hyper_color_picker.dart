@@ -19,11 +19,15 @@ class HyperColorPicker extends StatefulWidget {
     this.onChanged,
     this.showAlpha = true,
     this.style,
+    this.recommendedColors = const [],
   });
   final Color value;
   final ValueChanged<Color>? onChanged;
   final bool showAlpha;
   final HyperColorPickerStyle? style;
+
+  /// 可选推荐色；空列表不显示推荐区域，选择时使用该颜色的完整值。
+  final List<Color> recommendedColors;
 
   static Color? parseHex(String source) {
     final hex = source.trim().replaceFirst(RegExp(r'^#'), '');
@@ -280,34 +284,29 @@ class _HyperColorPickerState extends State<HyperColorPicker> {
                   : null,
             ),
           SizedBox(height: style.spacing),
-          Wrap(
-            spacing: style.spacing!,
-            runSpacing: style.spacing!,
-            children: [
-              for (final entry in const <String, Color>{
-                '纯黑': Color(0xFF000000),
-                '纯白': Color(0xFFFFFFFF),
-                '红': Color(0xFFFF0000),
-                '黄': Color(0xFFFFFF00),
-                '绿': Color(0xFF00FF00),
-                '青': Color(0xFF00FFFF),
-                '蓝': Color(0xFF0000FF),
-                '品红': Color(0xFFFF00FF),
-              }.entries)
-                HyperIconButton.outlined(
-                  tooltip: entry.key,
-                  icon: Icon(Icons.circle, color: entry.value),
-                  onPressed: enabled
-                      ? () => _change(
-                          HSVColor.fromColor(
-                            entry.value.withValues(alpha: widget.value.a),
-                          ),
-                        )
-                      : null,
-                ),
-            ],
-          ),
-          SizedBox(height: style.spacing),
+          if (widget.recommendedColors.isNotEmpty)
+            Wrap(
+              spacing: style.spacing!,
+              runSpacing: style.spacing!,
+              children: [
+                for (final color in widget.recommendedColors)
+                  HyperIconButton.outlined(
+                    tooltip: _hex(color),
+                    icon: Icon(Icons.circle, color: color),
+                    onPressed: enabled
+                        ? () => _change(
+                            HSVColor.fromColor(
+                              widget.showAlpha
+                                  ? color
+                                  : color.withValues(alpha: 1),
+                            ),
+                          )
+                        : null,
+                  ),
+              ],
+            ),
+          if (widget.recommendedColors.isNotEmpty)
+            SizedBox(height: style.spacing),
           HyperTextField(
             controller: _input,
             enabled: enabled,

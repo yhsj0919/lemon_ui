@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../foundation/hyper_control_state.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../interaction/hyper_pressable.dart';
+import '../../painting/hyper_box_decoration.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../tooltip/hyper_tooltip.dart';
 import 'hyper_chip_style.dart';
@@ -204,9 +205,10 @@ class HyperChip extends StatelessWidget {
         duration: theme.motion.fastDuration,
         curve: theme.motion.fastCurve,
       );
-      final resolved = defaults
-          .merge(chipTheme.resolve(visualStates))
-          .merge(style);
+      final configured = chipTheme.resolve(visualStates).merge(style);
+      final resolved = defaults.merge(
+        configured.resolvePalette(colors, theme.contrastTheme),
+      );
       final duration = reduceMotion ? Duration.zero : resolved.duration!;
       final curve = resolved.curve!;
       final foreground = resolved.foregroundColor!;
@@ -259,16 +261,18 @@ class HyperChip extends StatelessWidget {
                 duration: duration,
                 curve: curve,
                 margin: EdgeInsets.symmetric(vertical: verticalSpace),
-                decoration: BoxDecoration(
+                decoration: HyperBoxDecoration(
                   color: resolved.background?.color,
                   gradient: resolved.background?.gradient,
                   borderRadius: BorderRadius.circular(resolved.radius!),
-                  border: resolved.borderWidth! > 0
-                      ? Border.all(
-                          color: resolved.borderColor!,
-                          width: resolved.borderWidth!,
-                        )
-                      : null,
+                  border:
+                      resolved.boxBorder ??
+                      (resolved.borderWidth! > 0
+                          ? Border.all(
+                              color: resolved.borderColor!,
+                              width: resolved.borderWidth!,
+                            )
+                          : null),
                   boxShadow: resolved.boxShadow,
                 ),
                 foregroundDecoration: BoxDecoration(

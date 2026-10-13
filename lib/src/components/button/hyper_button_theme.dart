@@ -42,7 +42,9 @@ final class HyperButtonThemeData {
     final surface = switch (variant) {
       HyperButtonVariant.outlined ||
       HyperButtonVariant.ghost ||
-      HyperButtonVariant.text => common.copyWith(boxShadow: const <BoxShadow>[]),
+      HyperButtonVariant.text => common.copyWith(
+        boxShadow: const <BoxShadow>[],
+      ),
       _ => common,
     };
     return surface.merge(styleFor(variant));

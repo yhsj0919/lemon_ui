@@ -1,23 +1,18 @@
+import '../../foundation/hyper_line.dart';
+import '../../foundation/hyper_fill.dart';
+
 import 'package:flutter/widgets.dart';
 
 enum HyperDividerContentAlignment { start, center, end }
 
 /// 分隔线的绘制方式。
-enum HyperDividerPattern {
-  /// 连续实线。
-  solid,
-
-  /// 由等长线段组成的虚线。
-  dashed,
-
-  /// 由圆点组成的点线。
-  dotted,
-}
+typedef HyperDividerPattern = HyperLinePattern;
 
 /// HyperDivider 可由主题和实例共同配置的视觉属性。
 @immutable
 final class HyperDividerStyle {
   const HyperDividerStyle({
+    this.line,
     this.color,
     this.gradient,
     this.thickness,
@@ -39,6 +34,8 @@ final class HyperDividerStyle {
   });
 
   /// 纯色；设置 [gradient] 后由渐变优先绘制。
+  /// 共用线条样式；保留旧字段接口作为显式覆盖。
+  final HyperLine? line;
   final Color? color;
 
   /// 分隔线渐变。
@@ -77,6 +74,7 @@ final class HyperDividerStyle {
   final double? gap;
 
   HyperDividerStyle copyWith({
+    HyperLine? line,
     Color? color,
     Gradient? gradient,
     double? thickness,
@@ -97,6 +95,7 @@ final class HyperDividerStyle {
     double? iconSize,
   }) => merge(
     HyperDividerStyle(
+      line: line,
       color: color,
       gradient: gradient,
       thickness: thickness,
@@ -122,6 +121,20 @@ final class HyperDividerStyle {
   HyperDividerStyle merge(HyperDividerStyle? other) {
     if (other == null) return this;
     return HyperDividerStyle(
+      line:
+          other.line ??
+          line?.copyWith(
+            fill: other.gradient != null
+                ? HyperFill.gradient(other.gradient!)
+                : other.color != null
+                ? HyperFill.color(other.color!)
+                : null,
+            thickness: other.thickness,
+            pattern: other.pattern,
+            dashLength: other.dashLength,
+            gap: other.gap,
+            radius: other.radius,
+          ),
       color: other.color ?? color,
       gradient: other.gradient ?? gradient,
       thickness: other.thickness ?? thickness,
@@ -149,6 +162,9 @@ final class HyperDividerStyle {
     HyperDividerStyle b,
     double t,
   ) => HyperDividerStyle(
+    line: a.line == null || b.line == null
+        ? (t < .5 ? a.line : b.line)
+        : HyperLine.lerp(a.line!, b.line!, t),
     color: Color.lerp(a.color, b.color, t),
     gradient: Gradient.lerp(a.gradient, b.gradient, t),
     thickness: _lerpDouble(a.thickness, b.thickness, t),
@@ -179,6 +195,7 @@ final class HyperDividerStyle {
       identical(this, other) ||
       other is HyperDividerStyle &&
           other.color == color &&
+          other.line == line &&
           other.gradient == gradient &&
           other.thickness == thickness &&
           other.length == length &&
@@ -199,6 +216,7 @@ final class HyperDividerStyle {
 
   @override
   int get hashCode => Object.hash(
+    line,
     color,
     gradient,
     thickness,

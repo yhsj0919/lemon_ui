@@ -7,6 +7,69 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('标签复用线条边框并支持显式关闭', (tester) async {
+    final border = const HyperLine(
+      fill: HyperFill.color(Colors.red),
+      thickness: 2,
+      pattern: HyperLinePattern.dashed,
+    ).toBorder();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperChip.choice(
+          label: '标签',
+          selected: false,
+          onSelected: (_) {},
+          style: HyperChipStyle(boxBorder: border),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final container = tester
+        .widgetList<AnimatedContainer>(
+          find.descendant(
+            of: find.byType(HyperChip),
+            matching: find.byType(AnimatedContainer),
+          ),
+        )
+        .first;
+    expect((container.decoration as BoxDecoration).border, border);
+    final style = HyperChipStyle(boxBorder: border);
+    expect(style.copyWith(radius: 9).boxBorder, border);
+    expect(
+      style.merge(const HyperChipStyle(boxBorder: Border())).boxBorder,
+      const Border(),
+    );
+    expect(
+      HyperChipStyle.lerp(
+        style,
+        style.copyWith(boxBorder: border.scale(2) as BoxBorder),
+        .5,
+      ).boxBorder,
+      isA<HyperLineBorder>(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperChip.choice(
+          label: '标签',
+          selected: false,
+          onSelected: (_) {},
+          style: const HyperChipStyle(boxBorder: Border(), borderWidth: 3),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final cleared = tester
+        .widgetList<AnimatedContainer>(
+          find.descendant(
+            of: find.byType(HyperChip),
+            matching: find.byType(AnimatedContainer),
+          ),
+        )
+        .first;
+    expect((cleared.decoration as BoxDecoration).border, const Border());
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('普通与头像对勾使用相同画布、描边和抗锯齿路径', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -328,4 +391,3 @@ void main() {
     );
   });
 }
-

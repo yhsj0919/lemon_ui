@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../card/hyper_card_style.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 
+enum HyperMenuCheckPlacement { leading, trailing }
+
 /// 菜单实例或主题中的明确覆盖；null 字段继续继承。
 @immutable
 final class HyperMenuStyle {
@@ -16,6 +18,10 @@ final class HyperMenuStyle {
     this.groupSpacing,
     this.itemRadius,
     this.surfaceRadius,
+    this.checkPlacement,
+    this.checkColor,
+    this.checkSize,
+    this.checkSpacing,
     this.checkIcon,
     this.showCheckmark,
     this.iconSize,
@@ -48,6 +54,10 @@ final class HyperMenuStyle {
   final double? surfaceRadius;
 
   /// 选中项的标记图标。
+  final HyperMenuCheckPlacement? checkPlacement;
+  final Color? checkColor;
+  final double? checkSize;
+  final double? checkSpacing;
   final IconData? checkIcon;
 
   /// 是否显示选中对勾；false 保留选中配色但不占标记空间。
@@ -80,6 +90,10 @@ final class HyperMenuStyle {
     double? groupSpacing,
     double? itemRadius,
     double? surfaceRadius,
+    HyperMenuCheckPlacement? checkPlacement,
+    Color? checkColor,
+    double? checkSize,
+    double? checkSpacing,
     IconData? checkIcon,
     bool? showCheckmark,
     double? iconSize,
@@ -105,6 +119,10 @@ final class HyperMenuStyle {
     groupSpacing: groupSpacing ?? this.groupSpacing,
     itemRadius: itemRadius ?? this.itemRadius,
     surfaceRadius: surfaceRadius ?? this.surfaceRadius,
+    checkPlacement: checkPlacement ?? this.checkPlacement,
+    checkColor: checkColor ?? this.checkColor,
+    checkSize: checkSize ?? this.checkSize,
+    checkSpacing: checkSpacing ?? this.checkSpacing,
     checkIcon: checkIcon ?? this.checkIcon,
     showCheckmark: showCheckmark ?? this.showCheckmark,
     iconSize: iconSize ?? this.iconSize,
@@ -137,6 +155,10 @@ final class HyperMenuStyle {
       groupSpacing: other.groupSpacing ?? groupSpacing,
       itemRadius: other.itemRadius ?? itemRadius,
       surfaceRadius: other.surfaceRadius ?? surfaceRadius,
+      checkPlacement: other.checkPlacement ?? checkPlacement,
+      checkColor: other.checkColor ?? checkColor,
+      checkSize: other.checkSize ?? checkSize,
+      checkSpacing: other.checkSpacing ?? checkSpacing,
       checkIcon: other.checkIcon ?? checkIcon,
       showCheckmark: other.showCheckmark ?? showCheckmark,
       iconSize: other.iconSize ?? iconSize,
@@ -176,6 +198,10 @@ final class HyperMenuStyle {
       groupSpacing: number(a.groupSpacing, b.groupSpacing),
       itemRadius: number(a.itemRadius, b.itemRadius),
       surfaceRadius: number(a.surfaceRadius, b.surfaceRadius),
+      checkPlacement: discrete(a.checkPlacement, b.checkPlacement),
+      checkColor: Color.lerp(a.checkColor, b.checkColor, t),
+      checkSize: number(a.checkSize, b.checkSize),
+      checkSpacing: number(a.checkSpacing, b.checkSpacing),
       checkIcon: discrete(a.checkIcon, b.checkIcon),
       showCheckmark: discrete(a.showCheckmark, b.showCheckmark),
       iconSize: number(a.iconSize, b.iconSize),
@@ -227,6 +253,10 @@ final class HyperMenuStyle {
       other.groupSpacing == groupSpacing &&
       other.itemRadius == itemRadius &&
       other.surfaceRadius == surfaceRadius &&
+      other.checkPlacement == checkPlacement &&
+      other.checkColor == checkColor &&
+      other.checkSize == checkSize &&
+      other.checkSpacing == checkSpacing &&
       other.checkIcon == checkIcon &&
       other.showCheckmark == showCheckmark &&
       other.iconSize == iconSize &&
@@ -254,6 +284,10 @@ final class HyperMenuStyle {
     groupSpacing,
     itemRadius,
     surfaceRadius,
+    checkPlacement,
+    checkColor,
+    checkSize,
+    checkSpacing,
     checkIcon,
     showCheckmark,
     iconSize,

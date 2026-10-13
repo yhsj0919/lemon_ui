@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,6 +15,12 @@ const _unchanged = Object();
 @immutable
 final class HyperButtonStyle {
   HyperButtonStyle({
+    this.hoveredOffset,
+    this.hoveredScale,
+    this.focusedOffset,
+    this.focusedScale,
+    this.pressedOffset,
+    this.pressedScale,
     this.background,
     this.disabledBackground,
     this.material,
@@ -24,6 +32,7 @@ final class HyperButtonStyle {
     this.focusOverlayOpacity,
     this.pressOverlayOpacity,
     this.border,
+    this.boxBorder,
     this.borderRadius,
     this.textStyle,
     this.padding,
@@ -43,10 +52,43 @@ final class HyperButtonStyle {
     this.progressTrackColor,
     this.progressSize,
     this.progressThickness,
+    List<BoxShadow>? hoveredBoxShadow,
+    List<BoxShadow>? pressedBoxShadow,
+    List<BoxShadow>? disabledBoxShadow,
+    List<BoxShadow>? focusedBoxShadow,
     List<BoxShadow>? boxShadow,
-  }) : boxShadow = boxShadow == null ? null : List.unmodifiable(boxShadow);
+  }) : hoveredBoxShadow = hoveredBoxShadow == null
+           ? null
+           : List.unmodifiable(hoveredBoxShadow),
+       pressedBoxShadow = pressedBoxShadow == null
+           ? null
+           : List.unmodifiable(pressedBoxShadow),
+       disabledBoxShadow = disabledBoxShadow == null
+           ? null
+           : List.unmodifiable(disabledBoxShadow),
+       focusedBoxShadow = focusedBoxShadow == null
+           ? null
+           : List.unmodifiable(focusedBoxShadow),
+       boxShadow = boxShadow == null ? null : List.unmodifiable(boxShadow);
 
   /// 正常状态背景；null 表示继续继承。
+  /// hovered 状态的绘制位移；未设置不改变布局。
+  final Offset? hoveredOffset;
+
+  /// hovered 状态的绘制缩放；未设置不改变布局。
+  final double? hoveredScale;
+
+  /// focused 状态的绘制位移；未设置不改变布局。
+  final Offset? focusedOffset;
+
+  /// focused 状态的绘制缩放；未设置不改变布局。
+  final double? focusedScale;
+
+  /// pressed 状态的绘制位移；未设置不改变布局。
+  final Offset? pressedOffset;
+
+  /// pressed 状态的绘制缩放；未设置不改变布局。
+  final double? pressedScale;
   final HyperFill? background;
 
   /// 禁用状态背景；null 时使用正常背景。
@@ -79,11 +121,20 @@ final class HyperButtonStyle {
   /// 按钮边框；[BorderSide.none] 表示显式关闭。
   final BorderSide? border;
 
+  /// 显式 BoxBorder（包括虚线），优先于 border；空 Border 可关闭。
+  final BoxBorder? boxBorder;
+
   /// 按钮外形圆角。
   final BorderRadiusGeometry? borderRadius;
 
   /// 按钮阴影；空列表表示显式关闭。
   final List<BoxShadow>? boxShadow;
+
+  /// 聚焦时的阴影；null 继承普通阴影，空列表显式关闭。
+  final List<BoxShadow>? hoveredBoxShadow;
+  final List<BoxShadow>? pressedBoxShadow;
+  final List<BoxShadow>? disabledBoxShadow;
+  final List<BoxShadow>? focusedBoxShadow;
 
   /// 按钮文字样式。
   final TextStyle? textStyle;
@@ -143,6 +194,12 @@ final class HyperButtonStyle {
   HyperButtonStyle merge(HyperButtonStyle? other) {
     if (other == null) return this;
     return HyperButtonStyle(
+      hoveredOffset: other.hoveredOffset ?? hoveredOffset,
+      hoveredScale: other.hoveredScale ?? hoveredScale,
+      focusedOffset: other.focusedOffset ?? focusedOffset,
+      focusedScale: other.focusedScale ?? focusedScale,
+      pressedOffset: other.pressedOffset ?? pressedOffset,
+      pressedScale: other.pressedScale ?? pressedScale,
       background: other.background ?? background,
       disabledBackground: other.disabledBackground ?? disabledBackground,
       material: other.material ?? material,
@@ -155,8 +212,13 @@ final class HyperButtonStyle {
       focusOverlayOpacity: other.focusOverlayOpacity ?? focusOverlayOpacity,
       pressOverlayOpacity: other.pressOverlayOpacity ?? pressOverlayOpacity,
       border: other.border ?? border,
+      boxBorder: other.boxBorder ?? boxBorder,
       borderRadius: other.borderRadius ?? borderRadius,
       boxShadow: other.boxShadow ?? boxShadow,
+      hoveredBoxShadow: other.hoveredBoxShadow ?? hoveredBoxShadow,
+      pressedBoxShadow: other.pressedBoxShadow ?? pressedBoxShadow,
+      disabledBoxShadow: other.disabledBoxShadow ?? disabledBoxShadow,
+      focusedBoxShadow: other.focusedBoxShadow ?? focusedBoxShadow,
       textStyle: other.textStyle ?? textStyle,
       padding: other.padding ?? padding,
       margin: other.margin ?? margin,
@@ -180,6 +242,12 @@ final class HyperButtonStyle {
 
   /// 未传参数保留原值；显式传 null 时恢复该字段的继承行为。
   HyperButtonStyle copyWith({
+    Object? hoveredOffset = _unchanged,
+    Object? hoveredScale = _unchanged,
+    Object? focusedOffset = _unchanged,
+    Object? focusedScale = _unchanged,
+    Object? pressedOffset = _unchanged,
+    Object? pressedScale = _unchanged,
     Object? background = _unchanged,
     Object? disabledBackground = _unchanged,
     Object? material = _unchanged,
@@ -191,7 +259,12 @@ final class HyperButtonStyle {
     Object? focusOverlayOpacity = _unchanged,
     Object? pressOverlayOpacity = _unchanged,
     Object? border = _unchanged,
+    Object? boxBorder = _unchanged,
     Object? borderRadius = _unchanged,
+    Object? hoveredBoxShadow = _unchanged,
+    Object? pressedBoxShadow = _unchanged,
+    Object? disabledBoxShadow = _unchanged,
+    Object? focusedBoxShadow = _unchanged,
     Object? boxShadow = _unchanged,
     Object? textStyle = _unchanged,
     Object? padding = _unchanged,
@@ -212,6 +285,24 @@ final class HyperButtonStyle {
     Object? progressSize = _unchanged,
     Object? progressThickness = _unchanged,
   }) => HyperButtonStyle(
+    hoveredOffset: identical(hoveredOffset, _unchanged)
+        ? this.hoveredOffset
+        : hoveredOffset as Offset?,
+    hoveredScale: identical(hoveredScale, _unchanged)
+        ? this.hoveredScale
+        : hoveredScale as double?,
+    focusedOffset: identical(focusedOffset, _unchanged)
+        ? this.focusedOffset
+        : focusedOffset as Offset?,
+    focusedScale: identical(focusedScale, _unchanged)
+        ? this.focusedScale
+        : focusedScale as double?,
+    pressedOffset: identical(pressedOffset, _unchanged)
+        ? this.pressedOffset
+        : pressedOffset as Offset?,
+    pressedScale: identical(pressedScale, _unchanged)
+        ? this.pressedScale
+        : pressedScale as double?,
     background: identical(background, _unchanged)
         ? this.background
         : background as HyperFill?,
@@ -243,9 +334,24 @@ final class HyperButtonStyle {
         ? this.pressOverlayOpacity
         : pressOverlayOpacity as double?,
     border: identical(border, _unchanged) ? this.border : border as BorderSide?,
+    boxBorder: identical(boxBorder, _unchanged)
+        ? this.boxBorder
+        : boxBorder as BoxBorder?,
     borderRadius: identical(borderRadius, _unchanged)
         ? this.borderRadius
         : borderRadius as BorderRadiusGeometry?,
+    hoveredBoxShadow: identical(hoveredBoxShadow, _unchanged)
+        ? this.hoveredBoxShadow
+        : hoveredBoxShadow as List<BoxShadow>?,
+    pressedBoxShadow: identical(pressedBoxShadow, _unchanged)
+        ? this.pressedBoxShadow
+        : pressedBoxShadow as List<BoxShadow>?,
+    disabledBoxShadow: identical(disabledBoxShadow, _unchanged)
+        ? this.disabledBoxShadow
+        : disabledBoxShadow as List<BoxShadow>?,
+    focusedBoxShadow: identical(focusedBoxShadow, _unchanged)
+        ? this.focusedBoxShadow
+        : focusedBoxShadow as List<BoxShadow>?,
     boxShadow: identical(boxShadow, _unchanged)
         ? this.boxShadow
         : boxShadow as List<BoxShadow>?,
@@ -316,6 +422,12 @@ final class HyperButtonStyle {
     double? number(double? x, double? y) =>
         blend(x, y, (a, b, t) => a + (b - a) * t);
     return HyperButtonStyle(
+      hoveredOffset: Offset.lerp(a.hoveredOffset, b.hoveredOffset, t),
+      hoveredScale: number(a.hoveredScale, b.hoveredScale),
+      focusedOffset: Offset.lerp(a.focusedOffset, b.focusedOffset, t),
+      focusedScale: number(a.focusedScale, b.focusedScale),
+      pressedOffset: Offset.lerp(a.pressedOffset, b.pressedOffset, t),
+      pressedScale: number(a.pressedScale, b.pressedScale),
       background: blend(a.background, b.background, HyperFill.lerp),
       disabledBackground: blend(
         a.disabledBackground,
@@ -335,10 +447,35 @@ final class HyperButtonStyle {
       focusOverlayOpacity: number(a.focusOverlayOpacity, b.focusOverlayOpacity),
       pressOverlayOpacity: number(a.pressOverlayOpacity, b.pressOverlayOpacity),
       border: blend(a.border, b.border, BorderSide.lerp),
+      boxBorder: blend(
+        a.boxBorder,
+        b.boxBorder,
+        (x, y, t) => lerpHyperBoxBorder(x, y, t)!,
+      ),
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
         b.borderRadius,
         t,
+      ),
+      hoveredBoxShadow: blend(
+        a.hoveredBoxShadow,
+        b.hoveredBoxShadow,
+        (a, b, t) => BoxShadow.lerpList(a, b, t)!,
+      ),
+      pressedBoxShadow: blend(
+        a.pressedBoxShadow,
+        b.pressedBoxShadow,
+        (a, b, t) => BoxShadow.lerpList(a, b, t)!,
+      ),
+      disabledBoxShadow: blend(
+        a.disabledBoxShadow,
+        b.disabledBoxShadow,
+        (a, b, t) => BoxShadow.lerpList(a, b, t)!,
+      ),
+      focusedBoxShadow: blend(
+        a.focusedBoxShadow,
+        b.focusedBoxShadow,
+        (a, b, t) => BoxShadow.lerpList(a, b, t)!,
       ),
       boxShadow: blend(
         a.boxShadow,
@@ -386,6 +523,12 @@ final class HyperButtonStyle {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is HyperButtonStyle &&
+          other.hoveredOffset == hoveredOffset &&
+          other.hoveredScale == hoveredScale &&
+          other.focusedOffset == focusedOffset &&
+          other.focusedScale == focusedScale &&
+          other.pressedOffset == pressedOffset &&
+          other.pressedScale == pressedScale &&
           other.background == background &&
           other.disabledBackground == disabledBackground &&
           other.material == material &&
@@ -397,7 +540,12 @@ final class HyperButtonStyle {
           other.focusOverlayOpacity == focusOverlayOpacity &&
           other.pressOverlayOpacity == pressOverlayOpacity &&
           other.border == border &&
+          other.boxBorder == boxBorder &&
           other.borderRadius == borderRadius &&
+          listEquals(other.hoveredBoxShadow, hoveredBoxShadow) &&
+          listEquals(other.pressedBoxShadow, pressedBoxShadow) &&
+          listEquals(other.disabledBoxShadow, disabledBoxShadow) &&
+          listEquals(other.focusedBoxShadow, focusedBoxShadow) &&
           listEquals(other.boxShadow, boxShadow) &&
           other.textStyle == textStyle &&
           other.padding == padding &&
@@ -430,8 +578,19 @@ final class HyperButtonStyle {
     hoverOverlayOpacity,
     focusOverlayOpacity,
     pressOverlayOpacity,
+    boxBorder,
     border,
     borderRadius,
+    hoveredOffset,
+    hoveredScale,
+    focusedOffset,
+    focusedScale,
+    pressedOffset,
+    pressedScale,
+    Object.hashAll(hoveredBoxShadow ?? const []),
+    Object.hashAll(pressedBoxShadow ?? const []),
+    Object.hashAll(disabledBoxShadow ?? const []),
+    Object.hashAll(focusedBoxShadow ?? const []),
     Object.hashAll(boxShadow ?? const []),
     textStyle,
     padding,

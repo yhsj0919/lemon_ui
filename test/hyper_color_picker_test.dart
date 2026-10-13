@@ -5,6 +5,31 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('推荐色默认隐藏，传入后遵守透明度开关', (tester) async {
+    Color? selected;
+    for (final showAlpha in [true, false]) {
+      Widget build(List<Color> colors) => MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          child: Scaffold(
+            body: HyperColorPicker(
+              value: Colors.blue,
+              showAlpha: showAlpha,
+              recommendedColors: colors,
+              onChanged: (v) => selected = v,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(build(const []));
+      expect(find.byType(HyperIconButton), findsNothing);
+      await tester.pumpWidget(build(const [Color(0x803482FF)]));
+      expect(find.byType(HyperIconButton), findsOneWidget);
+      await tester.tap(find.byType(HyperIconButton));
+      await tester.pump();
+      expect(selected!.toARGB32(), showAlpha ? 0x803482FF : 0xFF3482FF);
+    }
+  });
   testWidgets('满明度色盘中间饱和度不会混入黑色', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -58,6 +83,7 @@ void main() {
                   child: StatefulBuilder(
                     builder: (context, update) => HyperColorPicker(
                       value: color,
+                      recommendedColors: const [Colors.black, Colors.white],
                       onChanged: (value) => update(() => color = value),
                     ),
                   ),
@@ -91,10 +117,18 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(color, const Color(0xFFFF0000));
-      await tester.tap(find.byTooltip('纯黑'));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (w) => w is HyperIconButton && w.tooltip == '#FF000000',
+        ),
+      );
       await tester.pumpAndSettle();
       expect(color, const Color(0xFF000000));
-      await tester.tap(find.byTooltip('纯白'));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (w) => w is HyperIconButton && w.tooltip == '#FFFFFFFF',
+        ),
+      );
       await tester.pumpAndSettle();
       expect(color, const Color(0xFFFFFFFF));
       final brightness = tester

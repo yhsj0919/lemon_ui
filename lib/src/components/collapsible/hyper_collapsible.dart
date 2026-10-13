@@ -179,6 +179,7 @@ class HyperCollapsible extends StatelessWidget {
     if (resolved.material != null) {
       surface = HyperMaterialSurface(
         material: resolved.material,
+        semanticBackground: resolved.background,
         quality: resolved.materialQuality,
         reduceTransparency: resolved.reduceTransparency,
         borderRadius: resolved.borderRadius,

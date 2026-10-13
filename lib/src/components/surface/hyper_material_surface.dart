@@ -12,6 +12,7 @@ class HyperMaterialSurface extends StatelessWidget {
   const HyperMaterialSurface({
     super.key,
     this.material,
+    this.semanticBackground,
     this.quality,
     this.reduceTransparency,
     this.width,
@@ -20,12 +21,19 @@ class HyperMaterialSurface extends StatelessWidget {
     this.margin,
     this.alignment,
     this.borderRadius,
+    this.border,
     this.clipBehavior = Clip.none,
     this.child,
   });
 
   /// 表面材质配方；null 时使用材质主题或普通表面色。
   final HyperSurfaceMaterial? material;
+
+  /// 继承全局高级配方时使用的组件语义底色；显式材质颜色优先。
+  final HyperFill? semanticBackground;
+
+  /// 显式轮廓（支持虚线）；空 Border 关闭材质轮廓，null 继承配方。
+  final BoxBorder? border;
 
   /// 当前表面的材质质量覆盖。
   final HyperMaterialQuality? quality;
@@ -65,11 +73,17 @@ class HyperMaterialSurface extends StatelessWidget {
     final resolved =
         materialTheme.resolveMaterial(
           material: material,
+          semanticBackground:
+              material == null || material == materialTheme.material
+              ? semanticBackground
+              : null,
           quality: quality,
           reduceTransparency: reduceTransparency,
         ) ??
         HyperSurfaceMaterial.solid(
-          background: HyperFill.color(hyperTheme.colors.surface),
+          background: semanticBackground?.isNone == true
+              ? const HyperFill.none()
+              : HyperFill.color(hyperTheme.colors.surface),
         );
     final radius = (borderRadius ?? BorderRadius.circular(sizes.controlRadius))
         .resolve(Directionality.of(context));
@@ -79,13 +93,14 @@ class HyperMaterialSurface extends StatelessWidget {
       gradient: fill?.gradient,
       borderRadius: radius,
     );
-    final borderDecoration =
-        resolved.border == null || resolved.border == BorderSide.none
+    final effectiveBorder =
+        border ??
+        (resolved.border == null || resolved.border == BorderSide.none
+            ? null
+            : Border.fromBorderSide(resolved.border!));
+    final borderDecoration = effectiveBorder == null
         ? null
-        : BoxDecoration(
-            border: Border.fromBorderSide(resolved.border!),
-            borderRadius: radius,
-          );
+        : BoxDecoration(border: effectiveBorder, borderRadius: radius);
 
     if (resolved.usesBackdrop) {
       // 背景滤镜与前景内容必须是兄弟层。若把文字作为 BackdropFilter 的

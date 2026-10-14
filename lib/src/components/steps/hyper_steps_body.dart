@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -136,12 +138,12 @@ class HyperStepsBody extends StatelessWidget {
         width: s.nodeSize,
         height: s.nodeSize,
         padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
+        decoration: HyperBoxDecoration(
           color: s.material == null ? s.nodeFill?.color : null,
           gradient: s.material == null ? s.nodeFill?.gradient : null,
           borderRadius: s.nodeBorderRadius,
         ),
-        foregroundDecoration: BoxDecoration(
+        foregroundDecoration: HyperBoxDecoration(
           border: Border.fromBorderSide(s.nodeBorder!),
           borderRadius: s.nodeBorderRadius,
         ),
@@ -316,7 +318,7 @@ class HyperStepsBody extends StatelessWidget {
                 minHeight: HyperTheme.sizesOf(context)
                     .minimumInteractiveDimension,
               ),
-              decoration: BoxDecoration(
+              decoration: HyperBoxDecoration(
                 color: s.overlayColor!.withValues(alpha: alpha.clamp(0, 1)),
                 borderRadius: s.interactionRadius,
               ),

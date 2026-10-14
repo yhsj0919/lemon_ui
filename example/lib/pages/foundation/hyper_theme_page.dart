@@ -13,14 +13,17 @@ class HyperThemePage extends StatefulWidget {
 
 class _HyperThemePageState extends State<HyperThemePage> {
   Brightness _brightness = Brightness.light;
+  bool _experiment = false;
   Color _seedColor = const Color(0xFFFF6900);
 
   @override
   Widget build(BuildContext context) {
-    final data = HyperThemeData.fromSeed(
-      seedColor: _seedColor,
-      brightness: _brightness,
-    );
+    final data = _experiment
+        ? HyperThemeData.fromSeed(
+            seedColor: _seedColor,
+            brightness: _brightness,
+          )
+        : HyperTheme.of(context);
 
     return HyperTheme(
       data: data,
@@ -45,47 +48,57 @@ class _HyperThemePageState extends State<HyperThemePage> {
                 ),
                 const SizedBox(height: 20),
                 DemoSection(
-                  title: '基础用法',
+                  title: _experiment ? '独立主题实验' : '当前全局主题',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          HyperSegmentedButton<Brightness>(
-                            segments: const [
-                              HyperSegment(
-                                value: Brightness.light,
-                                label: '亮色',
-                              ),
-                              HyperSegment(value: Brightness.dark, label: '暗色'),
-                            ],
-                            selected: {_brightness},
-                            onSelectionChanged: (value) {
-                              setState(() => _brightness = value.single);
-                            },
-                          ),
-                          HyperChip.choice(
-                            label: '小米橙',
-                            selected: _seedColor == const Color(0xFFFF6900),
-                            onSelected: (_) {
-                              setState(
-                                () => _seedColor = const Color(0xFFFF6900),
-                              );
-                            },
-                          ),
-                          HyperChip.choice(
-                            label: '蓝色',
-                            selected: _seedColor == const Color(0xFF3367D6),
-                            onSelected: (_) {
-                              setState(
-                                () => _seedColor = const Color(0xFF3367D6),
-                              );
-                            },
-                          ),
-                        ],
+                      HyperButton.tonal(
+                        onPressed: () =>
+                            setState(() => _experiment = !_experiment),
+                        child: Text(_experiment ? '返回全局主题' : '试验独立主题'),
                       ),
+                      const SizedBox(height: 12),
+                      if (_experiment)
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            HyperSegmentedButton<Brightness>(
+                              segments: const [
+                                HyperSegment(
+                                  value: Brightness.light,
+                                  label: '亮色',
+                                ),
+                                HyperSegment(
+                                  value: Brightness.dark,
+                                  label: '暗色',
+                                ),
+                              ],
+                              selected: {_brightness},
+                              onSelectionChanged: (value) {
+                                setState(() => _brightness = value.single);
+                              },
+                            ),
+                            HyperChip.choice(
+                              label: '小米橙',
+                              selected: _seedColor == const Color(0xFFFF6900),
+                              onSelected: (_) {
+                                setState(
+                                  () => _seedColor = const Color(0xFFFF6900),
+                                );
+                              },
+                            ),
+                            HyperChip.choice(
+                              label: '蓝色',
+                              selected: _seedColor == const Color(0xFF3367D6),
+                              onSelected: (_) {
+                                setState(
+                                  () => _seedColor = const Color(0xFF3367D6),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       const SizedBox(height: 24),
                       _ThemePreview(
                         title: '全局默认值',

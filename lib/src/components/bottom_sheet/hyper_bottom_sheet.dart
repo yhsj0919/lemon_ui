@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_navigator_scope.dart';
 import '../overlay/hyper_live_route_themes.dart';
 
@@ -113,7 +114,7 @@ class HyperBottomSheet extends StatelessWidget {
                     child: Container(
                       width: resolved.dragHandleSize!.width,
                       height: resolved.dragHandleSize!.height,
-                      decoration: BoxDecoration(
+                      decoration: HyperBoxDecoration(
                         color: resolved.dragHandleColor,
                         borderRadius: resolved.dragHandleBorderRadius,
                       ),
@@ -162,7 +163,7 @@ class HyperBottomSheet extends StatelessWidget {
       duration: duration,
       curve: curve,
       padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: resolved.material == null ? resolved.background?.color : null,
         gradient: resolved.material == null
             ? resolved.background?.gradient

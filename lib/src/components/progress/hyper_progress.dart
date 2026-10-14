@@ -9,9 +9,13 @@ import 'hyper_progress_style.dart';
 class HyperProgress extends StatelessWidget {
   const HyperProgress.linear({
     super.key,
+    this.bufferValue,
+    this.bufferColor,
+    this.bufferGradient,
     this.value,
     this.style,
     this.color,
+    this.gradient,
     this.trackColor,
     this.thickness,
     this.size,
@@ -47,7 +51,11 @@ class HyperProgress extends StatelessWidget {
        orbitingDotSize = null,
        radius = null,
        fillRadius = null,
-       variant = null;
+       variant = null,
+       bufferValue = null,
+       bufferColor = null,
+       bufferGradient = null,
+       gradient = null;
 
   const HyperProgress.infinite({
     super.key,
@@ -68,13 +76,21 @@ class HyperProgress extends StatelessWidget {
        fillRadius = null,
        strokeCap = null,
        animationCurve = null,
-       variant = null;
+       variant = null,
+       bufferValue = null,
+       bufferColor = null,
+       bufferGradient = null,
+       gradient = null;
 
   final bool circular;
   final bool infinite;
+  final double? bufferValue;
+  final Color? bufferColor;
+  final Gradient? bufferGradient;
   final double? value;
   final HyperProgressStyle? style;
   final Color? color;
+  final Gradient? gradient;
   final Color? trackColor;
   final double? thickness;
   final double? size;
@@ -121,6 +137,10 @@ class HyperProgress extends StatelessWidget {
       );
     }
     return HyperLinearProgress(
+      bufferGradient: bufferGradient,
+      bufferColor: bufferColor,
+      bufferValue: bufferValue,
+      gradient: gradient,
       variant: variant,
       value: value,
       style: style,

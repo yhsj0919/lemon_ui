@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -139,7 +141,11 @@ final class HyperContainerThemeData {
 
     return HyperContainerThemeData(
       background: blend(a.background, b.background, HyperFill.lerp),
-      border: blend(a.border, b.border, (x, y, t) => BoxBorder.lerp(x, y, t)!),
+      border: blend(
+        a.border,
+        b.border,
+        (x, y, t) => lerpHyperBoxBorder(x, y, t)!,
+      ),
       borderRadius: blend(
         a.borderRadius,
         b.borderRadius,

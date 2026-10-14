@@ -84,7 +84,29 @@ class _HyperMaterialSurfacePageState extends State<HyperMaterialSurfacePage> {
           const Text('材质只改变背景合成，不改变控件尺寸。普通质量和减少透明度都会让玻璃使用明确 fallback。'),
           const SizedBox(height: 16),
           DemoSection(
-            title: '基础用法',
+            title: '当前配方预览（跟随右侧设置）',
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFFFF8A45),
+                    Color(0xFF7E57C2),
+                    Color(0xFF42A5F5),
+                  ],
+                ),
+              ),
+              child: const HyperMaterialSurface(
+                key: Key('inherited-material-preview'),
+                padding: EdgeInsets.all(24),
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+                child: Text('当前配方：材质、透明度、模糊、染色、边框和阴影'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DemoSection(
+            title: '材质对照（实例显式配方）',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

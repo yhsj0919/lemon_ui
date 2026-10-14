@@ -10,7 +10,10 @@ final class HyperRadioStyle {
     this.size,
     this.minimumTapTargetSize,
     this.selectedColor,
+    this.unselectedColor,
     this.disabledSelectedColor,
+    this.disabledUnselectedColor,
+    this.spacing,
     this.backgroundColor,
     this.selectedBackgroundColor,
     this.border,
@@ -34,8 +37,13 @@ final class HyperRadioStyle {
   /// 启用且选中时的对勾或圆点颜色。
   final Color? selectedColor;
 
+  /// 未选中对勾颜色；透明色可关闭未选中标记。
+  final Color? unselectedColor;
+
   /// 禁用且选中时的内部标记颜色。
   final Color? disabledSelectedColor;
+  final Color? disabledUnselectedColor;
+  final double? spacing;
 
   /// 未选中状态背景色。
   final Color? backgroundColor;
@@ -79,6 +87,10 @@ final class HyperRadioStyle {
       size: other.size ?? size,
       minimumTapTargetSize: other.minimumTapTargetSize ?? minimumTapTargetSize,
       selectedColor: other.selectedColor ?? selectedColor,
+      unselectedColor: other.unselectedColor ?? unselectedColor,
+      disabledUnselectedColor:
+          other.disabledUnselectedColor ?? disabledUnselectedColor,
+      spacing: other.spacing ?? spacing,
       disabledSelectedColor:
           other.disabledSelectedColor ?? disabledSelectedColor,
       backgroundColor: other.backgroundColor ?? backgroundColor,

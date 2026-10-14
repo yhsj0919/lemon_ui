@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -125,7 +127,7 @@ final class HyperMessageStyle {
           : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
       border: a.border == null || b.border == null
           ? (t < .5 ? a.border : b.border)
-          : BoxBorder.lerp(a.border!, b.border!, t),
+          : lerpHyperBoxBorder(a.border!, b.border!, t),
       borderRadius: a.borderRadius == null || b.borderRadius == null
           ? (t < .5 ? a.borderRadius : b.borderRadius)
           : BorderRadiusGeometry.lerp(a.borderRadius!, b.borderRadius!, t),

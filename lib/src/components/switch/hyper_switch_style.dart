@@ -6,6 +6,8 @@ final class HyperSwitchStyle {
   HyperSwitchStyle({
     this.width,
     this.height,
+    this.thumbWidth,
+    this.thumbHeight,
     this.thumbSize,
     this.minimumTapTargetSize,
     this.activeTrackColor,
@@ -18,6 +20,12 @@ final class HyperSwitchStyle {
     this.disabledThumbColor,
     this.disabledActiveThumbColor,
     this.disabledInactiveThumbColor,
+    this.hoverOpacity,
+    this.pressedOpacity,
+    this.activeBorder,
+    this.inactiveBorder,
+    this.disabledBorder,
+    this.thumbBorder,
     this.overlayColor,
     this.border,
     this.borderRadius,
@@ -39,6 +47,8 @@ final class HyperSwitchStyle {
   final double? height;
 
   /// 滑块宽高。
+  final double? thumbWidth;
+  final double? thumbHeight;
   final double? thumbSize;
 
   /// 独立于视觉尺寸的最小命中区域边长。
@@ -75,6 +85,12 @@ final class HyperSwitchStyle {
   final Color? disabledInactiveThumbColor;
 
   /// 悬停和按下状态层颜色。
+  final double? hoverOpacity;
+  final double? pressedOpacity;
+  final BorderSide? activeBorder;
+  final BorderSide? inactiveBorder;
+  final BorderSide? disabledBorder;
+  final BorderSide? thumbBorder;
   final Color? overlayColor;
 
   /// 轨道边框。
@@ -109,6 +125,8 @@ final class HyperSwitchStyle {
     return HyperSwitchStyle(
       width: other.width ?? width,
       height: other.height ?? height,
+      thumbWidth: other.thumbWidth ?? thumbWidth,
+      thumbHeight: other.thumbHeight ?? thumbHeight,
       thumbSize: other.thumbSize ?? thumbSize,
       minimumTapTargetSize: other.minimumTapTargetSize ?? minimumTapTargetSize,
       activeTrackColor: other.activeTrackColor ?? activeTrackColor,
@@ -125,6 +143,12 @@ final class HyperSwitchStyle {
           other.disabledActiveThumbColor ?? disabledActiveThumbColor,
       disabledInactiveThumbColor:
           other.disabledInactiveThumbColor ?? disabledInactiveThumbColor,
+      hoverOpacity: other.hoverOpacity ?? hoverOpacity,
+      pressedOpacity: other.pressedOpacity ?? pressedOpacity,
+      activeBorder: other.activeBorder ?? activeBorder,
+      inactiveBorder: other.inactiveBorder ?? inactiveBorder,
+      disabledBorder: other.disabledBorder ?? disabledBorder,
+      thumbBorder: other.thumbBorder ?? thumbBorder,
       overlayColor: other.overlayColor ?? overlayColor,
       border: other.border ?? border,
       borderRadius: other.borderRadius ?? borderRadius,
@@ -149,6 +173,8 @@ final class HyperSwitchStyle {
     return HyperSwitchStyle(
       width: number(a.width, b.width),
       height: number(a.height, b.height),
+      thumbWidth: number(a.thumbWidth, b.thumbWidth),
+      thumbHeight: number(a.thumbHeight, b.thumbHeight),
       thumbSize: number(a.thumbSize, b.thumbSize),
       minimumTapTargetSize: number(
         a.minimumTapTargetSize,
@@ -196,6 +222,12 @@ final class HyperSwitchStyle {
         b.disabledInactiveThumbColor,
         t,
       ),
+      hoverOpacity: number(a.hoverOpacity, b.hoverOpacity),
+      pressedOpacity: number(a.pressedOpacity, b.pressedOpacity),
+      activeBorder: t < .5 ? a.activeBorder : b.activeBorder,
+      inactiveBorder: t < .5 ? a.inactiveBorder : b.inactiveBorder,
+      disabledBorder: t < .5 ? a.disabledBorder : b.disabledBorder,
+      thumbBorder: t < .5 ? a.thumbBorder : b.thumbBorder,
       overlayColor: Color.lerp(a.overlayColor, b.overlayColor, t),
       border: BorderSide.lerp(
         a.border ?? BorderSide.none,

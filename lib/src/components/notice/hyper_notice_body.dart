@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'package:flutter/material.dart';
@@ -131,7 +132,7 @@ class HyperNoticeBody extends StatelessWidget {
       duration: duration,
       curve: style.curve!,
       padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: style.material == null ? style.background?.color : null,
         gradient: style.material == null ? style.background?.gradient : null,
         border: style.border,

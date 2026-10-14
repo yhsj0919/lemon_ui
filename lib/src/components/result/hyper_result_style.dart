@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/foundation.dart';
@@ -183,7 +185,7 @@ final class HyperResultStyle {
           background: a.background == null || b.background == null
               ? (t < .5 ? a.background : b.background)
               : HyperFill.lerp(a.background!, b.background!, t),
-          border: BoxBorder.lerp(a.border, b.border, t),
+          border: lerpHyperBoxBorder(a.border, b.border, t),
           borderRadius: BorderRadiusGeometry.lerp(
             a.borderRadius,
             b.borderRadius,

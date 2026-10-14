@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../../motion/hyper_animated_checkmark.dart';
 
 import 'package:flutter/material.dart';
@@ -74,6 +75,7 @@ class HyperCheckbox extends StatelessWidget {
     final colors = theme.colors;
     final defaults = HyperCheckboxStyle(
       size: metrics.size,
+      markSize: metrics.markSize,
       minimumTapTargetSize:
           metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
       activeColor: colors.primary,
@@ -82,6 +84,9 @@ class HyperCheckbox extends StatelessWidget {
       disabledColor: colors.surfaceMuted,
       disabledCheckColor: colors.disabled,
       overlayColor: colors.stateLayer,
+      hoverOpacity: .07,
+      pressedOpacity: .12,
+      glyphScale: 1.15,
       border: BorderSide.none,
       markStrokeWidth: metrics.markStrokeWidth,
       pressScale: .85,
@@ -121,10 +126,15 @@ class HyperCheckbox extends StatelessWidget {
                     ? resolved.activeColor!
                     : resolved.inactiveColor!
               : resolved.disabledColor!;
+          final stateBorder = !enabled
+              ? resolved.disabledBorder ?? resolved.border!
+              : selected
+              ? resolved.selectedBorder ?? resolved.border!
+              : resolved.border!;
           final overlayAlpha = pressed
-              ? .12
+              ? resolved.pressedOpacity!
               : hovered
-              ? .07
+              ? resolved.hoverOpacity!
               : 0.0;
           final markColor = enabled
               ? resolved.checkColor!
@@ -142,23 +152,31 @@ class HyperCheckbox extends StatelessWidget {
               curve: resolved.curve!,
               width: resolved.size,
               height: resolved.size,
-              decoration: BoxDecoration(
+              decoration: HyperBoxDecoration(
                 color: Color.alphaBlend(
                   resolved.overlayColor!.withValues(alpha: overlayAlpha),
                   background,
                 ),
-                border: resolved.border == BorderSide.none
+                border: stateBorder == BorderSide.none
                     ? null
-                    : Border.fromBorderSide(resolved.border!),
+                    : Border.fromBorderSide(stateBorder),
                 borderRadius: resolved.borderRadius,
                 boxShadow: resolved.boxShadow,
               ),
-              child: HyperAnimatedCheckmark(
-                state: value,
-                color: markColor,
-                strokeWidth: resolved.markStrokeWidth!,
-                duration: duration,
-                curve: resolved.curve!,
+              child: Center(
+                child: SizedBox.square(
+                  dimension: resolved.markSize ?? resolved.size,
+                  child: HyperAnimatedCheckmark(
+                    state: value,
+                    glyphScale: resolved.markSize == null
+                        ? resolved.glyphScale!
+                        : 2,
+                    color: markColor,
+                    strokeWidth: resolved.markStrokeWidth!,
+                    duration: duration,
+                    curve: resolved.curve!,
+                  ),
+                ),
               ),
             ),
           );

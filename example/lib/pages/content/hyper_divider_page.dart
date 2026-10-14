@@ -23,7 +23,7 @@ class HyperDividerPage extends StatelessWidget {
           const HyperText('轻量分隔线，支持横向、纵向、渐变、虚线和点线。'),
           const SizedBox(height: 28),
           const DemoSection(
-            title: '默认主题预览 · 未确认',
+            title: '默认主题预览',
             child: Column(
               children: [
                 HyperDivider(),

@@ -10,8 +10,10 @@ final class HyperRadioSize {
     this.markSize,
     this.strokeWidth,
     this.radius,
+    this.spacing = 8,
   });
   final double size;
+  final double spacing;
   final double? minimumTapTargetSize;
   final double? indicatorSize;
   final double? markSize;
@@ -19,6 +21,7 @@ final class HyperRadioSize {
   final double? radius;
   HyperRadioSize copyWith({
     double? size,
+    double? spacing,
     double? minimumTapTargetSize,
     double? indicatorSize,
     double? markSize,
@@ -26,6 +29,7 @@ final class HyperRadioSize {
     double? radius,
   }) => HyperRadioSize(
     size: size ?? this.size,
+    spacing: spacing ?? this.spacing,
     minimumTapTargetSize: minimumTapTargetSize ?? this.minimumTapTargetSize,
     indicatorSize: indicatorSize ?? this.indicatorSize,
     markSize: markSize ?? this.markSize,
@@ -36,6 +40,7 @@ final class HyperRadioSize {
     double? optional(double? x, double? y) =>
         x == null || y == null ? (t < .5 ? x : y) : x + (y - x) * t;
     return HyperRadioSize(
+      spacing: a.spacing + (b.spacing - a.spacing) * t,
       size: a.size + (b.size - a.size) * t,
       minimumTapTargetSize: optional(
         a.minimumTapTargetSize,
@@ -52,6 +57,7 @@ final class HyperRadioSize {
   bool operator ==(Object other) =>
       other is HyperRadioSize &&
       other.size == size &&
+      other.spacing == spacing &&
       other.minimumTapTargetSize == minimumTapTargetSize &&
       other.indicatorSize == indicatorSize &&
       other.markSize == markSize &&
@@ -60,6 +66,7 @@ final class HyperRadioSize {
   @override
   int get hashCode => Object.hashAll([
     size,
+    spacing,
     minimumTapTargetSize,
     indicatorSize,
     markSize,

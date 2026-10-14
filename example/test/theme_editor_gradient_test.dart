@@ -19,10 +19,13 @@ void main() {
         .onSelected('hyper-button');
     await tester.pumpAndSettle();
     tester
-        .widget<HyperSegmentedButton<String>>(
-          find.byType(HyperSegmentedButton<String>),
+        .widget<HyperSelect<String>>(
+          find.descendant(
+            of: find.byKey(const ValueKey('editor-button-variant')),
+            matching: find.byType(HyperSelect<String>),
+          ),
         )
-        .onSelectionChanged!({'gradient'});
+        .onChanged!('gradient');
     await tester.pumpAndSettle();
     final scroll = find
         .descendant(

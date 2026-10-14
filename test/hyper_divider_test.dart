@@ -97,6 +97,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
       expect(tester.getSize(find.byKey(const Key('divider'))).height, entry.$2);
     }
   });

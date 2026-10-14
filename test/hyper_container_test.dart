@@ -42,7 +42,7 @@ void main() {
     expect(container.padding, const EdgeInsets.all(10));
   });
 
-  testWidgets('容器主题逐项回退到全局基础主题', (tester) async {
+  testWidgets('容器未覆盖项保持中性，不继承基础控件留白与圆角', (tester) async {
     final base = HyperThemeData.light();
     final theme = base.copyWith(
       sizes: base.sizes.copyWith(
@@ -76,8 +76,8 @@ void main() {
     );
     final decoration = container.decoration! as BoxDecoration;
     expect(decoration.color, Colors.green);
-    expect(decoration.borderRadius, BorderRadius.circular(30));
-    expect(container.padding, const EdgeInsets.all(14));
+    expect(decoration.borderRadius, BorderRadius.zero);
+    expect(container.padding, EdgeInsets.zero);
   });
 
   testWidgets('渐变、显式无背景和空阴影保持独立语义', (tester) async {
@@ -112,13 +112,14 @@ void main() {
     expect(second.boxShadow, isEmpty);
   });
 
-  testWidgets('带圆角的容器默认裁切子内容且仍可显式允许溢出', (tester) async {
+  testWidgets('容器默认不裁切且可显式开启裁切', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Column(
           children: [
             HyperContainer(
               key: Key('clipped'),
+              clipBehavior: Clip.antiAlias,
               animationDuration: Duration.zero,
               child: ColoredBox(color: Colors.red),
             ),

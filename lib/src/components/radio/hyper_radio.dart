@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
@@ -17,7 +19,7 @@ class HyperRadio<T> extends StatelessWidget {
     this.toggleable = false,
     this.style,
     this.child,
-    this.spacing = 8,
+    this.spacing,
     this.semanticLabel,
     this.autofocus = false,
   }) : variant = HyperRadioVariant.checkmark;
@@ -31,7 +33,7 @@ class HyperRadio<T> extends StatelessWidget {
     this.toggleable = false,
     this.style,
     this.child,
-    this.spacing = 8,
+    this.spacing,
     this.semanticLabel,
     this.autofocus = false,
   }) : variant = HyperRadioVariant.checkmark;
@@ -45,7 +47,7 @@ class HyperRadio<T> extends StatelessWidget {
     this.toggleable = false,
     this.style,
     this.child,
-    this.spacing = 8,
+    this.spacing,
     this.semanticLabel,
     this.autofocus = false,
   }) : variant = HyperRadioVariant.circle;
@@ -59,7 +61,7 @@ class HyperRadio<T> extends StatelessWidget {
     this.toggleable = false,
     this.style,
     this.child,
-    this.spacing = 8,
+    this.spacing,
     this.semanticLabel,
     this.autofocus = false,
   }) : variant = HyperRadioVariant.filled;
@@ -83,7 +85,7 @@ class HyperRadio<T> extends StatelessWidget {
   final Widget? child;
 
   /// 单选标记与内容之间的水平间距。
-  final double spacing;
+  final double? spacing;
 
   /// 屏幕阅读器使用的语义标签。
   final String? semanticLabel;
@@ -104,8 +106,10 @@ class HyperRadio<T> extends StatelessWidget {
     final size = metrics.size;
     final defaults = HyperRadioStyle(
       size: size,
+      spacing: metrics.spacing,
       minimumTapTargetSize:
           metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
+      unselectedColor: Colors.transparent,
       selectedColor: theme.colors.primary,
       disabledSelectedColor: theme.colors.disabled,
       strokeWidth: size * (7 / 56),
@@ -117,7 +121,8 @@ class HyperRadio<T> extends StatelessWidget {
       curve: theme.motion.standardCurve,
     );
     final variantDefaults = switch (variant) {
-      HyperRadioVariant.checkmark => const HyperRadioStyle(
+      HyperRadioVariant.checkmark => HyperRadioStyle(
+        unselectedColor: theme.colors.outline,
         backgroundColor: Colors.transparent,
         selectedBackgroundColor: Colors.transparent,
         border: BorderSide.none,
@@ -209,7 +214,7 @@ class HyperRadio<T> extends StatelessWidget {
                   height: resolved.minimumTapTargetSize,
                   child: Center(child: visual),
                 ),
-                SizedBox(width: spacing),
+                SizedBox(width: spacing ?? resolved.spacing),
                 child!,
               ],
             ),
@@ -253,7 +258,7 @@ class _RadioVisual extends StatelessWidget {
       width: style.size,
       height: style.size,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: selected ? style.selectedBackgroundColor : style.backgroundColor,
         border: borderSide == BorderSide.none
             ? null
@@ -269,7 +274,7 @@ class _RadioVisual extends StatelessWidget {
           curve: style.curve!,
           width: selected ? style.indicatorSize : 0,
           height: selected ? style.indicatorSize : 0,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration: HyperBoxDecoration(color: color, shape: BoxShape.circle),
         ),
       },
     );
@@ -289,6 +294,12 @@ class _RadioVisual extends StatelessWidget {
   Widget _buildCheckmark(Color color) => _AnimatedRadioMark(
     selected: selected,
     color: color,
+    unselectedColor: enabled
+        ? style.unselectedColor!
+        : (style.disabledUnselectedColor ??
+              style.unselectedColor!.withValues(
+                alpha: style.unselectedColor!.a * .5,
+              )),
     strokeWidth: style.strokeWidth!,
     duration: duration,
     curve: style.curve!,
@@ -298,6 +309,7 @@ class _RadioVisual extends StatelessWidget {
 class _AnimatedRadioMark extends StatefulWidget {
   const _AnimatedRadioMark({
     required this.selected,
+    required this.unselectedColor,
     required this.color,
     required this.strokeWidth,
     required this.duration,
@@ -306,6 +318,7 @@ class _AnimatedRadioMark extends StatefulWidget {
 
   final bool selected;
   final Color color;
+  final Color unselectedColor;
   final double strokeWidth;
   final Duration duration;
   final Curve curve;
@@ -353,6 +366,7 @@ class _AnimatedRadioMarkState extends State<_AnimatedRadioMark>
       builder: (context, _) => CustomPaint(
         painter: _RadioMarkPainter(
           progress: _controller.value,
+          unselectedColor: widget.unselectedColor,
           color: widget.color,
           strokeWidth: widget.strokeWidth,
         ),
@@ -364,16 +378,30 @@ class _AnimatedRadioMarkState extends State<_AnimatedRadioMark>
 class _RadioMarkPainter extends CustomPainter {
   const _RadioMarkPainter({
     required this.progress,
+    required this.unselectedColor,
     required this.color,
     required this.strokeWidth,
   });
 
   final double progress;
   final Color color;
+  final Color unselectedColor;
   final double strokeWidth;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final baseEdge = size.shortestSide;
+    final baseOrigin =
+        size.center(Offset.zero) - Offset(baseEdge / 2, baseEdge / 2);
+    canvas.drawPath(
+      hyperCheckboxCheckPath(baseOrigin, baseEdge, 1),
+      Paint()
+        ..color = unselectedColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
     if (progress <= 0) return;
     final edge = size.shortestSide;
     final origin = size.center(Offset.zero) - Offset(edge / 2, edge / 2);

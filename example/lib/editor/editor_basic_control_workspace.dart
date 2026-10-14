@@ -31,14 +31,24 @@ extension _BasicControlWorkspace on _ThemeEditorState {
     },
     _ => _mode.switchControl,
   };
+  bool get _basicPending => gallerySections.any(
+    (section) =>
+        section.title == '未确认' &&
+        section.items.any(
+          (item) => item.id == _ThemeEditorState._pages[_component],
+        ),
+  );
+
   Widget _basicControlPanel() {
     final theme = _resolveTheme(_dark), s = theme.sizes.resolve(_device);
     return _panel('组件工作区', [
-      HyperText('${_ThemeEditorState._components[_component]} · 未确认'),
+      HyperText(
+        '${_ThemeEditorState._components[_component]}${_basicPending ? ' · 未确认' : ''}',
+      ),
       HyperText(
         '${_ThemeEditorState._devices[_device]}尺寸 · ${_dark ? '暗色' : '亮色'}外观',
       ),
-      const HyperText('未确认仅表示默认样式待确认；组件可正常交互和配置。未覆盖项继续继承。'),
+      if (_basicPending) const HyperText('未确认仅表示默认样式待确认；组件可正常交互和配置。未覆盖项继续继承。'),
       if (_component == 'progress')
         _select('编辑对象', _progressObject, const {
           'common': '通用（所有进度对象）',
@@ -114,7 +124,13 @@ extension _BasicControlWorkspace on _ThemeEditorState {
     for (var i = 0; i < (a.shadows?.length ?? 0); i++) _shadow(i, target: a),
   ];
 
-  Widget _controlBorder(String label, EditorControlBorder border) => Column(
+  Widget _controlBorder(
+    String label,
+    EditorControlBorder border, {
+    Color? inheritedColor,
+    double inheritedWidth = 1,
+    double widthLimit = editorLineThicknessLimit,
+  }) => Column(
     children: [
       _heading(label),
       _select(
@@ -129,17 +145,16 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         '$label颜色',
         border.color,
         (value) => border.color = value,
-        inheritedColor: _resolveTheme(_dark).colors.outline,
+        inheritedColor: inheritedColor ?? _resolveTheme(_dark).colors.outline,
       ),
       _number(
         '$label宽度',
-        border.width ?? 1,
+        border.width ?? inheritedWidth,
         0,
-        20,
+        widthLimit,
         (value) => border.width = value,
         () => border.width = null,
         border.width != null,
-        wholeNumbers: false,
       ),
     ],
   );
@@ -161,7 +176,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => m.dotSize = value,
         () => m.dotSize = null,
         m.dotSize != null,
-        wholeNumbers: false,
       ),
       _heading('徽标内容'),
       _number(
@@ -172,7 +186,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => m.contentHeight = value,
         () => m.contentHeight = null,
         m.contentHeight != null,
-        wholeNumbers: false,
       ),
       _number(
         '内容水平内边距',
@@ -182,7 +195,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => m.horizontalPadding = value,
         () => m.horizontalPadding = null,
         m.horizontalPadding != null,
-        wholeNumbers: false,
       ),
       _number(
         '徽标字号',
@@ -192,7 +204,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => m.textSize = value,
         () => m.textSize = null,
         m.textSize != null,
-        wholeNumbers: false,
       ),
       _heading('文字'),
       _number(
@@ -203,7 +214,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.fontWeight = value,
         () => v.fontWeight = null,
         v.fontWeight != null,
-        wholeNumbers: false,
       ),
       _number(
         '文字行高',
@@ -231,7 +241,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.durationMilliseconds = value,
         () => v.durationMilliseconds = null,
         v.durationMilliseconds != null,
-        wholeNumbers: false,
       ),
       _select('过渡曲线', v.curve ?? 'inherit', const {
         'inherit': '继承默认',
@@ -240,25 +249,23 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         'fastOutSlowIn': '快出慢入',
       }, (value) => _change(() => v.curve = value == 'inherit' ? null : value)),
       _heading('徽标表面'),
-      _number(
+      _radiusNumber(
         '圆点圆角',
         m.dotRadius ?? s.badge.dotRadius,
         0,
-        1000,
+        editorRadiusLimit(s.badge.dotSize),
         (value) => m.dotRadius = value,
         () => m.dotRadius = null,
         m.dotRadius != null,
-        wholeNumbers: false,
       ),
-      _number(
+      _radiusNumber(
         '内容圆角',
         m.contentRadius ?? s.badge.contentRadius,
         0,
-        1000,
+        editorRadiusLimit(s.badge.contentHeight),
         (value) => m.contentRadius = value,
         () => m.contentRadius = null,
         m.contentRadius != null,
-        wholeNumbers: false,
       ),
       _color(
         '默认背景',
@@ -280,7 +287,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.borderWidth = value,
         () => v.borderWidth = null,
         v.borderWidth != null,
-        wholeNumbers: false,
       ),
       ...[_heading('表面阴影'), ..._controlShadows(a)],
     ];
@@ -293,6 +299,8 @@ extension _BasicControlWorkspace on _ThemeEditorState {
     final v = _basicAppearance.dividerStyle,
         m = _spec.dividerMetrics,
         colors = theme.colors;
+    final editorExplicitLineLength =
+        m.length ?? s.divider.length ?? s.select.width;
     return [
       const HyperText('线条长度未覆盖时按父布局伸展；长度数字是显式设置时的起始参考值。'),
       _heading('线条布局'),
@@ -300,41 +308,41 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         '线条长度',
         m.length ?? s.divider.length ?? (s.select.width),
         0,
-        1000,
+        editorExplicitLineLengthLimit,
         (value) => m.length = value,
         () => m.length = null,
         m.length != null,
-        wholeNumbers: false,
       ),
       _number(
         '起点缩进',
         m.indent ?? s.divider.indent ?? (0),
         0,
-        1000,
+        (editorExplicitLineLength - (m.endIndent ?? s.divider.endIndent ?? 0))
+            .clamp(0, editorLayoutInsetLimit),
         (value) => m.indent = value,
         () => m.indent = null,
         m.indent != null,
-        wholeNumbers: false,
       ),
       _number(
         '终点缩进',
         m.endIndent ?? s.divider.endIndent ?? (0),
         0,
-        1000,
+        (editorExplicitLineLength - (m.indent ?? s.divider.indent ?? 0)).clamp(
+          0,
+          editorLayoutInsetLimit,
+        ),
         (value) => m.endIndent = value,
         () => m.endIndent = null,
         m.endIndent != null,
-        wholeNumbers: false,
       ),
       _number(
         '线条粗细',
         m.thickness ?? s.divider.thickness,
         0,
-        1000,
+        editorLineThicknessLimit,
         (value) => m.thickness = value,
         () => m.thickness = null,
         m.thickness != null,
-        wholeNumbers: false,
       ),
       _heading('内容文字'),
       _number(
@@ -345,7 +353,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.fontSize = value,
         () => v.fontSize = null,
         v.fontSize != null,
-        wholeNumbers: false,
       ),
       _number(
         '文字字重',
@@ -355,17 +362,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.fontWeight = value,
         () => v.fontWeight = null,
         v.fontWeight != null,
-        wholeNumbers: false,
-      ),
-      _number(
-        '文字行高',
-        v.lineHeight ?? 1.2,
-        0.5,
-        4,
-        (value) => v.lineHeight = value,
-        () => v.lineHeight = null,
-        v.lineHeight != null,
-        wholeNumbers: false,
       ),
       _color(
         '内容文字颜色',
@@ -385,32 +381,29 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         '内容与线条间距',
         m.contentGap ?? s.divider.contentGap,
         0,
-        1000,
+        editorContentSpacingLimit,
         (value) => m.contentGap = value,
         () => m.contentGap = null,
         m.contentGap != null,
-        wholeNumbers: false,
       ),
       _number(
         '边缘线段长度',
         m.edgeExtent ?? s.divider.edgeExtent,
         0,
-        1000,
+        editorExplicitLineLength.clamp(0, editorLayoutInsetLimit),
         (value) => m.edgeExtent = value,
         () => m.edgeExtent = null,
         m.edgeExtent != null,
-        wholeNumbers: false,
       ),
       _heading('内容图标'),
       _number(
         '内容图标尺寸',
         m.iconSize ?? s.divider.iconSize,
         0,
-        1000,
+        editorContentIconLimit,
         (value) => m.iconSize = value,
         () => m.iconSize = null,
         m.iconSize != null,
-        wholeNumbers: false,
       ),
       _color(
         '内容图标颜色',
@@ -428,7 +421,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.durationMilliseconds = value,
         () => v.durationMilliseconds = null,
         v.durationMilliseconds != null,
-        wholeNumbers: false,
       ),
       _select('过渡曲线', v.curve ?? 'inherit', const {
         'inherit': '继承默认',
@@ -452,31 +444,28 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         '虚线长度',
         m.dashLength ?? s.divider.dashLength,
         0,
-        1000,
+        editorPatternSegmentLimit,
         (value) => m.dashLength = value,
         () => m.dashLength = null,
         m.dashLength != null,
-        wholeNumbers: false,
       ),
       _number(
         '线段间隔',
         m.gap ?? s.divider.gap,
         0,
-        1000,
+        editorPatternSegmentLimit,
         (value) => m.gap = value,
         () => m.gap = null,
         m.gap != null,
-        wholeNumbers: false,
       ),
-      _number(
+      _radiusNumber(
         '圆角',
         m.radius ?? s.divider.radius ?? (0),
         0,
-        1000,
+        editorRadiusLimit(s.divider.thickness),
         (value) => m.radius = value,
         () => m.radius = null,
         m.radius != null,
-        wholeNumbers: false,
       ),
       _color(
         '线条颜色',
@@ -505,33 +494,30 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           '线性长度',
           m.linearSize ?? s.progress.linearSize ?? (s.select.width),
           0,
-          1000,
+          editorExplicitLineLengthLimit,
           (value) => m.linearSize = value,
           () => m.linearSize = null,
           m.linearSize != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
         _number(
           '细轨道高度',
           m.linearThickness ?? s.progress.linearThickness,
           0,
-          1000,
+          editorLineThicknessLimit,
           (value) => m.linearThickness = value,
           () => m.linearThickness = null,
           m.linearThickness != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
         _number(
           '宽轨道高度',
           m.wideLinearThickness ?? s.progress.wideLinearThickness,
           0,
-          1000,
+          editorWideTrackThicknessLimit,
           (value) => m.wideLinearThickness = value,
           () => m.wideLinearThickness = null,
           m.wideLinearThickness != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'linear')
         _select(
@@ -547,23 +533,21 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         _number(
           '圆形直径',
           m.circularSize ?? s.progress.circularSize,
-          0,
-          1000,
+          2 * s.progress.circularThickness,
+          editorProgressDiameterLimit,
           (value) => m.circularSize = value,
           () => m.circularSize = null,
           m.circularSize != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
         _number(
           '圆形线宽',
           m.circularThickness ?? s.progress.circularThickness,
           0,
-          1000,
+          editorProgressStrokeLimit(s.progress.circularSize),
           (value) => m.circularThickness = value,
           () => m.circularThickness = null,
           m.circularThickness != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'circular')
         _select(
@@ -583,34 +567,38 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         _number(
           '无限进度直径',
           m.infiniteSize ?? s.progress.infiniteSize,
-          0,
-          1000,
+          (s.progress.infiniteThickness ?? 2) +
+              4 * s.progress.infiniteDotRadius,
+          editorProgressDiameterLimit,
           (value) => m.infiniteSize = value,
           () => m.infiniteSize = null,
           m.infiniteSize != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
-        _number(
+        _radiusNumber(
           '轨道圆点半径',
           m.infiniteDotRadius ?? s.progress.infiniteDotRadius,
           0,
-          1000,
+          editorOrbitDotLimit(
+            s.progress.infiniteSize,
+            s.progress.infiniteThickness ?? 2,
+          ),
           (value) => m.infiniteDotRadius = value,
           () => m.infiniteDotRadius = null,
           m.infiniteDotRadius != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
         _number(
           '无限进度线宽',
           m.infiniteThickness ?? s.progress.infiniteThickness ?? (2),
           0,
-          1000,
+          (s.progress.infiniteSize - 4 * s.progress.infiniteDotRadius).clamp(
+            0,
+            editorLineThicknessLimit,
+          ),
           (value) => m.infiniteThickness = value,
           () => m.infiniteThickness = null,
           m.infiniteThickness != null,
-          wholeNumbers: false,
         ),
       _heading('进度变化'),
       _number(
@@ -624,7 +612,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         (value) => v.durationMilliseconds = value,
         () => v.durationMilliseconds = null,
         v.durationMilliseconds != null,
-        wholeNumbers: false,
       ),
       _select('过渡曲线', v.curve ?? 'inherit', const {
         'inherit': '继承默认',
@@ -634,37 +621,108 @@ extension _BasicControlWorkspace on _ThemeEditorState {
       }, (value) => _change(() => v.curve = value == 'inherit' ? null : value)),
       _heading('轨道与填充表面'),
       if (_progressObject == 'common')
-        _number(
+        _radiusNumber(
           '圆角',
           m.radius ?? s.progress.radius ?? (s.progress.linearThickness / 2),
           0,
-          1000,
+          editorRadiusLimit(
+            s.progress.wideLinearThickness > s.progress.linearThickness
+                ? s.progress.wideLinearThickness
+                : s.progress.linearThickness,
+          ),
           (value) => m.radius = value,
           () => m.radius = null,
           m.radius != null,
-          wholeNumbers: false,
         ),
       if (_progressObject == 'common')
-        _number(
+        _radiusNumber(
           '填充端圆角',
           m.fillRadius ??
               s.progress.fillRadius ??
               (s.progress.linearThickness / 2),
           0,
-          1000,
+          editorRadiusLimit(
+            s.progress.wideLinearThickness > s.progress.linearThickness
+                ? s.progress.wideLinearThickness
+                : s.progress.linearThickness,
+          ),
           (value) => m.fillRadius = value,
           () => m.fillRadius = null,
           m.fillRadius != null,
-          wholeNumbers: false,
         ),
-      _color(
-        '进度颜色',
-        v.color,
-        (value) => v.color = value,
-        inheritedColor: _progressObject == 'infinite'
-            ? colors.textTertiary
-            : colors.primary,
-      ),
+      if (_progressObject == 'common' || _progressObject == 'linear') ...[
+        _select(
+          '进度填充',
+          v.gradient == null ? 'solid' : 'gradient',
+          const {'solid': '纯色', 'gradient': '渐变'},
+          (value) => _change(
+            () => v.gradient = value == 'solid'
+                ? null
+                : v.gradient ??
+                      EditorGradient(
+                        colors: [
+                          const EditorColor(semantic: 'primary'),
+                          const EditorColor(semantic: 'outline'),
+                        ],
+                        stops: [0, 1],
+                      ),
+          ),
+        ),
+        const HyperText('渐变用于线性细条和宽条，按完整轨道坐标绘制；圆形及无限等待保留纯色。'),
+        if (v.gradient != null)
+          ..._gradientProperties(
+            _basicAppearance,
+            readGradient: () => v.gradient,
+            writeGradient: (value) => v.gradient = value,
+          ),
+      ],
+      if (v.gradient == null ||
+          (_progressObject != 'common' && _progressObject != 'linear'))
+        _color(
+          '进度颜色',
+          v.color,
+          (value) => v.color = value,
+          inheritedColor: _progressObject == 'infinite'
+              ? colors.textTertiary
+              : colors.primary,
+        ),
+      if (_progressObject == 'common' || _progressObject == 'linear') ...[
+        _heading('缓冲填充'),
+        _select(
+          '缓冲填充方式',
+          v.bufferGradient == null ? 'solid' : 'gradient',
+          const {'solid': '纯色', 'gradient': '渐变'},
+          (value) => _change(
+            () => v.bufferGradient = value == 'solid'
+                ? null
+                : v.bufferGradient ??
+                      EditorGradient(
+                        colors: [
+                          const EditorColor(semantic: 'primary'),
+                          const EditorColor(semantic: 'outline'),
+                        ],
+                        stops: [0, 1],
+                      ),
+          ),
+        ),
+        if (v.bufferGradient == null)
+          _color(
+            '缓冲颜色',
+            v.bufferColor,
+            (value) => v.bufferColor = value,
+            inheritedColor: colors.primaryContainer,
+          ),
+        if (v.bufferGradient != null)
+          Column(
+            key: const ValueKey('editor-buffer-gradient'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _gradientProperties(
+              _basicAppearance,
+              readGradient: () => v.bufferGradient,
+              writeGradient: (value) => v.bufferGradient = value,
+            ),
+          ),
+      ],
       _color(
         '轨道颜色',
         v.trackColor,
@@ -691,11 +749,10 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           '标记尺寸',
           m.size ?? s.radio.size,
           0,
-          1000,
+          editorSelectionMarkLimit,
           (value) => m.size = value,
           () => m.size = null,
           m.size != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _radioVariant == 'common')
         _number(
@@ -704,44 +761,50 @@ extension _BasicControlWorkspace on _ThemeEditorState {
               s.radio.minimumTapTargetSize ??
               (s.minimumInteractiveDimension),
           0,
-          1000,
+          editorTapTargetLimit,
           (value) => m.minimumTapTargetSize = value,
           () => m.minimumTapTargetSize = null,
           m.minimumTapTargetSize != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _radioVariant == 'common')
         _number(
           '内部圆点尺寸',
           m.indicatorSize ?? s.radio.indicatorSize ?? (s.radio.size * .46),
           0,
-          1000,
+          s.radio.size,
           (value) => m.indicatorSize = value,
           () => m.indicatorSize = null,
           m.indicatorSize != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _radioVariant == 'common')
         _number(
           '对勾尺寸',
           m.markSize ?? s.radio.markSize ?? (s.radio.size),
           0,
-          1000,
+          s.radio.size,
           (value) => m.markSize = value,
           () => m.markSize = null,
           m.markSize != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _radioVariant == 'common')
         _number(
           '对勾线宽',
           m.strokeWidth ?? s.radio.strokeWidth ?? (s.radio.size * (7 / 56)),
           0,
-          1000,
+          editorSelectionStrokeLimit(s.radio.markSize ?? s.radio.size),
           (value) => m.strokeWidth = value,
           () => m.strokeWidth = null,
           m.strokeWidth != null,
-          wholeNumbers: false,
+        ),
+      if (_basicState == 'common' && _radioVariant == 'common')
+        _number(
+          '标记与文字间距',
+          m.spacing ?? s.radio.spacing,
+          0,
+          editorContentSpacingLimit,
+          (value) => m.spacing = value,
+          () => m.spacing = null,
+          m.spacing != null,
         ),
       if ((_basicState == 'pressed') || (_basicState == 'common'))
         _heading('标记交互'),
@@ -766,7 +829,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           (value) => v.durationMilliseconds = value,
           () => v.durationMilliseconds = null,
           v.durationMilliseconds != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _select(
@@ -780,38 +842,63 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           },
           (value) => _change(() => v.curve = value == 'inherit' ? null : value),
         ),
-      if ((_basicState == 'selected') || (_basicState == 'disabled'))
+      if (const {
+        'common',
+        'selected',
+        'unselected',
+        'disabled',
+      }.contains(_basicState))
         _heading('标记颜色'),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '选中标记颜色',
           v.selectedColor,
           (value) => v.selectedColor = value,
           inheritedColor: colors.primary,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'unselected')
+        _color(
+          '未选中标记颜色',
+          v.unselectedColor,
+          (value) => v.unselectedColor = value,
+          inheritedColor:
+              _radioVariant == 'common' || _radioVariant == 'checkmark'
+              ? colors.outline
+              : Colors.transparent,
+        ),
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用标记颜色',
           v.disabledSelectedColor,
           (value) => v.disabledSelectedColor = value,
           inheritedColor: colors.disabled,
         ),
-      if ((_basicState == 'common' && _radioVariant == 'common') ||
+      if (_basicState == 'common' || _basicState == 'disabled')
+        _color(
+          '禁用未选中标记颜色',
+          v.disabledUnselectedColor,
+          (value) => v.disabledUnselectedColor = value,
+          inheritedColor:
+              (_radioVariant == 'common' || _radioVariant == 'checkmark'
+                      ? colors.outline
+                      : Colors.transparent)
+                  .withValues(alpha: .5),
+        ),
+      if ((_basicState == 'common') ||
           (_basicState == 'unselected') ||
           (_basicState == 'selected'))
         _heading('标记表面'),
       if (_basicState == 'common' && _radioVariant == 'common')
-        _number(
+        _radiusNumber(
           '圆角',
           m.radius ?? s.radio.radius ?? (s.radio.size / 2),
           0,
-          1000,
+          editorRadiusLimit(s.radio.size),
           (value) => m.radius = value,
           () => m.radius = null,
           m.radius != null,
-          wholeNumbers: false,
         ),
-      if (_basicState == 'unselected')
+      if (_basicState == 'common' || _basicState == 'unselected')
         _color(
           '默认背景',
           v.backgroundColor,
@@ -820,7 +907,7 @@ extension _BasicControlWorkspace on _ThemeEditorState {
               ? colors.surfaceMuted
               : Colors.transparent,
         ),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '选中背景',
           v.selectedBackgroundColor,
@@ -829,8 +916,22 @@ extension _BasicControlWorkspace on _ThemeEditorState {
               ? colors.surfaceMuted
               : Colors.transparent,
         ),
-      if (_basicState == 'unselected') _controlBorder('默认边框', v.border),
-      if (_basicState == 'selected') _controlBorder('选中边框', v.selectedBorder),
+      if (_basicState == 'common' || _basicState == 'unselected')
+        _controlBorder(
+          '默认边框',
+          v.border,
+          inheritedColor: colors.outline,
+          inheritedWidth: _radioVariant == 'circle' ? 2 : 0,
+          widthLimit: editorSelectionStrokeLimit(s.radio.size),
+        ),
+      if (_basicState == 'common' || _basicState == 'selected')
+        _controlBorder(
+          '选中边框',
+          v.selectedBorder,
+          inheritedColor: colors.primary,
+          inheritedWidth: _radioVariant == 'circle' ? 2 : 0,
+          widthLimit: editorSelectionStrokeLimit(s.radio.size),
+        ),
       if (_basicState == 'common') ...[_heading('表面阴影'), ..._controlShadows(a)],
     ];
   }
@@ -852,11 +953,10 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           '标记尺寸',
           m.size ?? s.checkbox.size,
           0,
-          1000,
+          editorSelectionMarkLimit,
           (value) => m.size = value,
           () => m.size = null,
           m.size != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _checkboxVariant == 'common')
         _number(
@@ -865,22 +965,30 @@ extension _BasicControlWorkspace on _ThemeEditorState {
               s.checkbox.minimumTapTargetSize ??
               (s.minimumInteractiveDimension),
           0,
-          1000,
+          editorTapTargetLimit,
           (value) => m.minimumTapTargetSize = value,
           () => m.minimumTapTargetSize = null,
           m.minimumTapTargetSize != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _checkboxVariant == 'common')
         _number(
           '标记线宽',
           m.markStrokeWidth ?? s.checkbox.markStrokeWidth,
           0,
-          1000,
+          editorSelectionStrokeLimit(s.checkbox.markSize ?? s.checkbox.size),
           (value) => m.markStrokeWidth = value,
           () => m.markStrokeWidth = null,
           m.markStrokeWidth != null,
-          wholeNumbers: false,
+        ),
+      if (_basicState == 'common' && _checkboxVariant == 'common')
+        _number(
+          '对勾尺寸',
+          m.markSize ?? s.checkbox.markSize ?? (s.checkbox.size * 1.15 / 2),
+          0,
+          s.checkbox.size,
+          (value) => m.markSize = value,
+          () => m.markSize = null,
+          m.markSize != null,
         ),
       if ((_basicState == 'pressed') ||
           (_basicState == 'common') ||
@@ -907,7 +1015,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           (value) => v.durationMilliseconds = value,
           () => v.durationMilliseconds = null,
           v.durationMilliseconds != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _select(
@@ -921,78 +1028,120 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           },
           (value) => _change(() => v.curve = value == 'inherit' ? null : value),
         ),
-      if (_basicState == 'hovered' || _basicState == 'pressed')
+      if (_basicState == 'common' ||
+          _basicState == 'hovered' ||
+          _basicState == 'pressed')
         _color(
           '交互叠加色',
           v.overlayColor,
           (value) => v.overlayColor = value,
           inheritedColor: colors.stateLayer,
         ),
-      if ((_basicState == 'selected') || (_basicState == 'disabled'))
+      if (_basicState == 'common' || _basicState == 'hovered')
+        _number(
+          '悬停叠加透明度',
+          v.hoverOpacity ?? .07,
+          0,
+          1,
+          (value) => v.hoverOpacity = value,
+          () => v.hoverOpacity = null,
+          v.hoverOpacity != null,
+          wholeNumbers: false,
+        ),
+      if (_basicState == 'common' || _basicState == 'pressed')
+        _number(
+          '按下叠加透明度',
+          v.pressedOpacity ?? .12,
+          0,
+          1,
+          (value) => v.pressedOpacity = value,
+          () => v.pressedOpacity = null,
+          v.pressedOpacity != null,
+          wholeNumbers: false,
+        ),
+      if (const {'common', 'selected', 'disabled'}.contains(_basicState))
         _heading('标记颜色'),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '标记颜色',
           v.checkColor,
           (value) => v.checkColor = value,
           inheritedColor: colors.onPrimary,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用标记颜色',
           v.disabledCheckColor,
           (value) => v.disabledCheckColor = value,
           inheritedColor: colors.disabled,
         ),
-      if ((_basicState == 'common' && _checkboxVariant == 'common') ||
+      if ((_basicState == 'common') ||
           (_basicState == 'selected') ||
           (_basicState == 'unselected') ||
           (_basicState == 'disabled'))
         _heading('标记表面'),
       if (_basicState == 'common' && _checkboxVariant == 'common')
-        _number(
+        _radiusNumber(
           '矩形圆角',
           m.roundedRadius ?? s.checkbox.roundedRadius,
           0,
-          1000,
+          editorRadiusLimit(s.checkbox.size),
           (value) => m.roundedRadius = value,
           () => m.roundedRadius = null,
           m.roundedRadius != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common' && _checkboxVariant == 'common')
-        _number(
+        _radiusNumber(
           '圆形圆角',
           m.circleRadius ?? s.checkbox.circleRadius ?? (s.checkbox.size / 2),
           0,
-          1000,
+          editorRadiusLimit(s.checkbox.size),
           (value) => m.circleRadius = value,
           () => m.circleRadius = null,
           m.circleRadius != null,
-          wholeNumbers: false,
         ),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '选中背景',
           v.activeColor,
           (value) => v.activeColor = value,
           inheritedColor: colors.primary,
         ),
-      if (_basicState == 'unselected')
+      if (_basicState == 'common' || _basicState == 'unselected')
         _color(
           '未选中背景',
           v.inactiveColor,
           (value) => v.inactiveColor = value,
           inheritedColor: colors.surfaceMuted,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用背景',
           v.disabledColor,
           (value) => v.disabledColor = value,
           inheritedColor: colors.surfaceMuted,
         ),
-      if (_basicState == 'common') _controlBorder('共用边框', v.border),
+      if (_basicState == 'common' || _basicState == 'unselected')
+        _controlBorder(
+          '默认边框',
+          v.border,
+          inheritedWidth: 0,
+          widthLimit: editorSelectionStrokeLimit(s.checkbox.size),
+        ),
+      if (_basicState == 'common' || _basicState == 'selected')
+        _controlBorder(
+          '选中边框',
+          v.selectedBorder,
+          inheritedWidth: v.border.width ?? 0,
+          widthLimit: editorSelectionStrokeLimit(s.checkbox.size),
+        ),
+      if (_basicState == 'common' || _basicState == 'disabled')
+        _controlBorder(
+          '禁用边框',
+          v.disabledBorder,
+          inheritedWidth: v.border.width ?? 0,
+          widthLimit: editorSelectionStrokeLimit(s.checkbox.size),
+        ),
       if (_basicState == 'common') ...[_heading('表面阴影'), ..._controlShadows(a)],
     ];
   }
@@ -1011,28 +1160,29 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         _number(
           '轨道宽度',
           m.width ?? s.switchSize.width,
-          (s.switchSize.thumbSize + 2 * s.switchSize.thumbInset).clamp(
-            s.switchSize.checkedThumbOffset == null
-                ? 0
-                : s.switchSize.checkedThumbOffset! + s.switchSize.thumbSize,
-            1000,
-          ),
-          1000,
+          ((s.switchSize.thumbWidth ?? s.switchSize.thumbSize) +
+                  2 * s.switchSize.thumbInset)
+              .clamp(
+                s.switchSize.checkedThumbOffset == null
+                    ? 0
+                    : s.switchSize.checkedThumbOffset! +
+                          (s.switchSize.thumbWidth ?? s.switchSize.thumbSize),
+                double.infinity,
+              ),
+          editorSwitchWidthLimit,
           (value) => m.width = value,
           () => m.width = null,
           m.width != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _number(
           '轨道高度',
           m.height ?? s.switchSize.height,
-          s.switchSize.thumbSize,
-          1000,
+          1,
+          editorSwitchHeightLimit,
           (value) => m.height = value,
           () => m.height = null,
           m.height != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _number(
@@ -1041,42 +1191,64 @@ extension _BasicControlWorkspace on _ThemeEditorState {
               s.switchSize.minimumTapTargetSize ??
               (s.minimumInteractiveDimension),
           0,
-          1000,
+          editorTapTargetLimit,
           (value) => m.minimumTapTargetSize = value,
           () => m.minimumTapTargetSize = null,
           m.minimumTapTargetSize != null,
-          wholeNumbers: false,
         ),
       if ((_basicState == 'common')) _heading('滑块布局'),
       if (_basicState == 'common')
         _number(
           '滑块尺寸',
-          m.thumbSize ?? s.switchSize.thumbSize,
+          m.thumbSize ?? (s.switchSize.thumbWidth ?? s.switchSize.thumbSize),
           0,
           (s.switchSize.width - 2 * s.switchSize.thumbInset).clamp(
             0,
-            s.switchSize.height.clamp(
-              0,
-              s.switchSize.checkedThumbOffset == null
-                  ? 1000
-                  : s.switchSize.width - s.switchSize.checkedThumbOffset!,
-            ),
+            s.switchSize.checkedThumbOffset == null
+                ? s.switchSize.width
+                : s.switchSize.width - s.switchSize.checkedThumbOffset!,
           ),
           (value) => m.thumbSize = value,
           () => m.thumbSize = null,
           m.thumbSize != null,
-          wholeNumbers: false,
+        ),
+      if (_basicState == 'common')
+        _number(
+          '滑块宽度',
+          m.thumbWidth ?? s.switchSize.thumbWidth ?? s.switchSize.thumbSize,
+          0,
+          (s.switchSize.width - 2 * s.switchSize.thumbInset).clamp(
+            0,
+            s.switchSize.checkedThumbOffset == null
+                ? double.infinity
+                : s.switchSize.width - s.switchSize.checkedThumbOffset!,
+          ),
+          (value) => m.thumbWidth = value,
+          () => m.thumbWidth = null,
+          m.thumbWidth != null,
+        ),
+      if (_basicState == 'common')
+        _number(
+          '滑块高度',
+          m.thumbHeight ?? s.switchSize.thumbHeight ?? s.switchSize.thumbSize,
+          0,
+          editorSwitchHeightLimit,
+          (value) => m.thumbHeight = value,
+          () => m.thumbHeight = null,
+          m.thumbHeight != null,
         ),
       if (_basicState == 'common')
         _number(
           '滑块边缘距离',
           m.thumbInset ?? s.switchSize.thumbInset,
           0,
-          ((s.switchSize.width - s.switchSize.thumbSize) / 2).clamp(0, 1000),
+          ((s.switchSize.width -
+                      (s.switchSize.thumbWidth ?? s.switchSize.thumbSize)) /
+                  2)
+              .clamp(0, double.infinity),
           (value) => m.thumbInset = value,
           () => m.thumbInset = null,
           m.thumbInset != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _number(
@@ -1087,12 +1259,11 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           0,
           s.switchSize.checkedThumbOffset ??
               s.switchSize.width -
-                  s.switchSize.thumbSize -
+                  (s.switchSize.thumbWidth ?? s.switchSize.thumbSize) -
                   s.switchSize.thumbInset,
           (value) => m.uncheckedThumbOffset = value,
           () => m.uncheckedThumbOffset = null,
           m.uncheckedThumbOffset != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _number(
@@ -1100,19 +1271,22 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           m.checkedThumbOffset ??
               s.switchSize.checkedThumbOffset ??
               (s.switchSize.width -
-                  s.switchSize.thumbSize -
+                  (s.switchSize.thumbWidth ?? s.switchSize.thumbSize) -
                   s.switchSize.thumbInset),
           s.switchSize.uncheckedThumbOffset ?? s.switchSize.thumbInset,
-          (s.switchSize.width - s.switchSize.thumbSize).clamp(0, 1000),
+          (s.switchSize.width -
+                  (s.switchSize.thumbWidth ?? s.switchSize.thumbSize))
+              .clamp(0, double.infinity),
           (value) => m.checkedThumbOffset = value,
           () => m.checkedThumbOffset = null,
           m.checkedThumbOffset != null,
-          wholeNumbers: false,
         ),
       if ((_basicState == 'hovered' || _basicState == 'pressed') ||
           (_basicState == 'common'))
         _heading('滑块交互'),
-      if (_basicState == 'hovered' || _basicState == 'pressed')
+      if (_basicState == 'common' ||
+          _basicState == 'hovered' ||
+          _basicState == 'pressed')
         _number(
           '交互滑块缩放',
           v.interactionThumbScale ?? 1.127,
@@ -1133,7 +1307,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           (value) => v.durationMilliseconds = value,
           () => v.durationMilliseconds = null,
           v.durationMilliseconds != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
         _select(
@@ -1147,12 +1320,36 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           },
           (value) => _change(() => v.curve = value == 'inherit' ? null : value),
         ),
-      if (_basicState == 'hovered' || _basicState == 'pressed')
+      if (_basicState == 'common' ||
+          _basicState == 'hovered' ||
+          _basicState == 'pressed')
         _color(
           '交互叠加色',
           v.overlayColor,
           (value) => v.overlayColor = value,
           inheritedColor: colors.stateLayer,
+        ),
+      if (_basicState == 'common' || _basicState == 'hovered')
+        _number(
+          '悬停叠加透明度',
+          v.hoverOpacity ?? .07,
+          0,
+          1,
+          (value) => v.hoverOpacity = value,
+          () => v.hoverOpacity = null,
+          v.hoverOpacity != null,
+          wholeNumbers: false,
+        ),
+      if (_basicState == 'common' || _basicState == 'pressed')
+        _number(
+          '按下叠加透明度',
+          v.pressedOpacity ?? .12,
+          0,
+          1,
+          (value) => v.pressedOpacity = value,
+          () => v.pressedOpacity = null,
+          v.pressedOpacity != null,
+          wholeNumbers: false,
         ),
       if ((_basicState == 'common') ||
           (_basicState == 'selected') ||
@@ -1160,100 +1357,139 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           (_basicState == 'disabled'))
         _heading('轨道与滑块表面'),
       if (_basicState == 'common')
-        _number(
+        _radiusNumber(
           '圆角',
           m.radius ?? s.switchSize.radius ?? (s.switchSize.height / 2),
           0,
-          1000,
+          editorRadiusLimit(s.switchSize.height),
           (value) => m.radius = value,
           () => m.radius = null,
           m.radius != null,
-          wholeNumbers: false,
         ),
       if (_basicState == 'common')
-        _number(
+        _radiusNumber(
           '滑块圆角',
           m.thumbRadius ??
               s.switchSize.thumbRadius ??
-              (s.switchSize.thumbSize / 2),
+              ((s.switchSize.thumbWidth ?? s.switchSize.thumbSize) / 2),
           0,
-          1000,
+          editorRadiusLimit(
+            (s.switchSize.thumbWidth ?? s.switchSize.thumbSize).clamp(
+              0,
+              s.switchSize.thumbHeight ?? s.switchSize.thumbSize,
+            ),
+          ),
           (value) => m.thumbRadius = value,
           () => m.thumbRadius = null,
           m.thumbRadius != null,
-          wholeNumbers: false,
         ),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '开启轨道颜色',
           v.activeTrackColor,
           (value) => v.activeTrackColor = value,
           inheritedColor: colors.primary,
         ),
-      if (_basicState == 'unselected')
+      if (_basicState == 'common' || _basicState == 'unselected')
         _color(
           '关闭轨道颜色',
           v.inactiveTrackColor,
           (value) => v.inactiveTrackColor = value,
           inheritedColor: colors.surfaceMuted,
         ),
-      if (_basicState == 'selected')
+      if (_basicState == 'common' || _basicState == 'selected')
         _color(
           '开启滑块颜色',
           v.activeThumbColor,
           (value) => v.activeThumbColor = value,
           inheritedColor: colors.onPrimary,
         ),
-      if (_basicState == 'unselected')
+      if (_basicState == 'common' || _basicState == 'unselected')
         _color(
           '关闭滑块颜色',
           v.inactiveThumbColor,
           (value) => v.inactiveThumbColor = value,
           inheritedColor: colors.surfaceElevated,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用轨道回退色',
           v.disabledTrackColor,
           (value) => v.disabledTrackColor = value,
           inheritedColor: colors.surfaceMuted,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用开启轨道色',
           v.disabledActiveTrackColor,
           (value) => v.disabledActiveTrackColor = value,
           inheritedColor: colors.primary.withValues(alpha: .35),
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用关闭轨道色',
           v.disabledInactiveTrackColor,
           (value) => v.disabledInactiveTrackColor = value,
           inheritedColor: colors.surfaceMuted,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用滑块回退色',
           v.disabledThumbColor,
           (value) => v.disabledThumbColor = value,
           inheritedColor: colors.disabled,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用开启滑块色',
           v.disabledActiveThumbColor,
           (value) => v.disabledActiveThumbColor = value,
           inheritedColor: colors.surfaceElevated,
         ),
-      if (_basicState == 'disabled')
+      if (_basicState == 'common' || _basicState == 'disabled')
         _color(
           '禁用关闭滑块色',
           v.disabledInactiveThumbColor,
           (value) => v.disabledInactiveThumbColor = value,
           inheritedColor: colors.surfaceElevated,
         ),
-      if (_basicState == 'common') _controlBorder('共用边框', v.border),
+      if (_basicState == 'common')
+        _controlBorder(
+          '共用边框',
+          v.border,
+          inheritedWidth: 0,
+          widthLimit: editorSelectionStrokeLimit(s.switchSize.height),
+        ),
+      if (_basicState == 'common' || _basicState == 'selected')
+        _controlBorder(
+          '开启边框',
+          v.activeBorder,
+          inheritedWidth: v.border.width ?? 0,
+          widthLimit: editorSelectionStrokeLimit(s.switchSize.height),
+        ),
+      if (_basicState == 'common' || _basicState == 'unselected')
+        _controlBorder(
+          '关闭边框',
+          v.inactiveBorder,
+          inheritedWidth: v.border.width ?? 0,
+          widthLimit: editorSelectionStrokeLimit(s.switchSize.height),
+        ),
+      if (_basicState == 'common' || _basicState == 'disabled')
+        _controlBorder(
+          '禁用边框',
+          v.disabledBorder,
+          inheritedWidth: v.border.width ?? 0,
+          widthLimit: editorSelectionStrokeLimit(s.switchSize.height),
+        ),
+      if (_basicState == 'common')
+        _controlBorder(
+          '滑块边框',
+          v.thumbBorder,
+          inheritedWidth: 0,
+          widthLimit: editorSelectionStrokeLimit(
+            (s.switchSize.thumbWidth ?? s.switchSize.thumbSize),
+          ),
+        ),
       if (_basicState == 'common') ...[_heading('滑块阴影'), ..._controlShadows(a)],
     ];
   }
@@ -1286,103 +1522,14 @@ extension _BasicControlWorkspace on _ThemeEditorState {
           }
         }),
       ),
-      if (gradient != null) ...[
-        if (gradient.kind == EditorGradientKind.linear)
-          _number(
-            '渐变方向（度）',
-            gradient.angle,
-            0,
-            360,
-            (value) => gradient.angle = value,
-            () => gradient.angle = 0,
-            true,
-          ),
-        if (gradient.kind != EditorGradientKind.linear) ...[
-          _number(
-            '渐变中心 X',
-            gradient.centerX,
-            -1,
-            1,
-            (value) => gradient.centerX = value,
-            () => gradient.centerX = 0,
-            true,
-            wholeNumbers: false,
-          ),
-          _number(
-            '渐变中心 Y',
-            gradient.centerY,
-            -1,
-            1,
-            (value) => gradient.centerY = value,
-            () => gradient.centerY = 0,
-            true,
-            wholeNumbers: false,
-          ),
-        ],
-        if (gradient.kind == EditorGradientKind.radial)
-          _number(
-            '渐变半径',
-            gradient.radius,
-            .01,
-            2,
-            (value) => gradient.radius = value,
-            () => gradient.radius = .5,
-            true,
-            wholeNumbers: false,
-          ),
-        if (gradient.kind == EditorGradientKind.sweep) ...[
-          _number(
-            '扫描起始角（度）',
-            gradient.startAngle,
-            0,
-            gradient.endAngle - .01,
-            (value) => gradient.startAngle = value,
-            () => gradient.startAngle = 0,
-            true,
-            wholeNumbers: false,
-          ),
-          _number(
-            '扫描终止角（度）',
-            gradient.endAngle,
-            gradient.startAngle + .01,
-            360,
-            (value) => gradient.endAngle = value,
-            () => gradient.endAngle = 360,
-            true,
-            wholeNumbers: false,
-          ),
-        ],
-        for (var i = 0; i < gradient.colors.length; i++) ...[
-          _color('渐变节点 ${i + 1}', gradient.colors[i], (value) {
-            if (value != null) gradient.colors[i] = value;
-          }),
-          _number(
-            '节点 ${i + 1} 位置',
-            gradient.stops[i],
-            i == 0 ? 0 : gradient.stops[i - 1],
-            i == gradient.stops.length - 1 ? 1 : gradient.stops[i + 1],
-            (value) => gradient.stops[i] = value,
-            () => gradient.stops[i] = i / (gradient.stops.length - 1),
-            true,
-            wholeNumbers: false,
-          ),
-          if (gradient.colors.length > 2)
-            HyperButton.ghost(
-              onPressed: () => _change(() {
-                gradient.colors.removeAt(i);
-                gradient.stops.removeAt(i);
-              }),
-              child: const HyperText('删除节点'),
-            ),
-        ],
-        HyperButton.tonal(
-          onPressed: () => _change(() {
-            gradient.colors.add(const EditorColor(semantic: 'primary'));
-            gradient.stops.add(1);
-          }),
-          child: const HyperText('添加节点'),
+      if (gradient != null)
+        ..._gradientProperties(
+          _basicAppearance,
+          readGradient: () => visual.gradient,
+          writeGradient: (value) => visual.gradient = value,
+          inheritedGradient: _resolveTheme(_dark).dividerTheme.style.gradient,
+          showType: false,
         ),
-      ],
     ];
   }
 

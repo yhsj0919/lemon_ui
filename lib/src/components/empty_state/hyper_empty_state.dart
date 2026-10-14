@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -165,7 +167,7 @@ class HyperEmptyState extends StatelessWidget {
           duration: duration,
           curve: resolved.curve!,
           padding: resolved.padding,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: resolved.background?.color,
             gradient: resolved.background?.gradient,
             border: resolved.border,

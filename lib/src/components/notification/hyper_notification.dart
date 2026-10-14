@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'package:flutter/material.dart';
@@ -106,7 +107,7 @@ class HyperNotification extends StatelessWidget {
                         Container(
                           width: resolved.unreadSize,
                           height: resolved.unreadSize,
-                          decoration: BoxDecoration(
+                          decoration: HyperBoxDecoration(
                             color: resolved.unreadColor,
                             shape: BoxShape.circle,
                           ),
@@ -203,7 +204,7 @@ class HyperNotification extends StatelessWidget {
         duration: duration,
         curve: resolved.curve!,
         padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
+        decoration: HyperBoxDecoration(
           color: resolved.material == null ? resolved.background?.color : null,
           gradient: resolved.material == null
               ? resolved.background?.gradient
@@ -211,7 +212,7 @@ class HyperNotification extends StatelessWidget {
           borderRadius: resolved.borderRadius,
           boxShadow: resolved.boxShadow,
         ),
-        foregroundDecoration: BoxDecoration(
+        foregroundDecoration: HyperBoxDecoration(
           color: resolved.overlayColor!.withValues(alpha: opacity.clamp(0, 1)),
           border: resolved.border,
           borderRadius: resolved.borderRadius,

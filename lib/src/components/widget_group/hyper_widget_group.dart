@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -98,14 +100,17 @@ class HyperWidgetGroup extends StatelessWidget {
         connected ? EdgeInsets.zero : border?.dimensions ?? EdgeInsets.zero,
       ),
       clipBehavior: connected ? Clip.antiAlias : clipBehavior,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color:
             resolved.backgroundColor ??
             (connected ? theme.colors.surface : null),
         borderRadius: radius,
         boxShadow: resolved.boxShadow,
       ),
-      foregroundDecoration: BoxDecoration(border: border, borderRadius: radius),
+      foregroundDecoration: HyperBoxDecoration(
+        border: border,
+        borderRadius: radius,
+      ),
       child: TweenAnimationBuilder<double>(
         tween: Tween<double>(end: spacing),
         duration: duration,
@@ -139,7 +144,10 @@ class HyperWidgetGroup extends StatelessWidget {
               _buildItem(
                 children[index],
                 itemHeight,
-                resolved.itemBorderRadius,
+                resolved.itemBorderRadius ??
+                    (connected
+                        ? null
+                        : BorderRadius.circular(metrics.innerRadius)),
                 duration,
                 curve,
                 connected,
@@ -189,7 +197,7 @@ class HyperWidgetGroup extends StatelessWidget {
               duration: duration,
               curve: curve,
               clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(borderRadius: radius),
+              decoration: HyperBoxDecoration(borderRadius: radius),
               child: scopedChild,
             ),
     );

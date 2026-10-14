@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -111,7 +113,7 @@ class HyperPageIndicator extends StatelessWidget {
               curve: s.curve!,
               width: selected ? s.selectedWidth : s.dotSize,
               height: s.dotSize,
-              decoration: BoxDecoration(
+              decoration: HyperBoxDecoration(
                 color: fill.color,
                 gradient: fill.gradient,
                 borderRadius: s.dotRadius,
@@ -180,7 +182,7 @@ class HyperPageIndicator extends StatelessWidget {
       duration: duration,
       curve: s.curve!,
       padding: s.padding,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: s.material == null ? s.background?.color : null,
         gradient: s.material == null ? s.background?.gradient : null,
         borderRadius: s.borderRadius,
@@ -204,11 +206,11 @@ class HyperPageIndicator extends StatelessWidget {
       child: AnimatedContainer(
         duration: duration,
         curve: s.curve!,
-        decoration: BoxDecoration(
+        decoration: HyperBoxDecoration(
           borderRadius: s.borderRadius,
           boxShadow: s.boxShadow,
         ),
-        foregroundDecoration: BoxDecoration(
+        foregroundDecoration: HyperBoxDecoration(
           borderRadius: s.borderRadius,
           border: s.border,
         ),

@@ -265,11 +265,7 @@ class EditorDividerVisual {
         ? null
         : Duration(milliseconds: durationMilliseconds!.round()),
     curve: editorControlCurve(curve),
-    textStyle:
-        fontSize == null &&
-            fontWeight == null &&
-            lineHeight == null &&
-            textColor == null
+    textStyle: fontSize == null && fontWeight == null && textColor == null
         ? null
         : TextStyle(
             fontSize: fontSize,
@@ -280,7 +276,6 @@ class EditorDividerVisual {
                     0,
                     8,
                   )],
-            height: lineHeight,
           ),
     gradient: gradient?.resolve(colors),
     pattern: pattern == null
@@ -362,6 +357,9 @@ class EditorDividerMetrics {
 class EditorProgressVisual {
   double? durationMilliseconds;
   EditorColor? color;
+  EditorGradient? gradient;
+  EditorColor? bufferColor;
+  EditorGradient? bufferGradient;
   EditorColor? trackColor;
   String? variant;
   String? strokeCap;
@@ -373,6 +371,9 @@ class EditorProgressVisual {
     if (strokeCap != null) 'strokeCap': strokeCap,
     if (curve != null) 'curve': curve,
     if (color != null) 'color': color!.toJson(),
+    if (gradient != null) 'gradient': gradient!.toJson(),
+    if (bufferColor != null) 'bufferColor': bufferColor!.toJson(),
+    if (bufferGradient != null) 'bufferGradient': bufferGradient!.toJson(),
     if (trackColor != null) 'trackColor': trackColor!.toJson(),
   };
   static EditorProgressVisual fromJson(Map<String, dynamic> j) {
@@ -380,6 +381,9 @@ class EditorProgressVisual {
       (k) => !{
         'durationMilliseconds',
         'color',
+        'gradient',
+        'bufferColor',
+        'bufferGradient',
         'trackColor',
         'variant',
         'strokeCap',
@@ -400,6 +404,15 @@ class EditorProgressVisual {
       throw const FormatException('无效 curve');
     }
     return EditorProgressVisual()
+      ..bufferColor = j['bufferColor'] == null
+          ? null
+          : EditorColor.fromJson(j['bufferColor'] as Map<String, dynamic>)
+      ..bufferGradient = j['bufferGradient'] == null
+          ? null
+          : EditorGradient.fromJson(j['bufferGradient'] as Map<String, dynamic>)
+      ..gradient = j['gradient'] == null
+          ? null
+          : EditorGradient.fromJson(j['gradient'] as Map<String, dynamic>)
       ..durationMilliseconds = number(
         j['durationMilliseconds'],
         min: 0,
@@ -418,6 +431,9 @@ class EditorProgressVisual {
 
   HyperProgressStyle resolve(HyperColorScheme colors) => HyperProgressStyle(
     color: color?.resolve(colors),
+    gradient: gradient?.resolve(colors),
+    bufferColor: bufferColor?.resolve(colors),
+    bufferGradient: bufferGradient?.resolve(colors),
     trackColor: trackColor?.resolve(colors),
     animationDuration: durationMilliseconds == null
         ? null
@@ -505,7 +521,9 @@ class EditorRadioVisual {
   double? pressScale;
   double? durationMilliseconds;
   EditorColor? selectedColor;
+  EditorColor? unselectedColor;
   EditorColor? disabledSelectedColor;
+  EditorColor? disabledUnselectedColor;
   EditorColor? backgroundColor;
   EditorColor? selectedBackgroundColor;
   String? curve;
@@ -518,10 +536,12 @@ class EditorRadioVisual {
         selectedBackgroundColor = null;
         selectedBorder = EditorControlBorder();
       case 'unselected':
+        unselectedColor = null;
         backgroundColor = null;
         border = EditorControlBorder();
       case 'disabled':
         disabledSelectedColor = null;
+        disabledUnselectedColor = null;
       case 'pressed':
         pressScale = null;
     }
@@ -532,7 +552,10 @@ class EditorRadioVisual {
     if (durationMilliseconds != null)
       'durationMilliseconds': durationMilliseconds,
     if (curve != null) 'curve': curve,
+    if (unselectedColor != null) 'unselectedColor': unselectedColor!.toJson(),
     if (selectedColor != null) 'selectedColor': selectedColor!.toJson(),
+    if (disabledUnselectedColor != null)
+      'disabledUnselectedColor': disabledUnselectedColor!.toJson(),
     if (disabledSelectedColor != null)
       'disabledSelectedColor': disabledSelectedColor!.toJson(),
     if (backgroundColor != null) 'backgroundColor': backgroundColor!.toJson(),
@@ -548,7 +571,9 @@ class EditorRadioVisual {
         'pressScale',
         'durationMilliseconds',
         'selectedColor',
+        'unselectedColor',
         'disabledSelectedColor',
+        'disabledUnselectedColor',
         'backgroundColor',
         'selectedBackgroundColor',
         'curve',
@@ -569,9 +594,17 @@ class EditorRadioVisual {
         min: 0,
         max: 5000,
       )
+      ..unselectedColor = j['unselectedColor'] == null
+          ? null
+          : EditorColor.fromJson(j['unselectedColor'] as Map<String, dynamic>)
       ..selectedColor = j['selectedColor'] == null
           ? null
           : EditorColor.fromJson(j['selectedColor'] as Map<String, dynamic>)
+      ..disabledUnselectedColor = j['disabledUnselectedColor'] == null
+          ? null
+          : EditorColor.fromJson(
+              j['disabledUnselectedColor'] as Map<String, dynamic>,
+            )
       ..disabledSelectedColor = j['disabledSelectedColor'] == null
           ? null
           : EditorColor.fromJson(
@@ -596,6 +629,8 @@ class EditorRadioVisual {
 
   HyperRadioStyle resolve(HyperColorScheme colors) => HyperRadioStyle(
     selectedColor: selectedColor?.resolve(colors),
+    unselectedColor: unselectedColor?.resolve(colors),
+    disabledUnselectedColor: disabledUnselectedColor?.resolve(colors),
     disabledSelectedColor: disabledSelectedColor?.resolve(colors),
     backgroundColor: backgroundColor?.resolve(colors),
     selectedBackgroundColor: selectedBackgroundColor?.resolve(colors),
@@ -614,12 +649,14 @@ class EditorRadioVisual {
 
 class EditorRadioMetrics {
   double? size;
+  double? spacing;
   double? minimumTapTargetSize;
   double? indicatorSize;
   double? markSize;
   double? strokeWidth;
   double? radius;
   Map<String, Object?> toJson() => {
+    if (spacing != null) 'spacing': spacing,
     if (size != null) 'size': size,
     if (minimumTapTargetSize != null)
       'minimumTapTargetSize': minimumTapTargetSize,
@@ -632,6 +669,7 @@ class EditorRadioMetrics {
     if (j.keys.any(
       (k) => !{
         'size',
+        'spacing',
         'minimumTapTargetSize',
         'indicatorSize',
         'markSize',
@@ -642,6 +680,7 @@ class EditorRadioMetrics {
       throw const FormatException('不支持的控件尺寸字段');
     }
     return EditorRadioMetrics()
+      ..spacing = number(j['spacing'], min: 0, max: 64)
       ..size = number(j['size'], min: 0, max: 1000)
       ..minimumTapTargetSize = number(
         j['minimumTapTargetSize'],
@@ -655,6 +694,7 @@ class EditorRadioMetrics {
   }
 
   HyperRadioSize resolve(HyperRadioSize base) => base.copyWith(
+    spacing: spacing,
     size: size,
     minimumTapTargetSize: minimumTapTargetSize,
     indicatorSize: indicatorSize,
@@ -665,6 +705,9 @@ class EditorRadioMetrics {
 }
 
 class EditorCheckboxVisual {
+  double? hoverOpacity;
+  double? pressedOpacity;
+  double? glyphScale;
   double? pressScale;
   double? durationMilliseconds;
   EditorColor? activeColor;
@@ -674,26 +717,36 @@ class EditorCheckboxVisual {
   EditorColor? disabledCheckColor;
   EditorColor? overlayColor;
   String? curve;
+  EditorControlBorder selectedBorder = EditorControlBorder();
+  EditorControlBorder disabledBorder = EditorControlBorder();
   EditorControlBorder border = EditorControlBorder();
   void resetState(String state) {
     switch (state) {
       case 'selected':
+        selectedBorder = EditorControlBorder();
         activeColor = null;
         checkColor = null;
       case 'unselected':
+        border = EditorControlBorder();
         inactiveColor = null;
       case 'disabled':
+        disabledBorder = EditorControlBorder();
         disabledColor = null;
         disabledCheckColor = null;
       case 'hovered':
+        hoverOpacity = null;
         overlayColor = null;
       case 'pressed':
+        pressedOpacity = null;
         overlayColor = null;
         pressScale = null;
     }
   }
 
   Map<String, Object?> toJson() => {
+    if (hoverOpacity != null) 'hoverOpacity': hoverOpacity,
+    if (pressedOpacity != null) 'pressedOpacity': pressedOpacity,
+    if (glyphScale != null) 'glyphScale': glyphScale,
     if (pressScale != null) 'pressScale': pressScale,
     if (durationMilliseconds != null)
       'durationMilliseconds': durationMilliseconds,
@@ -705,11 +758,18 @@ class EditorCheckboxVisual {
     if (disabledCheckColor != null)
       'disabledCheckColor': disabledCheckColor!.toJson(),
     if (overlayColor != null) 'overlayColor': overlayColor!.toJson(),
+    if (selectedBorder.toJson().isNotEmpty)
+      'selectedBorder': selectedBorder.toJson(),
+    if (disabledBorder.toJson().isNotEmpty)
+      'disabledBorder': disabledBorder.toJson(),
     if (border.toJson().isNotEmpty) 'border': border.toJson(),
   };
   static EditorCheckboxVisual fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'hoverOpacity',
+        'pressedOpacity',
+        'glyphScale',
         'pressScale',
         'durationMilliseconds',
         'activeColor',
@@ -719,6 +779,8 @@ class EditorCheckboxVisual {
         'disabledCheckColor',
         'overlayColor',
         'curve',
+        'selectedBorder',
+        'disabledBorder',
         'border',
       }.contains(k),
     )) {
@@ -729,6 +791,9 @@ class EditorCheckboxVisual {
       throw const FormatException('无效 curve');
     }
     return EditorCheckboxVisual()
+      ..hoverOpacity = number(j['hoverOpacity'], min: 0, max: 1)
+      ..pressedOpacity = number(j['pressedOpacity'], min: 0, max: 1)
+      ..glyphScale = number(j['glyphScale'], min: 0, max: 2)
       ..pressScale = number(j['pressScale'], min: 0.5, max: 1.5)
       ..durationMilliseconds = number(
         j['durationMilliseconds'],
@@ -756,6 +821,12 @@ class EditorCheckboxVisual {
           ? null
           : EditorColor.fromJson(j['overlayColor'] as Map<String, dynamic>)
       ..curve = j['curve'] as String?
+      ..selectedBorder = EditorControlBorder.fromJson(
+        (j['selectedBorder'] as Map<String, dynamic>?) ?? {},
+      )
+      ..disabledBorder = EditorControlBorder.fromJson(
+        (j['disabledBorder'] as Map<String, dynamic>?) ?? {},
+      )
       ..border = EditorControlBorder.fromJson(
         (j['border'] as Map<String, dynamic>?) ?? {},
       );
@@ -768,22 +839,29 @@ class EditorCheckboxVisual {
     disabledColor: disabledColor?.resolve(colors),
     disabledCheckColor: disabledCheckColor?.resolve(colors),
     overlayColor: overlayColor?.resolve(colors),
+    hoverOpacity: hoverOpacity,
+    pressedOpacity: pressedOpacity,
+    glyphScale: glyphScale,
     pressScale: pressScale,
     duration: durationMilliseconds == null
         ? null
         : Duration(milliseconds: durationMilliseconds!.round()),
     curve: editorControlCurve(curve),
+    selectedBorder: selectedBorder.resolve(colors),
+    disabledBorder: disabledBorder.resolve(colors),
     border: border.resolve(colors),
   );
 }
 
 class EditorCheckboxMetrics {
   double? size;
+  double? markSize;
   double? markStrokeWidth;
   double? roundedRadius;
   double? minimumTapTargetSize;
   double? circleRadius;
   Map<String, Object?> toJson() => {
+    if (markSize != null) 'markSize': markSize,
     if (size != null) 'size': size,
     if (markStrokeWidth != null) 'markStrokeWidth': markStrokeWidth,
     if (roundedRadius != null) 'roundedRadius': roundedRadius,
@@ -795,6 +873,7 @@ class EditorCheckboxMetrics {
     if (j.keys.any(
       (k) => !{
         'size',
+        'markSize',
         'markStrokeWidth',
         'roundedRadius',
         'minimumTapTargetSize',
@@ -804,6 +883,7 @@ class EditorCheckboxMetrics {
       throw const FormatException('不支持的控件尺寸字段');
     }
     return EditorCheckboxMetrics()
+      ..markSize = number(j['markSize'], min: 0, max: 1000)
       ..size = number(j['size'], min: 0, max: 1000)
       ..markStrokeWidth = number(j['markStrokeWidth'], min: 0, max: 1000)
       ..roundedRadius = number(j['roundedRadius'], min: 0, max: 1000)
@@ -817,6 +897,7 @@ class EditorCheckboxMetrics {
 
   HyperCheckboxSize resolve(HyperCheckboxSize base) => base.copyWith(
     size: size,
+    markSize: markSize,
     markStrokeWidth: markStrokeWidth,
     roundedRadius: roundedRadius,
     minimumTapTargetSize: minimumTapTargetSize,
@@ -825,6 +906,8 @@ class EditorCheckboxMetrics {
 }
 
 class EditorSwitchVisual {
+  double? hoverOpacity;
+  double? pressedOpacity;
   double? interactionThumbScale;
   double? durationMilliseconds;
   EditorColor? activeTrackColor;
@@ -839,16 +922,23 @@ class EditorSwitchVisual {
   EditorColor? disabledInactiveThumbColor;
   EditorColor? overlayColor;
   String? curve;
+  EditorControlBorder activeBorder = EditorControlBorder();
+  EditorControlBorder inactiveBorder = EditorControlBorder();
+  EditorControlBorder disabledBorder = EditorControlBorder();
+  EditorControlBorder thumbBorder = EditorControlBorder();
   EditorControlBorder border = EditorControlBorder();
   void resetState(String state) {
     switch (state) {
       case 'selected':
+        activeBorder = EditorControlBorder();
         activeTrackColor = null;
         activeThumbColor = null;
       case 'unselected':
+        inactiveBorder = EditorControlBorder();
         inactiveTrackColor = null;
         inactiveThumbColor = null;
       case 'disabled':
+        disabledBorder = EditorControlBorder();
         disabledTrackColor = null;
         disabledActiveTrackColor = null;
         disabledInactiveTrackColor = null;
@@ -856,15 +946,19 @@ class EditorSwitchVisual {
         disabledActiveThumbColor = null;
         disabledInactiveThumbColor = null;
       case 'hovered':
+        hoverOpacity = null;
         overlayColor = null;
         interactionThumbScale = null;
       case 'pressed':
+        pressedOpacity = null;
         overlayColor = null;
         interactionThumbScale = null;
     }
   }
 
   Map<String, Object?> toJson() => {
+    if (hoverOpacity != null) 'hoverOpacity': hoverOpacity,
+    if (pressedOpacity != null) 'pressedOpacity': pressedOpacity,
     if (interactionThumbScale != null)
       'interactionThumbScale': interactionThumbScale,
     if (durationMilliseconds != null)
@@ -891,11 +985,19 @@ class EditorSwitchVisual {
     if (disabledInactiveThumbColor != null)
       'disabledInactiveThumbColor': disabledInactiveThumbColor!.toJson(),
     if (overlayColor != null) 'overlayColor': overlayColor!.toJson(),
+    if (activeBorder.toJson().isNotEmpty) 'activeBorder': activeBorder.toJson(),
+    if (inactiveBorder.toJson().isNotEmpty)
+      'inactiveBorder': inactiveBorder.toJson(),
+    if (disabledBorder.toJson().isNotEmpty)
+      'disabledBorder': disabledBorder.toJson(),
+    if (thumbBorder.toJson().isNotEmpty) 'thumbBorder': thumbBorder.toJson(),
     if (border.toJson().isNotEmpty) 'border': border.toJson(),
   };
   static EditorSwitchVisual fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'hoverOpacity',
+        'pressedOpacity',
         'interactionThumbScale',
         'durationMilliseconds',
         'activeTrackColor',
@@ -910,6 +1012,10 @@ class EditorSwitchVisual {
         'disabledInactiveThumbColor',
         'overlayColor',
         'curve',
+        'activeBorder',
+        'inactiveBorder',
+        'disabledBorder',
+        'thumbBorder',
         'border',
       }.contains(k),
     )) {
@@ -920,6 +1026,8 @@ class EditorSwitchVisual {
       throw const FormatException('无效 curve');
     }
     return EditorSwitchVisual()
+      ..hoverOpacity = number(j['hoverOpacity'], min: 0, max: 1)
+      ..pressedOpacity = number(j['pressedOpacity'], min: 0, max: 1)
       ..interactionThumbScale = number(
         j['interactionThumbScale'],
         min: 0.5,
@@ -980,6 +1088,18 @@ class EditorSwitchVisual {
           ? null
           : EditorColor.fromJson(j['overlayColor'] as Map<String, dynamic>)
       ..curve = j['curve'] as String?
+      ..activeBorder = EditorControlBorder.fromJson(
+        (j['activeBorder'] as Map<String, dynamic>?) ?? {},
+      )
+      ..inactiveBorder = EditorControlBorder.fromJson(
+        (j['inactiveBorder'] as Map<String, dynamic>?) ?? {},
+      )
+      ..disabledBorder = EditorControlBorder.fromJson(
+        (j['disabledBorder'] as Map<String, dynamic>?) ?? {},
+      )
+      ..thumbBorder = EditorControlBorder.fromJson(
+        (j['thumbBorder'] as Map<String, dynamic>?) ?? {},
+      )
       ..border = EditorControlBorder.fromJson(
         (j['border'] as Map<String, dynamic>?) ?? {},
       );
@@ -997,11 +1117,17 @@ class EditorSwitchVisual {
     disabledActiveThumbColor: disabledActiveThumbColor?.resolve(colors),
     disabledInactiveThumbColor: disabledInactiveThumbColor?.resolve(colors),
     overlayColor: overlayColor?.resolve(colors),
+    hoverOpacity: hoverOpacity,
+    pressedOpacity: pressedOpacity,
     interactionThumbScale: interactionThumbScale,
     duration: durationMilliseconds == null
         ? null
         : Duration(milliseconds: durationMilliseconds!.round()),
     curve: editorControlCurve(curve),
+    activeBorder: activeBorder.resolve(colors),
+    inactiveBorder: inactiveBorder.resolve(colors),
+    disabledBorder: disabledBorder.resolve(colors),
+    thumbBorder: thumbBorder.resolve(colors),
     border: border.resolve(colors),
   );
 }
@@ -1009,6 +1135,8 @@ class EditorSwitchVisual {
 class EditorSwitchMetrics {
   double? width;
   double? height;
+  double? thumbWidth;
+  double? thumbHeight;
   double? thumbSize;
   double? thumbInset;
   double? minimumTapTargetSize;
@@ -1019,6 +1147,8 @@ class EditorSwitchMetrics {
   Map<String, Object?> toJson() => {
     if (width != null) 'width': width,
     if (height != null) 'height': height,
+    if (thumbWidth != null) 'thumbWidth': thumbWidth,
+    if (thumbHeight != null) 'thumbHeight': thumbHeight,
     if (thumbSize != null) 'thumbSize': thumbSize,
     if (thumbInset != null) 'thumbInset': thumbInset,
     if (minimumTapTargetSize != null)
@@ -1034,6 +1164,8 @@ class EditorSwitchMetrics {
       (k) => !{
         'width',
         'height',
+        'thumbWidth',
+        'thumbHeight',
         'thumbSize',
         'thumbInset',
         'minimumTapTargetSize',
@@ -1048,6 +1180,8 @@ class EditorSwitchMetrics {
     return EditorSwitchMetrics()
       ..width = number(j['width'], min: 0, max: 1000)
       ..height = number(j['height'], min: 0, max: 1000)
+      ..thumbWidth = number(j['thumbWidth'], min: 0, max: 1000)
+      ..thumbHeight = number(j['thumbHeight'], min: 0, max: 1000)
       ..thumbSize = number(j['thumbSize'], min: 0, max: 1000)
       ..thumbInset = number(j['thumbInset'], min: 0, max: 1000)
       ..minimumTapTargetSize = number(
@@ -1069,6 +1203,8 @@ class EditorSwitchMetrics {
     final result = base.copyWith(
       width: width,
       height: height,
+      thumbWidth: thumbWidth,
+      thumbHeight: thumbHeight,
       thumbSize: thumbSize,
       thumbInset: thumbInset,
       minimumTapTargetSize: minimumTapTargetSize,
@@ -1079,13 +1215,15 @@ class EditorSwitchMetrics {
     );
     final travelEnd =
         result.checkedThumbOffset ??
-        result.width - result.thumbSize - result.thumbInset;
+        result.width -
+            (result.thumbWidth ?? result.thumbSize) -
+            result.thumbInset;
     final travelStart = result.uncheckedThumbOffset ?? result.thumbInset;
-    if (result.width < result.thumbSize + 2 * result.thumbInset ||
-        result.height < result.thumbSize ||
+    if (result.width <
+            (result.thumbWidth ?? result.thumbSize) + 2 * result.thumbInset ||
         travelEnd < travelStart ||
         travelStart < 0 ||
-        travelEnd > result.width - result.thumbSize) {
+        travelEnd > result.width - (result.thumbWidth ?? result.thumbSize)) {
       throw const FormatException('开关尺寸需容纳滑块和边缘距离，开启偏移不得小于关闭偏移');
     }
     return result;

@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'dart:math' as math;
@@ -225,7 +226,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
           context,
           width,
           DecoratedBox(
-            decoration: BoxDecoration(
+            decoration: HyperBoxDecoration(
               color: resolved.backgroundColor,
               border: BorderDirectional(
                 end: BorderSide(color: resolved.borderColor!),
@@ -355,7 +356,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
               ),
               width: compact ? style.itemHeight : null,
               constraints: BoxConstraints(minHeight: style.itemHeight!),
-              decoration: BoxDecoration(
+              decoration: HyperBoxDecoration(
                 color: selected
                     ? background
                     : pressed || hovering

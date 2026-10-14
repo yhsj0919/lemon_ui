@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -125,7 +127,7 @@ class HyperBadge extends StatelessWidget {
               horizontal:
                   resolved.horizontalPadding ?? metrics.horizontalPadding,
             ),
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: badgeBackground,
         borderRadius: BorderRadius.circular(
           dot

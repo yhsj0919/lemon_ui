@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -103,7 +105,7 @@ class HyperDescriptionList extends StatelessWidget {
             duration: duration(cs),
             curve: cs.curve!,
             padding: cs.cellPadding,
-            decoration: BoxDecoration(
+            decoration: HyperBoxDecoration(
               color: fill.color,
               gradient: fill.gradient,
             ),
@@ -178,7 +180,7 @@ class HyperDescriptionList extends StatelessWidget {
             width: placement.width,
             child: DecoratedBox(
               position: DecorationPosition.foreground,
-              decoration: BoxDecoration(
+              decoration: HyperBoxDecoration(
                 border: bordered && !last
                     ? BorderDirectional(
                         end: BorderSide(
@@ -226,7 +228,7 @@ class HyperDescriptionList extends StatelessWidget {
         body = AnimatedContainer(
           duration: duration(s),
           curve: s.curve!,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: s.material == null ? s.background!.color : null,
             gradient: s.material == null ? s.background!.gradient : null,
             borderRadius: s.borderRadius,
@@ -251,7 +253,7 @@ class HyperDescriptionList extends StatelessWidget {
           // 前景边框不占布局宽度，跨列与普通列使用同一套宽度。
           body = DecoratedBox(
             position: DecorationPosition.foreground,
-            decoration: BoxDecoration(
+            decoration: HyperBoxDecoration(
               border: Border.all(
                 color: s.borderColor!,
                 width: s.borderThickness!,

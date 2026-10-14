@@ -19,9 +19,11 @@ class _HyperTypographySchemePageState extends State<HyperTypographySchemePage> {
   Widget build(BuildContext context) {
     final parent = HyperTheme.of(context);
     final typography = parent.typography.copyWith(
-      body: _useLargeBody ? 18 : 16,
+      body: _useLargeBody ? 18 : parent.typography.body,
     );
-    final theme = parent.copyWith(typography: typography);
+    final theme = _useLargeBody
+        ? parent.copyWith(typography: typography)
+        : parent;
 
     return HyperTheme(
       data: theme,
@@ -48,7 +50,7 @@ class _HyperTypographySchemePageState extends State<HyperTypographySchemePage> {
                     children: [
                       Row(
                         children: [
-                          const Expanded(child: Text('全局正文改为 18')),
+                          const Expanded(child: Text('局部示例覆盖：正文 18')),
                           HyperSwitch(
                             value: _useLargeBody,
                             onChanged: (value) =>
@@ -57,21 +59,54 @@ class _HyperTypographySchemePageState extends State<HyperTypographySchemePage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      _sample('超大展示 · 48', text.displayLarge),
-                      _sample('大展示 · 40', text.displayMedium),
-                      _sample('小展示 · 36', text.displaySmall),
-                      _sample('页面标题 · 32', text.headlineLarge),
-                      _sample('区块标题 · 24', text.headlineMedium),
-                      _sample('小节标题 · 20', text.headlineSmall),
-                      _sample('强调正文 · 18', text.bodyLarge),
+                      _sample(
+                        '超大展示 · ${text.displayLarge?.fontSize?.toStringAsFixed(0)}',
+                        text.displayLarge,
+                      ),
+                      _sample(
+                        '大展示 · ${text.displayMedium?.fontSize?.toStringAsFixed(0)}',
+                        text.displayMedium,
+                      ),
+                      _sample(
+                        '小展示 · ${text.displaySmall?.fontSize?.toStringAsFixed(0)}',
+                        text.displaySmall,
+                      ),
+                      _sample(
+                        '页面标题 · ${text.headlineLarge?.fontSize?.toStringAsFixed(0)}',
+                        text.headlineLarge,
+                      ),
+                      _sample(
+                        '区块标题 · ${text.headlineMedium?.fontSize?.toStringAsFixed(0)}',
+                        text.headlineMedium,
+                      ),
+                      _sample(
+                        '小节标题 · ${text.headlineSmall?.fontSize?.toStringAsFixed(0)}',
+                        text.headlineSmall,
+                      ),
+                      _sample(
+                        '强调正文 · ${text.bodyLarge?.fontSize?.toStringAsFixed(0)}',
+                        text.bodyLarge,
+                      ),
                       _sample(
                         '正文 · ${typography.body.toStringAsFixed(0)}',
                         text.bodyMedium,
                       ),
-                      _sample('辅助正文 · 14', text.bodySmall),
-                      _sample('控件文字 · 16', text.labelLarge),
-                      _sample('标签 · 14', text.labelMedium),
-                      _sample('注释 · 12', text.labelSmall),
+                      _sample(
+                        '辅助正文 · ${text.bodySmall?.fontSize?.toStringAsFixed(0)}',
+                        text.bodySmall,
+                      ),
+                      _sample(
+                        '控件文字 · ${text.labelLarge?.fontSize?.toStringAsFixed(0)}',
+                        text.labelLarge,
+                      ),
+                      _sample(
+                        '标签 · ${text.labelMedium?.fontSize?.toStringAsFixed(0)}',
+                        text.labelMedium,
+                      ),
+                      _sample(
+                        '注释 · ${text.labelSmall?.fontSize?.toStringAsFixed(0)}',
+                        text.labelSmall,
+                      ),
                     ],
                   ),
                 ),

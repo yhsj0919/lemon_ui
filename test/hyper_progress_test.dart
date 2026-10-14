@@ -3,6 +3,34 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('线性确定进度在宽松宽度下占满可用空间，实例长度保持优先', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HyperLinearProgress(key: Key('expand'), value: .35),
+                HyperLinearProgress(
+                  key: Key('explicit'),
+                  value: .35,
+                  length: 120,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byKey(const Key('expand'))).width, 300);
+    expect(tester.getSize(find.byKey(const Key('explicit'))).width, 120);
+    expect(tester.takeException(), isNull);
+  });
+
   Widget app(
     Widget child, {
     HyperThemeData? theme,
@@ -99,9 +127,17 @@ void main() {
 
     expect(
       tester
-          .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+          .widget<Semantics>(
+            find
+                .descendant(
+                  of: find.byType(HyperLinearProgress),
+                  matching: find.byType(Semantics),
+                )
+                .first,
+          )
+          .properties
           .value,
-      1,
+      '100%',
     );
     expect(
       tester
@@ -174,10 +210,7 @@ void main() {
           ),
         ),
       );
-      expect(
-        tester.getSize(find.byType(HyperLinearProgress)).height,
-        entry.$2,
-      );
+      expect(tester.getSize(find.byType(HyperLinearProgress)).height, entry.$2);
       expect(
         tester.getSize(find.byType(HyperCircularProgress)),
         Size.square(entry.$3),
@@ -210,17 +243,31 @@ void main() {
       ),
     );
 
-    final indicator = tester.widget<LinearProgressIndicator>(
-      find.byType(LinearProgressIndicator),
-    );
+    final dynamic painter = tester
+        .widget<CustomPaint>(
+          find.descendant(
+            of: find.byType(HyperLinearProgress),
+            matching: find.byType(CustomPaint),
+          ),
+        )
+        .painter;
     expect(
       tester.getSize(find.byType(HyperLinearProgress)),
       const Size(180, 10),
     );
-    expect(indicator.color, Colors.orange);
-    expect(indicator.backgroundColor, Colors.black12);
-    expect(indicator.minHeight, 10);
-    expect(indicator.borderRadius, BorderRadius.circular(5));
+    expect(painter.color, Colors.orange);
+    expect(painter.trackColor, Colors.black12);
+    expect(
+      tester
+          .widget<ClipRRect>(
+            find.descendant(
+              of: find.byType(HyperLinearProgress),
+              matching: find.byType(ClipRRect),
+            ),
+          )
+          .borderRadius,
+      BorderRadius.circular(5),
+    );
   });
 
   testWidgets('减少动画时不确定进度降级为静态状态', (tester) async {
@@ -228,19 +275,24 @@ void main() {
       app(
         const Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            HyperLinearProgress(),
-            HyperCircularProgress(),
-          ],
+          children: [HyperLinearProgress(), HyperCircularProgress()],
         ),
       ),
     );
 
     expect(
       tester
-          .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+          .widget<Semantics>(
+            find
+                .descendant(
+                  of: find.byType(HyperLinearProgress),
+                  matching: find.byType(Semantics),
+                )
+                .first,
+          )
+          .properties
           .value,
-      .35,
+      '35%',
     );
     expect(
       tester

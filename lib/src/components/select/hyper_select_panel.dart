@@ -50,6 +50,8 @@ class HyperSelectPanel<T> extends StatelessWidget {
       final menuStyle = HyperMenuStyle(
         width: width,
         maxHeight: double.infinity,
+        itemTextStyle: HyperTheme.of(context).textTheme.labelLarge
+            ?.merge(menuVisual?.itemTextStyle),
       ).merge(style.menuStyle).copyWith(checkIcon: style.checkIcon);
       Widget body;
       if (controller.loading) {

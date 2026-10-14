@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'package:flutter/material.dart';
@@ -163,14 +164,14 @@ class HyperCollapsible extends StatelessWidget {
       duration: duration,
       curve: resolved.curve!,
       padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: resolved.material == null ? resolved.background?.color : null,
         gradient: resolved.material == null
             ? resolved.background?.gradient
             : null,
         borderRadius: resolved.borderRadius,
       ),
-      foregroundDecoration: BoxDecoration(
+      foregroundDecoration: HyperBoxDecoration(
         border: resolved.border,
         borderRadius: resolved.borderRadius,
       ),

@@ -13,6 +13,73 @@ void main() {
     ),
   );
 
+  testWidgets('对勾尺寸独立于外框并居中', (tester) async {
+    await tester.pumpWidget(
+      app(
+        HyperCheckbox(
+          value: true,
+          onChanged: (_) {},
+          style: HyperCheckboxStyle(size: 22, markSize: 12),
+        ),
+      ),
+    );
+    final visual = find.byKey(const ValueKey('hyper_checkbox_visual'));
+    final mark = find.descendant(
+      of: visual,
+      matching: find.byType(CustomPaint),
+    );
+    expect(tester.getSize(mark), const Size(12, 12));
+    final dynamic painter = tester.widget<CustomPaint>(mark).painter;
+    expect(painter.glyphScale, 2);
+    expect(tester.getCenter(mark), tester.getCenter(visual));
+  });
+
+  testWidgets('状态边框独立覆盖，半选中沿用选中边框', (tester) async {
+    final style = HyperCheckboxStyle(
+      border: const BorderSide(color: Colors.red),
+      selectedBorder: const BorderSide(color: Colors.blue),
+      disabledBorder: BorderSide.none,
+      hoverOpacity: .2,
+      pressedOpacity: .3,
+      glyphScale: 1,
+    );
+    for (final value in <bool?>[false, true, null]) {
+      await tester.pumpWidget(
+        app(
+          HyperCheckbox(
+            value: value,
+            tristate: true,
+            onChanged: (_) {},
+            style: style,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final box = tester.widget<AnimatedContainer>(
+        find.byKey(const ValueKey('hyper_checkbox_visual')),
+      );
+      final decoration = box.decoration! as BoxDecoration;
+      expect(
+        (decoration.border! as Border).top.color,
+        value == false ? Colors.red : Colors.blue,
+      );
+    }
+    await tester.pumpWidget(
+      app(HyperCheckbox(value: true, onChanged: null, style: style)),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      (tester
+                  .widget<AnimatedContainer>(
+                    find.byKey(const ValueKey('hyper_checkbox_visual')),
+                  )
+                  .decoration!
+              as BoxDecoration)
+          .border,
+      isNull,
+    );
+  });
+
   testWidgets('三态按未选中、选中、半选中顺序循环', (tester) async {
     bool? value = false;
     await tester.pumpWidget(

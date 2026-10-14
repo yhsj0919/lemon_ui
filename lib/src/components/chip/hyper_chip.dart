@@ -275,7 +275,7 @@ class HyperChip extends StatelessWidget {
                           : null),
                   boxShadow: resolved.boxShadow,
                 ),
-                foregroundDecoration: BoxDecoration(
+                foregroundDecoration: HyperBoxDecoration(
                   color: overlay,
                   borderRadius: BorderRadius.circular(resolved.radius!),
                 ),
@@ -508,7 +508,7 @@ class HyperChip extends StatelessWidget {
                           child: AnimatedContainer(
                             duration: duration,
                             curve: curve,
-                            decoration: BoxDecoration(
+                            decoration: HyperBoxDecoration(
                               borderRadius: BorderRadius.circular(
                                 resolved.radius!,
                               ),

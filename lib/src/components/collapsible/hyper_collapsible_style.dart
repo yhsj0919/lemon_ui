@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -152,7 +154,7 @@ final class HyperCollapsibleStyle {
           : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
       materialQuality: t < .5 ? a.materialQuality : b.materialQuality,
       reduceTransparency: t < .5 ? a.reduceTransparency : b.reduceTransparency,
-      border: BoxBorder.lerp(a.border, b.border, t),
+      border: lerpHyperBoxBorder(a.border, b.border, t),
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
         b.borderRadius,

@@ -13,14 +13,17 @@ class HyperProgressPage extends StatefulWidget {
 
 class _HyperProgressPageState extends State<HyperProgressPage> {
   double _value = .35;
+  double _buffer = .65;
   bool _disableAnimations = false;
 
   @override
   Widget build(BuildContext context) {
     final parent = HyperTheme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context)
-          .copyWith(disableAnimations: _disableAnimations),
+      data: MediaQuery.of(context).copyWith(
+        disableAnimations:
+            MediaQuery.of(context).disableAnimations || _disableAnimations,
+      ),
       child: Material(
         color: HyperTheme.of(context).colors.background,
         child: ListView(
@@ -41,9 +44,12 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Expanded(child: HyperText('减少动画')),
+                      const HyperText('减少动画'),
                       HyperSwitch(
                         value: _disableAnimations,
                         onChanged: (value) =>
@@ -59,13 +65,19 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const HyperText('细线进度'),
+                  const SizedBox(height: 8),
                   HyperProgress.linear(value: _value),
                   const SizedBox(height: 16),
+                  const HyperText('宽条进度'),
+                  const SizedBox(height: 8),
                   HyperProgress.linear(
                     value: _value,
                     variant: HyperProgressVariant.wide,
                   ),
                   const SizedBox(height: 16),
+                  const HyperText('圆形进度与无限等待'),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 16,
                     runSpacing: 16,
@@ -121,6 +133,31 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
               ),
             ),
             DemoSection(
+              title: '二级缓冲进度',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HyperText(
+                    '已完成 ${(_value * 100).round()}% · 已缓冲 ${(_buffer.clamp(_value, 1) * 100).round()}%',
+                  ),
+                  const SizedBox(height: 12),
+                  HyperProgress.linear(
+                    value: _value,
+                    bufferValue: _buffer,
+                    variant: HyperProgressVariant.wide,
+                  ),
+                  const SizedBox(height: 16),
+                  HyperText('调整缓冲'),
+                  HyperSlider(
+                    value: _buffer.clamp(_value, 1).toDouble(),
+                    min: _value,
+                    max: 1,
+                    onChanged: (value) => setState(() => _buffer = value),
+                  ),
+                ],
+              ),
+            ),
+            DemoSection(
               title: '宽条与 Slider 对照',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +199,10 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
                 children: [
                   const HyperLinearProgress(semanticsLabel: '正在加载'),
                   const SizedBox(height: 20),
-                  const Row(
+                  const Wrap(
+                    spacing: 20,
+                    runSpacing: 16,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       HyperCircularProgress(),
                       SizedBox(width: 20),
@@ -187,8 +227,10 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
                 children: [
                   const HyperText('仅使用默认属性，对比普通圆环与按钮内部加载态。'),
                   const SizedBox(height: 12),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 16,
+                    crossAxisAlignment: WrapCrossAlignment.end,
                     children: [
                       const Column(
                         children: [
@@ -210,6 +252,28 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
                         ],
                       ),
                     ],
+                  ),
+                ],
+              ),
+            ),
+            const DemoSection(
+              title: '渐变填充（实例 Style 覆盖）',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HyperProgress.linear(
+                    value: .65,
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF3482FF), Color(0xFF7A4DFF)],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  HyperProgress.linear(
+                    value: .65,
+                    variant: HyperProgressVariant.wide,
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF3482FF), Color(0xFF7A4DFF)],
+                    ),
                   ),
                 ],
               ),

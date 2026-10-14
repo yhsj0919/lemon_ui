@@ -91,7 +91,7 @@ class EditorGradient {
     final model = EditorGradient(
       colors: value.colors.map((c) => EditorColor(argb: c.toARGB32())).toList(),
       stops:
-          value.stops ??
+          value.stops?.toList() ??
           List.generate(
             value.colors.length,
             (i) => i / (value.colors.length - 1),
@@ -126,7 +126,7 @@ class EditorGradient {
   }
   Map<String, Object?> toJson() => {
     'colors': colors.map((c) => c.toJson()).toList(),
-    'stops': stops,
+    'stops': stops.toList(),
     'angle': angle,
     if (kind != EditorGradientKind.linear) 'kind': kind.name,
     if (centerX != 0) 'centerX': centerX,
@@ -141,6 +141,7 @@ class EditorGradient {
             'colors',
             'stops',
             'angle',
+            'mirrored',
             'kind',
             'centerX',
             'centerY',
@@ -152,6 +153,9 @@ class EditorGradient {
         (json['kind'] != null &&
             !EditorGradientKind.values.any((v) => v.name == json['kind']))) {
       throw const FormatException('不支持的渐变属性');
+    }
+    if (json['mirrored'] != null && json['mirrored'] is! bool) {
+      throw const FormatException('无效渐变展开方式');
     }
     final colors = (json['colors'] as List)
         .map((c) => EditorColor.fromJson(c as Map<String, dynamic>))
@@ -187,16 +191,43 @@ class EditorGradient {
     );
   }
 
+  void appendStop() {
+    final color = colors.last;
+    if (stops.last == 1) {
+      var first = stops.length - 1;
+      while (first > 0 && stops[first - 1] == 1) {
+        first--;
+      }
+      final start = first == 0 ? 0.0 : stops[first - 1];
+      final count = stops.length - first;
+      for (var i = 0; i < count; i++) {
+        stops[first + i] = start + (1 - start) * (i + 1) / (count + 1);
+      }
+    }
+    colors.add(color);
+    stops.add(1);
+  }
+
+  void resetStop(int index) {
+    final min = index == 0 ? 0.0 : stops[index - 1];
+    final max = index == stops.length - 1 ? 1.0 : stops[index + 1];
+    stops[index] = (index / (stops.length - 1)).clamp(min, max).toDouble();
+  }
+
   Gradient resolve(HyperColorScheme scheme) {
     final radians = angle * math.pi / 180;
     final end = Alignment(math.cos(radians), math.sin(radians));
-    final values = colors.map((c) => c.resolve(scheme)).toList();
+    final source = List<Color>.unmodifiable(
+      colors.map((c) => c.resolve(scheme)),
+    );
+    final values = source;
+    final positions = List<double>.unmodifiable(stops);
     return switch (kind) {
       EditorGradientKind.radial => RadialGradient(
         center: Alignment(centerX, centerY),
         radius: radius,
         colors: values,
-        stops: stops,
+        stops: positions,
       ),
       EditorGradientKind.sweep => SweepGradient(
         center: Alignment(centerX, centerY),
@@ -204,13 +235,13 @@ class EditorGradient {
         endAngle: endAngle * math.pi / 180,
         transform: GradientRotation(radians),
         colors: values,
-        stops: stops,
+        stops: positions,
       ),
       EditorGradientKind.linear => LinearGradient(
         begin: Alignment(-end.x, -end.y),
         end: end,
         colors: values,
-        stops: stops,
+        stops: positions,
       ),
     };
   }

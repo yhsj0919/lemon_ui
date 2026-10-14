@@ -55,6 +55,28 @@ class _HyperWidgetGroupPageState extends State<HyperWidgetGroupPage> {
           const HyperText('混合任意控件；组只负责排列和外层视觉。'),
           SizedBox(height: sizes.sectionSpacing),
           DemoSection(
+            title: '子项圆角预览（继承当前主题）',
+            child: HyperWidgetGroup(
+              key: const Key('inherited-item-radius-group'),
+              children: [
+                for (final label in ['复制', '移动', '删除'])
+                  HyperWidgetGroupItem(
+                    child: Container(
+                      width: 88,
+                      height: 44,
+                      color: theme.colors.primary,
+                      alignment: Alignment.center,
+                      child: Text(
+                        label,
+                        style: TextStyle(color: theme.colors.onPrimary),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          SizedBox(height: sizes.sectionSpacing),
+          DemoSection(
             title: '连续按钮组',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

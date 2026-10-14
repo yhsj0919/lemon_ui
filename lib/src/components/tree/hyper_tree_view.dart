@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -269,12 +271,12 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
                 curve: s.curve!,
                 constraints: BoxConstraints(minHeight: s.rowHeight!),
                 padding: s.rowPadding,
-                decoration: BoxDecoration(
+                decoration: HyperBoxDecoration(
                   color: fill.color,
                   gradient: fill.gradient,
                   borderRadius: s.rowRadius,
                 ),
-                foregroundDecoration: BoxDecoration(
+                foregroundDecoration: HyperBoxDecoration(
                   borderRadius: s.rowRadius,
                   border: states.contains(HyperControlState.focused)
                       ? Border.all(color: s.focusColor!)
@@ -417,7 +419,7 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       duration: duration,
       curve: s.curve!,
       padding: s.padding,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: s.material == null ? s.background?.color : null,
         gradient: s.material == null ? s.background?.gradient : null,
         borderRadius: s.borderRadius,
@@ -436,7 +438,10 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
     }
     return DecoratedBox(
       position: DecorationPosition.foreground,
-      decoration: BoxDecoration(border: s.border, borderRadius: s.borderRadius),
+      decoration: HyperBoxDecoration(
+        border: s.border,
+        borderRadius: s.borderRadius,
+      ),
       child: body,
     );
   }

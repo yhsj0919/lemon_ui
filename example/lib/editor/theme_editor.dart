@@ -1,3 +1,5 @@
+import 'editor_surface_fields.dart';
+import 'editor_dimension_limits.dart';
 import 'editor_basic_control_fields.dart';
 import 'editor_tag_fields.dart';
 import 'editor_chip_fields.dart';
@@ -25,6 +27,7 @@ import 'editor_component_navigation.dart';
 import 'editor_selection_controller.dart';
 
 part 'editor_basic_control_workspace.dart';
+part 'editor_surface_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
 class ThemeEditor extends StatefulWidget {
@@ -87,9 +90,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
   String? _encodedDocument;
   bool get _dirty => _saved != (_encodedDocument ??= _document.encode());
 
+  HyperThemeData _resolveDeviceTheme(bool dark) {
+    final theme = _document.resolve(dark, deviceType: _device);
+    return theme.copyWith(
+      typography: theme.typographyTheme.resolve(_device),
+      typographyTheme: theme.typographyTheme,
+    );
+  }
+
   HyperThemeData _resolveTheme(bool dark) => dark
-      ? (_resolvedDark ??= _document.resolve(true))
-      : (_resolvedLight ??= _document.resolve(false));
+      ? (_resolvedDark ??= _resolveDeviceTheme(true))
+      : (_resolvedLight ??= _resolveDeviceTheme(false));
 
   void _updateState(VoidCallback change) {
     setState(() {
@@ -123,6 +134,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
             _ => _mode.chip,
           },
           'select' => _selectSurfaceAnchor ? _mode.selectAnchor : _mode.select,
+          'container' => _mode.container,
+          'collapsible' => _mode.collapsible,
+          'group' => _mode.group,
           'card' => _mode.card,
           'field' => _mode.field,
           _ => _mode.menu,
@@ -131,6 +145,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'button': 'Button',
     'tag': 'Tag',
     'chip': 'Chip',
+    'container': 'Container',
+    'collapsible': 'Collapsible / Accordion',
+    'group': 'WidgetGroup',
+    'surface': 'MaterialSurface',
     'card': 'Card',
     'field': 'TextField',
     'select': 'Select',
@@ -146,6 +164,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'button': 'hyper-button',
     'tag': 'hyper-tag',
     'chip': 'hyper-chip',
+    'container': 'hyper-container',
+    'collapsible': 'hyper-collapsible',
+    'group': 'hyper-widget-group',
+    'surface': 'hyper-material-surface',
     'card': 'hyper-card',
     'field': 'hyper-text-field',
     'select': 'hyper-select-fields',
@@ -694,6 +716,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     ),
   );
   Widget _heading(String text) => Padding(
+    key: ValueKey('editor-heading-$text'),
     padding: const EdgeInsets.only(top: 20, bottom: 12),
     child: HyperText(text, style: const TextStyle(fontWeight: FontWeight.w600)),
   );
@@ -731,6 +754,24 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ],
     ),
   );
+  Widget _radiusNumber(
+    String label,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double> changed,
+    VoidCallback reset,
+    bool overridden,
+  ) => _number(
+    label,
+    value.clamp(min, max).toDouble(),
+    min,
+    max,
+    changed,
+    reset,
+    overridden,
+  );
+
   Widget _number(
     String label,
     double value,
@@ -740,51 +781,73 @@ class _ThemeEditorState extends State<ThemeEditor> {
     VoidCallback reset,
     bool overridden, {
     bool wholeNumbers = true,
-  }) => Padding(
-    key: ValueKey('editor-number-$label'),
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: HyperTooltip(
-                message: editorPropertyHelp(label),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: HyperText(
-                        '$label  ${value.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+  }) {
+    final lower = wholeNumbers ? min.ceilToDouble() : min;
+    final upper = wholeNumbers ? max.floorToDouble() : max;
+    final hasRange = upper > lower;
+    final sliderMin = lower <= upper ? lower : max;
+    final sliderMax = lower <= upper ? upper : max;
+    final sliderValue = (wholeNumbers ? value.roundToDouble() : value)
+        .clamp(sliderMin, sliderMax)
+        .toDouble();
+    return Padding(
+      key: ValueKey('editor-number-$label'),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: HyperTooltip(
+                  message: editorPropertyHelp(label),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: HyperText(
+                          '$label  ${value.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+                        ),
                       ),
-                    ),
-                    const Icon(Icons.info_outline, size: 14),
-                  ],
+                      const Icon(Icons.info_outline, size: 14),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            HyperIconButton.ghost(
-              tooltip: overridden ? '恢复继承' : '继承默认',
-              style: HyperIconButtonStyle(size: 24, minimumTapTargetSize: 24),
-              onPressed: overridden ? () => _change(reset) : null,
-              icon: Icon(overridden ? Icons.restart_alt : Icons.link, size: 16),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        HyperSlider(
-          value: value.clamp(min, max),
-          min: min,
-          max: max,
-          divisions: wholeNumbers ? (max - min).round() : null,
-          onChangeStart: (_) => _gestureStart = _document.encode(),
-          onChangeEnd: (_) => _endGesture(),
-          onChanged: (value) => _change(
-            () => changed(wholeNumbers ? value.roundToDouble() : value),
+              HyperIconButton.ghost(
+                tooltip: overridden ? '恢复继承' : '继承默认',
+                style: HyperIconButtonStyle(size: 24, minimumTapTargetSize: 24),
+                onPressed: overridden ? () => _change(reset) : null,
+                icon: Icon(
+                  overridden ? Icons.restart_alt : Icons.link,
+                  size: 16,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 6),
+          HyperSlider(
+            value: sliderValue,
+            min: sliderMin,
+            max: sliderMax,
+            divisions: wholeNumbers && hasRange
+                ? (upper - lower).round()
+                : null,
+            onChangeStart: (_) => _gestureStart = _document.encode(),
+            onChangeEnd: (_) => _endGesture(),
+            onChanged: !hasRange
+                ? null
+                : (value) => _change(
+                    () => changed(
+                      (wholeNumbers ? value.roundToDouble() : value)
+                          .clamp(lower, upper)
+                          .toDouble(),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _color(
     String label,
     EditorColor? color,
@@ -805,6 +868,8 @@ class _ThemeEditorState extends State<ThemeEditor> {
       '材质染色' => colors.surface.withValues(alpha: .06),
       '材质背景' => colors.surface,
       '背景' => switch (_component) {
+        'container' =>
+          theme.containerTheme.background?.color ?? Colors.transparent,
         'button' =>
           theme.buttonTheme
                   .resolve(_buttonVariant ?? HyperButtonVariant.filled)
@@ -902,10 +967,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
     ),
   );
 
-  Widget _globalPanel() {
+  Widget _globalPanel({Set<String>? sections}) {
     final theme = _resolveTheme(_dark),
         typo = theme.typographyTheme.resolve(_device);
-    return _panel('全局工作区', [
+    final children = <Widget>[
       const HyperText('编辑设备'),
       Row(
         children: [
@@ -1625,11 +1690,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _mode.palette.onSurface,
         (value) => _mode.palette.onSurface = value,
       ),
-      _number(
+      _radiusNumber(
         '表面圆角',
         theme.sizes.resolve(_device).surfaceRadius,
         0,
-        200,
+        editorSurfaceRadiusLimit,
         (v) => _spec.layout.surfaceRadius = v,
         () => _spec.layout.surfaceRadius = null,
         _spec.layout.surfaceRadius != null,
@@ -1661,11 +1726,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
         (value) => _mode.palette.onSurfaceMuted = value,
       ),
       _heading('控件轮廓'),
-      _number(
+      _radiusNumber(
         '控件圆角',
         theme.sizes.resolve(_device).controlRadius,
         0,
-        200,
+        editorSurfaceRadiusLimit,
         (v) => _spec.layout.controlRadius = v,
         () => _spec.layout.controlRadius = null,
         _spec.layout.controlRadius != null,
@@ -1677,11 +1742,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
         (value) => _mode.palette.outline = value,
       ),
       _heading('浮层表面'),
-      _number(
+      _radiusNumber(
         '浮层圆角',
         theme.sizes.resolve(_device).overlayRadius,
         0,
-        200,
+        editorSurfaceRadiusLimit,
         (v) => _spec.layout.overlayRadius = v,
         () => _spec.layout.overlayRadius = null,
         _spec.layout.overlayRadius != null,
@@ -1855,13 +1920,102 @@ class _ThemeEditorState extends State<ThemeEditor> {
       for (var i = 0; i < (_mode.materialAppearance.shadows?.length ?? 0); i++)
         _shadow(i, target: _mode.materialAppearance),
       const HyperText('材质仅作用于继承该配方的预览表面，文字保持清晰。'),
-    ]);
+    ];
+    if (sections == null) {
+      final compact = <Widget>[];
+      var materialDetails = false;
+      for (final child in children) {
+        if (child.key == const ValueKey('editor-heading-材质质量与降级')) {
+          materialDetails = true;
+          compact.add(_heading('材质'));
+        }
+        if (!materialDetails ||
+            child.key == const ValueKey('editor-select-配方')) {
+          compact.add(child);
+        }
+      }
+      compact.add(
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-material-surface';
+            _component = 'surface';
+          }),
+          child: const Text('编辑材质详细参数'),
+        ),
+      );
+      return _panel('全局工作区', compact);
+    }
+    var include = _page != 'hyper-material-surface';
+    final selected = <Widget>[
+      if (_page != 'hyper-material-surface')
+        const HyperText('修改全局配置，与顶部全局工作区共用同一数据；未覆盖组件同步继承。'),
+    ];
+    for (final child in children) {
+      final key = child.key;
+      if (key is ValueKey<String> && key.value.startsWith('editor-heading-')) {
+        final title = key.value.substring('editor-heading-'.length);
+        include = sections.any(
+          (section) => title == section || title.startsWith('$section ·'),
+        );
+      }
+      if (include) selected.add(child);
+    }
+    return _panel(
+      _page == 'hyper-material-surface' ? '材质设置' : '全局配置',
+      selected,
+    );
   }
 
   Widget _componentPanel() => Obx(_buildComponentPanel);
 
   Widget _buildComponentPanel() {
+    final sections = switch (_page) {
+      'hyper-color-scheme' => {
+        '主题与强调色',
+        '文字语义颜色',
+        '图标',
+        '禁用状态',
+        '交互状态',
+        '错误状态',
+        '成功状态',
+        '警告状态',
+        '前景对比度',
+        '页面背景',
+        '普通表面',
+        '抬升表面',
+        '弱化表面',
+        '控件轮廓',
+        '浮层表面',
+      },
+      'hyper-typography-scheme' => {'文字缩放', '字体', '语义字阶', '文字语义颜色'},
+      'hyper-motion-theme' => {'快速动效', '标准动效', '强调动效', '弹簧动效'},
+      'hyper-material-surface' => {'材质质量与降级', '背景材质', '材质阴影'},
+      _ => null,
+    };
+    if (sections != null) {
+      return _globalPanel(sections: sections.isEmpty ? null : sections);
+    }
     if (_isBasicControl) return _basicControlPanel();
+    if (const {
+      'container',
+      'card',
+      'collapsible',
+      'group',
+    }.contains(_component)) {
+      return _surfacePanel();
+    }
+    if (_component == 'surface') {
+      return _panel('材质表面', [
+        const HyperText('材质配方、质量和降级请在全局配置的材质设置中编辑；本页预览复用同一配置。'),
+      ]);
+    }
+    if (_page == 'hyper-fill') {
+      return _panel('填充样式', [
+        const HyperText(
+          'HyperFill 是纯色、渐变及无填充的共用样式对象。示例使用显式填充；背景设置在实际使用它的组件中编辑，圆角由承载组件控制。',
+        ),
+      ]);
+    }
     final supported = _components.containsKey(_component);
     if (!supported) {
       final item = gallerySections
@@ -2075,11 +2229,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
           _buttonState == 'common')
         ..._buttonSizeProperties(s),
       if (_component == 'card')
-        _number(
+        _radiusNumber(
           '圆角',
           s.card.radius,
           0,
-          60,
+          editorSurfaceRadiusLimit,
           (v) => _spec.cardRadius = v,
           () => _spec.cardRadius = null,
           _spec.cardRadius != null,
@@ -2095,11 +2249,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
           () => _spec.menuHeight = null,
           _spec.menuHeight != null,
         ),
-        _number(
+        _radiusNumber(
           '表面圆角',
           s.menu.surfaceRadius,
           0,
-          60,
+          editorSurfaceRadiusLimit,
           (v) => _spec.menuRadius = v,
           () => _spec.menuRadius = null,
           _spec.menuRadius != null,
@@ -2114,31 +2268,31 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (_component != 'select' || _selectState == 'common')) ...[
         if (_component == 'button' && _buttonVariant == null) ...[
           _heading('按钮表面'),
-          _number(
+          _radiusNumber(
             '圆角',
             s.button.radius,
             0,
-            60,
+            editorRadiusLimit(s.textField.minimumHeight),
             (v) => _spec.buttonRadius = v,
             () => _spec.buttonRadius = null,
             _spec.buttonRadius != null,
           ),
         ],
         if (_component == 'select' && !_selectSurfaceAnchor) ...[
-          _number(
+          _radiusNumber(
             '面板圆角',
             _spec.selectMetrics.surfaceRadius ?? s.menu.surfaceRadius,
             0,
-            60,
+            editorSurfaceRadiusLimit,
             (v) => _spec.selectMetrics.surfaceRadius = v,
             () => _spec.selectMetrics.surfaceRadius = null,
             _spec.selectMetrics.surfaceRadius != null,
           ),
-          _number(
+          _radiusNumber(
             '选项圆角',
             _spec.selectMetrics.itemRadius ?? s.menu.itemRadius,
             0,
-            60,
+            editorRadiusLimit(s.menu.itemHeight),
             (v) => _spec.selectMetrics.itemRadius = v,
             () => _spec.selectMetrics.itemRadius = null,
             _spec.selectMetrics.itemRadius != null,
@@ -2355,11 +2509,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
 
       _heading('标签表面'),
       if (_tagState == 'common' && _tagVariant == 'common')
-        _number(
+        _radiusNumber(
           '标签圆角',
           s.tag.radius,
           0,
-          60,
+          editorRadiusLimit(s.tag.height),
           (value) => m.radius = value,
           () => m.radius = null,
           m.radius != null,
@@ -2565,7 +2719,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         (value) => v.durationMilliseconds = value,
         () => v.durationMilliseconds = null,
         v.durationMilliseconds != null,
-        wholeNumbers: false,
       ),
       _color(
         '标签叠加色',
@@ -2632,11 +2785,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ),
       _heading('标签表面'),
       if (_chipState == 'common')
-        _number(
+        _radiusNumber(
           '标签圆角',
           s.chip.radius,
           0,
-          60,
+          editorRadiusLimit(s.chip.height),
           (value) => m.radius = value,
           () => m.radius = null,
           m.radius != null,
@@ -2696,11 +2849,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => a.foreground = value,
           inheritedColor: theme.colors.textPrimary,
         ),
-        _number(
+        _radiusNumber(
           '触发圆角',
           _spec.selectMetrics.radius ?? s.button.radius,
           0,
-          60,
+          editorRadiusLimit(
+            s.select.minimumHeight ?? s.textField.minimumHeight,
+          ),
           (value) => _spec.selectMetrics.radius = value,
           () => _spec.selectMetrics.radius = null,
           _spec.selectMetrics.radius != null,
@@ -2778,7 +2933,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.hoveredOffsetX = value,
           () => v.hoveredOffsetX = null,
           v.hoveredOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发悬停垂直位移',
@@ -2788,7 +2942,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.hoveredOffsetY = value,
           () => v.hoveredOffsetY = null,
           v.hoveredOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发悬停缩放',
@@ -2810,7 +2963,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.focusedOffsetX = value,
           () => v.focusedOffsetX = null,
           v.focusedOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发聚焦垂直位移',
@@ -2820,7 +2972,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.focusedOffsetY = value,
           () => v.focusedOffsetY = null,
           v.focusedOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发聚焦缩放',
@@ -2842,7 +2993,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.pressedOffsetX = value,
           () => v.pressedOffsetX = null,
           v.pressedOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发按下垂直位移',
@@ -2852,7 +3002,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => v.pressedOffsetY = value,
           () => v.pressedOffsetY = null,
           v.pressedOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '触发按下缩放',
@@ -3060,8 +3209,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           _heading('选项文字'),
           _number(
             '选项字号',
-            v.optionFontSize ??
-                theme.typographyTheme.resolve(_device).listTitle,
+            v.optionFontSize ?? theme.typography.control,
             8,
             64,
             (value) => v.optionFontSize = value,
@@ -3319,11 +3467,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
           () => v.cursorWidth = null,
           v.cursorWidth != null,
         ),
-        _number(
+        _radiusNumber(
           '光标圆角',
           v.cursorRadius ?? (theme.textFieldTheme.style.cursorRadius?.x ?? 1),
           0,
-          600,
+          editorRadiusLimit(
+            v.cursorWidth ?? theme.textFieldTheme.style.cursorWidth ?? 2,
+          ),
           (value) => v.cursorRadius = value,
           () => v.cursorRadius = null,
           v.cursorRadius != null,
@@ -3372,11 +3522,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
           v.durationMilliseconds != null,
         ),
         _heading('输入框表面'),
-        _number(
+        _radiusNumber(
           '圆角',
           s.textField.radius,
           0,
-          60,
+          editorRadiusLimit(s.textField.minimumHeight),
           (v) => _spec.fieldRadius = v,
           () => _spec.fieldRadius = null,
           _spec.fieldRadius != null,
@@ -3413,6 +3563,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
       theme.buttonTheme
           .resolve(_buttonVariant ?? HyperButtonVariant.filled)
           .background,
+    'container' => theme.containerTheme.background ?? const HyperFill.none(),
+    'collapsible' => theme.collapsibleTheme.style.background,
+    'group' =>
+      theme.widgetGroupTheme.style.backgroundColor == null
+          ? null
+          : HyperFill.color(theme.widgetGroupTheme.style.backgroundColor!),
     'card' => theme.cardTheme.style?.background,
     'tag' =>
       resolveEditorTag(
@@ -3631,7 +3787,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
               label == '边框' ? '虚线长度' : '$label虚线长度',
               border.dashLength ?? 6,
               1,
-              30,
+              editorPatternSegmentLimit,
               (v) => border.dashLength = v,
               () => border.dashLength = null,
               border.dashLength != null,
@@ -3641,7 +3797,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
             label == '边框' ? '虚线间隔' : '$label虚线间隔',
             border.gapLength ?? 4,
             1,
-            30,
+            editorPatternSegmentLimit,
             (v) => border.gapLength = v,
             () => border.gapLength = null,
             border.gapLength != null,
@@ -3652,9 +3808,15 @@ class _ThemeEditorState extends State<ThemeEditor> {
     ];
   }
 
-  List<Widget> _gradientProperties(EditorComponent appearance) {
+  List<Widget> _gradientProperties(
+    EditorComponent appearance, {
+    EditorGradient? Function()? readGradient,
+    ValueChanged<EditorGradient?>? writeGradient,
+    Gradient? inheritedGradient,
+    bool showType = true,
+  }) {
     final theme = _resolveTheme(_dark);
-    final inherited = _componentFill(theme)?.gradient;
+    final inherited = inheritedGradient ?? _componentFill(theme)?.gradient;
     final baseColors =
         inherited?.colors ??
         [
@@ -3662,6 +3824,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           Color.lerp(theme.colors.primary, theme.colors.error, .45)!,
         ];
     final gradient =
+        readGradient?.call() ??
         appearance.gradient ??
         appearance.buttonStyle.gradient ??
         (inherited == null ? null : EditorGradient.fromGradient(inherited)) ??
@@ -3677,28 +3840,43 @@ class _ThemeEditorState extends State<ThemeEditor> {
               ),
         );
     void edit(void Function(EditorGradient) change) {
-      final next = EditorGradient.fromJson(gradient.toJson());
+      final current =
+          readGradient?.call() ??
+          appearance.gradient ??
+          appearance.buttonStyle.gradient ??
+          gradient;
+      final next = EditorGradient.fromJson(current.toJson());
       change(next);
-      appearance.gradient = next;
-      appearance.fillKind = EditorFillKind.gradient;
-      appearance.buttonStyle.gradient = null;
+      if (writeGradient != null) {
+        writeGradient(next);
+      } else {
+        appearance.gradient = next;
+        appearance.fillKind = EditorFillKind.gradient;
+        appearance.buttonStyle.gradient = null;
+      }
     }
 
     return [
       Row(
         children: [
-          const Expanded(child: HyperText('渐变背景')),
+          Expanded(child: HyperText(writeGradient == null ? '渐变背景' : '渐变节点')),
           HyperIconButton.ghost(
             tooltip: '恢复继承',
             icon: const Icon(Icons.restart_alt),
             onPressed:
-                appearance.gradient == null &&
-                    appearance.buttonStyle.gradient == null
+                (readGradient != null
+                    ? readGradient() == null
+                    : appearance.gradient == null &&
+                          appearance.buttonStyle.gradient == null)
                 ? null
                 : () => _change(() {
-                    appearance.gradient = null;
-                    appearance.buttonStyle.gradient = null;
-                    appearance.fillKind = null;
+                    if (writeGradient != null) {
+                      writeGradient(null);
+                    } else {
+                      appearance.gradient = null;
+                      appearance.buttonStyle.gradient = null;
+                      appearance.fillKind = null;
+                    }
                   }),
           ),
           HyperIconButton.ghost(
@@ -3706,34 +3884,21 @@ class _ThemeEditorState extends State<ThemeEditor> {
             icon: const Icon(Icons.add),
             onPressed: () => _change(
               () => edit((g) {
-                final index = g.stops.length - 1;
-                g.colors.insert(
-                  index,
-                  EditorColor(
-                    argb: Color.lerp(
-                      g.colors[index - 1].resolve(theme.colors),
-                      g.colors[index].resolve(theme.colors),
-                      .5,
-                    )!.toARGB32(),
-                  ),
-                );
-                g.stops.insert(
-                  index,
-                  (g.stops[index - 1] + g.stops[index]) / 2,
-                );
+                g.appendStop();
               }),
             ),
           ),
         ],
       ),
-      _select(
-        '渐变类型',
-        gradient.kind.name,
-        const {'linear': '线性', 'radial': '径向', 'sweep': '扫描'},
-        (v) => _change(
-          () => edit((g) => g.kind = EditorGradientKind.values.byName(v)),
+      if (showType)
+        _select(
+          '渐变类型',
+          gradient.kind.name,
+          const {'linear': '线性', 'radial': '径向', 'sweep': '扫描'},
+          (v) => _change(
+            () => edit((g) => g.kind = EditorGradientKind.values.byName(v)),
+          ),
         ),
-      ),
       if (gradient.kind == EditorGradientKind.linear)
         _number(
           '渐变方向（度）',
@@ -3848,7 +4013,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
             i == 0 ? 0 : gradient.stops[i - 1],
             i == gradient.stops.length - 1 ? 1 : gradient.stops[i + 1],
             (v) => edit((g) => g.stops[i] = v),
-            () => edit((g) => g.stops[i] = i == 0 ? 0 : gradient.stops[i - 1]),
+            () => edit((g) => g.resetStop(i)),
             appearance.gradient != null ||
                 appearance.buttonStyle.gradient != null,
             wholeNumbers: false,
@@ -4268,7 +4433,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.hoveredOffsetX = v,
           () => visual.hoveredOffsetX = null,
           visual.hoveredOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '悬停垂直位移',
@@ -4278,7 +4442,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.hoveredOffsetY = v,
           () => visual.hoveredOffsetY = null,
           visual.hoveredOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '悬停缩放',
@@ -4301,7 +4464,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.focusedOffsetX = v,
           () => visual.focusedOffsetX = null,
           visual.focusedOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '聚焦垂直位移',
@@ -4311,7 +4473,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.focusedOffsetY = v,
           () => visual.focusedOffsetY = null,
           visual.focusedOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '聚焦缩放',
@@ -4334,7 +4495,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.pressedOffsetX = v,
           () => visual.pressedOffsetX = null,
           visual.pressedOffsetX != null,
-          wholeNumbers: false,
         ),
         _number(
           '按下垂直位移',
@@ -4344,7 +4504,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (v) => visual.pressedOffsetY = v,
           () => visual.pressedOffsetY = null,
           visual.pressedOffsetY != null,
-          wholeNumbers: false,
         ),
         _number(
           '按下缩放',

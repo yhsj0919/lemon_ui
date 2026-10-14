@@ -14,6 +14,38 @@ void main() {
     ),
   );
 
+  testWidgets('文字间距继承样式且实例可覆盖', (tester) async {
+    Widget radio(double? spacing) => app(
+      HyperRadio<String>(
+        value: 'b',
+        groupValue: 'a',
+        onChanged: (_) {},
+        spacing: spacing,
+        style: const HyperRadioStyle(
+          spacing: 17,
+          disabledUnselectedColor: Colors.red,
+        ),
+        child: const Text('label'),
+      ),
+    );
+    await tester.pumpWidget(radio(null));
+    expect(
+      find.byWidgetPredicate((w) => w is SizedBox && w.width == 17),
+      findsOneWidget,
+    );
+    await tester.pumpWidget(radio(3));
+    expect(
+      find.byWidgetPredicate((w) => w is SizedBox && w.width == 3),
+      findsOneWidget,
+    );
+    const size = HyperRadioSize(size: 22, spacing: 8);
+    expect(size.copyWith(spacing: 12).spacing, 12);
+    expect(
+      HyperRadioSize.lerp(size, size.copyWith(spacing: 12), .5).spacing,
+      10,
+    );
+  });
+
   testWidgets('点击后选择当前值', (tester) async {
     String? selected = 'a';
     await tester.pumpWidget(

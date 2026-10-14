@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../foundation/hyper_line.dart';
 import '../../foundation/hyper_fill.dart';
@@ -179,40 +180,100 @@ class HyperDivider extends StatelessWidget {
     if (child == null) {
       result = line(current.length);
     } else {
-      final content = Flexible(
-        child: DefaultTextStyle(
-          style: current.textStyle ?? const TextStyle(),
-          child: IconTheme(
-            data: IconThemeData(
-              size: current.iconSize,
-              color: current.iconColor,
-            ),
-            child: child!,
-          ),
+      final content = DefaultTextStyle(
+        style: current.textStyle ?? const TextStyle(),
+        child: IconTheme(
+          data: IconThemeData(size: current.iconSize, color: current.iconColor),
+          child: child!,
         ),
       );
       Widget gap() => axis == Axis.horizontal
           ? SizedBox(width: current.contentGap)
           : SizedBox(height: current.contentGap);
       final position = current.contentAlignment!;
+      Widget space(double? extent) => SizedBox(
+        width: axis == Axis.horizontal ? extent : current.line!.thickness,
+        height: axis == Axis.vertical ? extent : current.line!.thickness,
+      );
       result = SizedBox(
         width: axis == Axis.horizontal ? current.length : null,
         height: axis == Axis.vertical ? current.length : null,
-        child: Flex(
-          direction: axis,
-          children: [
-            if (position == HyperDividerContentAlignment.start)
-              line(current.edgeExtent)
-            else
-              Expanded(child: line()),
-            gap(),
-            content,
-            gap(),
-            if (position == HyperDividerContentAlignment.end)
-              line(current.edgeExtent)
-            else
-              Expanded(child: line()),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final extent = axis == Axis.horizontal
+                ? constraints.maxWidth
+                : constraints.maxHeight;
+            final maxContent =
+                (extent -
+                        2 * current.contentGap! -
+                        (position == HyperDividerContentAlignment.center
+                            ? 0
+                            : current.edgeExtent!))
+                    .clamp(0.0, double.infinity)
+                    .toDouble();
+            final constrainedContent = ConstrainedBox(
+              constraints: axis == Axis.horizontal
+                  ? BoxConstraints(maxWidth: maxContent)
+                  : BoxConstraints(maxHeight: maxContent),
+              child: content,
+            );
+            return Builder(
+              builder: (paintContext) => CustomPaint(
+                painter: _HyperDividerPainter(
+                  axis: axis,
+                  line: current.line!,
+                  contentCutout: () {
+                    final render = paintContext.findRenderObject();
+                    if (render is! RenderCustomPaint ||
+                        render.child is! RenderFlex) {
+                      return null;
+                    }
+                    final flex = render.child! as RenderFlex;
+                    final children = <RenderBox>[];
+                    RenderBox? currentChild = flex.firstChild;
+                    while (currentChild != null) {
+                      children.add(currentChild);
+                      currentChild = flex.childAfter(currentChild);
+                    }
+                    if (children.length != 5) return null;
+                    Rect bounds(RenderBox box) =>
+                        (box.parentData! as FlexParentData).offset & box.size;
+                    final gapBounds = bounds(children[1])
+                        .expandToInclude(bounds(children[3]));
+                    return axis == Axis.horizontal
+                        ? Rect.fromLTRB(
+                            gapBounds.left,
+                            0,
+                            gapBounds.right,
+                            flex.size.height,
+                          )
+                        : Rect.fromLTRB(
+                            0,
+                            gapBounds.top,
+                            flex.size.width,
+                            gapBounds.bottom,
+                          );
+                  },
+                ),
+                child: Flex(
+                  direction: axis,
+                  children: [
+                    if (position == HyperDividerContentAlignment.start)
+                      space(current.edgeExtent)
+                    else
+                      Expanded(child: space(null)),
+                    gap(),
+                    constrainedContent,
+                    gap(),
+                    if (position == HyperDividerContentAlignment.end)
+                      space(current.edgeExtent)
+                    else
+                      Expanded(child: space(null)),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       );
     }
@@ -235,7 +296,12 @@ class _DividerTween extends Tween<HyperDividerStyle> {
 }
 
 class _HyperDividerPainter extends CustomPainter {
-  const _HyperDividerPainter({required this.axis, required this.line});
+  const _HyperDividerPainter({
+    required this.axis,
+    required this.line,
+    this.contentCutout,
+  });
+  final Rect? Function()? contentCutout;
 
   final Axis axis;
   final HyperLine line;
@@ -252,9 +318,27 @@ class _HyperDividerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (!size.isFinite || size.isEmpty || line.isNone) return;
-    final rect = Offset.zero & size;
+    final fullRect = Offset.zero & size;
+    final lineSize = axis == Axis.horizontal
+        ? Size(size.width, thickness)
+        : Size(thickness, size.height);
+    final rect = Offset.zero & lineSize;
     canvas.save();
-    canvas.clipRect(rect);
+    canvas.clipRect(fullRect);
+    final cutout = contentCutout?.call();
+    if (cutout != null) {
+      canvas.clipPath(
+        Path.combine(
+          PathOperation.difference,
+          Path()..addRect(fullRect),
+          Path()..addRect(cutout),
+        ),
+      );
+    }
+    canvas.translate(
+      axis == Axis.vertical ? (size.width - thickness) / 2 : 0,
+      axis == Axis.horizontal ? (size.height - thickness) / 2 : 0,
+    );
     final paint = Paint()
       ..isAntiAlias = true
       ..color = color
@@ -301,6 +385,7 @@ class _HyperDividerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HyperDividerPainter oldDelegate) =>
+      contentCutout != oldDelegate.contentCutout ||
       axis != oldDelegate.axis ||
       color != oldDelegate.color ||
       gradient != oldDelegate.gradient ||

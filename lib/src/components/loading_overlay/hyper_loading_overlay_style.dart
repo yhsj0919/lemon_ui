@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -157,7 +159,7 @@ final class HyperLoadingOverlayStyle {
           : HyperFill.lerp(a.contentBackground!, b.contentBackground!, t),
       contentBorder: a.contentBorder == null || b.contentBorder == null
           ? (t < .5 ? a.contentBorder : b.contentBorder)
-          : BoxBorder.lerp(a.contentBorder!, b.contentBorder!, t),
+          : lerpHyperBoxBorder(a.contentBorder!, b.contentBorder!, t),
       contentBorderRadius:
           a.contentBorderRadius == null || b.contentBorderRadius == null
           ? (t < .5 ? a.contentBorderRadius : b.contentBorderRadius)

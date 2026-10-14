@@ -10,6 +10,9 @@ final class HyperProgressStyle {
   const HyperProgressStyle({
     this.variant,
     this.color,
+    this.gradient,
+    this.bufferColor,
+    this.bufferGradient,
     this.trackColor,
     this.thickness,
     this.size,
@@ -23,9 +26,12 @@ final class HyperProgressStyle {
 
   /// 已完成部分的颜色。
   final Color? color;
+  final Gradient? gradient;
   final HyperProgressVariant? variant;
 
   /// 未完成轨道的颜色。
+  final Color? bufferColor;
+  final Gradient? bufferGradient;
   final Color? trackColor;
 
   /// 线性轨道高度或圆形轨道线宽。
@@ -55,6 +61,9 @@ final class HyperProgressStyle {
   HyperProgressStyle copyWith({
     HyperProgressVariant? variant,
     Color? color,
+    Gradient? gradient,
+    Color? bufferColor,
+    Gradient? bufferGradient,
     Color? trackColor,
     double? thickness,
     double? size,
@@ -68,6 +77,9 @@ final class HyperProgressStyle {
     HyperProgressStyle(
       variant: variant,
       color: color,
+      gradient: gradient,
+      bufferColor: bufferColor,
+      bufferGradient: bufferGradient,
       trackColor: trackColor,
       thickness: thickness,
       size: size,
@@ -86,6 +98,11 @@ final class HyperProgressStyle {
     return HyperProgressStyle(
       variant: other.variant ?? variant,
       color: other.color ?? color,
+      gradient: other.gradient ?? (other.color != null ? null : gradient),
+      bufferColor: other.bufferColor ?? bufferColor,
+      bufferGradient:
+          other.bufferGradient ??
+          (other.bufferColor != null ? null : bufferGradient),
       trackColor: other.trackColor ?? trackColor,
       thickness: other.thickness ?? thickness,
       size: other.size ?? size,
@@ -106,6 +123,9 @@ final class HyperProgressStyle {
   ) => HyperProgressStyle(
     variant: t < .5 ? a.variant : b.variant,
     color: Color.lerp(a.color, b.color, t),
+    gradient: Gradient.lerp(a.gradient, b.gradient, t),
+    bufferColor: Color.lerp(a.bufferColor, b.bufferColor, t),
+    bufferGradient: Gradient.lerp(a.bufferGradient, b.bufferGradient, t),
     trackColor: Color.lerp(a.trackColor, b.trackColor, t),
     thickness: _lerpDouble(a.thickness, b.thickness, t),
     size: _lerpDouble(a.size, b.size, t),
@@ -140,7 +160,10 @@ final class HyperProgressStyle {
       identical(this, other) ||
       other is HyperProgressStyle &&
           other.color == color &&
+          other.gradient == gradient &&
           other.variant == variant &&
+          other.bufferColor == bufferColor &&
+          other.bufferGradient == bufferGradient &&
           other.trackColor == trackColor &&
           other.thickness == thickness &&
           other.size == size &&
@@ -155,6 +178,9 @@ final class HyperProgressStyle {
   int get hashCode => Object.hash(
     variant,
     color,
+    gradient,
+    bufferColor,
+    bufferGradient,
     trackColor,
     thickness,
     size,

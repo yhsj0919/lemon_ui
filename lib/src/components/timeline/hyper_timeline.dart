@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -178,12 +180,12 @@ class HyperTimeline extends StatelessWidget {
           width: s.nodeSize,
           height: s.nodeSize,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: s.material == null ? s.nodeFill?.color : null,
             gradient: s.material == null ? s.nodeFill?.gradient : null,
             borderRadius: s.nodeBorderRadius,
           ),
-          foregroundDecoration: BoxDecoration(
+          foregroundDecoration: HyperBoxDecoration(
             border: Border.fromBorderSide(s.nodeBorder!),
             borderRadius: s.nodeBorderRadius,
           ),

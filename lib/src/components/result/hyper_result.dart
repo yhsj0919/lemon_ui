@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -137,7 +139,7 @@ class HyperResult extends StatelessWidget {
       duration: duration,
       curve: s.curve!,
       padding: s.padding,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: s.background?.color,
         gradient: s.background?.gradient,
         borderRadius: s.borderRadius,
@@ -172,11 +174,11 @@ class HyperResult extends StatelessWidget {
     body = AnimatedContainer(
       duration: duration,
       curve: s.curve!,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         borderRadius: s.borderRadius,
         boxShadow: s.boxShadow,
       ),
-      foregroundDecoration: BoxDecoration(
+      foregroundDecoration: HyperBoxDecoration(
         border: s.border,
         borderRadius: s.borderRadius,
       ),

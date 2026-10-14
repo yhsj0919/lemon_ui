@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -155,7 +157,7 @@ final class HyperPageIndicatorStyle {
           reduceTransparency: t < .5
               ? a.reduceTransparency
               : b.reduceTransparency,
-          border: BoxBorder.lerp(a.border, b.border, t),
+          border: lerpHyperBoxBorder(a.border, b.border, t),
           borderRadius: BorderRadiusGeometry.lerp(
             a.borderRadius,
             b.borderRadius,

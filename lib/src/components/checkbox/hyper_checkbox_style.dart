@@ -8,12 +8,18 @@ enum HyperCheckboxVariant { circle, rounded }
 final class HyperCheckboxStyle {
   HyperCheckboxStyle({
     this.size,
+    this.markSize,
     this.minimumTapTargetSize,
     this.activeColor,
     this.inactiveColor,
     this.checkColor,
     this.disabledColor,
     this.disabledCheckColor,
+    this.hoverOpacity,
+    this.pressedOpacity,
+    this.glyphScale,
+    this.selectedBorder,
+    this.disabledBorder,
     this.overlayColor,
     this.border,
     this.borderRadius,
@@ -26,6 +32,7 @@ final class HyperCheckboxStyle {
 
   /// 复选框视觉区域边长。
   final double? size;
+  final double? markSize;
 
   /// 独立于视觉尺寸的最小命中区域边长。
   final double? minimumTapTargetSize;
@@ -46,6 +53,11 @@ final class HyperCheckboxStyle {
   final Color? disabledCheckColor;
 
   /// 悬停和按下状态层颜色。
+  final double? hoverOpacity;
+  final double? pressedOpacity;
+  final double? glyphScale;
+  final BorderSide? selectedBorder;
+  final BorderSide? disabledBorder;
   final Color? overlayColor;
 
   /// 未选中状态边框。
@@ -73,12 +85,18 @@ final class HyperCheckboxStyle {
     if (other == null) return this;
     return HyperCheckboxStyle(
       size: other.size ?? size,
+      markSize: other.markSize ?? markSize,
       minimumTapTargetSize: other.minimumTapTargetSize ?? minimumTapTargetSize,
       activeColor: other.activeColor ?? activeColor,
       inactiveColor: other.inactiveColor ?? inactiveColor,
       checkColor: other.checkColor ?? checkColor,
       disabledColor: other.disabledColor ?? disabledColor,
       disabledCheckColor: other.disabledCheckColor ?? disabledCheckColor,
+      hoverOpacity: other.hoverOpacity ?? hoverOpacity,
+      pressedOpacity: other.pressedOpacity ?? pressedOpacity,
+      glyphScale: other.glyphScale ?? glyphScale,
+      selectedBorder: other.selectedBorder ?? selectedBorder,
+      disabledBorder: other.disabledBorder ?? disabledBorder,
       overlayColor: other.overlayColor ?? overlayColor,
       border: other.border ?? border,
       borderRadius: other.borderRadius ?? borderRadius,

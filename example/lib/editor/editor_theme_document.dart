@@ -1,3 +1,4 @@
+import 'editor_surface_fields.dart';
 import 'editor_basic_control_fields.dart';
 import 'editor_tag_fields.dart';
 import 'editor_chip_fields.dart';
@@ -66,6 +67,7 @@ class EditorComponent {
   final pressedShadow = EditorComponentShadow();
   final disabledShadow = EditorComponentShadow();
   final focusedShadow = EditorComponentShadow();
+  EditorSurfaceFields surface = EditorSurfaceFields();
   EditorBadgeVisual badgeStyle = EditorBadgeVisual();
   EditorDividerVisual dividerStyle = EditorDividerVisual();
   EditorProgressVisual progressStyle = EditorProgressVisual();
@@ -78,6 +80,7 @@ class EditorComponent {
   EditorTextFieldVisual textFieldStyle = EditorTextFieldVisual();
   EditorButtonVisual buttonStyle = EditorButtonVisual();
   Map<String, Object?> toJson() => {
+    if (surface.toJson().isNotEmpty) 'surface': surface.toJson(),
     if (dividerStyle.toJson().isNotEmpty) 'dividerStyle': dividerStyle.toJson(),
     if (progressStyle.toJson().isNotEmpty)
       'progressStyle': progressStyle.toJson(),
@@ -109,6 +112,7 @@ class EditorComponent {
   };
   factory EditorComponent.fromJson(Map<String, dynamic> json) {
     _checkFields(json, {
+      'surface',
       'badgeStyle',
       'dividerStyle',
       'progressStyle',
@@ -147,6 +151,9 @@ class EditorComponent {
               (dynamic s) => EditorShadow.fromJson(s as Map<String, dynamic>),
             )
             .toList(),
+      )
+      ..surface = EditorSurfaceFields.fromJson(
+        (json['surface'] as Map<String, dynamic>?) ?? {},
       )
       ..hoveredShadow.shadows = (json['hoveredShadows'] as List<dynamic>?)
           ?.map((s) => EditorShadow.fromJson(s as Map<String, dynamic>))
@@ -289,6 +296,10 @@ class EditorShadow {
 
 /// 当前设备的显式规格覆盖，默认值始终来自 Hyper 主题。
 class EditorDevice {
+  EditorSurfaceFields containerMetrics = EditorSurfaceFields();
+  EditorSurfaceFields cardMetrics = EditorSurfaceFields();
+  EditorSurfaceFields collapsibleMetrics = EditorSurfaceFields();
+  EditorSurfaceFields groupMetrics = EditorSurfaceFields();
   EditorBadgeMetrics badgeMetrics = EditorBadgeMetrics();
   EditorDividerMetrics dividerMetrics = EditorDividerMetrics();
   EditorProgressMetrics progressMetrics = EditorProgressMetrics();
@@ -312,6 +323,12 @@ class EditorDevice {
       menuHeight,
       menuRadius;
   Map<String, Object?> toJson() => {
+    if (containerMetrics.toJson().isNotEmpty)
+      'containerMetrics': containerMetrics.toJson(),
+    if (cardMetrics.toJson().isNotEmpty) 'cardMetrics': cardMetrics.toJson(),
+    if (collapsibleMetrics.toJson().isNotEmpty)
+      'collapsibleMetrics': collapsibleMetrics.toJson(),
+    if (groupMetrics.toJson().isNotEmpty) 'groupMetrics': groupMetrics.toJson(),
     if (badgeMetrics.toJson().isNotEmpty) 'badgeMetrics': badgeMetrics.toJson(),
     if (dividerMetrics.toJson().isNotEmpty)
       'dividerMetrics': dividerMetrics.toJson(),
@@ -346,6 +363,10 @@ class EditorDevice {
     _checkFields(j, {
       'typography',
       'buttonMetrics',
+      'containerMetrics',
+      'cardMetrics',
+      'collapsibleMetrics',
+      'groupMetrics',
       'badgeMetrics',
       'dividerMetrics',
       'progressMetrics',
@@ -368,6 +389,18 @@ class EditorDevice {
       'menuRadius',
     });
     return EditorDevice()
+      ..groupMetrics = EditorSurfaceFields.fromJson(
+        (j['groupMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..collapsibleMetrics = EditorSurfaceFields.fromJson(
+        (j['collapsibleMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..cardMetrics = EditorSurfaceFields.fromJson(
+        (j['cardMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..containerMetrics = EditorSurfaceFields.fromJson(
+        (j['containerMetrics'] as Map<String, dynamic>?) ?? {},
+      )
       ..badgeMetrics = EditorBadgeMetrics.fromJson(
         (j['badgeMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -467,6 +500,9 @@ class EditorMode {
   final checkboxCircle = EditorComponent();
   final checkboxRounded = EditorComponent();
   final switchControl = EditorComponent();
+  final container = EditorComponent();
+  final collapsible = EditorComponent();
+  final group = EditorComponent();
   final card = EditorComponent();
   final field = EditorComponent();
   final menu = EditorComponent();
@@ -519,6 +555,9 @@ class EditorMode {
       'checkboxRounded': checkboxRounded.toJson(),
     if (switchControl.toJson().isNotEmpty)
       'switchControl': switchControl.toJson(),
+    if (container.toJson().isNotEmpty) 'container': container.toJson(),
+    if (collapsible.toJson().isNotEmpty) 'collapsible': collapsible.toJson(),
+    if (group.toJson().isNotEmpty) 'group': group.toJson(),
     if (card.toJson().isNotEmpty) 'card': card.toJson(),
     if (field.toJson().isNotEmpty) 'field': field.toJson(),
     if (select.toJson().isNotEmpty) 'select': select.toJson(),
@@ -565,6 +604,9 @@ class EditorMode {
       'checkboxCircle',
       'checkboxRounded',
       'switchControl',
+      'container',
+      'collapsible',
+      'group',
       'card',
       'field',
       'select',
@@ -610,6 +652,7 @@ class EditorMode {
       target.pressedShadow.shadows = value.pressedShadow.shadows;
       target.disabledShadow.shadows = value.disabledShadow.shadows;
       target.focusedShadow.shadows = value.focusedShadow.shadows;
+      target.surface = value.surface;
       target.buttonStyle = value.buttonStyle;
       target.textFieldStyle = value.textFieldStyle;
       target.selectStyle = value.selectStyle;
@@ -651,6 +694,9 @@ class EditorMode {
     read('checkboxCircle', result.checkboxCircle);
     read('checkboxRounded', result.checkboxRounded);
     read('switchControl', result.switchControl);
+    read('container', result.container);
+    read('collapsible', result.collapsible);
+    read('group', result.group);
     read('card', result.card);
     read('field', result.field);
     read('menu', result.menu);
@@ -756,7 +802,10 @@ class EditorThemeDocument {
     }
   }
 
-  HyperThemeData resolve(bool isDark) {
+  HyperThemeData resolve(
+    bool isDark, {
+    HyperDeviceType deviceType = HyperDeviceType.desktop,
+  }) {
     final m = mode(isDark);
     var theme = HyperThemeData.fromSeed(
       seedColor: Color(m.seed ?? 0xff3482ff),
@@ -819,7 +868,36 @@ class EditorThemeDocument {
             deleteIconSize: d.chipMetrics.deleteIconSize,
             deleteTargetWidth: d.chipMetrics.deleteTargetWidth,
           ),
-          card: s.card.copyWith(radius: d.cardRadius),
+          card: s.card.copyWith(
+            radius: d.cardMetrics.radius ?? d.cardRadius,
+            padding: d.cardMetrics.resolvedPadding(
+              s.card.padding.resolve(TextDirection.ltr),
+            ),
+            titlePadding: d.cardMetrics.titlePadding == null
+                ? null
+                : EdgeInsets.all(d.cardMetrics.titlePadding!),
+            outsideTitlePadding: d.cardMetrics.outsideTitlePadding == null
+                ? null
+                : EdgeInsets.all(d.cardMetrics.outsideTitlePadding!),
+            titleSpacing: d.cardMetrics.titleSpacing,
+            outsideTitleSpacing: d.cardMetrics.outsideTitleSpacing,
+            actionSpacing: d.cardMetrics.actionSpacing,
+          ),
+          collapsible: s.collapsible.copyWith(
+            radius: d.collapsibleMetrics.radius,
+            headerPadding: d.collapsibleMetrics.insets,
+            contentPadding: d.collapsibleMetrics.contentInsets,
+            headerMinHeight: d.collapsibleMetrics.headerHeight,
+            iconSize: d.collapsibleMetrics.iconSize,
+            spacing: d.collapsibleMetrics.spacing,
+          ),
+          widgetGroup: s.widgetGroup.copyWith(
+            radius: d.groupMetrics.radius,
+            innerRadius: d.groupMetrics.itemRadius,
+            spacing: d.groupMetrics.spacing,
+            separatorExtent: d.groupMetrics.separatorExtent,
+            separatorThickness: d.groupMetrics.separatorThickness,
+          ),
           textField: d.textFieldMetrics
               .resolve(s.textField)
               .copyWith(minimumHeight: d.fieldHeight, radius: d.fieldRadius),
@@ -1172,12 +1250,94 @@ class EditorThemeDocument {
               ),
         ),
       ),
+      containerTheme: theme.containerTheme.copyWith(
+        background: background(m.container),
+        border: m.container.border.resolve(colors),
+        borderRadius: device(deviceType).containerMetrics.borderRadius,
+        padding: device(deviceType).containerMetrics.insets,
+        boxShadow: m.container.shadows?.map((s) => s.resolve(colors)).toList(),
+        animationDuration: m.container.surface.animationDuration,
+        animationCurve: m.container.surface.animationCurve,
+        clipBehavior: m.container.surface.clipping,
+      ),
+      widgetGroupTheme: theme.widgetGroupTheme.copyWith(
+        style: theme.widgetGroupTheme.style.merge(
+          HyperWidgetGroupStyle(
+            backgroundColor: m.group.background?.resolve(colors),
+            border: m.group.border.resolve(colors),
+            padding: device(deviceType).groupMetrics.insets,
+            separatorColor: m.group.surface.separatorColor?.resolve(colors),
+            duration: m.group.surface.animationDuration,
+            curve: m.group.surface.animationCurve,
+            boxShadow: m.group.shadows?.map((s) => s.resolve(colors)).toList(),
+          ),
+        ),
+      ),
+      accordionTheme: theme.accordionTheme.copyWith(
+        style: theme.accordionTheme.style.merge(
+          HyperAccordionStyle(
+            showDividers: m.collapsible.surface.showDividers,
+            dividerColor: m.collapsible.surface.separatorColor?.resolve(colors),
+            dividerThickness: device(deviceType)
+                .collapsibleMetrics
+                .separatorThickness,
+          ),
+        ),
+      ),
+      collapsibleTheme: theme.collapsibleTheme.copyWith(
+        style: theme.collapsibleTheme.style.merge(
+          HyperCollapsibleStyle(
+            background: background(m.collapsible),
+            border: m.collapsible.border.resolve(colors),
+            headerStyle: TextStyle(
+              color: m.collapsible.surface.textColor?.resolve(colors),
+              fontSize: device(deviceType).collapsibleMetrics.fontSize,
+              height: m.collapsible.surface.lineHeight,
+            ),
+            iconColor: m.collapsible.surface.iconColor?.resolve(colors),
+            overlayColor: m.collapsible.surface.overlayColor?.resolve(colors),
+            hoverOpacity: m.collapsible.surface.hoverOpacity,
+            focusOpacity: m.collapsible.surface.focusOpacity,
+            pressedOpacity: m.collapsible.surface.pressedOpacity,
+            disabledOpacity: m.collapsible.surface.disabledOpacity,
+            duration: m.collapsible.surface.animationDuration,
+            curve: m.collapsible.surface.animationCurve,
+          ),
+        ),
+      ),
+      titledCardTheme: theme.titledCardTheme.copyWith(
+        style: (theme.titledCardTheme.style ?? const HyperTitledCardStyle())
+            .merge(
+              HyperTitledCardStyle(
+                titleTextStyle: TextStyle(
+                  fontSize: device(deviceType).cardMetrics.titleFontSize,
+                  color: c.surface.titleColor?.resolve(colors),
+                ),
+                actionTextStyle: TextStyle(
+                  fontSize: device(deviceType).cardMetrics.actionFontSize,
+                  color: c.surface.actionColor?.resolve(colors),
+                ),
+              ),
+            ),
+      ),
       cardTheme: theme.cardTheme.copyWith(
         style: (theme.cardTheme.style ?? HyperCardStyle()).merge(
           HyperCardStyle(
             background: background(c),
             border: c.border.resolve(colors),
             foregroundColor: c.foreground?.resolve(colors),
+            padding: device(deviceType).cardMetrics.resolvedPadding(
+              theme.sizes
+                  .resolve(deviceType)
+                  .card
+                  .padding
+                  .resolve(TextDirection.ltr),
+            ),
+            overlayColor: c.surface.overlayColor?.resolve(colors),
+            pressedScale: c.surface.pressedScale,
+            animationDuration: c.surface.animationDuration,
+            animationCurve: c.surface.animationCurve,
+            clipBehavior: c.surface.clipping,
             boxShadow: c.shadows?.map((s) => s.resolve(colors)).toList(),
           ),
         ),

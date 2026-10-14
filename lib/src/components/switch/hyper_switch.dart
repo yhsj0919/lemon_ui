@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_control_state.dart';
@@ -52,6 +54,8 @@ class _HyperSwitchState extends State<HyperSwitch> {
       width: metrics.width,
       height: metrics.height,
       thumbSize: metrics.thumbSize,
+      thumbWidth: metrics.thumbWidth,
+      thumbHeight: metrics.thumbHeight,
       minimumTapTargetSize:
           metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
       activeTrackColor: colors.primary,
@@ -68,20 +72,50 @@ class _HyperSwitchState extends State<HyperSwitch> {
       border: BorderSide.none,
       borderRadius: BorderRadius.circular(metrics.radius ?? metrics.height / 2),
       thumbRadius: BorderRadius.circular(
-        metrics.thumbRadius ?? metrics.thumbSize / 2,
+        metrics.thumbRadius ??
+            (metrics.thumbWidth ?? metrics.thumbSize).clamp(
+                  0,
+                  metrics.thumbHeight ?? metrics.thumbSize,
+                ) /
+                2,
       ),
       uncheckedThumbOffset: metrics.uncheckedThumbOffset ?? metrics.thumbInset,
       checkedThumbOffset:
           metrics.checkedThumbOffset ??
-          metrics.width - metrics.thumbSize - metrics.thumbInset,
+          metrics.width -
+              (metrics.thumbWidth ?? metrics.thumbSize) -
+              metrics.thumbInset,
+      hoverOpacity: .07,
+      pressedOpacity: .12,
       interactionThumbScale: 1.127,
       thumbShadow: const [],
       duration: theme.motion.fastDuration,
       curve: theme.motion.fastCurve,
     );
-    final style = defaults
-        .merge(HyperSwitchTheme.of(context).style)
+    final overrides = (HyperSwitchTheme.of(context).style ?? HyperSwitchStyle())
         .merge(widget.style);
+    final geometry = defaults.merge(overrides);
+    final style = geometry.merge(
+      HyperSwitchStyle(
+        checkedThumbOffset:
+            overrides.checkedThumbOffset ??
+            metrics.checkedThumbOffset ??
+            geometry.width! -
+                (geometry.thumbWidth ?? geometry.thumbSize!) -
+                metrics.thumbInset,
+        thumbRadius:
+            overrides.thumbRadius ??
+            (metrics.thumbRadius == null
+                ? BorderRadius.circular(
+                    (geometry.thumbWidth ?? geometry.thumbSize!).clamp(
+                          0,
+                          geometry.thumbHeight ?? geometry.thumbSize!,
+                        ) /
+                        2,
+                  )
+                : null),
+      ),
+    );
     final enabled = widget.onChanged != null;
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
@@ -124,9 +158,9 @@ class _HyperSwitchState extends State<HyperSwitch> {
             states.contains(HyperControlState.pressed) ||
             states.contains(HyperControlState.dragged);
         final alpha = pressed
-            ? .12
+            ? style.pressedOpacity!
             : hovered
-            ? .07
+            ? style.hoverOpacity!
             : 0.0;
         final baseTrack = switch ((enabled, widget.value)) {
           (true, true) => style.activeTrackColor!,
@@ -148,21 +182,27 @@ class _HyperSwitchState extends State<HyperSwitch> {
           (false, false) =>
             style.disabledInactiveThumbColor ?? style.disabledThumbColor!,
         };
+        final trackBorder = !enabled
+            ? style.disabledBorder ?? style.border!
+            : widget.value
+            ? style.activeBorder ?? style.border!
+            : style.inactiveBorder ?? style.border!;
         final duration = reduceMotion ? Duration.zero : style.duration!;
         final visual = AnimatedContainer(
           duration: duration,
           curve: style.curve!,
           width: style.width,
           height: style.height,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
+          clipBehavior: Clip.none,
+          decoration: HyperBoxDecoration(
             color: track,
-            border: style.border == BorderSide.none
+            border: trackBorder == BorderSide.none
                 ? null
-                : Border.fromBorderSide(style.border!),
+                : Border.fromBorderSide(trackBorder),
             borderRadius: style.borderRadius,
           ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               AnimatedPositionedDirectional(
                 duration: _dragging ? Duration.zero : duration,
@@ -172,7 +212,9 @@ class _HyperSwitchState extends State<HyperSwitch> {
                         ? style.checkedThumbOffset!
                         : style.uncheckedThumbOffset!) +
                     _dragOffset,
-                top: (style.height! - style.thumbSize!) / 2,
+                top:
+                    (style.height! - (style.thumbHeight ?? style.thumbSize!)) /
+                    2,
                 child: AnimatedScale(
                   duration: duration,
                   curve: style.curve!,
@@ -180,11 +222,16 @@ class _HyperSwitchState extends State<HyperSwitch> {
                       ? style.interactionThumbScale!
                       : 1,
                   child: Container(
-                    width: style.thumbSize,
-                    height: style.thumbSize,
-                    decoration: BoxDecoration(
+                    width: style.thumbWidth ?? style.thumbSize,
+                    height: style.thumbHeight ?? style.thumbSize,
+                    decoration: HyperBoxDecoration(
                       color: thumb,
                       borderRadius: style.thumbRadius,
+                      border:
+                          style.thumbBorder == null ||
+                              style.thumbBorder == BorderSide.none
+                          ? null
+                          : Border.fromBorderSide(style.thumbBorder!),
                       boxShadow: style.thumbShadow,
                     ),
                   ),

@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -89,12 +91,12 @@ class HyperAvatar extends StatelessWidget {
           width: extent,
           height: extent,
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: resolved.backgroundColor ?? theme.colors.surfaceMuted,
             boxShadow: resolved.boxShadow,
             borderRadius: BorderRadius.circular(radius),
           ),
-          foregroundDecoration: BoxDecoration(
+          foregroundDecoration: HyperBoxDecoration(
             borderRadius: BorderRadius.circular(radius),
             border: (resolved.borderWidth ?? 0) > 0
                 ? Border.all(

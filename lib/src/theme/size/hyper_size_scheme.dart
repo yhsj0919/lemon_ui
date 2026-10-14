@@ -532,6 +532,7 @@ final class HyperSizeScheme {
         ),
         checkbox: const HyperCheckboxSize(
           size: 26,
+          markSize: 16,
           markStrokeWidth: 2.34,
           roundedRadius: 6,
         ),
@@ -956,6 +957,7 @@ final class HyperSizeScheme {
         ),
         checkbox: const HyperCheckboxSize(
           size: 26,
+          markSize: 16,
           markStrokeWidth: 2.34,
           roundedRadius: 6,
         ),
@@ -1380,6 +1382,7 @@ final class HyperSizeScheme {
         ),
         checkbox: const HyperCheckboxSize(
           size: 22,
+          markSize: 14,
           markStrokeWidth: 2,
           roundedRadius: 4,
         ),
@@ -1804,6 +1807,7 @@ final class HyperSizeScheme {
         ),
         checkbox: const HyperCheckboxSize(
           size: 26,
+          markSize: 16,
           markStrokeWidth: 2.34,
           roundedRadius: 6,
         ),

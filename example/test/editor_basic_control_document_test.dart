@@ -7,6 +7,77 @@ import 'package:lemon_ui_example/editor/editor_button_fields.dart';
 import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 
 void main() {
+  test('开关交互透明度与独立边框保存和重置', () {
+    final visual = EditorSwitchVisual()
+      ..hoverOpacity = .2
+      ..pressedOpacity = .3
+      ..activeBorder.width = 2
+      ..inactiveBorder.visible = false
+      ..disabledBorder.width = 1
+      ..thumbBorder.width = 1;
+    final restored = EditorSwitchVisual.fromJson(visual.toJson());
+    expect(restored.toJson(), visual.toJson());
+    restored.resetState('selected');
+    expect(restored.activeBorder.toJson(), isEmpty);
+    expect(restored.thumbBorder.width, 1);
+    restored.resetState('hovered');
+    expect(restored.hoverOpacity, isNull);
+    expect(restored.pressedOpacity, .3);
+  });
+  test('复选新增交互和状态边框往返并按状态重置', () {
+    final visual = EditorCheckboxVisual()
+      ..hoverOpacity = .2
+      ..pressedOpacity = .3
+      ..glyphScale = 1
+      ..selectedBorder.visible = false
+      ..disabledBorder.width = 2;
+    final restored = EditorCheckboxVisual.fromJson(visual.toJson());
+    expect(restored.toJson(), visual.toJson());
+    restored.resetState('hovered');
+    expect(restored.hoverOpacity, isNull);
+    expect(restored.pressedOpacity, .3);
+    restored.resetState('selected');
+    expect(restored.selectedBorder.toJson(), isEmpty);
+    expect(restored.disabledBorder.width, 2);
+  });
+  test('单选新增间距及禁用未选中颜色可往返和重置', () {
+    final visual = EditorRadioVisual()
+      ..disabledUnselectedColor = const EditorColor(semantic: 'primary');
+    final restored = EditorRadioVisual.fromJson(visual.toJson());
+    expect(restored.disabledUnselectedColor, isNotNull);
+    restored.resetState('disabled');
+    expect(restored.disabledUnselectedColor, isNull);
+    final metrics = EditorRadioMetrics()..spacing = 13;
+    expect(EditorRadioMetrics.fromJson(metrics.toJson()).spacing, 13);
+  });
+  test('进度渐变按对象和亮暗保存，主题回读保留节点', () {
+    final doc = EditorThemeDocument();
+    doc.light.progressLinear.progressStyle.gradient = EditorGradient(
+      colors: [
+        const EditorColor(semantic: 'primary'),
+        const EditorColor(semantic: 'outline'),
+      ],
+      stops: [0, 1],
+    );
+    doc.light.progressLinear.progressStyle.bufferColor = const EditorColor(
+      semantic: 'primary',
+    );
+    doc.light.progressLinear.progressStyle.bufferGradient =
+        doc.light.progressLinear.progressStyle.gradient;
+    final loaded = EditorThemeDocument.decode(doc.encode());
+    expect(loaded.encode(), doc.encode());
+    expect(
+      loaded.resolve(false).progressTheme.linearStyle.bufferGradient,
+      isA<LinearGradient>(),
+    );
+    expect(
+      loaded.resolve(false).progressTheme.linearStyle.gradient,
+      isA<LinearGradient>(),
+    );
+    expect(loaded.resolve(true).progressTheme.linearStyle.gradient, isNull);
+    expect(loaded.resolve(false).progressTheme.circularStyle.gradient, isNull);
+  });
+
   test('Badge 全部外观字段可往返，未知字段拒绝', () {
     final json = <String, dynamic>{
       'borderWidth': 2,
@@ -434,7 +505,9 @@ void main() {
       stops: [0, 1],
       kind: EditorGradientKind.sweep,
     );
+    d.light.divider.dividerStyle.lineHeight = 4;
     final loaded = EditorThemeDocument.decode(d.encode()).resolve(false);
+    expect(loaded.dividerTheme.style.textStyle?.height, isNull);
     expect(loaded.dividerTheme.style.gradient, isA<SweepGradient>());
     final merged =
         const HyperDividerStyle(
@@ -448,7 +521,7 @@ void main() {
     expect(merged.textStyle!.color, Colors.blue);
     expect(merged.textStyle!.fontWeight, FontWeight.w600);
   });
-  test('六个入口只在未确认分类出现，页面 id 唯一', () {
+  test('徽标、分割线、进度、单选、复选与开关已确认，其余入口保持未确认，页面 id 唯一', () {
     const ids = {
       'hyper-badge',
       'hyper-divider',
@@ -459,7 +532,47 @@ void main() {
     };
     final pending = gallerySections.singleWhere((s) => s.title == '未确认');
     for (final id in ids) {
-      expect(pending.items.where((i) => i.id == id), hasLength(1));
+      expect(
+        pending.items.where((i) => i.id == id),
+        hasLength(
+          {
+                'hyper-badge',
+                'hyper-divider',
+                'hyper-progress-indicator',
+                'hyper-radio',
+                'hyper-checkbox',
+                'hyper-switch',
+              }.contains(id)
+              ? 0
+              : 1,
+        ),
+      );
+      if ({
+        'hyper-badge',
+        'hyper-divider',
+        'hyper-progress-indicator',
+        'hyper-radio',
+        'hyper-checkbox',
+        'hyper-switch',
+      }.contains(id)) {
+        expect(
+          gallerySections
+              .singleWhere(
+                (s) =>
+                    s.title ==
+                    ((id == 'hyper-radio' ||
+                            id == 'hyper-checkbox' ||
+                            id == 'hyper-switch')
+                        ? '选择控件'
+                        : id == 'hyper-progress-indicator'
+                        ? '反馈与状态'
+                        : '文字与内容'),
+              )
+              .items
+              .where((i) => i.id == id),
+          hasLength(1),
+        );
+      }
       expect(galleryItems.where((i) => i.id == id), hasLength(1));
     }
   });

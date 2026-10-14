@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -5,7 +7,7 @@ import '../../theme/core/hyper_theme.dart';
 
 /// 轻量的主题化容器。
 ///
-/// 视觉属性按“实例 → 容器主题 → 全局基础主题 → 内置默认值”解析。
+/// 视觉属性按“实例 → 容器主题 → 中性默认值”解析。
 /// 所有尺寸均直接使用 Flutter 逻辑尺寸，不执行倍率换算。
 class HyperContainer extends StatelessWidget {
   const HyperContainer({
@@ -65,7 +67,7 @@ class HyperContainer extends StatelessWidget {
   /// 样式变化动画曲线。
   final Curve? animationCurve;
 
-  /// 内容裁切方式；默认按容器圆角抗锯齿裁切。
+  /// 内容裁切方式；默认不裁切。
   ///
   /// 容器阴影属于装饰层，不受子内容裁切影响。需要允许子内容越界时可明确
   /// 传入 [Clip.none]。
@@ -74,18 +76,13 @@ class HyperContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final sizes = HyperTheme.sizesOf(context);
     final componentTheme = theme.containerTheme;
     final resolvedBackground =
-        background ??
-        componentTheme.background ??
-        HyperFill.color(theme.colors.surface);
+        background ?? componentTheme.background ?? const HyperFill.none();
     final resolvedBorderRadius =
-        borderRadius ??
-        componentTheme.borderRadius ??
-        BorderRadius.circular(sizes.controlRadius);
+        borderRadius ?? componentTheme.borderRadius ?? BorderRadius.zero;
     final resolvedPadding =
-        padding ?? componentTheme.padding ?? sizes.controlPadding;
+        padding ?? componentTheme.padding ?? EdgeInsets.zero;
     final resolvedDuration =
         animationDuration ??
         componentTheme.animationDuration ??
@@ -93,7 +90,7 @@ class HyperContainer extends StatelessWidget {
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     final effectiveDuration = reduceMotion ? Duration.zero : resolvedDuration;
-    final decoration = BoxDecoration(
+    final decoration = HyperBoxDecoration(
       color: resolvedBackground.color,
       gradient: resolvedBackground.gradient,
       border: border ?? componentTheme.border,
@@ -108,7 +105,7 @@ class HyperContainer extends StatelessWidget {
         componentTheme.animationCurve ??
         theme.motion.standardCurve;
     final resolvedClip =
-        clipBehavior ?? componentTheme.clipBehavior ?? Clip.antiAlias;
+        clipBehavior ?? componentTheme.clipBehavior ?? Clip.none;
 
     if (effectiveDuration == Duration.zero) {
       return Container(

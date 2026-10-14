@@ -21,14 +21,14 @@ class _HyperColorSchemePageState extends State<HyperColorSchemePage> {
 
   String _seedName = _seeds.keys.first;
   Brightness _brightness = Brightness.light;
+  bool _customScheme = false;
 
   @override
   Widget build(BuildContext context) {
     final seed = _seeds[_seedName]!;
-    final scheme = HyperColorScheme.fromSeed(
-      seedColor: seed,
-      brightness: _brightness,
-    );
+    final scheme = _customScheme
+        ? HyperColorScheme.fromSeed(seedColor: seed, brightness: _brightness)
+        : HyperTheme.of(context).colors;
 
     return ColoredBox(
       color: scheme.background,
@@ -47,53 +47,60 @@ class _HyperColorSchemePageState extends State<HyperColorSchemePage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '切换种子色和亮暗模式，观察完整颜色方案。',
+            '默认展示当前全局语义颜色；种子色实验使用独立配方。',
             style: TextStyle(color: scheme.onBackground),
           ),
           const SizedBox(height: 20),
           DemoSection(
-            title: '基础用法',
+            title: _customScheme ? '种子色实验（独立配方）' : '当前全局颜色',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    HyperSegmentedButton<Brightness>(
-                      segments: const [
-                        HyperSegment(
-                          value: Brightness.light,
-                          label: '亮色',
-                          icon: Icon(Icons.light_mode_outlined),
-                        ),
-                        HyperSegment(
-                          value: Brightness.dark,
-                          label: '暗色',
-                          icon: Icon(Icons.dark_mode_outlined),
-                        ),
-                      ],
-                      selected: {_brightness},
-                      onSelectionChanged: (value) {
-                        setState(() => _brightness = value.single);
-                      },
-                    ),
-                    for (final entry in _seeds.entries)
-                      HyperChip.choice(
-                        label: entry.key,
-                        selected: entry.key == _seedName,
-                        avatar: CircleAvatar(backgroundColor: entry.value),
-                        style: const HyperChipStyle(
-                          checkmarkPlacement:
-                              HyperChipCheckmarkPlacement.avatarOverlay,
-                          checkmarkColor: Colors.white,
-                        ),
-                        onSelected: (_) =>
-                            setState(() => _seedName = entry.key),
-                      ),
-                  ],
+                HyperButton.tonal(
+                  onPressed: () =>
+                      setState(() => _customScheme = !_customScheme),
+                  child: Text(_customScheme ? '返回全局颜色' : '试验种子色'),
                 ),
+                const SizedBox(height: 12),
+                if (_customScheme)
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      HyperSegmentedButton<Brightness>(
+                        segments: const [
+                          HyperSegment(
+                            value: Brightness.light,
+                            label: '亮色',
+                            icon: Icon(Icons.light_mode_outlined),
+                          ),
+                          HyperSegment(
+                            value: Brightness.dark,
+                            label: '暗色',
+                            icon: Icon(Icons.dark_mode_outlined),
+                          ),
+                        ],
+                        selected: {_brightness},
+                        onSelectionChanged: (value) {
+                          setState(() => _brightness = value.single);
+                        },
+                      ),
+                      for (final entry in _seeds.entries)
+                        HyperChip.choice(
+                          label: entry.key,
+                          selected: entry.key == _seedName,
+                          avatar: CircleAvatar(backgroundColor: entry.value),
+                          style: const HyperChipStyle(
+                            checkmarkPlacement:
+                                HyperChipCheckmarkPlacement.avatarOverlay,
+                            checkmarkColor: Colors.white,
+                          ),
+                          onSelected: (_) =>
+                              setState(() => _seedName = entry.key),
+                        ),
+                    ],
+                  ),
                 const SizedBox(height: 24),
                 _RealPagePreview(scheme: scheme),
                 const SizedBox(height: 24),

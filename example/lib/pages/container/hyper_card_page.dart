@@ -28,21 +28,13 @@ class _HyperCardPageState extends State<HyperCardPage> {
           const SizedBox(height: 24),
           const HyperText('基础卡片', variant: HyperTextVariant.sectionTitle),
           const SizedBox(height: 12),
-          const HyperCard(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: HyperText('内容自行决定内部布局'),
-            ),
-          ),
+          const HyperCard(child: HyperText('继承当前卡片主题内边距')),
           const SizedBox(height: 16),
           const HyperText('整卡交互', variant: HyperTextVariant.sectionTitle),
           const SizedBox(height: 12),
           HyperCard(
             onTap: () => setState(() => _taps++),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: HyperText('点击次数：$_taps'),
-            ),
+            child: HyperText('点击次数：$_taps'),
           ),
           const SizedBox(height: 16),
           const HyperText('局部覆盖', variant: HyperTextVariant.sectionTitle),
@@ -89,10 +81,7 @@ class _HyperCardPageState extends State<HyperCardPage> {
           const HyperTitledCard(
             title: Text('标题在外'),
             action: Text('查看全部'),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('内容可放列表或其他控件'),
-            ),
+            child: Text('内容可放列表或其他控件'),
           ),
           const SizedBox(height: 16),
           const HyperTitledCard(

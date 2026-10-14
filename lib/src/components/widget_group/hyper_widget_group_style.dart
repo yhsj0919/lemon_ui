@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -70,7 +72,7 @@ final class HyperWidgetGroupStyle {
       spacing: number(a.spacing, b.spacing),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      border: BoxBorder.lerp(a.border, b.border, t),
+      border: lerpHyperBoxBorder(a.border, b.border, t),
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
         b.borderRadius,

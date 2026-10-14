@@ -1,3 +1,4 @@
+import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import '../overlay/hyper_navigator_scope.dart';
@@ -108,7 +109,7 @@ class HyperDialog extends StatelessWidget {
           : (resolved.duration ?? theme.motion.fastDuration),
       curve: resolved.curve ?? theme.motion.fastCurve,
       padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: resolved.material == null ? resolved.background?.color : null,
         gradient: resolved.material == null
             ? resolved.background?.gradient

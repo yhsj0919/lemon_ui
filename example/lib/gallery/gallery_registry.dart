@@ -73,6 +73,14 @@ final List<GallerySection> gallerySections = [
     title: '基础能力',
     items: [
       GalleryItem(
+        id: 'hyper-line',
+        title: 'HyperLine',
+        description: '分割线与边框共用的实线、虚线、点线样式。',
+        icon: Icons.line_style,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperLinePage(),
+      ),
+      GalleryItem(
         id: 'hyper-fill',
         title: 'HyperFill',
         description: '纯色、渐变和显式无填充。',
@@ -222,6 +230,22 @@ final List<GallerySection> gallerySections = [
     title: '文字与内容',
     items: [
       GalleryItem(
+        id: 'hyper-divider',
+        title: 'HyperDivider',
+        description: '横向、纵向、渐变、虚线和点线。',
+        icon: Icons.horizontal_rule,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperDividerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-badge',
+        title: 'HyperBadge',
+        description: '点、数量、短文本徽标和独立锚点定位。',
+        icon: Icons.notification_important_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperBadgePage(),
+      ),
+      GalleryItem(
         id: 'hyper-tree-view',
         title: 'HyperTreeView',
         description: '静态树、动态子节点、加载重试与缓存。',
@@ -332,6 +356,29 @@ final List<GallerySection> gallerySections = [
     title: '选择控件',
     items: [
       GalleryItem(
+        id: 'hyper-switch',
+        title: 'HyperSwitch',
+        description: '点击、拖动、设备尺寸与独立主题。',
+        icon: Icons.toggle_on_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperSwitchPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-checkbox',
+        title: 'HyperCheckbox',
+        description: '未选中、选中、半选中与独立主题。',
+        icon: Icons.check_box_outlined,
+        builder: (_) => const HyperCheckboxPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-radio',
+        title: 'HyperRadio',
+        description: 'MIUIX 勾线单选、分组值和取消选择。',
+        icon: Icons.radio_button_checked,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperRadioPage(),
+      ),
+      GalleryItem(
         id: 'hyper-dropdown',
         title: 'HyperDropdown',
         description: '自定义内容下拉面板，支持分组与多级筛选。',
@@ -382,6 +429,14 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '反馈与状态',
     items: [
+      GalleryItem(
+        id: 'hyper-progress-indicator',
+        title: 'HyperProgress',
+        description: '线性、圆形、确定进度与不确定进度。',
+        icon: Icons.data_usage,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperProgressPage(),
+      ),
       GalleryItem(
         id: 'hyper-notification-center',
         title: 'HyperNotificationCenter',
@@ -573,67 +628,7 @@ final List<GallerySection> gallerySections = [
       ),
     ],
   ),
-  GallerySection(
-    title: '未确认',
-    items: [
-      GalleryItem(
-        id: 'hyper-badge',
-        title: 'HyperBadge',
-        description: '点、数量、短文本徽标和独立锚点定位。',
-        icon: Icons.notification_important_outlined,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperBadgePage(),
-      ),
-      GalleryItem(
-        id: 'hyper-divider',
-        title: 'HyperDivider',
-        description: '横向、纵向、渐变、虚线和点线。',
-        icon: Icons.horizontal_rule,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperDividerPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-progress-indicator',
-        title: 'HyperProgress',
-        description: '线性、圆形、确定进度与不确定进度。',
-        icon: Icons.data_usage,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperProgressPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-radio',
-        title: 'HyperRadio',
-        description: 'MIUIX 勾线单选、分组值和取消选择。',
-        icon: Icons.radio_button_checked,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperRadioPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-checkbox',
-        title: 'HyperCheckbox',
-        description: '未选中、选中、半选中与独立主题。',
-        icon: Icons.check_box_outlined,
-        builder: (_) => const HyperCheckboxPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-switch',
-        title: 'HyperSwitch',
-        description: '点击、拖动、设备尺寸与独立主题。',
-        icon: Icons.toggle_on_outlined,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperSwitchPage(),
-      ),
-
-      GalleryItem(
-        id: 'hyper-line',
-        title: 'HyperLine',
-        description: '分割线与边框共用的实线、虚线、点线样式。',
-        icon: Icons.line_style,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperLinePage(),
-      ),
-    ],
-  ),
+  GallerySection(title: '未确认', items: []),
 ];
 
 /// 按注册顺序展开全部演示页。

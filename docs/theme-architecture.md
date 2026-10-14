@@ -678,3 +678,5 @@ Tag 与 Chip 的标签配色由 foundation/hyper_label_palette.dart 统一解析
 Badge / Divider / Progress / Radio / Checkbox / Switch 的编辑覆盖见 [主题编辑器](theme-editor.md)。颜色与动效按亮暗外观存储，尺寸仍通过四端 HyperSizeScheme 的强类型 copyWith 统一管理，编辑器没有在组件中保存设备规格。Radio 增加可选命中、标记及圆角几何；Checkbox 增加可选命中与圆形圆角；Switch 增加可选命中、圆角和滑块偏移；Progress 增加可选线性长度、轨道/填充圆角和无限线宽；Divider 增加可选长度、两端缩进与圆角。字段为空时保留原默认推导，无跨端倍率或新机型规格。copyWith、插值、值相等和哈希纳入四端纯主题回归检查。
 
 Divider 的稀疏 TextStyle 覆盖现在按字段合并，字重/行高覆盖不会丢失默认字体和颜色。组件默认文字缩放策略不变；新增设置尚未完成渲染或设备审核。
+
+带内容分割线只绘制一个完整线条表面，内容与两侧 contentGap 的区域在绘制时透明裁切；不使用背景色遮挡，不把渐变和虚线相位按两段重新起算。所有内容位置沿完整线条的渐变坐标采样，不自动镜像；对称配色由使用方添加颜色节点实现。布局仍使用内容实际尺寸并遵守文字缩放。

@@ -74,7 +74,8 @@ class HyperCheckbox extends StatelessWidget {
     final colors = theme.colors;
     final defaults = HyperCheckboxStyle(
       size: metrics.size,
-      minimumTapTargetSize: sizes.minimumInteractiveDimension,
+      minimumTapTargetSize:
+          metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
       activeColor: colors.primary,
       inactiveColor: colors.surfaceMuted,
       checkColor: colors.onPrimary,
@@ -84,14 +85,14 @@ class HyperCheckbox extends StatelessWidget {
       border: BorderSide.none,
       markStrokeWidth: metrics.markStrokeWidth,
       pressScale: .85,
-      duration: HyperAnimatedCheckmark.defaultDuration,
-      curve: HyperAnimatedCheckmark.defaultCurve,
+      duration: theme.motion.standardDuration,
+      curve: theme.motion.standardCurve,
       boxShadow: const [],
     );
     final variantDefaults = HyperCheckboxStyle(
       borderRadius: BorderRadius.circular(
         variant == HyperCheckboxVariant.circle
-            ? metrics.size / 2
+            ? metrics.circleRadius ?? metrics.size / 2
             : metrics.roundedRadius,
       ),
     );

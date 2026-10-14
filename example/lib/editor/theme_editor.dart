@@ -1,3 +1,4 @@
+import 'editor_basic_control_fields.dart';
 import 'editor_tag_fields.dart';
 import 'editor_chip_fields.dart';
 import 'editor_select_fields.dart';
@@ -23,6 +24,8 @@ import 'editor_theme_document.dart';
 import 'editor_component_navigation.dart';
 import 'editor_selection_controller.dart';
 
+part 'editor_basic_control_workspace.dart';
+
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
 class ThemeEditor extends StatefulWidget {
   const ThemeEditor({super.key});
@@ -44,6 +47,29 @@ class _ThemeEditorState extends State<ThemeEditor> {
   set _page(String value) => _selection.page.value = value;
   double _textScale = 1;
   String? _gestureStart;
+  String _radioState = 'common',
+      _checkboxState = 'common',
+      _switchState = 'common';
+  String get _basicState => switch (_component) {
+    'radio' => _radioState,
+    'checkbox' => _checkboxState,
+    'switch' => _switchState,
+    _ => 'common',
+  };
+  set _basicState(String value) {
+    switch (_component) {
+      case 'radio':
+        _radioState = value;
+      case 'checkbox':
+        _checkboxState = value;
+      case 'switch':
+        _switchState = value;
+    }
+  }
+
+  String _radioVariant = 'common',
+      _checkboxVariant = 'common',
+      _progressObject = 'common';
   String _tagState = 'common';
   String _tagVariant = 'common';
   String _chipState = 'common';
@@ -75,30 +101,32 @@ class _ThemeEditorState extends State<ThemeEditor> {
 
   EditorMode get _mode => _document.mode(_dark);
   EditorDevice get _spec => _document.device(_device);
-  EditorComponent get _appearance => switch (_component) {
-    'button' =>
-      _buttonVariant == null
-          ? _mode.button
-          : _mode.buttonVariants.forVariant(_buttonVariant!),
-    'tag' =>
-      _tagState == 'disabled'
-          ? _mode.tagDisabled
-          : _tagVariant == 'emphasized'
-          ? _mode.tagEmphasized
-          : _mode.tag,
-    'chip' => switch (_chipState) {
-      'selected' => _mode.chipSelected,
-      'hovered' => _mode.chipHovered,
-      'focused' => _mode.chipFocused,
-      'pressed' => _mode.chipPressed,
-      'disabled' => _mode.chipDisabled,
-      _ => _mode.chip,
-    },
-    'select' => _selectSurfaceAnchor ? _mode.selectAnchor : _mode.select,
-    'card' => _mode.card,
-    'field' => _mode.field,
-    _ => _mode.menu,
-  };
+  EditorComponent get _appearance => _isBasicControl
+      ? _basicAppearance
+      : switch (_component) {
+          'button' =>
+            _buttonVariant == null
+                ? _mode.button
+                : _mode.buttonVariants.forVariant(_buttonVariant!),
+          'tag' =>
+            _tagState == 'disabled'
+                ? _mode.tagDisabled
+                : _tagVariant == 'emphasized'
+                ? _mode.tagEmphasized
+                : _mode.tag,
+          'chip' => switch (_chipState) {
+            'selected' => _mode.chipSelected,
+            'hovered' => _mode.chipHovered,
+            'focused' => _mode.chipFocused,
+            'pressed' => _mode.chipPressed,
+            'disabled' => _mode.chipDisabled,
+            _ => _mode.chip,
+          },
+          'select' => _selectSurfaceAnchor ? _mode.selectAnchor : _mode.select,
+          'card' => _mode.card,
+          'field' => _mode.field,
+          _ => _mode.menu,
+        };
   static const _components = {
     'button': 'Button',
     'tag': 'Tag',
@@ -106,6 +134,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'card': 'Card',
     'field': 'TextField',
     'select': 'Select',
+    'badge': 'Badge',
+    'divider': 'Divider',
+    'progress': 'Progress',
+    'radio': 'Radio',
+    'checkbox': 'Checkbox',
+    'switch': 'Switch',
     'menu': 'Menu',
   };
   static const _pages = {
@@ -115,6 +149,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'card': 'hyper-card',
     'field': 'hyper-text-field',
     'select': 'hyper-select-fields',
+    'badge': 'hyper-badge',
+    'divider': 'hyper-divider',
+    'progress': 'hyper-progress-indicator',
+    'radio': 'hyper-radio',
+    'checkbox': 'hyper-checkbox',
+    'switch': 'hyper-switch',
     'menu': 'hyper-menu',
   };
   static const _devices = {
@@ -158,6 +198,25 @@ class _ThemeEditorState extends State<ThemeEditor> {
   }
 
   void _change(VoidCallback change) {
+    if (_component == 'switch') {
+      final before = _document.encode();
+      try {
+        _updateState(() {
+          change();
+          _document.validateControlGeometry();
+        });
+      } on FormatException catch (error) {
+        _updateState(() => _document = EditorThemeDocument.decode(before));
+        _notice('${error.message}。请先调整关联尺寸或重置当前编辑范围。');
+        return;
+      }
+      if (_gestureStart == null && _document.encode() != before) {
+        _undo.add(before);
+        _redo.clear();
+      }
+      return;
+    }
+
     if (_gestureStart != null) {
       _updateState(change);
       return;
@@ -1802,6 +1861,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   Widget _componentPanel() => Obx(_buildComponentPanel);
 
   Widget _buildComponentPanel() {
+    if (_isBasicControl) return _basicControlPanel();
     final supported = _components.containsKey(_component);
     if (!supported) {
       final item = gallerySections
@@ -2188,6 +2248,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
           () => m.horizontalPadding = null,
           m.horizontalPadding != null,
         ),
+      ],
+      _heading('标签文字与图标'),
+      if (_tagState == 'common' && _tagVariant == 'common') ...[
         _number(
           '图标尺寸',
           s.tag.iconSize,
@@ -2207,7 +2270,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           m.iconSpacing != null,
         ),
       ],
-      _heading('标签文字与图标'),
       _number(
         '标签字号',
         v.fontSize ?? theme.textTheme.labelMedium?.fontSize ?? 12,
@@ -2353,7 +2415,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
         ),
       ],
       if (_chipState == 'common') ...[
-        _heading('图标与头像'),
+        _heading('标签图标'),
         _number(
           '标签图标尺寸',
           s.chip.iconSize,
@@ -2371,36 +2433,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
           (value) => m.iconSpacing = value,
           () => m.iconSpacing = null,
           m.iconSpacing != null,
-        ),
-        _number(
-          '头像尺寸',
-          s.chip.avatarSize,
-          0,
-          120,
-          (value) => m.avatarSize = value,
-          () => m.avatarSize = null,
-          m.avatarSize != null,
-        ),
-      ],
-      if (_chipState == 'common') ...[
-        _heading('删除操作'),
-        _number(
-          '删除图标尺寸',
-          s.chip.deleteIconSize,
-          0,
-          120,
-          (value) => m.deleteIconSize = value,
-          () => m.deleteIconSize = null,
-          m.deleteIconSize != null,
-        ),
-        _number(
-          '删除区域宽度',
-          s.chip.deleteTargetWidth,
-          0,
-          120,
-          (value) => m.deleteTargetWidth = value,
-          () => m.deleteTargetWidth = null,
-          m.deleteTargetWidth != null,
         ),
       ],
       _heading('文字'),
@@ -2420,6 +2452,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
         inheritedColor: palette.foregroundColor ?? theme.colors.textSecondary,
       ),
       _heading('头像与选中标记'),
+      if (_chipState == 'common') ...[
+        _number(
+          '头像尺寸',
+          s.chip.avatarSize,
+          0,
+          120,
+          (value) => m.avatarSize = value,
+          () => m.avatarSize = null,
+          m.avatarSize != null,
+        ),
+      ],
       _select(
         '显示标签选中标记',
         v.showCheckmark?.toString() ?? 'inherit',
@@ -2447,19 +2490,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         (value) =>
             _change(() => v.checkIcon = value == 'inherit' ? null : value),
       ),
-      _heading('删除操作图标'),
-      _select(
-        '标签删除图标',
-        v.deleteIcon ?? 'inherit',
-        const {
-          'inherit': '继承默认',
-          'close': '关闭',
-          'cancel': '圆形关闭',
-          'delete': '删除',
-        },
-        (value) =>
-            _change(() => v.deleteIcon = value == 'inherit' ? null : value),
-      ),
       _number(
         '头像透明度',
         v.avatarOpacity ?? 1,
@@ -2480,17 +2510,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         v.checkmarkScale != null,
         wholeNumbers: false,
       ),
-      _number(
-        '标签过渡时长（毫秒）',
-        v.durationMilliseconds ??
-            theme.motion.fastDuration.inMilliseconds.toDouble(),
-        0,
-        5000,
-        (value) => v.durationMilliseconds = value,
-        () => v.durationMilliseconds = null,
-        v.durationMilliseconds != null,
-        wholeNumbers: false,
-      ),
       _color(
         '选中图标颜色',
         v.checkColor,
@@ -2502,6 +2521,51 @@ class _ThemeEditorState extends State<ThemeEditor> {
         v.avatarColor,
         (value) => v.avatarColor = value,
         inheritedColor: theme.colors.primaryContainer,
+      ),
+      _heading('删除操作'),
+      if (_chipState == 'common') ...[
+        _number(
+          '删除图标尺寸',
+          s.chip.deleteIconSize,
+          0,
+          120,
+          (value) => m.deleteIconSize = value,
+          () => m.deleteIconSize = null,
+          m.deleteIconSize != null,
+        ),
+        _number(
+          '删除区域宽度',
+          s.chip.deleteTargetWidth,
+          0,
+          120,
+          (value) => m.deleteTargetWidth = value,
+          () => m.deleteTargetWidth = null,
+          m.deleteTargetWidth != null,
+        ),
+      ],
+      _select(
+        '标签删除图标',
+        v.deleteIcon ?? 'inherit',
+        const {
+          'inherit': '继承默认',
+          'close': '关闭',
+          'cancel': '圆形关闭',
+          'delete': '删除',
+        },
+        (value) =>
+            _change(() => v.deleteIcon = value == 'inherit' ? null : value),
+      ),
+      _heading('交互与过渡'),
+      _number(
+        '标签过渡时长（毫秒）',
+        v.durationMilliseconds ??
+            theme.motion.fastDuration.inMilliseconds.toDouble(),
+        0,
+        5000,
+        (value) => v.durationMilliseconds = value,
+        () => v.durationMilliseconds = null,
+        v.durationMilliseconds != null,
+        wholeNumbers: false,
       ),
       _color(
         '标签叠加色',

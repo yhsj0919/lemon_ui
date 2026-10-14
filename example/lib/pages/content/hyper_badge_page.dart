@@ -40,7 +40,7 @@ class _HyperBadgePageState extends State<HyperBadgePage> {
           const HyperText('点、数字、短文本与自定义内容；角标定位由独立组件负责。'),
           SizedBox(height: sizes.sectionSpacing),
           DemoSection(
-            title: '内容形态',
+            title: '默认主题预览 · 未确认',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

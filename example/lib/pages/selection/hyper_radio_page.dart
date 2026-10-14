@@ -32,6 +32,31 @@ class _HyperRadioPageState extends State<HyperRadioPage> {
           const Text('默认使用 MIUIX 勾线样式，也提供 .circle 和 .filled 变体。'),
           const SizedBox(height: 20),
           DemoSection(
+            title: '默认主题预览 · 未确认',
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                HyperRadio<String>(
+                  value: '标准',
+                  groupValue: _value,
+                  toggleable: true,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                HyperRadio<String>(
+                  value: '其他',
+                  groupValue: _value,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                const HyperRadio<String>(
+                  value: '标准',
+                  groupValue: '标准',
+                  onChanged: null,
+                ),
+              ],
+            ),
+          ),
+          DemoSection(
             title: '基础用法',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

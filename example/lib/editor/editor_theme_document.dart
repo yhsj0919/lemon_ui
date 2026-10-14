@@ -1,3 +1,4 @@
+import 'editor_basic_control_fields.dart';
 import 'editor_tag_fields.dart';
 import 'editor_chip_fields.dart';
 import 'editor_select_fields.dart';
@@ -65,12 +66,26 @@ class EditorComponent {
   final pressedShadow = EditorComponentShadow();
   final disabledShadow = EditorComponentShadow();
   final focusedShadow = EditorComponentShadow();
+  EditorBadgeVisual badgeStyle = EditorBadgeVisual();
+  EditorDividerVisual dividerStyle = EditorDividerVisual();
+  EditorProgressVisual progressStyle = EditorProgressVisual();
+  EditorRadioVisual radioStyle = EditorRadioVisual();
+  EditorCheckboxVisual checkboxStyle = EditorCheckboxVisual();
+  EditorSwitchVisual switchStyle = EditorSwitchVisual();
   EditorTagVisual tagStyle = EditorTagVisual();
   EditorChipVisual chipStyle = EditorChipVisual();
   EditorSelectVisual selectStyle = EditorSelectVisual();
   EditorTextFieldVisual textFieldStyle = EditorTextFieldVisual();
   EditorButtonVisual buttonStyle = EditorButtonVisual();
   Map<String, Object?> toJson() => {
+    if (dividerStyle.toJson().isNotEmpty) 'dividerStyle': dividerStyle.toJson(),
+    if (progressStyle.toJson().isNotEmpty)
+      'progressStyle': progressStyle.toJson(),
+    if (radioStyle.toJson().isNotEmpty) 'radioStyle': radioStyle.toJson(),
+    if (checkboxStyle.toJson().isNotEmpty)
+      'checkboxStyle': checkboxStyle.toJson(),
+    if (switchStyle.toJson().isNotEmpty) 'switchStyle': switchStyle.toJson(),
+    if (badgeStyle.toJson().isNotEmpty) 'badgeStyle': badgeStyle.toJson(),
     if (tagStyle.toJson().isNotEmpty) 'tagStyle': tagStyle.toJson(),
     if (chipStyle.toJson().isNotEmpty) 'chipStyle': chipStyle.toJson(),
     if (selectStyle.toJson().isNotEmpty) 'selectStyle': selectStyle.toJson(),
@@ -94,6 +109,12 @@ class EditorComponent {
   };
   factory EditorComponent.fromJson(Map<String, dynamic> json) {
     _checkFields(json, {
+      'badgeStyle',
+      'dividerStyle',
+      'progressStyle',
+      'radioStyle',
+      'checkboxStyle',
+      'switchStyle',
       'tagStyle',
       'chipStyle',
       'selectStyle',
@@ -139,6 +160,24 @@ class EditorComponent {
       ..focusedShadow.shadows = (json['focusedShadows'] as List<dynamic>?)
           ?.map((s) => EditorShadow.fromJson(s as Map<String, dynamic>))
           .toList()
+      ..badgeStyle = EditorBadgeVisual.fromJson(
+        (json['badgeStyle'] as Map<String, dynamic>?) ?? {},
+      )
+      ..dividerStyle = EditorDividerVisual.fromJson(
+        (json['dividerStyle'] as Map<String, dynamic>?) ?? {},
+      )
+      ..progressStyle = EditorProgressVisual.fromJson(
+        (json['progressStyle'] as Map<String, dynamic>?) ?? {},
+      )
+      ..radioStyle = EditorRadioVisual.fromJson(
+        (json['radioStyle'] as Map<String, dynamic>?) ?? {},
+      )
+      ..checkboxStyle = EditorCheckboxVisual.fromJson(
+        (json['checkboxStyle'] as Map<String, dynamic>?) ?? {},
+      )
+      ..switchStyle = EditorSwitchVisual.fromJson(
+        (json['switchStyle'] as Map<String, dynamic>?) ?? {},
+      )
       ..tagStyle = EditorTagVisual.fromJson(
         (json['tagStyle'] as Map<String, dynamic>?) ?? {},
       )
@@ -250,6 +289,12 @@ class EditorShadow {
 
 /// 当前设备的显式规格覆盖，默认值始终来自 Hyper 主题。
 class EditorDevice {
+  EditorBadgeMetrics badgeMetrics = EditorBadgeMetrics();
+  EditorDividerMetrics dividerMetrics = EditorDividerMetrics();
+  EditorProgressMetrics progressMetrics = EditorProgressMetrics();
+  EditorRadioMetrics radioMetrics = EditorRadioMetrics();
+  EditorCheckboxMetrics checkboxMetrics = EditorCheckboxMetrics();
+  EditorSwitchMetrics switchMetrics = EditorSwitchMetrics();
   EditorTagMetrics tagMetrics = EditorTagMetrics();
   EditorChipMetrics chipMetrics = EditorChipMetrics();
   EditorSelectMetrics selectMetrics = EditorSelectMetrics();
@@ -267,6 +312,16 @@ class EditorDevice {
       menuHeight,
       menuRadius;
   Map<String, Object?> toJson() => {
+    if (badgeMetrics.toJson().isNotEmpty) 'badgeMetrics': badgeMetrics.toJson(),
+    if (dividerMetrics.toJson().isNotEmpty)
+      'dividerMetrics': dividerMetrics.toJson(),
+    if (progressMetrics.toJson().isNotEmpty)
+      'progressMetrics': progressMetrics.toJson(),
+    if (radioMetrics.toJson().isNotEmpty) 'radioMetrics': radioMetrics.toJson(),
+    if (checkboxMetrics.toJson().isNotEmpty)
+      'checkboxMetrics': checkboxMetrics.toJson(),
+    if (switchMetrics.toJson().isNotEmpty)
+      'switchMetrics': switchMetrics.toJson(),
     if (tagMetrics.toJson().isNotEmpty) 'tagMetrics': tagMetrics.toJson(),
     if (chipMetrics.toJson().isNotEmpty) 'chipMetrics': chipMetrics.toJson(),
     if (selectMetrics.toJson().isNotEmpty)
@@ -291,6 +346,12 @@ class EditorDevice {
     _checkFields(j, {
       'typography',
       'buttonMetrics',
+      'badgeMetrics',
+      'dividerMetrics',
+      'progressMetrics',
+      'radioMetrics',
+      'checkboxMetrics',
+      'switchMetrics',
       'tagMetrics',
       'chipMetrics',
       'selectMetrics',
@@ -307,6 +368,24 @@ class EditorDevice {
       'menuRadius',
     });
     return EditorDevice()
+      ..badgeMetrics = EditorBadgeMetrics.fromJson(
+        (j['badgeMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..dividerMetrics = EditorDividerMetrics.fromJson(
+        (j['dividerMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..progressMetrics = EditorProgressMetrics.fromJson(
+        (j['progressMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..radioMetrics = EditorRadioMetrics.fromJson(
+        (j['radioMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..checkboxMetrics = EditorCheckboxMetrics.fromJson(
+        (j['checkboxMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..switchMetrics = EditorSwitchMetrics.fromJson(
+        (j['switchMetrics'] as Map<String, dynamic>?) ?? {},
+      )
       ..tagMetrics = EditorTagMetrics.fromJson(
         (j['tagMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -374,6 +453,20 @@ class EditorMode {
   final chipFocused = EditorComponent();
   final chipPressed = EditorComponent();
   final chipDisabled = EditorComponent();
+  final badge = EditorComponent();
+  final divider = EditorComponent();
+  final progress = EditorComponent();
+  final progressLinear = EditorComponent();
+  final progressCircular = EditorComponent();
+  final progressInfinite = EditorComponent();
+  final radio = EditorComponent();
+  final radioCheckmark = EditorComponent();
+  final radioCircle = EditorComponent();
+  final radioFilled = EditorComponent();
+  final checkbox = EditorComponent();
+  final checkboxCircle = EditorComponent();
+  final checkboxRounded = EditorComponent();
+  final switchControl = EditorComponent();
   final card = EditorComponent();
   final field = EditorComponent();
   final menu = EditorComponent();
@@ -405,6 +498,27 @@ class EditorMode {
     if (chipFocused.toJson().isNotEmpty) 'chipFocused': chipFocused.toJson(),
     if (chipPressed.toJson().isNotEmpty) 'chipPressed': chipPressed.toJson(),
     if (chipDisabled.toJson().isNotEmpty) 'chipDisabled': chipDisabled.toJson(),
+    if (badge.toJson().isNotEmpty) 'badge': badge.toJson(),
+    if (divider.toJson().isNotEmpty) 'divider': divider.toJson(),
+    if (progress.toJson().isNotEmpty) 'progress': progress.toJson(),
+    if (progressLinear.toJson().isNotEmpty)
+      'progressLinear': progressLinear.toJson(),
+    if (progressCircular.toJson().isNotEmpty)
+      'progressCircular': progressCircular.toJson(),
+    if (progressInfinite.toJson().isNotEmpty)
+      'progressInfinite': progressInfinite.toJson(),
+    if (radio.toJson().isNotEmpty) 'radio': radio.toJson(),
+    if (radioCheckmark.toJson().isNotEmpty)
+      'radioCheckmark': radioCheckmark.toJson(),
+    if (radioCircle.toJson().isNotEmpty) 'radioCircle': radioCircle.toJson(),
+    if (radioFilled.toJson().isNotEmpty) 'radioFilled': radioFilled.toJson(),
+    if (checkbox.toJson().isNotEmpty) 'checkbox': checkbox.toJson(),
+    if (checkboxCircle.toJson().isNotEmpty)
+      'checkboxCircle': checkboxCircle.toJson(),
+    if (checkboxRounded.toJson().isNotEmpty)
+      'checkboxRounded': checkboxRounded.toJson(),
+    if (switchControl.toJson().isNotEmpty)
+      'switchControl': switchControl.toJson(),
     if (card.toJson().isNotEmpty) 'card': card.toJson(),
     if (field.toJson().isNotEmpty) 'field': field.toJson(),
     if (select.toJson().isNotEmpty) 'select': select.toJson(),
@@ -437,6 +551,20 @@ class EditorMode {
       'chipFocused',
       'chipPressed',
       'chipDisabled',
+      'badge',
+      'divider',
+      'progress',
+      'progressLinear',
+      'progressCircular',
+      'progressInfinite',
+      'radio',
+      'radioCheckmark',
+      'radioCircle',
+      'radioFilled',
+      'checkbox',
+      'checkboxCircle',
+      'checkboxRounded',
+      'switchControl',
       'card',
       'field',
       'select',
@@ -485,6 +613,12 @@ class EditorMode {
       target.buttonStyle = value.buttonStyle;
       target.textFieldStyle = value.textFieldStyle;
       target.selectStyle = value.selectStyle;
+      target.badgeStyle = value.badgeStyle;
+      target.dividerStyle = value.dividerStyle;
+      target.progressStyle = value.progressStyle;
+      target.radioStyle = value.radioStyle;
+      target.checkboxStyle = value.checkboxStyle;
+      target.switchStyle = value.switchStyle;
       target.tagStyle = value.tagStyle;
       target.chipStyle = value.chipStyle;
       target.fillKind = value.fillKind;
@@ -503,6 +637,20 @@ class EditorMode {
     read('chipFocused', result.chipFocused);
     read('chipPressed', result.chipPressed);
     read('chipDisabled', result.chipDisabled);
+    read('badge', result.badge);
+    read('divider', result.divider);
+    read('progress', result.progress);
+    read('progressLinear', result.progressLinear);
+    read('progressCircular', result.progressCircular);
+    read('progressInfinite', result.progressInfinite);
+    read('radio', result.radio);
+    read('radioCheckmark', result.radioCheckmark);
+    read('radioCircle', result.radioCircle);
+    read('radioFilled', result.radioFilled);
+    read('checkbox', result.checkbox);
+    read('checkboxCircle', result.checkboxCircle);
+    read('checkboxRounded', result.checkboxRounded);
+    read('switchControl', result.switchControl);
     read('card', result.card);
     read('field', result.field);
     read('menu', result.menu);
@@ -591,7 +739,21 @@ class EditorThemeDocument {
     d.watch = EditorDevice.fromJson(
       (devices['watch'] as Map<String, dynamic>?) ?? {},
     );
+    for (final type in HyperDeviceType.values) {
+      d
+          .device(type)
+          .switchMetrics
+          .resolve(_defaultTheme.sizes.resolve(type).switchSize);
+    }
     return d;
+  }
+
+  /// 关联尺寸同时检查；导入和编辑事务使用同一校验路径。
+  void validateControlGeometry() {
+    for (final type in HyperDeviceType.values) {
+      device(type).switchMetrics
+          .resolve(_defaultTheme.sizes.resolve(type).switchSize);
+    }
   }
 
   HyperThemeData resolve(bool isDark) {
@@ -634,6 +796,12 @@ class EditorThemeDocument {
             chipSpacing: d.selectMetrics.chipSpacing,
             minimumInputWidth: d.selectMetrics.minimumInputWidth,
           ),
+          badge: d.badgeMetrics.resolve(s.badge),
+          divider: d.dividerMetrics.resolve(s.divider),
+          progress: d.progressMetrics.resolve(s.progress),
+          radio: d.radioMetrics.resolve(s.radio),
+          checkbox: d.checkboxMetrics.resolve(s.checkbox),
+          switchSize: d.switchMetrics.resolve(s.switchSize),
           tag: s.tag.copyWith(
             height: d.tagMetrics.height,
             horizontalPadding: d.tagMetrics.horizontalPadding,
@@ -695,6 +863,20 @@ class EditorThemeDocument {
             ? null
             : HyperFill.color(c.background!.resolve(colors)),
     };
+    HyperRadioStyle controlRadio(EditorComponent c) => c.radioStyle
+        .resolve(colors)
+        .merge(
+          HyperRadioStyle(
+            boxShadow: c.shadows?.map((s) => s.resolve(colors)).toList(),
+          ),
+        );
+    HyperCheckboxStyle controlCheckbox(EditorComponent c) => c.checkboxStyle
+        .resolve(colors)
+        .merge(
+          HyperCheckboxStyle(
+            boxShadow: c.shadows?.map((s) => s.resolve(colors)).toList(),
+          ),
+        );
     final b = m.button, c = m.card, f = m.field, n = m.menu;
     HyperButtonStyle variantStyle(HyperButtonVariant variant) {
       final value = m.buttonVariants.forVariant(variant);
@@ -922,6 +1104,72 @@ class EditorThemeDocument {
           focused: resolveEditorChip(m.chipFocused, colors),
           pressed: resolveEditorChip(m.chipPressed, colors),
           disabled: resolveEditorChip(m.chipDisabled, colors),
+        ),
+      ),
+      badgeTheme: theme.badgeTheme.copyWith(
+        style: theme.badgeTheme.style
+            .merge(m.badge.badgeStyle.resolve(colors))
+            .merge(
+              HyperBadgeStyle(
+                boxShadow: m.badge.shadows
+                    ?.map((s) => s.resolve(colors))
+                    .toList(),
+              ),
+            ),
+      ),
+      dividerTheme: theme.dividerTheme.copyWith(
+        style: theme.dividerTheme.style.merge(
+          m.divider.dividerStyle.resolve(colors),
+        ),
+      ),
+      progressTheme: theme.progressTheme.merge(
+        HyperProgressThemeData(
+          style: m.progress.progressStyle.resolve(colors),
+          linearStyle: m.progressLinear.progressStyle.resolve(colors),
+          circularStyle: m.progressCircular.progressStyle.resolve(colors),
+          infiniteStyle: m.progressInfinite.progressStyle.resolve(colors),
+        ),
+      ),
+      radioTheme: HyperRadioThemeData(
+        style:
+            theme.radioTheme.style?.merge(controlRadio(m.radio)) ??
+            controlRadio(m.radio),
+        checkmark:
+            theme.radioTheme.checkmark?.merge(controlRadio(m.radioCheckmark)) ??
+            controlRadio(m.radioCheckmark),
+        circle:
+            theme.radioTheme.circle?.merge(controlRadio(m.radioCircle)) ??
+            controlRadio(m.radioCircle),
+        filled:
+            theme.radioTheme.filled?.merge(controlRadio(m.radioFilled)) ??
+            controlRadio(m.radioFilled),
+      ),
+      checkboxTheme: HyperCheckboxThemeData(
+        style:
+            theme.checkboxTheme.style?.merge(controlCheckbox(m.checkbox)) ??
+            controlCheckbox(m.checkbox),
+        circle:
+            theme.checkboxTheme.circle?.merge(
+              controlCheckbox(m.checkboxCircle),
+            ) ??
+            controlCheckbox(m.checkboxCircle),
+        rounded:
+            theme.checkboxTheme.rounded?.merge(
+              controlCheckbox(m.checkboxRounded),
+            ) ??
+            controlCheckbox(m.checkboxRounded),
+      ),
+      switchTheme: theme.switchTheme.merge(
+        HyperSwitchThemeData(
+          style: m.switchControl.switchStyle
+              .resolve(colors)
+              .merge(
+                HyperSwitchStyle(
+                  thumbShadow: m.switchControl.shadows
+                      ?.map((s) => s.resolve(colors))
+                      .toList(),
+                ),
+              ),
         ),
       ),
       cardTheme: theme.cardTheme.copyWith(

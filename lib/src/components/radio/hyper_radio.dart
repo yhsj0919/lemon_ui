@@ -100,10 +100,12 @@ class HyperRadio<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
-    final size = sizes.radio.size;
+    final metrics = sizes.radio;
+    final size = metrics.size;
     final defaults = HyperRadioStyle(
       size: size,
-      minimumTapTargetSize: sizes.minimumInteractiveDimension,
+      minimumTapTargetSize:
+          metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
       selectedColor: theme.colors.primary,
       disabledSelectedColor: theme.colors.disabled,
       strokeWidth: size * (7 / 56),
@@ -111,8 +113,8 @@ class HyperRadio<T> extends StatelessWidget {
       borderRadius: BorderRadius.circular(size / 2),
       boxShadow: const [],
       pressScale: .85,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.fastOutSlowIn,
+      duration: theme.motion.standardDuration,
+      curve: theme.motion.standardCurve,
     );
     final variantDefaults = switch (variant) {
       HyperRadioVariant.checkmark => const HyperRadioStyle(
@@ -140,6 +142,16 @@ class HyperRadio<T> extends StatelessWidget {
     };
     final resolved = defaults
         .merge(variantDefaults)
+        .merge(
+          HyperRadioStyle(
+            indicatorSize: metrics.indicatorSize,
+            markSize: metrics.markSize,
+            strokeWidth: metrics.strokeWidth,
+            borderRadius: metrics.radius == null
+                ? null
+                : BorderRadius.circular(metrics.radius!),
+          ),
+        )
         .merge(HyperRadioTheme.of(context).resolve(variant))
         .merge(style);
     final enabled = onChanged != null;

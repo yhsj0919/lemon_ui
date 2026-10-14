@@ -94,9 +94,10 @@ class HyperDivider extends StatelessWidget {
     final defaults = HyperDividerStyle(
       color: theme.colors.outline,
       thickness: metrics.thickness,
-      indent: 0,
-      endIndent: 0,
-      radius: 0,
+      length: metrics.length,
+      indent: metrics.indent ?? 0,
+      endIndent: metrics.endIndent ?? 0,
+      radius: metrics.radius ?? 0,
       pattern: HyperDividerPattern.solid,
       dashLength: metrics.dashLength,
       gap: metrics.gap,

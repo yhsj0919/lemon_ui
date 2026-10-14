@@ -447,3 +447,8 @@ class HyperContainer extends StatelessWidget {
 ## 四端预览与验收（2026-10-11）
 
 Demo 已加入真实设备及四端画布切换、横竖屏、文字缩放、安全区和键盘占位。后续先使用 [UI 审核台账](device-preview-and-review.md) 验收 Select / Autocomplete / PopupListTile，再逐项审核其他已创建控件；实现完成与 UI 已审核分开记录。模拟预览不替代实机验收。
+
+
+## 设置扩展进度（2026-10-14）
+
+已补充 Progress、Radio、Checkbox、Switch、Badge、Divider 设置工作区，支持四端尺寸、亮暗外观、变体/对象与状态范围、继承恢复、文件往返和默认预览。六个入口按用户要求登记「未确认」，等待样式及交互审核，暂不迁入正式分类。详见 [主题编辑器](theme-editor.md)。后续先审核这批，再补 Avatar / AvatarGroup、Slider、WidgetGroup 等设置；表单相关组件仍按原计划最后处理。

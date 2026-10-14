@@ -33,6 +33,22 @@ class _HyperSwitchPageState extends State<HyperSwitchPage> {
           ),
           const SizedBox(height: 24),
           DemoSection(
+            title: '默认主题预览 · 未确认',
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                HyperSwitch(
+                  value: _enabled,
+                  onChanged: (value) => setState(() => _enabled = value),
+                ),
+                HyperSwitch(value: false, onChanged: (_) {}),
+                const HyperSwitch(value: true, onChanged: null),
+                const HyperSwitch(value: false, onChanged: null),
+              ],
+            ),
+          ),
+          DemoSection(
             title: '基础用法',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

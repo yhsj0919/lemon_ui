@@ -47,7 +47,7 @@ class _HyperInfiniteProgressState extends State<HyperInfiniteProgress>
     return HyperProgressStyle(
           color: theme.colors.textTertiary,
           size: metrics.infiniteSize,
-          thickness: 2,
+          thickness: metrics.infiniteThickness ?? 2,
           orbitingDotSize: metrics.infiniteDotRadius,
           animationDuration: const Duration(milliseconds: 800),
         )
@@ -58,14 +58,16 @@ class _HyperInfiniteProgressState extends State<HyperInfiniteProgress>
 
   void _syncAnimation() {
     final style = _resolveStyle();
-    _controller.duration = widget.animationDuration ?? style.animationDuration!;
+    final duration = widget.animationDuration ?? style.animationDuration!;
+    final changed = duration != _controller.duration;
+    _controller.duration = duration;
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (reduceMotion) {
+    if (reduceMotion || duration == Duration.zero) {
       _controller
         ..stop()
         ..value = 0;
-    } else if (!_controller.isAnimating) {
+    } else if (changed || !_controller.isAnimating) {
       _controller.repeat();
     }
   }
@@ -130,7 +132,8 @@ class _HyperInfiniteProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = (size.shortestSide - thickness) / 2;
+    final radius =
+        (size.shortestSide - thickness).clamp(0.0, double.infinity) / 2;
     final ringPaint = Paint()
       ..isAntiAlias = true
       ..color = color

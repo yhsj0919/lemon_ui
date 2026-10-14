@@ -8,6 +8,7 @@ import '../../interaction/hyper_pressable.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
 import '../surface/hyper_material_surface.dart';
+import '../overlay/hyper_backdrop_safe_opacity.dart';
 import 'hyper_page_indicator_model.dart';
 import 'hyper_page_indicator_style.dart';
 import 'hyper_page_indicator_theme.dart';
@@ -196,7 +197,7 @@ class HyperPageIndicator extends StatelessWidget {
         child: content,
       );
     }
-    return AnimatedOpacity(
+    return HyperBackdropSafeAnimatedOpacity(
       opacity: enabled ? 1 : s.disabledOpacity!,
       duration: duration,
       curve: s.curve!,

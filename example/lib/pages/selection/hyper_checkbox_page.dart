@@ -34,6 +34,23 @@ class _HyperCheckboxPageState extends State<HyperCheckboxPage> {
           const Text('点击后按未选中、选中、半选中的顺序循环。'),
           const SizedBox(height: 20),
           DemoSection(
+            title: '默认主题预览 · 未确认',
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                HyperCheckbox(
+                  value: _value,
+                  tristate: true,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                HyperCheckbox(value: true, onChanged: (_) {}),
+                HyperCheckbox(value: null, tristate: true, onChanged: (_) {}),
+                const HyperCheckbox(value: true, onChanged: null),
+              ],
+            ),
+          ),
+          DemoSection(
             title: '与 Flutter 原生 Checkbox 对比',
             child: Wrap(
               spacing: HyperTheme.sizesOf(context).sectionSpacing,

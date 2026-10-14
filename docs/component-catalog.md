@@ -864,3 +864,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 受控分段按钮，支持单选、多选、可清空、图标、禁用项、横向/纵向与等分宽度。
 复用 WidgetGroup 的连接布局与基础按钮尺寸，通过 segmentedButtonTheme 和
 HyperSegmentedButtonStyle 配置整体与选中视觉；页面导航继续使用 HyperTab。
+
+
+## 设置工作区进度（2026-10-14）
+
+Progress、Radio、Checkbox、Switch、Badge、Divider 新增设置项与默认预览，按用户指示全部放入「未确认」，组件正常可用。设置分对象、变体与状态编辑，四端尺寸和亮暗外观独立保存。实现进度不等于样式已确认；详见 [主题编辑器](theme-editor.md) 与 [审核台账](device-preview-and-review.md)。

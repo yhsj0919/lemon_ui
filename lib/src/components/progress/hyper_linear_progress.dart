@@ -50,6 +50,9 @@ class HyperLinearProgress extends StatelessWidget {
       color: theme.colors.primary,
       trackColor: theme.colors.surfaceMuted,
       variant: HyperProgressVariant.thin,
+      size: metrics.linearSize,
+      radius: metrics.radius,
+      fillRadius: metrics.fillRadius,
       animationDuration: theme.motion.standardDuration,
       animationCurve: theme.motion.standardCurve,
     ).merge(progressTheme.style).merge(progressTheme.linearStyle).merge(style);

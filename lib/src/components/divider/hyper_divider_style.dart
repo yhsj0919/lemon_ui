@@ -144,7 +144,7 @@ final class HyperDividerStyle {
       radius: other.radius ?? radius,
       pattern: other.pattern ?? pattern,
       dashLength: other.dashLength ?? dashLength,
-      textStyle: other.textStyle ?? textStyle,
+      textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
       iconColor: other.iconColor ?? iconColor,
       contentAlignment: other.contentAlignment ?? contentAlignment,
       edgeExtent: other.edgeExtent ?? edgeExtent,

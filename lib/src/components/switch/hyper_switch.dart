@@ -52,7 +52,8 @@ class _HyperSwitchState extends State<HyperSwitch> {
       width: metrics.width,
       height: metrics.height,
       thumbSize: metrics.thumbSize,
-      minimumTapTargetSize: sizes.minimumInteractiveDimension,
+      minimumTapTargetSize:
+          metrics.minimumTapTargetSize ?? sizes.minimumInteractiveDimension,
       activeTrackColor: colors.primary,
       inactiveTrackColor: colors.surfaceMuted,
       disabledTrackColor: colors.surfaceMuted,
@@ -65,10 +66,13 @@ class _HyperSwitchState extends State<HyperSwitch> {
       disabledInactiveThumbColor: colors.surfaceElevated,
       overlayColor: Colors.transparent,
       border: BorderSide.none,
-      borderRadius: BorderRadius.circular(metrics.height / 2),
-      thumbRadius: BorderRadius.circular(metrics.thumbSize / 2),
-      uncheckedThumbOffset: metrics.thumbInset,
+      borderRadius: BorderRadius.circular(metrics.radius ?? metrics.height / 2),
+      thumbRadius: BorderRadius.circular(
+        metrics.thumbRadius ?? metrics.thumbSize / 2,
+      ),
+      uncheckedThumbOffset: metrics.uncheckedThumbOffset ?? metrics.thumbInset,
       checkedThumbOffset:
+          metrics.checkedThumbOffset ??
           metrics.width - metrics.thumbSize - metrics.thumbInset,
       interactionThumbScale: 1.127,
       thumbShadow: const [],

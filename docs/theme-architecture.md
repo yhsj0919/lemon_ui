@@ -671,3 +671,10 @@ PopupListTile 关闭后的焦点恢复依据打开来源：鼠标和触摸打开
 panelBuilder(context, close) 提供任意面板内容，组件只管理触发、开合、设备呈现、边界与表面。过滤数据、选择和多级业务由调用方管理；可组合 HyperMenu 的子菜单。默认样式及设备规格复用 Select / Selection 主题，局部与实例显式覆盖优先；面板复用 resolveHyperMenuSurface 及统一材质降级。Desktop 使用锚定浮层，其他设备复用 Select 呈现解析。用户明确确认后，Demo 已移入正式“选择控件”分类，页面 id hyper-dropdown 保持不变，工作区复用 Select 配置入口；未进行目标截图视觉还原。
 
 Tag 与 Chip 的标签配色由 foundation/hyper_label_palette.dart 统一解析，组件各自通过强类型 Style 公开基色、配色方式和背景/边框/前景减淡比例。Tag 的 background 与 boxBorder 分别复用 HyperFill 和公共线条边框；原 backgroundColor、borderColor、borderWidth 保持兼容，显式背景颜色覆盖上层填充。Tag 全局、局部主题和实例覆盖保留原有优先级，尺寸继续由 HyperSizeScheme.tag 管理。
+
+
+## 基础控件工作区与中央几何扩展（2026-10-14）
+
+Badge / Divider / Progress / Radio / Checkbox / Switch 的编辑覆盖见 [主题编辑器](theme-editor.md)。颜色与动效按亮暗外观存储，尺寸仍通过四端 HyperSizeScheme 的强类型 copyWith 统一管理，编辑器没有在组件中保存设备规格。Radio 增加可选命中、标记及圆角几何；Checkbox 增加可选命中与圆形圆角；Switch 增加可选命中、圆角和滑块偏移；Progress 增加可选线性长度、轨道/填充圆角和无限线宽；Divider 增加可选长度、两端缩进与圆角。字段为空时保留原默认推导，无跨端倍率或新机型规格。copyWith、插值、值相等和哈希纳入四端纯主题回归检查。
+
+Divider 的稀疏 TextStyle 覆盖现在按字段合并，字重/行高覆盖不会丢失默认字体和颜色。组件默认文字缩放策略不变；新增设置尚未完成渲染或设备审核。

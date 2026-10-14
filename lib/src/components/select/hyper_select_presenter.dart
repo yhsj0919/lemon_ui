@@ -57,7 +57,7 @@ Future<void> showHyperSelectModal({
             destination: navigator.context,
             child: HyperScaffold(
               appBar: HyperAppBar(title: Text(title)),
-              body: SafeArea(child: builder(context)),
+              body: SafeArea(child: Builder(builder: builder)),
             ),
           ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) =>

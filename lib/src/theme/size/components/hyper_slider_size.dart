@@ -6,6 +6,8 @@ final class HyperSliderSize {
   const HyperSliderSize({
     required this.trackHeight,
     required this.thumbRadius,
+    this.thumbWidth,
+    this.thumbHeight,
     required this.stepPointRadius,
     required this.thinTrackHeight,
     required this.thinThumbRadius,
@@ -18,6 +20,7 @@ final class HyperSliderSize {
 
   final double trackHeight;
   final double thumbRadius;
+  final double? thumbWidth, thumbHeight;
   final double stepPointRadius;
   final double thinTrackHeight;
   final double thinThumbRadius;
@@ -30,6 +33,8 @@ final class HyperSliderSize {
   HyperSliderSize copyWith({
     double? trackHeight,
     double? thumbRadius,
+    double? thumbWidth,
+    double? thumbHeight,
     double? stepPointRadius,
     double? thinTrackHeight,
     double? thinThumbRadius,
@@ -41,6 +46,8 @@ final class HyperSliderSize {
   }) => HyperSliderSize(
     trackHeight: trackHeight ?? this.trackHeight,
     thumbRadius: thumbRadius ?? this.thumbRadius,
+    thumbWidth: thumbWidth ?? this.thumbWidth,
+    thumbHeight: thumbHeight ?? this.thumbHeight,
     stepPointRadius: stepPointRadius ?? this.stepPointRadius,
     thinTrackHeight: thinTrackHeight ?? this.thinTrackHeight,
     thinThumbRadius: thinThumbRadius ?? this.thinThumbRadius,
@@ -54,6 +61,12 @@ final class HyperSliderSize {
 
   static HyperSliderSize lerp(HyperSliderSize a, HyperSliderSize b, double t) =>
       HyperSliderSize(
+        thumbWidth: a.thumbWidth == null || b.thumbWidth == null
+            ? (t < .5 ? a.thumbWidth : b.thumbWidth)
+            : a.thumbWidth! + (b.thumbWidth! - a.thumbWidth!) * t,
+        thumbHeight: a.thumbHeight == null || b.thumbHeight == null
+            ? (t < .5 ? a.thumbHeight : b.thumbHeight)
+            : a.thumbHeight! + (b.thumbHeight! - a.thumbHeight!) * t,
         trackHeight: a.trackHeight + (b.trackHeight - a.trackHeight) * t,
         thumbRadius: a.thumbRadius + (b.thumbRadius - a.thumbRadius) * t,
         stepPointRadius:
@@ -80,6 +93,8 @@ final class HyperSliderSize {
       other is HyperSliderSize &&
       other.trackHeight == trackHeight &&
       other.thumbRadius == thumbRadius &&
+      other.thumbWidth == thumbWidth &&
+      other.thumbHeight == thumbHeight &&
       other.stepPointRadius == stepPointRadius &&
       other.thinTrackHeight == thinTrackHeight &&
       other.thinThumbRadius == thinThumbRadius &&
@@ -93,6 +108,8 @@ final class HyperSliderSize {
   int get hashCode => Object.hash(
     trackHeight,
     thumbRadius,
+    thumbWidth,
+    thumbHeight,
     stepPointRadius,
     thinTrackHeight,
     thinThumbRadius,

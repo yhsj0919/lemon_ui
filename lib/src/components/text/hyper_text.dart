@@ -1,3 +1,5 @@
+import 'hyper_scrolling_text.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -6,7 +8,7 @@ import 'hyper_text_theme.dart';
 
 /// 使用 Hyper 语义字号和系统字体的基础文字控件。
 ///
-/// 控件直接返回 Flutter [Text]，不会增加布局、缩放或动画包装。最终样式优先级为：
+/// 普通构造直接返回 Flutter [Text]；[HyperText.scrolling] 提供单行溢出滚动。最终样式优先级为：
 /// 实例 [style]、语义层级主题、文字公共主题、全局 [TextTheme]。
 class HyperText extends StatelessWidget {
   const HyperText(
@@ -26,7 +28,57 @@ class HyperText extends StatelessWidget {
     this.textWidthBasis,
     this.textHeightBehavior,
     this.selectionColor,
-  });
+  }) : _scrollTrigger = null,
+       _scrollMode = HyperTextScrollMode.pingPong,
+       _scrollDuration = null,
+       _scrollSpeed = 40,
+       _pauseDuration = null,
+       _loopGap = null,
+       _scrollCurve = Curves.linear;
+
+  /// 单行溢出滚动；支持往返、跑马灯以及自动或悬停触发。
+  const HyperText.scrolling(
+    this.data, {
+    super.key,
+    this.variant = HyperTextVariant.body,
+    this.style,
+    this.semanticsLabel,
+    HyperTextScrollTrigger trigger = HyperTextScrollTrigger.automatic,
+    HyperTextScrollMode mode = HyperTextScrollMode.pingPong,
+    Duration? duration,
+    double speed = 40,
+    Duration? pauseDuration,
+    double? loopGap,
+    Curve curve = Curves.linear,
+  }) : assert(loopGap == null || loopGap >= 0),
+       assert(speed > 0 && speed < double.infinity),
+       _scrollTrigger = trigger,
+       _scrollMode = mode,
+       _scrollDuration = duration,
+       _scrollSpeed = speed,
+       // Public constructor name is kept independent of private storage.
+       // ignore: prefer_initializing_formals
+       _pauseDuration = pauseDuration,
+       _loopGap = loopGap,
+       _scrollCurve = curve,
+       strutStyle = null,
+       textAlign = null,
+       textDirection = null,
+       locale = null,
+       softWrap = false,
+       overflow = TextOverflow.clip,
+       textScaler = null,
+       maxLines = 1,
+       textWidthBasis = null,
+       textHeightBehavior = null,
+       selectionColor = null;
+
+  final HyperTextScrollTrigger? _scrollTrigger;
+  final HyperTextScrollMode _scrollMode;
+  final Duration? _scrollDuration, _pauseDuration;
+  final double? _loopGap;
+  final double _scrollSpeed;
+  final Curve _scrollCurve;
 
   /// 显示的纯文本内容。
   final String data;
@@ -75,6 +127,21 @@ class HyperText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_scrollTrigger != null) {
+      return HyperScrollingText(
+        data,
+        variant: variant,
+        style: style,
+        semanticsLabel: semanticsLabel,
+        trigger: _scrollTrigger,
+        mode: _scrollMode,
+        duration: _scrollDuration,
+        speed: _scrollSpeed,
+        pauseDuration: _pauseDuration,
+        loopGap: _loopGap,
+        curve: _scrollCurve,
+      );
+    }
     final theme = HyperTheme.of(context);
     // 默认正文服从父级文字环境，使按钮、列表项等容器能够统一控制排版。
     // 显式语义层级仍从 Hyper 主题读取完整样式，不受普通正文环境覆盖。

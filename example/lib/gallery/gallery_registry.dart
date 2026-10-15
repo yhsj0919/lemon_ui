@@ -1,3 +1,4 @@
+import '../pages/content/hyper_scrolling_text_page.dart';
 import '../pages/selection/hyper_dropdown_page.dart';
 import '../pages/framework/hyper_top_navigation_page.dart';
 import '../pages/selection/hyper_color_picker_page.dart';
@@ -278,6 +279,14 @@ final List<GallerySection> gallerySections = [
         builder: (_) => const HyperTimelinePage(),
       ),
       GalleryItem(
+        id: 'hyper-scrolling-text',
+        title: 'HyperScrollingText',
+        description: '单行溢出滚动，支持自动和悬停触发。',
+        icon: Icons.text_fields,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperScrollingTextPage(),
+      ),
+      GalleryItem(
         id: 'hyper-text',
         title: 'HyperText',
         description: '系统字体、语义字号和三层样式覆盖。',
@@ -390,6 +399,7 @@ final List<GallerySection> gallerySections = [
         title: 'HyperColorPicker',
         description: '色轮、明度、透明度与 HEX 输入，支持自适应选色面板。',
         icon: Icons.colorize,
+        hasStyleOverrides: true,
         builder: (_) => const HyperColorPickerPage(),
       ),
       GalleryItem(

@@ -183,10 +183,11 @@ final class HyperTextFieldStyle {
           actionWidth: other.actionWidth ?? actionWidth,
           labelGap: other.labelGap ?? labelGap,
           textAlignVertical: other.textAlignVertical ?? textAlignVertical,
-          textStyle: other.textStyle ?? textStyle,
-          hintStyle: other.hintStyle ?? hintStyle,
-          labelStyle: other.labelStyle ?? labelStyle,
-          counterStyle: other.counterStyle ?? counterStyle,
+          textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
+          hintStyle: hintStyle?.merge(other.hintStyle) ?? other.hintStyle,
+          labelStyle: labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
+          counterStyle:
+              counterStyle?.merge(other.counterStyle) ?? other.counterStyle,
           foregroundColor: other.foregroundColor ?? foregroundColor,
           iconColor: other.iconColor ?? iconColor,
           cursorColor: other.cursorColor ?? cursorColor,
@@ -197,8 +198,12 @@ final class HyperTextFieldStyle {
           showPasswordIcon: other.showPasswordIcon ?? showPasswordIcon,
           hidePasswordIcon: other.hidePasswordIcon ?? hidePasswordIcon,
           errorIconColor: other.errorIconColor ?? errorIconColor,
-          errorPopupStyle: other.errorPopupStyle ?? errorPopupStyle,
-          errorTextStyle: other.errorTextStyle ?? errorTextStyle,
+          errorPopupStyle:
+              errorPopupStyle?.merge(other.errorPopupStyle) ??
+              other.errorPopupStyle,
+          errorTextStyle:
+              errorTextStyle?.merge(other.errorTextStyle) ??
+              other.errorTextStyle,
           errorTransitionBuilder:
               other.errorTransitionBuilder ?? errorTransitionBuilder,
           errorPlacement: other.errorPlacement ?? errorPlacement,

@@ -1,3 +1,5 @@
+import 'editor_input_fields.dart';
+import 'editor_content_fields.dart';
 import 'editor_surface_fields.dart';
 import 'editor_basic_control_fields.dart';
 import 'editor_tag_fields.dart';
@@ -67,6 +69,8 @@ class EditorComponent {
   final pressedShadow = EditorComponentShadow();
   final disabledShadow = EditorComponentShadow();
   final focusedShadow = EditorComponentShadow();
+  EditorInputFields input = EditorInputFields();
+  EditorContentFields content = EditorContentFields();
   EditorSurfaceFields surface = EditorSurfaceFields();
   EditorBadgeVisual badgeStyle = EditorBadgeVisual();
   EditorDividerVisual dividerStyle = EditorDividerVisual();
@@ -80,6 +84,8 @@ class EditorComponent {
   EditorTextFieldVisual textFieldStyle = EditorTextFieldVisual();
   EditorButtonVisual buttonStyle = EditorButtonVisual();
   Map<String, Object?> toJson() => {
+    if (input.toJson().isNotEmpty) 'input': input.toJson(),
+    if (content.toJson().isNotEmpty) 'content': content.toJson(),
     if (surface.toJson().isNotEmpty) 'surface': surface.toJson(),
     if (dividerStyle.toJson().isNotEmpty) 'dividerStyle': dividerStyle.toJson(),
     if (progressStyle.toJson().isNotEmpty)
@@ -112,6 +118,8 @@ class EditorComponent {
   };
   factory EditorComponent.fromJson(Map<String, dynamic> json) {
     _checkFields(json, {
+      'input',
+      'content',
       'surface',
       'badgeStyle',
       'dividerStyle',
@@ -151,6 +159,12 @@ class EditorComponent {
               (dynamic s) => EditorShadow.fromJson(s as Map<String, dynamic>),
             )
             .toList(),
+      )
+      ..input = EditorInputFields.fromJson(
+        (json['input'] as Map<String, dynamic>?) ?? {},
+      )
+      ..content = EditorContentFields.fromJson(
+        (json['content'] as Map<String, dynamic>?) ?? {},
       )
       ..surface = EditorSurfaceFields.fromJson(
         (json['surface'] as Map<String, dynamic>?) ?? {},
@@ -296,6 +310,18 @@ class EditorShadow {
 
 /// 当前设备的显式规格覆盖，默认值始终来自 Hyper 主题。
 class EditorDevice {
+  EditorInputFields sliderInput = EditorInputFields();
+  EditorInputFields segmentedInput = EditorInputFields();
+  EditorInputFields colorPickerInput = EditorInputFields();
+  EditorInputFields iconButtonInput = EditorInputFields();
+  EditorContentFields treeContent = EditorContentFields();
+  EditorContentFields resultContent = EditorContentFields();
+  EditorContentFields descriptionContent = EditorContentFields();
+  EditorContentFields timelineContent = EditorContentFields();
+  EditorContentFields avatarContent = EditorContentFields();
+  EditorContentFields listTileContent = EditorContentFields();
+  EditorContentFields textContent = EditorContentFields();
+  EditorContentFields iconContent = EditorContentFields();
   EditorSurfaceFields containerMetrics = EditorSurfaceFields();
   EditorSurfaceFields cardMetrics = EditorSurfaceFields();
   EditorSurfaceFields collapsibleMetrics = EditorSurfaceFields();
@@ -323,6 +349,26 @@ class EditorDevice {
       menuHeight,
       menuRadius;
   Map<String, Object?> toJson() => {
+    if (sliderInput.toJson().isNotEmpty) 'sliderInput': sliderInput.toJson(),
+    if (segmentedInput.toJson().isNotEmpty)
+      'segmentedInput': segmentedInput.toJson(),
+    if (colorPickerInput.toJson().isNotEmpty)
+      'colorPickerInput': colorPickerInput.toJson(),
+    if (iconButtonInput.toJson().isNotEmpty)
+      'iconButtonInput': iconButtonInput.toJson(),
+    if (treeContent.toJson().isNotEmpty) 'treeContent': treeContent.toJson(),
+    if (resultContent.toJson().isNotEmpty)
+      'resultContent': resultContent.toJson(),
+    if (descriptionContent.toJson().isNotEmpty)
+      'descriptionContent': descriptionContent.toJson(),
+    if (timelineContent.toJson().isNotEmpty)
+      'timelineContent': timelineContent.toJson(),
+    if (avatarContent.toJson().isNotEmpty)
+      'avatarContent': avatarContent.toJson(),
+    if (listTileContent.toJson().isNotEmpty)
+      'listTileContent': listTileContent.toJson(),
+    if (textContent.toJson().isNotEmpty) 'textContent': textContent.toJson(),
+    if (iconContent.toJson().isNotEmpty) 'iconContent': iconContent.toJson(),
     if (containerMetrics.toJson().isNotEmpty)
       'containerMetrics': containerMetrics.toJson(),
     if (cardMetrics.toJson().isNotEmpty) 'cardMetrics': cardMetrics.toJson(),
@@ -363,6 +409,18 @@ class EditorDevice {
     _checkFields(j, {
       'typography',
       'buttonMetrics',
+      'sliderInput',
+      'segmentedInput',
+      'colorPickerInput',
+      'iconButtonInput',
+      'treeContent',
+      'resultContent',
+      'descriptionContent',
+      'timelineContent',
+      'avatarContent',
+      'listTileContent',
+      'textContent',
+      'iconContent',
       'containerMetrics',
       'cardMetrics',
       'collapsibleMetrics',
@@ -389,6 +447,42 @@ class EditorDevice {
       'menuRadius',
     });
     return EditorDevice()
+      ..iconContent = EditorContentFields.fromJson(
+        (j['iconContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..textContent = EditorContentFields.fromJson(
+        (j['textContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..listTileContent = EditorContentFields.fromJson(
+        (j['listTileContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..avatarContent = EditorContentFields.fromJson(
+        (j['avatarContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..timelineContent = EditorContentFields.fromJson(
+        (j['timelineContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..descriptionContent = EditorContentFields.fromJson(
+        (j['descriptionContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..resultContent = EditorContentFields.fromJson(
+        (j['resultContent'] as Map<String, dynamic>?) ?? {},
+      )
+      ..sliderInput = EditorInputFields.fromJson(
+        (j['sliderInput'] as Map<String, dynamic>?) ?? {},
+      )
+      ..segmentedInput = EditorInputFields.fromJson(
+        (j['segmentedInput'] as Map<String, dynamic>?) ?? {},
+      )
+      ..colorPickerInput = EditorInputFields.fromJson(
+        (j['colorPickerInput'] as Map<String, dynamic>?) ?? {},
+      )
+      ..iconButtonInput = EditorInputFields.fromJson(
+        (j['iconButtonInput'] as Map<String, dynamic>?) ?? {},
+      )
+      ..treeContent = EditorContentFields.fromJson(
+        (j['treeContent'] as Map<String, dynamic>?) ?? {},
+      )
       ..groupMetrics = EditorSurfaceFields.fromJson(
         (j['groupMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -500,6 +594,24 @@ class EditorMode {
   final checkboxCircle = EditorComponent();
   final checkboxRounded = EditorComponent();
   final switchControl = EditorComponent();
+  final sliderInput = EditorComponent();
+  final segmentedInput = EditorComponent();
+  final segmentedGroupInput = EditorComponent();
+  final segmentedSelectedInput = EditorComponent();
+  final colorPickerInput = EditorComponent();
+  final iconButtonInput = EditorComponent();
+  final iconButtonFilledInput = EditorComponent();
+  final iconButtonTonalInput = EditorComponent();
+  final iconButtonOutlinedInput = EditorComponent();
+  final iconButtonGhostInput = EditorComponent();
+  final treeContent = EditorComponent();
+  final resultContent = EditorComponent();
+  final descriptionContent = EditorComponent();
+  final timelineContent = EditorComponent();
+  final avatarContent = EditorComponent();
+  final listTileContent = EditorComponent();
+  final textContent = EditorComponent();
+  final iconContent = EditorComponent();
   final container = EditorComponent();
   final collapsible = EditorComponent();
   final group = EditorComponent();
@@ -555,6 +667,38 @@ class EditorMode {
       'checkboxRounded': checkboxRounded.toJson(),
     if (switchControl.toJson().isNotEmpty)
       'switchControl': switchControl.toJson(),
+    if (segmentedGroupInput.toJson().isNotEmpty)
+      'segmentedGroupInput': segmentedGroupInput.toJson(),
+    if (sliderInput.toJson().isNotEmpty) 'sliderInput': sliderInput.toJson(),
+    if (segmentedInput.toJson().isNotEmpty)
+      'segmentedInput': segmentedInput.toJson(),
+    if (segmentedSelectedInput.toJson().isNotEmpty)
+      'segmentedSelectedInput': segmentedSelectedInput.toJson(),
+    if (colorPickerInput.toJson().isNotEmpty)
+      'colorPickerInput': colorPickerInput.toJson(),
+    if (iconButtonInput.toJson().isNotEmpty)
+      'iconButtonInput': iconButtonInput.toJson(),
+    if (iconButtonFilledInput.toJson().isNotEmpty)
+      'iconButtonFilledInput': iconButtonFilledInput.toJson(),
+    if (iconButtonTonalInput.toJson().isNotEmpty)
+      'iconButtonTonalInput': iconButtonTonalInput.toJson(),
+    if (iconButtonOutlinedInput.toJson().isNotEmpty)
+      'iconButtonOutlinedInput': iconButtonOutlinedInput.toJson(),
+    if (iconButtonGhostInput.toJson().isNotEmpty)
+      'iconButtonGhostInput': iconButtonGhostInput.toJson(),
+    if (treeContent.toJson().isNotEmpty) 'treeContent': treeContent.toJson(),
+    if (resultContent.toJson().isNotEmpty)
+      'resultContent': resultContent.toJson(),
+    if (descriptionContent.toJson().isNotEmpty)
+      'descriptionContent': descriptionContent.toJson(),
+    if (timelineContent.toJson().isNotEmpty)
+      'timelineContent': timelineContent.toJson(),
+    if (avatarContent.toJson().isNotEmpty)
+      'avatarContent': avatarContent.toJson(),
+    if (listTileContent.toJson().isNotEmpty)
+      'listTileContent': listTileContent.toJson(),
+    if (textContent.toJson().isNotEmpty) 'textContent': textContent.toJson(),
+    if (iconContent.toJson().isNotEmpty) 'iconContent': iconContent.toJson(),
     if (container.toJson().isNotEmpty) 'container': container.toJson(),
     if (collapsible.toJson().isNotEmpty) 'collapsible': collapsible.toJson(),
     if (group.toJson().isNotEmpty) 'group': group.toJson(),
@@ -604,6 +748,24 @@ class EditorMode {
       'checkboxCircle',
       'checkboxRounded',
       'switchControl',
+      'sliderInput',
+      'segmentedInput',
+      'segmentedGroupInput',
+      'segmentedSelectedInput',
+      'colorPickerInput',
+      'iconButtonInput',
+      'iconButtonFilledInput',
+      'iconButtonTonalInput',
+      'iconButtonOutlinedInput',
+      'iconButtonGhostInput',
+      'treeContent',
+      'resultContent',
+      'descriptionContent',
+      'timelineContent',
+      'avatarContent',
+      'listTileContent',
+      'textContent',
+      'iconContent',
       'container',
       'collapsible',
       'group',
@@ -652,6 +814,8 @@ class EditorMode {
       target.pressedShadow.shadows = value.pressedShadow.shadows;
       target.disabledShadow.shadows = value.disabledShadow.shadows;
       target.focusedShadow.shadows = value.focusedShadow.shadows;
+      target.input = value.input;
+      target.content = value.content;
       target.surface = value.surface;
       target.buttonStyle = value.buttonStyle;
       target.textFieldStyle = value.textFieldStyle;
@@ -694,6 +858,24 @@ class EditorMode {
     read('checkboxCircle', result.checkboxCircle);
     read('checkboxRounded', result.checkboxRounded);
     read('switchControl', result.switchControl);
+    read('sliderInput', result.sliderInput);
+    read('segmentedInput', result.segmentedInput);
+    read('segmentedGroupInput', result.segmentedGroupInput);
+    read('segmentedSelectedInput', result.segmentedSelectedInput);
+    read('colorPickerInput', result.colorPickerInput);
+    read('iconButtonInput', result.iconButtonInput);
+    read('iconButtonFilledInput', result.iconButtonFilledInput);
+    read('iconButtonTonalInput', result.iconButtonTonalInput);
+    read('iconButtonOutlinedInput', result.iconButtonOutlinedInput);
+    read('iconButtonGhostInput', result.iconButtonGhostInput);
+    read('treeContent', result.treeContent);
+    read('resultContent', result.resultContent);
+    read('descriptionContent', result.descriptionContent);
+    read('timelineContent', result.timelineContent);
+    read('avatarContent', result.avatarContent);
+    read('listTileContent', result.listTileContent);
+    read('textContent', result.textContent);
+    read('iconContent', result.iconContent);
     read('container', result.container);
     read('collapsible', result.collapsible);
     read('group', result.group);
@@ -867,6 +1049,43 @@ class EditorThemeDocument {
             avatarSize: d.chipMetrics.avatarSize,
             deleteIconSize: d.chipMetrics.deleteIconSize,
             deleteTargetWidth: d.chipMetrics.deleteTargetWidth,
+          ),
+          slider: s.slider.copyWith(
+            thumbWidth: d.sliderInput.thumbWidth,
+            thumbHeight: d.sliderInput.thumbHeight,
+            trackHeight: d.sliderInput.trackHeight,
+            thumbRadius: d.sliderInput.thumbRadius,
+            thinTrackHeight: d.sliderInput.thinTrackHeight,
+            thinThumbRadius: d.sliderInput.thinThumbRadius,
+            stepPointRadius: d.sliderInput.stepPointRadius,
+            capsuleWidth: d.sliderInput.capsuleWidth,
+            capsuleCornerRadius: d.sliderInput.capsuleCornerRadius,
+            capsuleIconSize: d.sliderInput.capsuleIconSize,
+            capsuleIconInset: d.sliderInput.capsuleIconInset,
+            capsuleOverscrollExtent: d.sliderInput.capsuleOverscrollExtent,
+          ),
+          colorPicker: s.colorPicker.copyWith(
+            width: d.colorPickerInput.width,
+            paletteHeight: d.colorPickerInput.paletteHeight,
+            radius: d.colorPickerInput.radius,
+            spacing: d.colorPickerInput.spacing,
+            markerRadius: d.colorPickerInput.markerRadius,
+            previewHeight: d.colorPickerInput.previewHeight,
+          ),
+          iconButton: s.iconButton.copyWith(
+            size: d.iconButtonInput.width,
+            iconSize: d.iconButtonInput.iconSize,
+            progressSize: d.iconButtonInput.progressSize,
+            radius: d.iconButtonInput.radius,
+          ),
+          timeline: s.timeline.copyWith(
+            nodeSize: d.timelineContent.nodeSize,
+            iconSize: d.timelineContent.iconSize,
+          ),
+          avatar: s.avatar.copyWith(
+            small: d.avatarContent.avatarSmall,
+            medium: d.avatarContent.avatarMedium,
+            large: d.avatarContent.avatarLarge,
           ),
           card: s.card.copyWith(
             radius: d.cardMetrics.radius ?? d.cardRadius,
@@ -1250,6 +1469,462 @@ class EditorThemeDocument {
               ),
         ),
       ),
+      treeViewTheme: theme.treeViewTheme.copyWith(
+        style: theme.treeViewTheme.style.merge(
+          HyperTreeViewStyle(
+            rowHeight: device(deviceType).treeContent.rowHeight,
+            rowSpacing: device(deviceType).treeContent.rowSpacing,
+            indent: device(deviceType).treeContent.indent,
+            iconSize: device(deviceType).treeContent.iconSize,
+            contentSpacing: device(deviceType).treeContent.contentSpacing,
+            foregroundColor:
+                (m.treeContent.content.foregroundColor ??
+                        m.treeContent.content.textStyleColor)
+                    ?.resolve(colors),
+            selectedForegroundColor: m
+                .treeContent
+                .content
+                .selectedForegroundColor
+                ?.resolve(colors),
+            disabledColor: m.treeContent.content.disabledColor?.resolve(colors),
+            focusColor: m.treeContent.content.focusColor?.resolve(colors),
+            errorColor: m.treeContent.content.errorColor?.resolve(colors),
+            rowBackground: m.treeContent.content.rowBackground == null
+                ? null
+                : HyperFill.color(
+                    m.treeContent.content.rowBackground!.resolve(colors),
+                  ),
+            selectedBackground: m.treeContent.content.selectedBackground == null
+                ? null
+                : HyperFill.color(
+                    m.treeContent.content.selectedBackground!.resolve(colors),
+                  ),
+            hoverBackground: m.treeContent.content.hoverBackground == null
+                ? null
+                : HyperFill.color(
+                    m.treeContent.content.hoverBackground!.resolve(colors),
+                  ),
+            pressedBackground: m.treeContent.content.pressedBackground == null
+                ? null
+                : HyperFill.color(
+                    m.treeContent.content.pressedBackground!.resolve(colors),
+                  ),
+            textStyle: TextStyle(
+              fontSize: device(deviceType).treeContent.textStyleSize,
+              fontWeight: m.treeContent.content.textStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m.treeContent.content.textStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.treeContent.content.textStyleColor?.resolve(colors),
+            ),
+            rowPadding: device(deviceType).treeContent.padding == null
+                ? null
+                : EdgeInsets.all(device(deviceType).treeContent.padding!),
+            background: background(m.treeContent),
+            border: m.treeContent.border.resolve(colors),
+            borderRadius: device(deviceType).treeContent.radius == null
+                ? null
+                : BorderRadius.circular(device(deviceType).treeContent.radius!),
+            rowRadius: device(deviceType).treeContent.rowRadius == null
+                ? null
+                : BorderRadius.circular(
+                    device(deviceType).treeContent.rowRadius!,
+                  ),
+            duration: m.treeContent.content.animationDuration,
+            curve: m.treeContent.content.animationCurve,
+          ),
+        ),
+      ),
+      resultTheme: theme.resultTheme.copyWith(
+        style: theme.resultTheme.style.merge(
+          HyperResultStyle(
+            iconSize: device(deviceType).resultContent.iconSize,
+            illustrationSize: device(deviceType).resultContent.illustrationSize,
+            maxWidth: device(deviceType).resultContent.maxWidth,
+            contentSpacing: device(deviceType).resultContent.contentSpacing,
+            titleSpacing: device(deviceType).resultContent.titleSpacing,
+            actionSpacing: device(deviceType).resultContent.actionSpacing,
+            actionRunSpacing: device(deviceType).resultContent.actionRunSpacing,
+            iconColor: m.resultContent.content.iconColor?.resolve(colors),
+            titleStyle: TextStyle(
+              fontSize: device(deviceType).resultContent.titleStyleSize,
+              fontWeight: m.resultContent.content.titleStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .resultContent
+                                    .content
+                                    .titleStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.resultContent.content.titleStyleColor?.resolve(colors),
+            ),
+            descriptionStyle: TextStyle(
+              fontSize: device(deviceType).resultContent.descriptionStyleSize,
+              fontWeight: m.resultContent.content.descriptionStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .resultContent
+                                    .content
+                                    .descriptionStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.resultContent.content.descriptionStyleColor?.resolve(
+                colors,
+              ),
+            ),
+            padding: device(deviceType).resultContent.padding == null
+                ? null
+                : EdgeInsets.all(device(deviceType).resultContent.padding!),
+            background: background(m.resultContent),
+            border: m.resultContent.border.resolve(colors),
+            borderRadius: device(deviceType).resultContent.radius == null
+                ? null
+                : BorderRadius.circular(
+                    device(deviceType).resultContent.radius!,
+                  ),
+            boxShadow: m.resultContent.shadows
+                ?.map((s) => s.resolve(colors))
+                .toList(),
+            duration: m.resultContent.content.animationDuration,
+            curve: m.resultContent.content.animationCurve,
+          ),
+        ),
+      ),
+      descriptionListTheme: theme.descriptionListTheme.copyWith(
+        style: theme.descriptionListTheme.style.merge(
+          HyperDescriptionListStyle(
+            contentHeight: device(deviceType).descriptionContent.contentHeight,
+            contentHeightMode:
+                m.descriptionContent.content.contentHeightMode == null
+                ? null
+                : HyperDescriptionContentHeightMode.values.byName(
+                    m.descriptionContent.content.contentHeightMode!,
+                  ),
+            valueAlign: m.descriptionContent.content.valueAlign == null
+                ? null
+                : TextAlign.values.byName(
+                    m.descriptionContent.content.valueAlign!,
+                  ),
+            labelAlign: m.descriptionContent.content.labelAlign == null
+                ? null
+                : TextAlign.values.byName(
+                    m.descriptionContent.content.labelAlign!,
+                  ),
+            borderThickness: device(deviceType).descriptionContent.borderWidth,
+            columnSpacing: device(deviceType).descriptionContent.columnSpacing,
+            rowSpacing: device(deviceType).descriptionContent.rowSpacing,
+            labelValueSpacing: device(deviceType)
+                .descriptionContent
+                .labelValueSpacing,
+            minimumColumnWidth: device(deviceType)
+                .descriptionContent
+                .minimumColumnWidth,
+            borderColor: m.descriptionContent.content.borderColor?.resolve(
+              colors,
+            ),
+            labelBackground:
+                m.descriptionContent.content.labelBackground == null
+                ? null
+                : HyperFill.color(
+                    m.descriptionContent.content.labelBackground!.resolve(
+                      colors,
+                    ),
+                  ),
+            valueBackground:
+                m.descriptionContent.content.valueBackground == null
+                ? null
+                : HyperFill.color(
+                    m.descriptionContent.content.valueBackground!.resolve(
+                      colors,
+                    ),
+                  ),
+            labelStyle: TextStyle(
+              fontSize: device(deviceType).descriptionContent.labelStyleSize,
+              fontWeight: m.descriptionContent.content.labelStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .descriptionContent
+                                    .content
+                                    .labelStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.descriptionContent.content.labelStyleColor?.resolve(
+                colors,
+              ),
+            ),
+            valueStyle: TextStyle(
+              fontSize: device(deviceType).descriptionContent.valueStyleSize,
+              fontWeight: m.descriptionContent.content.valueStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .descriptionContent
+                                    .content
+                                    .valueStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.descriptionContent.content.valueStyleColor?.resolve(
+                colors,
+              ),
+            ),
+            cellPadding: device(deviceType).descriptionContent.padding == null
+                ? null
+                : EdgeInsets.all(
+                    device(deviceType).descriptionContent.padding!,
+                  ),
+            background: background(m.descriptionContent),
+            borderRadius: device(deviceType).descriptionContent.radius == null
+                ? null
+                : BorderRadius.circular(
+                    device(deviceType).descriptionContent.radius!,
+                  ),
+            duration: m.descriptionContent.content.animationDuration,
+            curve: m.descriptionContent.content.animationCurve,
+          ),
+        ),
+      ),
+      timelineTheme: theme.timelineTheme.copyWith(
+        style: theme.timelineTheme.style.merge(
+          HyperTimelineStyle(
+            lineThickness: device(deviceType).timelineContent.lineThickness,
+            nodeLineGap: device(deviceType).timelineContent.nodeLineGap,
+            spacing: device(deviceType).timelineContent.spacing,
+            itemSpacing: device(deviceType).timelineContent.itemSpacing,
+            textSpacing: device(deviceType).timelineContent.textSpacing,
+            nodeForeground: m.timelineContent.content.nodeForeground?.resolve(
+              colors,
+            ),
+            lineColor: m.timelineContent.content.lineColor?.resolve(colors),
+            nodeFill: m.timelineContent.content.nodeFill == null
+                ? null
+                : HyperFill.color(
+                    m.timelineContent.content.nodeFill!.resolve(colors),
+                  ),
+            timeStyle: TextStyle(
+              fontSize: device(deviceType).timelineContent.timeStyleSize,
+              fontWeight: m.timelineContent.content.timeStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .timelineContent
+                                    .content
+                                    .timeStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.timelineContent.content.timeStyleColor?.resolve(colors),
+            ),
+            titleStyle: TextStyle(
+              fontSize: device(deviceType).timelineContent.titleStyleSize,
+              fontWeight: m.timelineContent.content.titleStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .timelineContent
+                                    .content
+                                    .titleStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.timelineContent.content.titleStyleColor?.resolve(colors),
+            ),
+            contentStyle: TextStyle(
+              fontSize: device(deviceType).timelineContent.contentStyleSize,
+              fontWeight: m.timelineContent.content.contentStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .timelineContent
+                                    .content
+                                    .contentStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.timelineContent.content.contentStyleColor?.resolve(
+                colors,
+              ),
+            ),
+            duration: m.timelineContent.content.animationDuration,
+            curve: m.timelineContent.content.animationCurve,
+          ),
+        ),
+      ),
+      avatarTheme: theme.avatarTheme.copyWith(
+        groupStyle: theme.avatarTheme.groupStyle.merge(
+          HyperAvatarStyle(
+            overlap: device(deviceType).avatarContent.overlap,
+            spacing: device(deviceType).avatarContent.spacing,
+            ringWidth: device(deviceType).avatarContent.ringWidth,
+            ringColor: m.avatarContent.content.ringColor?.resolve(colors),
+            iconSize: device(deviceType).avatarContent.iconSize,
+            radius: device(deviceType).avatarContent.radius,
+            duration: m.avatarContent.content.animationDuration,
+            curve: m.avatarContent.content.animationCurve,
+          ),
+        ),
+        style: theme.avatarTheme.style.merge(
+          HyperAvatarStyle(
+            iconSize: device(deviceType).avatarContent.iconSize,
+            overlap: device(deviceType).avatarContent.overlap,
+            spacing: device(deviceType).avatarContent.spacing,
+            ringWidth: device(deviceType).avatarContent.ringWidth,
+            backgroundColor: m.avatarContent.content.backgroundColor?.resolve(
+              colors,
+            ),
+            foregroundColor: m.avatarContent.content.foregroundColor?.resolve(
+              colors,
+            ),
+            borderColor: m.avatarContent.content.borderColor?.resolve(colors),
+            ringColor: m.avatarContent.content.ringColor?.resolve(colors),
+            textStyle: TextStyle(
+              fontSize: device(deviceType).avatarContent.textStyleSize,
+              fontWeight: m.avatarContent.content.textStyleWeight == null
+                  ? null
+                  : FontWeight
+                        .values[(m.avatarContent.content.textStyleWeight! / 100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.avatarContent.content.textStyleColor?.resolve(colors),
+            ),
+            borderWidth: device(deviceType).avatarContent.borderWidth,
+            radius: device(deviceType).avatarContent.radius,
+            boxShadow: m.avatarContent.shadows
+                ?.map((s) => s.resolve(colors))
+                .toList(),
+            duration: m.avatarContent.content.animationDuration,
+            curve: m.avatarContent.content.animationCurve,
+          ),
+        ),
+      ),
+      listTileTheme: theme.listTileTheme.copyWith(
+        style: (theme.listTileTheme.style ?? const HyperListTileStyle()).merge(
+          HyperListTileStyle(
+            minHeight: device(deviceType).listTileContent.minHeight,
+            leadingSize: device(deviceType).listTileContent.leadingSize,
+            leadingSpacing: device(deviceType).listTileContent.leadingSpacing,
+            trailingSpacing: device(deviceType).listTileContent.trailingSpacing,
+            trailingIconSize: device(deviceType)
+                .listTileContent
+                .trailingIconSize,
+            foregroundColor: m.listTileContent.content.foregroundColor?.resolve(
+              colors,
+            ),
+            subtitleColor: m.listTileContent.content.subtitleColor?.resolve(
+              colors,
+            ),
+            trailingColor: m.listTileContent.content.trailingColor?.resolve(
+              colors,
+            ),
+            disabledColor: m.listTileContent.content.disabledColor?.resolve(
+              colors,
+            ),
+            overlayColor: m.listTileContent.content.overlayColor?.resolve(
+              colors,
+            ),
+            titleStyle: TextStyle(
+              fontSize: device(deviceType).listTileContent.titleStyleSize,
+              fontWeight: m.listTileContent.content.titleStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .listTileContent
+                                    .content
+                                    .titleStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.listTileContent.content.titleStyleColor?.resolve(colors),
+            ),
+            subtitleStyle: TextStyle(
+              fontSize: device(deviceType).listTileContent.subtitleStyleSize,
+              fontWeight: m.listTileContent.content.subtitleStyleWeight == null
+                  ? null
+                  : FontWeight.values[(m
+                                    .listTileContent
+                                    .content
+                                    .subtitleStyleWeight! /
+                                100)
+                            .round()
+                            .clamp(1, 9) -
+                        1],
+              color: m.listTileContent.content.subtitleStyleColor?.resolve(
+                colors,
+              ),
+            ),
+            padding: device(deviceType).listTileContent.padding == null
+                ? null
+                : EdgeInsets.all(device(deviceType).listTileContent.padding!),
+            animationDuration: m.listTileContent.content.animationDuration,
+            animationCurve: m.listTileContent.content.animationCurve,
+          ),
+        ),
+      ),
+      textComponentTheme: HyperTextThemeData(
+        style: (theme.textComponentTheme.style ?? const TextStyle()).merge(
+          TextStyle(
+            fontSize: device(deviceType).textContent.textStyleSize,
+            fontWeight: m.textContent.content.textStyleWeight == null
+                ? null
+                : FontWeight.values[(m.textContent.content.textStyleWeight! /
+                              100)
+                          .round()
+                          .clamp(1, 9) -
+                      1],
+            color: m.textContent.content.textStyleColor?.resolve(colors),
+          ),
+        ),
+        displayLarge: theme.textComponentTheme.displayLarge,
+        displayMedium: theme.textComponentTheme.displayMedium,
+        displaySmall: theme.textComponentTheme.displaySmall,
+        pageTitle: theme.textComponentTheme.pageTitle,
+        sectionTitle: theme.textComponentTheme.sectionTitle,
+        subsectionTitle: theme.textComponentTheme.subsectionTitle,
+        bodyLarge: theme.textComponentTheme.bodyLarge,
+        body: theme.textComponentTheme.body,
+        bodySmall: theme.textComponentTheme.bodySmall,
+        control: theme.textComponentTheme.control,
+        label: theme.textComponentTheme.label,
+        caption: theme.textComponentTheme.caption,
+      ),
+      iconTheme: theme.iconTheme.merge(
+        HyperIconThemeData(
+          style: HyperIconStyle(
+            color: m.iconContent.content.foregroundColor == null
+                ? null
+                : HyperStateValue.all(
+                    m.iconContent.content.foregroundColor!.resolve(colors),
+                  ),
+            size: device(deviceType).iconContent.iconExtent == null
+                ? null
+                : HyperStateValue.all(
+                    device(deviceType).iconContent.iconExtent!,
+                  ),
+            fill: m.iconContent.content.iconFill == null
+                ? null
+                : HyperStateValue.all(m.iconContent.content.iconFill!),
+            weight: m.iconContent.content.iconWeight == null
+                ? null
+                : HyperStateValue.all(m.iconContent.content.iconWeight!),
+            grade: m.iconContent.content.iconGrade == null
+                ? null
+                : HyperStateValue.all(m.iconContent.content.iconGrade!),
+            opticalSize: m.iconContent.content.iconOpticalSize == null
+                ? null
+                : HyperStateValue.all(m.iconContent.content.iconOpticalSize!),
+          ),
+        ),
+      ),
       containerTheme: theme.containerTheme.copyWith(
         background: background(m.container),
         border: m.container.border.resolve(colors),
@@ -1306,6 +1981,56 @@ class EditorThemeDocument {
         ),
       ),
       titledCardTheme: theme.titledCardTheme.copyWith(
+        inside: (theme.titledCardTheme.inside ?? const HyperTitledCardStyle())
+            .merge(
+              HyperTitledCardStyle(
+                actionPadding: device(deviceType).cardMetrics.actionInsets(
+                  true,
+                  theme.sizes
+                      .resolve(deviceType)
+                      .card
+                      .actionPadding
+                      .resolve(TextDirection.ltr),
+                ),
+                actionIconSize: device(deviceType)
+                    .cardMetrics
+                    .insideActionIconSize,
+                titleTextStyle: TextStyle(
+                  fontSize: device(deviceType).cardMetrics.insideTitleFontSize,
+                  color: c.surface.insideTitleColor?.resolve(colors),
+                ),
+                actionTextStyle: TextStyle(
+                  fontSize: device(deviceType).cardMetrics.insideActionFontSize,
+                  color: c.surface.insideActionColor?.resolve(colors),
+                ),
+              ),
+            ),
+        outside: (theme.titledCardTheme.outside ?? const HyperTitledCardStyle())
+            .merge(
+              HyperTitledCardStyle(
+                actionPadding: device(deviceType).cardMetrics.actionInsets(
+                  false,
+                  theme.sizes
+                      .resolve(deviceType)
+                      .card
+                      .actionPadding
+                      .resolve(TextDirection.ltr),
+                ),
+                actionIconSize: device(deviceType)
+                    .cardMetrics
+                    .outsideActionIconSize,
+                titleTextStyle: TextStyle(
+                  fontSize: device(deviceType).cardMetrics.outsideTitleFontSize,
+                  color: c.surface.outsideTitleColor?.resolve(colors),
+                ),
+                actionTextStyle: TextStyle(
+                  fontSize: device(deviceType)
+                      .cardMetrics
+                      .outsideActionFontSize,
+                  color: c.surface.outsideActionColor?.resolve(colors),
+                ),
+              ),
+            ),
         style: (theme.titledCardTheme.style ?? const HyperTitledCardStyle())
             .merge(
               HyperTitledCardStyle(
@@ -1366,6 +2091,50 @@ class EditorThemeDocument {
                 )
                 .merge(
                   HyperTextFieldStyle(
+                    errorTextStyle: TextStyle(
+                      fontSize: device(deviceType)
+                          .textFieldMetrics
+                          .errorFontSize,
+                    ),
+                    errorPopupStyle: HyperCardStyle(
+                      padding:
+                          device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupPadding ==
+                              null
+                          ? null
+                          : EdgeInsets.all(
+                              device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupPadding!,
+                            ),
+                      borderRadius:
+                          device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupRadius ==
+                              null
+                          ? null
+                          : BorderRadius.circular(
+                              device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupRadius!,
+                            ),
+                      border:
+                          device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupBorderWidth ==
+                              null
+                          ? null
+                          : Border.all(
+                              width: device(deviceType)
+                                  .textFieldMetrics
+                                  .errorPopupBorderWidth!,
+                              color:
+                                  f.textFieldStyle.errorPopupBorderColor
+                                      ?.resolve(colors) ??
+                                  colors.outline,
+                            ),
+                    ),
                     background: background(f),
                     border: f.border.resolve(colors),
                     foregroundColor: f.foreground?.resolve(colors),
@@ -1510,6 +2279,6 @@ class EditorThemeDocument {
             ),
       ),
     );
-    return theme;
+    return applyEditorInputs(theme, m, device(deviceType), deviceType);
   }
 }

@@ -94,19 +94,43 @@ class _PageState extends State<HyperCollapsiblePage> {
             ],
           ),
         ]),
-        section('横向内容区域', [
-          HyperButton.text(
-            label: Text(_horizontal ? '收起横向区域' : '展开横向区域'),
-            onPressed: () => setState(() => _horizontal = !_horizontal),
+        section('横向展开搜索', [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              HyperButton.tonal(
+                key: const Key('horizontal-search-toggle'),
+                label: Text(_horizontal ? '收起搜索' : '搜索'),
+                onPressed: () => setState(() => _horizontal = !_horizontal),
+              ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) => Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: HyperCollapsible(
+                      expanded: _horizontal,
+                      axis: Axis.horizontal,
+                      style: const HyperCollapsibleStyle(
+                        background: HyperFill.none(),
+                        border: Border(),
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      child: SizedBox(
+                        width: constraints.maxWidth,
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.only(
+                            start: sizes.compactSectionSpacing,
+                          ),
+                          child: const HyperTextField(hintText: '输入关键词搜索'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          HyperCollapsible(
-            expanded: _horizontal,
-            axis: Axis.horizontal,
-            child: SizedBox(
-              width: sizes.loadingOverlay.maxContentWidth,
-              child: const Text('横向改变内容裁切宽度；父布局需要允许宽度变化。无标题时，可由外部按钮控制。'),
-            ),
-          ),
+          const HyperText('点击搜索，输入框从按钮右侧展开；收起后保留入口。此例显式关闭折叠区背景、边框和圆角，由输入框绘制表面；内容内边距继承工作区设置。'),
         ]),
         section('局部主题、分隔线与统一材质', [
           HyperButton.text(

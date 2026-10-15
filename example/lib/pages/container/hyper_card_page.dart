@@ -24,7 +24,7 @@ class _HyperCardPageState extends State<HyperCardPage> {
         children: [
           const HyperText('HyperCard', variant: HyperTextVariant.pageTitle),
           const SizedBox(height: 8),
-          const HyperText('基础表面保持零内边距；内容、媒体和操作区由调用方自由组合。'),
+          const HyperText('卡片默认提供内容内边距；标题区独立配置，媒体可显式关闭内边距。'),
           const SizedBox(height: 24),
           const HyperText('基础卡片', variant: HyperTextVariant.sectionTitle),
           const SizedBox(height: 12),
@@ -71,10 +71,7 @@ class _HyperCardPageState extends State<HyperCardPage> {
                   tint: Color(0x143482FF),
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
-                child: HyperText('Card 与 Button 使用相同的材质配方'),
-              ),
+              child: const HyperText('Card 与 Button 使用相同的材质配方'),
             ),
           ),
           const SizedBox(height: 16),

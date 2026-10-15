@@ -29,3 +29,16 @@ const editorSwitchHeightLimit = 64.0;
 
 double editorSelectionStrokeLimit(double size) =>
     editorRadiusLimit(size).clamp(0, editorLineThicknessLimit).toDouble();
+
+// Content preview editor bounds: bounded illustration and readable content area.
+// These are editor operation limits, not official default dimensions; validate per demo.
+const editorContentIllustrationLimit = 256.0;
+const editorContentWidthLimit = 960.0;
+
+// Scrollable content viewport editing bound; independent of component defaults.
+// Matches the content preview operation extent, pending review on small devices.
+const editorContentHeightLimit = 960.0;
+
+// Capsule slider width operation boundary; vertical height is supplied by parent.
+// Allows editing up to a wide control, not a device default or official specification.
+const editorCapsuleWidthLimit = 128.0;

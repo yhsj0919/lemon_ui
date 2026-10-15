@@ -129,6 +129,7 @@ class _HyperColorPickerState extends State<HyperColorPicker> {
       List<Color> colors, {
       bool checker = false,
     }) => HyperSliderStyle(
+      showValueIndicator: ShowValueIndicator.never,
       trackShape: _ColorTrackShape(
         colors,
         checker: checker,

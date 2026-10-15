@@ -1,3 +1,6 @@
+import '../card/hyper_card_style.dart';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// 滑块的实例视觉覆盖；空字段继承局部或全局主题。
@@ -14,8 +17,14 @@ final class HyperSliderStyle {
     this.overlayColor,
     this.valueIndicatorColor,
     this.valueIndicatorTextStyle,
+    this.showValueIndicator,
+    this.valueIndicatorSurface,
+    this.valueIndicatorGap,
     this.trackHeight,
     this.thumbRadius,
+    this.thumbWidth,
+    this.thumbHeight,
+    this.thumbShadows,
     this.overlayRadius,
     this.thumbOutlineColor,
     this.thumbOutlineWidth,
@@ -60,8 +69,13 @@ final class HyperSliderStyle {
   final Color? overlayColor;
   final Color? valueIndicatorColor;
   final TextStyle? valueIndicatorTextStyle;
+  final ShowValueIndicator? showValueIndicator;
+  final HyperCardStyle? valueIndicatorSurface;
+  final double? valueIndicatorGap;
   final double? trackHeight;
   final double? thumbRadius;
+  final double? thumbWidth, thumbHeight;
+  final List<BoxShadow>? thumbShadows;
   final double? overlayRadius;
   final Color? thumbOutlineColor;
   final double? thumbOutlineWidth;
@@ -114,6 +128,9 @@ final class HyperSliderStyle {
               other.valueIndicatorTextStyle ?? valueIndicatorTextStyle,
           trackHeight: other.trackHeight ?? trackHeight,
           thumbRadius: other.thumbRadius ?? thumbRadius,
+          thumbWidth: other.thumbWidth ?? thumbWidth,
+          thumbHeight: other.thumbHeight ?? thumbHeight,
+          thumbShadows: other.thumbShadows ?? thumbShadows,
           overlayRadius: other.overlayRadius ?? overlayRadius,
           thumbOutlineColor: other.thumbOutlineColor ?? thumbOutlineColor,
           thumbOutlineWidth: other.thumbOutlineWidth ?? thumbOutlineWidth,
@@ -127,6 +144,11 @@ final class HyperSliderStyle {
           rangeTrackShape: other.rangeTrackShape ?? rangeTrackShape,
           thumbShape: other.thumbShape ?? thumbShape,
           overlayShape: other.overlayShape ?? overlayShape,
+          valueIndicatorSurface:
+              valueIndicatorSurface?.merge(other.valueIndicatorSurface) ??
+              other.valueIndicatorSurface,
+          valueIndicatorGap: other.valueIndicatorGap ?? valueIndicatorGap,
+          showValueIndicator: other.showValueIndicator ?? showValueIndicator,
           valueIndicatorShape: other.valueIndicatorShape ?? valueIndicatorShape,
           rangeThumbShape: other.rangeThumbShape ?? rangeThumbShape,
           rangeValueIndicatorShape:
@@ -205,6 +227,9 @@ final class HyperSliderStyle {
     ),
     trackHeight: _lerpDouble(a.trackHeight, b.trackHeight, t),
     thumbRadius: _lerpDouble(a.thumbRadius, b.thumbRadius, t),
+    thumbWidth: _lerpDouble(a.thumbWidth, b.thumbWidth, t),
+    thumbHeight: _lerpDouble(a.thumbHeight, b.thumbHeight, t),
+    thumbShadows: BoxShadow.lerpList(a.thumbShadows, b.thumbShadows, t),
     overlayRadius: _lerpDouble(a.overlayRadius, b.overlayRadius, t),
     thumbOutlineColor: Color.lerp(a.thumbOutlineColor, b.thumbOutlineColor, t),
     thumbOutlineWidth: _lerpDouble(a.thumbOutlineWidth, b.thumbOutlineWidth, t),
@@ -224,6 +249,16 @@ final class HyperSliderStyle {
     rangeTrackShape: t < .5 ? a.rangeTrackShape : b.rangeTrackShape,
     thumbShape: t < .5 ? a.thumbShape : b.thumbShape,
     overlayShape: t < .5 ? a.overlayShape : b.overlayShape,
+    valueIndicatorSurface:
+        a.valueIndicatorSurface == null || b.valueIndicatorSurface == null
+        ? (t < .5 ? a.valueIndicatorSurface : b.valueIndicatorSurface)
+        : HyperCardStyle.lerp(
+            a.valueIndicatorSurface!,
+            b.valueIndicatorSurface!,
+            t,
+          ),
+    valueIndicatorGap: _lerpDouble(a.valueIndicatorGap, b.valueIndicatorGap, t),
+    showValueIndicator: t < .5 ? a.showValueIndicator : b.showValueIndicator,
     valueIndicatorShape: t < .5 ? a.valueIndicatorShape : b.valueIndicatorShape,
     rangeThumbShape: t < .5 ? a.rangeThumbShape : b.rangeThumbShape,
     rangeValueIndicatorShape: t < .5
@@ -335,8 +370,14 @@ final class HyperSliderStyle {
       other.overlayColor == overlayColor &&
       other.valueIndicatorColor == valueIndicatorColor &&
       other.valueIndicatorTextStyle == valueIndicatorTextStyle &&
+      other.showValueIndicator == showValueIndicator &&
+      other.valueIndicatorSurface == valueIndicatorSurface &&
+      other.valueIndicatorGap == valueIndicatorGap &&
       other.trackHeight == trackHeight &&
       other.thumbRadius == thumbRadius &&
+      other.thumbWidth == thumbWidth &&
+      other.thumbHeight == thumbHeight &&
+      listEquals(other.thumbShadows, thumbShadows) &&
       other.overlayRadius == overlayRadius &&
       other.thumbOutlineColor == thumbOutlineColor &&
       other.thumbOutlineWidth == thumbOutlineWidth &&
@@ -382,8 +423,14 @@ final class HyperSliderStyle {
     overlayColor,
     valueIndicatorColor,
     valueIndicatorTextStyle,
+    showValueIndicator,
+    valueIndicatorSurface,
+    valueIndicatorGap,
     trackHeight,
     thumbRadius,
+    thumbWidth,
+    thumbHeight,
+    Object.hashAll(thumbShadows ?? const <BoxShadow>[]),
     overlayRadius,
     thumbOutlineColor,
     thumbOutlineWidth,

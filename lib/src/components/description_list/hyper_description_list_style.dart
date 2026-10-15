@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_surface_material.dart';
 
+enum HyperDescriptionContentHeightMode { auto, maximum, fixed }
+
 @immutable
 final class HyperDescriptionListStyle {
   const HyperDescriptionListStyle({
@@ -19,14 +21,16 @@ final class HyperDescriptionListStyle {
     this.columnSpacing,
     this.rowSpacing,
     this.labelValueSpacing,
-    this.headerSpacing,
+    this.labelAlign,
+    this.valueAlign,
+    this.contentHeight,
+    this.contentHeightMode,
     this.minimumColumnWidth,
     this.labelWidth,
     this.labelFlex,
     this.valueFlex,
     this.labelStyle,
     this.valueStyle,
-    this.titleStyle,
     this.placeholder,
     this.duration,
     this.curve,
@@ -45,14 +49,16 @@ final class HyperDescriptionListStyle {
   final double? columnSpacing;
   final double? rowSpacing;
   final double? labelValueSpacing;
-  final double? headerSpacing;
+  final TextAlign? labelAlign;
+  final TextAlign? valueAlign;
+  final double? contentHeight;
+  final HyperDescriptionContentHeightMode? contentHeightMode;
   final double? minimumColumnWidth;
   final double? labelWidth;
   final int? labelFlex;
   final int? valueFlex;
   final TextStyle? labelStyle;
   final TextStyle? valueStyle;
-  final TextStyle? titleStyle;
   final String? placeholder;
   final Duration? duration;
   final Curve? curve;
@@ -71,14 +77,16 @@ final class HyperDescriptionListStyle {
     double? columnSpacing,
     double? rowSpacing,
     double? labelValueSpacing,
-    double? headerSpacing,
+    TextAlign? labelAlign,
+    TextAlign? valueAlign,
+    double? contentHeight,
+    HyperDescriptionContentHeightMode? contentHeightMode,
     double? minimumColumnWidth,
     double? labelWidth,
     int? labelFlex,
     int? valueFlex,
     TextStyle? labelStyle,
     TextStyle? valueStyle,
-    TextStyle? titleStyle,
     String? placeholder,
     Duration? duration,
     Curve? curve,
@@ -97,14 +105,16 @@ final class HyperDescriptionListStyle {
     columnSpacing: columnSpacing ?? this.columnSpacing,
     rowSpacing: rowSpacing ?? this.rowSpacing,
     labelValueSpacing: labelValueSpacing ?? this.labelValueSpacing,
-    headerSpacing: headerSpacing ?? this.headerSpacing,
+    labelAlign: labelAlign ?? this.labelAlign,
+    valueAlign: valueAlign ?? this.valueAlign,
+    contentHeight: contentHeight ?? this.contentHeight,
+    contentHeightMode: contentHeightMode ?? this.contentHeightMode,
     minimumColumnWidth: minimumColumnWidth ?? this.minimumColumnWidth,
     labelWidth: labelWidth ?? this.labelWidth,
     labelFlex: labelFlex ?? this.labelFlex,
     valueFlex: valueFlex ?? this.valueFlex,
     labelStyle: labelStyle ?? this.labelStyle,
     valueStyle: valueStyle ?? this.valueStyle,
-    titleStyle: titleStyle ?? this.titleStyle,
     placeholder: placeholder ?? this.placeholder,
     duration: duration ?? this.duration,
     curve: curve ?? this.curve,
@@ -127,14 +137,16 @@ final class HyperDescriptionListStyle {
           columnSpacing: other.columnSpacing ?? columnSpacing,
           rowSpacing: other.rowSpacing ?? rowSpacing,
           labelValueSpacing: other.labelValueSpacing ?? labelValueSpacing,
-          headerSpacing: other.headerSpacing ?? headerSpacing,
+          labelAlign: other.labelAlign ?? labelAlign,
+          valueAlign: other.valueAlign ?? valueAlign,
+          contentHeight: other.contentHeight ?? contentHeight,
+          contentHeightMode: other.contentHeightMode ?? contentHeightMode,
           minimumColumnWidth: other.minimumColumnWidth ?? minimumColumnWidth,
           labelWidth: other.labelWidth ?? labelWidth,
           labelFlex: other.labelFlex ?? labelFlex,
           valueFlex: other.valueFlex ?? valueFlex,
           labelStyle: labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
           valueStyle: valueStyle?.merge(other.valueStyle) ?? other.valueStyle,
-          titleStyle: titleStyle?.merge(other.titleStyle) ?? other.titleStyle,
           placeholder: other.placeholder ?? placeholder,
           duration: other.duration ?? duration,
           curve: other.curve ?? curve,
@@ -187,9 +199,12 @@ final class HyperDescriptionListStyle {
           ? (t < .5 ? a.labelValueSpacing : b.labelValueSpacing)
           : a.labelValueSpacing! +
                 (b.labelValueSpacing! - a.labelValueSpacing!) * t,
-      headerSpacing: a.headerSpacing == null || b.headerSpacing == null
-          ? (t < .5 ? a.headerSpacing : b.headerSpacing)
-          : a.headerSpacing! + (b.headerSpacing! - a.headerSpacing!) * t,
+      labelAlign: t < .5 ? a.labelAlign : b.labelAlign,
+      valueAlign: t < .5 ? a.valueAlign : b.valueAlign,
+      contentHeight: a.contentHeight == null || b.contentHeight == null
+          ? (t < .5 ? a.contentHeight : b.contentHeight)
+          : a.contentHeight! + (b.contentHeight! - a.contentHeight!) * t,
+      contentHeightMode: t < .5 ? a.contentHeightMode : b.contentHeightMode,
       minimumColumnWidth:
           a.minimumColumnWidth == null || b.minimumColumnWidth == null
           ? (t < .5 ? a.minimumColumnWidth : b.minimumColumnWidth)
@@ -202,7 +217,6 @@ final class HyperDescriptionListStyle {
       valueFlex: t < .5 ? a.valueFlex : b.valueFlex,
       labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
       valueStyle: TextStyle.lerp(a.valueStyle, b.valueStyle, t),
-      titleStyle: TextStyle.lerp(a.titleStyle, b.titleStyle, t),
       placeholder: t < .5 ? a.placeholder : b.placeholder,
       duration: a.duration == null || b.duration == null
           ? (t < .5 ? a.duration : b.duration)
@@ -235,14 +249,16 @@ final class HyperDescriptionListStyle {
       columnSpacing == other.columnSpacing &&
       rowSpacing == other.rowSpacing &&
       labelValueSpacing == other.labelValueSpacing &&
-      headerSpacing == other.headerSpacing &&
+      labelAlign == other.labelAlign &&
+      valueAlign == other.valueAlign &&
+      contentHeight == other.contentHeight &&
+      contentHeightMode == other.contentHeightMode &&
       minimumColumnWidth == other.minimumColumnWidth &&
       labelWidth == other.labelWidth &&
       labelFlex == other.labelFlex &&
       valueFlex == other.valueFlex &&
       labelStyle == other.labelStyle &&
       valueStyle == other.valueStyle &&
-      titleStyle == other.titleStyle &&
       placeholder == other.placeholder &&
       duration == other.duration &&
       curve == other.curve &&
@@ -262,14 +278,16 @@ final class HyperDescriptionListStyle {
     columnSpacing,
     rowSpacing,
     labelValueSpacing,
-    headerSpacing,
+    labelAlign,
+    valueAlign,
+    contentHeight,
+    contentHeightMode,
     minimumColumnWidth,
     labelWidth,
     labelFlex,
     valueFlex,
     labelStyle,
     valueStyle,
-    titleStyle,
     placeholder,
     duration,
     curve,

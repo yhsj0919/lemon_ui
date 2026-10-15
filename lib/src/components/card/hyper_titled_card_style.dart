@@ -7,6 +7,8 @@ final class HyperTitledCardStyle {
     this.titlePadding,
     this.titleSpacing,
     this.actionSpacing,
+    this.actionPadding,
+    this.actionIconSize,
     this.titleTextStyle,
     this.actionTextStyle,
   });
@@ -19,6 +21,8 @@ final class HyperTitledCardStyle {
 
   /// 标题与右侧 action 的最小距离。
   final double? actionSpacing;
+  final EdgeInsetsGeometry? actionPadding;
+  final double? actionIconSize;
   final TextStyle? titleTextStyle;
 
   /// 标题右侧内容的默认文字样式；显式子控件样式仍优先。
@@ -30,6 +34,8 @@ final class HyperTitledCardStyle {
           titlePadding: other.titlePadding ?? titlePadding,
           titleSpacing: other.titleSpacing ?? titleSpacing,
           actionSpacing: other.actionSpacing ?? actionSpacing,
+          actionPadding: other.actionPadding ?? actionPadding,
+          actionIconSize: other.actionIconSize ?? actionIconSize,
           titleTextStyle:
               titleTextStyle?.merge(other.titleTextStyle) ??
               other.titleTextStyle,
@@ -42,12 +48,16 @@ final class HyperTitledCardStyle {
     EdgeInsetsGeometry? titlePadding,
     double? titleSpacing,
     double? actionSpacing,
+    EdgeInsetsGeometry? actionPadding,
+    double? actionIconSize,
     TextStyle? titleTextStyle,
     TextStyle? actionTextStyle,
   }) => HyperTitledCardStyle(
     titlePadding: titlePadding ?? this.titlePadding,
     titleSpacing: titleSpacing ?? this.titleSpacing,
     actionSpacing: actionSpacing ?? this.actionSpacing,
+    actionPadding: actionPadding ?? this.actionPadding,
+    actionIconSize: actionIconSize ?? this.actionIconSize,
     titleTextStyle:
         this.titleTextStyle?.merge(titleTextStyle) ?? titleTextStyle,
     actionTextStyle:
@@ -59,6 +69,7 @@ final class HyperTitledCardStyle {
     HyperTitledCardStyle b,
     double t,
   ) => HyperTitledCardStyle(
+    actionPadding: EdgeInsetsGeometry.lerp(a.actionPadding, b.actionPadding, t),
     titlePadding: EdgeInsetsGeometry.lerp(a.titlePadding, b.titlePadding, t),
     titleSpacing: a.titleSpacing == null || b.titleSpacing == null
         ? (t < .5 ? a.titleSpacing : b.titleSpacing)
@@ -66,6 +77,9 @@ final class HyperTitledCardStyle {
     actionSpacing: a.actionSpacing == null || b.actionSpacing == null
         ? (t < .5 ? a.actionSpacing : b.actionSpacing)
         : a.actionSpacing! + (b.actionSpacing! - a.actionSpacing!) * t,
+    actionIconSize: a.actionIconSize == null || b.actionIconSize == null
+        ? (t < .5 ? a.actionIconSize : b.actionIconSize)
+        : a.actionIconSize! + (b.actionIconSize! - a.actionIconSize!) * t,
     titleTextStyle: TextStyle.lerp(a.titleTextStyle, b.titleTextStyle, t),
     actionTextStyle: TextStyle.lerp(a.actionTextStyle, b.actionTextStyle, t),
   );
@@ -76,6 +90,8 @@ final class HyperTitledCardStyle {
       other.titlePadding == titlePadding &&
       other.titleSpacing == titleSpacing &&
       other.actionSpacing == actionSpacing &&
+      other.actionPadding == actionPadding &&
+      other.actionIconSize == actionIconSize &&
       other.titleTextStyle == titleTextStyle &&
       other.actionTextStyle == actionTextStyle;
 
@@ -84,6 +100,8 @@ final class HyperTitledCardStyle {
     titlePadding,
     titleSpacing,
     actionSpacing,
+    actionPadding,
+    actionIconSize,
     titleTextStyle,
     actionTextStyle,
   );

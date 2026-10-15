@@ -396,7 +396,11 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       ],
     ];
     Widget body = rows.isEmpty
-        ? widget.empty ?? Text(s.emptyLabel!, style: s.textStyle)
+        ? widget.empty ??
+              Text(
+                s.emptyLabel!,
+                style: s.textStyle!.copyWith(color: s.foregroundColor),
+              )
         : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -419,6 +423,7 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       duration: duration,
       curve: s.curve!,
       padding: s.padding,
+      clipBehavior: Clip.antiAlias,
       decoration: HyperBoxDecoration(
         color: s.material == null ? s.background?.color : null,
         gradient: s.material == null ? s.background?.gradient : null,

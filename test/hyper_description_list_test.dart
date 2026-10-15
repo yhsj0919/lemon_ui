@@ -1,8 +1,70 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  test('分割线独占整行，任意内容参与跨列布局', () {
+    final layout = HyperDescriptionListLayout(
+      const [
+        HyperDescriptionItem(id: 'a', label: Text('a')),
+        HyperDescriptionItem.divider(id: 'divider'),
+        HyperDescriptionItem.custom(
+          id: 'custom',
+          span: 2,
+          child: Row(children: [Text('x'), Icon(Icons.check)]),
+        ),
+        HyperDescriptionItem(id: 'b', label: Text('b')),
+      ],
+      columns: 2,
+      width: 400,
+      minimumColumnWidth: 100,
+      spacing: 10,
+    );
+    expect(layout.rows.length, 4);
+    expect(layout.rows[1].single.width, 400);
+    expect(layout.rows[2].single.span, 2);
+  });
+  testWidgets('内容高度限制且长内容可滚动', (tester) async {
+    for (final mode in [
+      HyperDescriptionContentHeightMode.maximum,
+      HyperDescriptionContentHeightMode.fixed,
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Center(
+              child: SizedBox(
+                width: 300,
+                child: HyperDescriptionList(
+                  style: HyperDescriptionListStyle(
+                    contentHeightMode: mode,
+                    contentHeight: 100,
+                  ),
+                  items: const [
+                    HyperDescriptionItem(
+                      id: 'a',
+                      label: Text('标签'),
+                      value: SizedBox(height: 300, child: Text('长内容')),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final scroll = find.byType(SingleChildScrollView);
+      expect(tester.getSize(scroll).height, 100);
+      expect(
+        tester.getSize(find.byType(HyperDescriptionList)).height,
+        100,
+      );
+      await tester.drag(scroll, const Offset(0, -80));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+  });
   test('四端尺寸覆盖独立，主题插值包含描述列表', () {
     const sizes = [
       HyperSizeScheme.phone(),

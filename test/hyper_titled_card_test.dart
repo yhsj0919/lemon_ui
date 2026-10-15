@@ -3,6 +3,54 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('标题20边距与操作区4边距独立', (tester) async {
+    for (final position in HyperCardTitlePosition.values) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            duration: Duration.zero,
+            child: Center(
+              child: SizedBox(
+                width: 300,
+                child: HyperTitledCard(
+                  titlePosition: position,
+                  style: const HyperTitledCardStyle(
+                    titlePadding: EdgeInsets.all(20),
+                    actionPadding: EdgeInsets.all(4),
+                  ),
+                  title: const SizedBox(
+                    key: Key('title-area'),
+                    width: 40,
+                    height: 20,
+                  ),
+                  action: const SizedBox(
+                    key: Key('action-area'),
+                    width: 30,
+                    height: 30,
+                  ),
+                  child: const Text('content'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final card = find.byType(HyperTitledCard);
+      final rect = tester.getRect(card);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('title-area'))).dx - rect.left,
+        20,
+      );
+      expect(
+        rect.right -
+            tester.getTopRight(find.byKey(const Key('action-area'))).dx,
+        4,
+      );
+      expect(tester.takeException(), isNull);
+    }
+  });
   testWidgets('标题内外布局共用任意 action 和内容', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -91,12 +139,13 @@ void main() {
     final card = tester.getTopLeft(find.byType(HyperCard).first);
     final title = tester.getTopLeft(find.text('分组标题'));
     final titleBottom = tester.getBottomLeft(find.text('分组标题'));
-    final metrics = HyperTheme.sizesOf(
-      tester.element(find.text('分组标题')),
-    ).card;
+    final metrics = HyperTheme.sizesOf(tester.element(find.text('分组标题'))).card;
     final padding = metrics.outsideTitlePadding.resolve(TextDirection.ltr);
     expect(title.dx - card.dx, padding.left);
-    expect(card.dy - titleBottom.dy, padding.bottom + metrics.outsideTitleSpacing);
+    expect(
+      card.dy - titleBottom.dy,
+      padding.bottom + metrics.outsideTitleSpacing,
+    );
     final actionStyle = DefaultTextStyle.of(tester.element(find.text('刷新')))
         .style;
     expect(actionStyle.fontSize, 14);

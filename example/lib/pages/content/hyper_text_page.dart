@@ -17,10 +17,23 @@ class _HyperTextPageState extends State<HyperTextPage> {
   @override
   Widget build(BuildContext context) {
     final parent = HyperTheme.of(context);
+    final inherited = parent.textComponentTheme;
     final textTheme = HyperTextThemeData(
+      style: inherited.style,
+      displayLarge: inherited.displayLarge,
+      displayMedium: inherited.displayMedium,
+      displaySmall: inherited.displaySmall,
+      pageTitle: inherited.pageTitle,
+      sectionTitle: inherited.sectionTitle,
+      subsectionTitle: inherited.subsectionTitle,
+      bodyLarge: inherited.bodyLarge,
+      bodySmall: inherited.bodySmall,
+      control: inherited.control,
+      label: inherited.label,
+      caption: inherited.caption,
       body: _emphasizeBody
           ? TextStyle(color: parent.colors.primary, fontWeight: FontWeight.w600)
-          : null,
+          : inherited.body,
     );
 
     return HyperTheme(

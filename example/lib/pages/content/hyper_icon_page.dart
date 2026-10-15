@@ -3,111 +3,68 @@ import 'package:lemon_ui/lemon_ui.dart';
 
 import '../../gallery/demo_section.dart';
 
-/// 展示 HyperIcon 的设备尺寸、状态样式和三层主题覆盖。
-class HyperIconPage extends StatefulWidget {
+/// 图标主题预览与明确标记的局部、实例覆盖。
+class HyperIconPage extends StatelessWidget {
   const HyperIconPage({super.key});
 
   @override
-  State<HyperIconPage> createState() => _HyperIconPageState();
-}
-
-class _HyperIconPageState extends State<HyperIconPage> {
-  bool _selected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final parent = HyperTheme.of(context);
-    final globalIconTheme = HyperIconThemeData(
-      style: HyperIconStyle(
-        color: HyperStateValue.fromMap(
-          fallback: parent.colors.textSecondary,
-          values: {HyperControlState.selected: parent.colors.primary},
-        ),
+  Widget build(BuildContext context) => Material(
+    color: HyperTheme.of(context).colors.background,
+    child: ListView(
+      padding: EdgeInsets.all(
+        HyperTheme.sizesOf(context).pageHorizontalPadding,
       ),
-    );
-    final states = _selected
-        ? const {HyperControlState.selected}
-        : const <HyperControlState>{};
-
-    return HyperTheme(
-      data: parent.copyWith(iconTheme: globalIconTheme),
-      child: Builder(
-        builder: (context) => Material(
-          color: HyperTheme.of(context).colors.background,
-          child: ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal: HyperTheme.sizesOf(context).pageHorizontalPadding,
-              vertical: 24,
-            ),
+      children: [
+        const HyperText('HyperIcon', variant: HyperTextVariant.pageTitle),
+        const HyperText('默认示例直接继承图标主题，局部和实例覆盖单独展示。'),
+        const DemoSection(
+          title: '默认主题预览',
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 20,
             children: [
-              const HyperText('HyperIcon', variant: HyperTextVariant.pageTitle),
-              const SizedBox(height: 8),
-              const HyperText('复用 Flutter 图标绘制，只统一设备尺寸、状态和主题入口。'),
-              const SizedBox(height: 20),
-              DemoSection(
-                title: '基础用法',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(child: HyperText('选中状态')),
-                        HyperSwitch(
-                          value: _selected,
-                          onChanged: (value) =>
-                              setState(() => _selected = value),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Wrap(
-                      spacing: 24,
-                      runSpacing: 20,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        HyperIcon(
-                          Icons.favorite,
-                          states: states,
-                          semanticLabel: '收藏',
-                        ),
-                        const HyperIcon(Icons.settings, size: 32),
-                        const HyperIcon(
-                          Icons.star,
-                          color: Color(0xFFFF9500),
-                          size: 36,
-                          fill: 1,
-                        ),
-                        HyperIconTheme(
-                          data: const HyperIconThemeData(
-                            style: HyperIconStyle(
-                              color: HyperStateValue.all(Color(0xFF7A4DFF)),
-                              size: HyperStateValue.all(28),
-                            ),
-                          ),
-                          child: const HyperIcon(Icons.auto_awesome),
-                        ),
-                        const HyperIcon.widget(
-                          Icon(Icons.bolt),
-                          size: 30,
-                          color: Color(0xFF00A870),
-                          semanticLabel: '自定义图标内容',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              HyperIcon(
+                Icons.favorite,
+                key: Key('icon-theme-preview'),
+                semanticLabel: '收藏',
               ),
-              DemoSection(
-                title: '设备默认尺寸',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [const HyperText('手机/平板 24，桌面 18，手表 20；实例尺寸始终优先。')],
+              HyperIcon(Icons.settings),
+              HyperIcon(Icons.star),
+              HyperIcon.widget(Icon(Icons.bolt), semanticLabel: '自定义图标内容'),
+            ],
+          ),
+        ),
+        const DemoSection(
+          title: '实例与局部主题覆盖（显式设置）',
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 20,
+            children: [
+              HyperIcon(Icons.settings, size: 32),
+              HyperIcon(
+                Icons.star,
+                color: Color(0xFFFF9500),
+                size: 36,
+                fill: 1,
+              ),
+              HyperIconTheme(
+                data: HyperIconThemeData(
+                  style: HyperIconStyle(
+                    color: HyperStateValue.all(Color(0xFF7A4DFF)),
+                    size: HyperStateValue.all(28),
+                  ),
                 ),
+                child: HyperIcon(Icons.auto_awesome),
+              ),
+              HyperIcon.widget(
+                Icon(Icons.bolt),
+                size: 30,
+                color: Color(0xFF00A870),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
 }

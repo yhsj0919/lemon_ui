@@ -25,6 +25,7 @@ class HyperCollapsible extends StatelessWidget {
     this.enabled = true,
     this.showIndicator = true,
     this.maintainState = true,
+    this.maintainCrossAxisSize = true,
     this.axis = Axis.vertical,
     this.focusNode,
     this.autofocus = false,
@@ -32,6 +33,10 @@ class HyperCollapsible extends StatelessWidget {
     this.style,
   });
   final bool expanded, enabled, showIndicator, maintainState, autofocus;
+
+  /// 横向折叠时保留内容高度，避免父布局在收起后跳变。
+  /// 开启时需保留内容以响应布局与文字缩放，优先于 maintainState=false。
+  final bool maintainCrossAxisSize;
   final Widget child;
   final Widget? header, leading, trailing;
   final ValueChanged<bool>? onExpandedChanged;
@@ -52,7 +57,15 @@ class HyperCollapsible extends StatelessWidget {
               reduceTransparency: material.reduceTransparency,
               borderRadius: BorderRadius.circular(metrics.radius),
               headerPadding: metrics.headerPadding,
-              contentPadding: metrics.contentPadding,
+              contentPadding: header == null
+                  ? metrics.contentPadding
+                        .resolve(Directionality.of(context))
+                        .copyWith(
+                          top: metrics.contentPadding
+                              .resolve(Directionality.of(context))
+                              .bottom,
+                        )
+                  : metrics.contentPadding,
               headerMinHeight: metrics.headerMinHeight,
               iconSize: metrics.iconSize,
               spacing: metrics.spacing,
@@ -77,15 +90,22 @@ class HyperCollapsible extends StatelessWidget {
     final duration = (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
         ? Duration.zero
         : resolved.duration!;
-    final content = _Content(
-      expanded: expanded,
-      maintainState: maintainState,
-      axis: axis,
-      duration: duration,
-      curve: resolved.curve!,
-      transitionBuilder: resolved.transitionBuilder,
-      child: Padding(padding: resolved.contentPadding!, child: child),
+    final paddedContent = Padding(
+      padding: resolved.contentPadding!,
+      child: child,
     );
+    final content = header == null
+        ? paddedContent
+        : _Content(
+            expanded: expanded,
+            maintainState: maintainState,
+            maintainCrossAxisSize: maintainCrossAxisSize,
+            axis: axis,
+            duration: duration,
+            curve: resolved.curve!,
+            transitionBuilder: resolved.transitionBuilder,
+            child: paddedContent,
+          );
     Widget buildHeader(Set<HyperControlState> states) {
       final alpha = !enabled
           ? 0.0
@@ -188,6 +208,18 @@ class HyperCollapsible extends StatelessWidget {
         child: surface,
       );
     }
+    if (header == null) {
+      surface = _Content(
+        expanded: expanded,
+        maintainState: maintainState,
+        maintainCrossAxisSize: maintainCrossAxisSize,
+        axis: axis,
+        duration: duration,
+        curve: resolved.curve!,
+        transitionBuilder: resolved.transitionBuilder,
+        child: surface,
+      );
+    }
     return HyperBackdropSafeAnimatedOpacity(
       opacity: enabled ? 1 : resolved.disabledOpacity!.clamp(0, 1),
       duration: duration,
@@ -205,13 +237,14 @@ class _Content extends StatefulWidget {
   const _Content({
     required this.expanded,
     required this.maintainState,
+    required this.maintainCrossAxisSize,
     required this.axis,
     required this.duration,
     required this.curve,
     required this.child,
     this.transitionBuilder,
   });
-  final bool expanded, maintainState;
+  final bool expanded, maintainState, maintainCrossAxisSize;
   final Axis axis;
   final Duration duration;
   final Curve curve;
@@ -254,11 +287,13 @@ class _ContentState extends State<_Content>
   @override
   Widget build(BuildContext context) {
     final hidden = !widget.expanded && _controller.isDismissed;
-    if (hidden && !widget.maintainState) {
+    final reserveHeight =
+        widget.axis == Axis.horizontal && widget.maintainCrossAxisSize;
+    if (hidden && !widget.maintainState && !reserveHeight) {
       return const SizedBox.shrink();
     }
     return Offstage(
-      offstage: hidden,
+      offstage: hidden && !reserveHeight,
       child: TickerMode(
         enabled: !hidden,
         child: IgnorePointer(

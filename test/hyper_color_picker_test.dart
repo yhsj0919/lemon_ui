@@ -5,6 +5,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('选色器内部默认关闭全局滑块数值提示', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light().copyWith(
+            sliderTheme: const HyperSliderThemeData(
+              style: HyperSliderStyle(
+                showValueIndicator: ShowValueIndicator.alwaysVisible,
+              ),
+            ),
+          ),
+          duration: Duration.zero,
+          child: Scaffold(
+            body: HyperColorPicker(value: Colors.blue, onChanged: (_) {}),
+          ),
+        ),
+      ),
+    );
+    for (final element in find.byType(Slider).evaluate()) {
+      expect(
+        SliderTheme.of(element).showValueIndicator,
+        ShowValueIndicator.never,
+      );
+    }
+    expect(find.byType(Slider), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('推荐色默认隐藏，传入后遵守透明度开关', (tester) async {
     Color? selected;
     for (final showAlpha in [true, false]) {

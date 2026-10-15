@@ -272,3 +272,5 @@ export 'src/components/color_picker/hyper_color_picker_theme.dart';
 export 'src/theme/size/components/hyper_color_picker_size.dart';
 
 export 'src/components/select/hyper_dropdown.dart';
+
+export 'src/components/text/hyper_scrolling_text.dart';

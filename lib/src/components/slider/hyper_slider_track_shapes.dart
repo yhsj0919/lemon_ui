@@ -111,6 +111,21 @@ class HyperRangeSliderTrackShape extends RoundedRectRangeSliderTrackShape {
   final Color inactivePointColor;
 
   @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) => const HyperSliderTrackShape().getPreferredRect(
+    parentBox: parentBox,
+    offset: offset,
+    sliderTheme: sliderTheme,
+    isEnabled: isEnabled,
+    isDiscrete: isDiscrete,
+  );
+
+  @override
   void paint(
     PaintingContext context,
     Offset offset, {

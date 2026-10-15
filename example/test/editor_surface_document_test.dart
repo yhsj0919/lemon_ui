@@ -8,6 +8,16 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui_example/editor/editor_theme_document.dart';
 
 void main() {
+ test('内外标题和操作文字独立保存与解析',(){
+  final d=EditorThemeDocument();
+  d.desktop.cardMetrics..insideTitleFontSize=22..outsideTitleFontSize=13..insideActionFontSize=16..outsideActionFontSize=12;
+  final restored=EditorThemeDocument.decode(d.encode());
+  final theme=restored.resolve(false).titledCardTheme;
+  expect(theme.inside!.titleTextStyle!.fontSize,22);
+  expect(theme.outside!.titleTextStyle!.fontSize,13);
+  expect(theme.inside!.actionTextStyle!.fontSize,16);
+  expect(theme.outside!.actionTextStyle!.fontSize,12);
+ });
   testWidgets('材质工作区保留详细参数并移除设备切换', (tester) async {
     SharedPreferences.setMockInitialValues({});
     await tester.binding.setSurfaceSize(const Size(1440, 5000));

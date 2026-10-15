@@ -15,6 +15,20 @@ class EditorSurfaceFields {
   double? actionSpacing;
   double? titleFontSize;
   double? actionFontSize;
+  double? insideTitleFontSize;
+  double? outsideTitleFontSize;
+  double? insideActionFontSize;
+  double? outsideActionFontSize;
+  double? insideActionIconSize;
+  double? outsideActionIconSize;
+  double? insideActionPadding;
+  double? outsideActionPadding;
+  double? insideActionPaddingTop;
+  double? insideActionPaddingBottom;
+  double? insideActionPaddingRight;
+  double? outsideActionPaddingTop;
+  double? outsideActionPaddingBottom;
+  double? outsideActionPaddingRight;
   double? padding;
   double? contentPadding;
   double? radius;
@@ -35,6 +49,10 @@ class EditorSurfaceFields {
   EditorColor? iconColor;
   EditorColor? titleColor;
   EditorColor? actionColor;
+  EditorColor? insideTitleColor;
+  EditorColor? outsideTitleColor;
+  EditorColor? insideActionColor;
+  EditorColor? outsideActionColor;
   EditorColor? textColor;
   EditorColor? overlayColor;
   EditorColor? separatorColor;
@@ -53,6 +71,32 @@ class EditorSurfaceFields {
     if (actionSpacing != null) 'actionSpacing': actionSpacing,
     if (titleFontSize != null) 'titleFontSize': titleFontSize,
     if (actionFontSize != null) 'actionFontSize': actionFontSize,
+    if (insideTitleFontSize != null) 'insideTitleFontSize': insideTitleFontSize,
+    if (outsideTitleFontSize != null)
+      'outsideTitleFontSize': outsideTitleFontSize,
+    if (insideActionFontSize != null)
+      'insideActionFontSize': insideActionFontSize,
+    if (outsideActionFontSize != null)
+      'outsideActionFontSize': outsideActionFontSize,
+    if (insideActionIconSize != null)
+      'insideActionIconSize': insideActionIconSize,
+    if (outsideActionIconSize != null)
+      'outsideActionIconSize': outsideActionIconSize,
+    if (insideActionPadding != null) 'insideActionPadding': insideActionPadding,
+    if (outsideActionPadding != null)
+      'outsideActionPadding': outsideActionPadding,
+    if (insideActionPaddingTop != null)
+      'insideActionPaddingTop': insideActionPaddingTop,
+    if (insideActionPaddingBottom != null)
+      'insideActionPaddingBottom': insideActionPaddingBottom,
+    if (insideActionPaddingRight != null)
+      'insideActionPaddingRight': insideActionPaddingRight,
+    if (outsideActionPaddingTop != null)
+      'outsideActionPaddingTop': outsideActionPaddingTop,
+    if (outsideActionPaddingBottom != null)
+      'outsideActionPaddingBottom': outsideActionPaddingBottom,
+    if (outsideActionPaddingRight != null)
+      'outsideActionPaddingRight': outsideActionPaddingRight,
     if (padding != null) 'padding': padding,
     if (contentPadding != null) 'contentPadding': contentPadding,
     if (radius != null) 'radius': radius,
@@ -73,6 +117,14 @@ class EditorSurfaceFields {
     if (iconColor != null) 'iconColor': iconColor!.toJson(),
     if (titleColor != null) 'titleColor': titleColor!.toJson(),
     if (actionColor != null) 'actionColor': actionColor!.toJson(),
+    if (insideTitleColor != null)
+      'insideTitleColor': insideTitleColor!.toJson(),
+    if (outsideTitleColor != null)
+      'outsideTitleColor': outsideTitleColor!.toJson(),
+    if (insideActionColor != null)
+      'insideActionColor': insideActionColor!.toJson(),
+    if (outsideActionColor != null)
+      'outsideActionColor': outsideActionColor!.toJson(),
     if (textColor != null) 'textColor': textColor!.toJson(),
     if (overlayColor != null) 'overlayColor': overlayColor!.toJson(),
     if (separatorColor != null) 'separatorColor': separatorColor!.toJson(),
@@ -93,6 +145,20 @@ class EditorSurfaceFields {
       'actionSpacing',
       'titleFontSize',
       'actionFontSize',
+      'insideTitleFontSize',
+      'outsideTitleFontSize',
+      'insideActionFontSize',
+      'outsideActionFontSize',
+      'insideActionIconSize',
+      'outsideActionIconSize',
+      'insideActionPadding',
+      'outsideActionPadding',
+      'insideActionPaddingTop',
+      'insideActionPaddingBottom',
+      'insideActionPaddingRight',
+      'outsideActionPaddingTop',
+      'outsideActionPaddingBottom',
+      'outsideActionPaddingRight',
       'padding',
       'contentPadding',
       'radius',
@@ -113,6 +179,10 @@ class EditorSurfaceFields {
       'iconColor',
       'titleColor',
       'actionColor',
+      'insideTitleColor',
+      'outsideTitleColor',
+      'insideActionColor',
+      'outsideActionColor',
       'textColor',
       'overlayColor',
       'separatorColor',
@@ -143,6 +213,76 @@ class EditorSurfaceFields {
       ..actionSpacing = number(j['actionSpacing'], min: 0, max: 1000)
       ..titleFontSize = number(j['titleFontSize'], min: 0, max: 1000)
       ..actionFontSize = number(j['actionFontSize'], min: 0, max: 1000)
+      ..insideTitleFontSize = number(
+        j['insideTitleFontSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideTitleFontSize = number(
+        j['outsideTitleFontSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionFontSize = number(
+        j['insideActionFontSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionFontSize = number(
+        j['outsideActionFontSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionIconSize = number(
+        j['insideActionIconSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionIconSize = number(
+        j['outsideActionIconSize'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionPadding = number(
+        j['insideActionPadding'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionPadding = number(
+        j['outsideActionPadding'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionPaddingTop = number(
+        j['insideActionPaddingTop'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionPaddingBottom = number(
+        j['insideActionPaddingBottom'],
+        min: 0,
+        max: 1000,
+      )
+      ..insideActionPaddingRight = number(
+        j['insideActionPaddingRight'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionPaddingTop = number(
+        j['outsideActionPaddingTop'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionPaddingBottom = number(
+        j['outsideActionPaddingBottom'],
+        min: 0,
+        max: 1000,
+      )
+      ..outsideActionPaddingRight = number(
+        j['outsideActionPaddingRight'],
+        min: 0,
+        max: 1000,
+      )
       ..padding = number(j['padding'], min: 0, max: 1000)
       ..contentPadding = number(j['contentPadding'], min: 0, max: 1000)
       ..radius = number(j['radius'], min: 0, max: 1000)
@@ -169,6 +309,20 @@ class EditorSurfaceFields {
       ..actionColor = j['actionColor'] == null
           ? null
           : EditorColor.fromJson(j['actionColor'] as Map<String, dynamic>)
+      ..insideTitleColor = j['insideTitleColor'] == null
+          ? null
+          : EditorColor.fromJson(j['insideTitleColor'] as Map<String, dynamic>)
+      ..outsideTitleColor = j['outsideTitleColor'] == null
+          ? null
+          : EditorColor.fromJson(j['outsideTitleColor'] as Map<String, dynamic>)
+      ..insideActionColor = j['insideActionColor'] == null
+          ? null
+          : EditorColor.fromJson(j['insideActionColor'] as Map<String, dynamic>)
+      ..outsideActionColor = j['outsideActionColor'] == null
+          ? null
+          : EditorColor.fromJson(
+              j['outsideActionColor'] as Map<String, dynamic>,
+            )
       ..textColor = j['textColor'] == null
           ? null
           : EditorColor.fromJson(j['textColor'] as Map<String, dynamic>)
@@ -181,6 +335,24 @@ class EditorSurfaceFields {
       ..curve = j['curve'] as String?
       ..clip = j['clip'] as String?
       ..showDividers = j['showDividers'] as bool?;
+  }
+
+  EdgeInsets? actionInsets(bool inside, EdgeInsets base) {
+    final all = inside ? insideActionPadding : outsideActionPadding;
+    final top = inside ? insideActionPaddingTop : outsideActionPaddingTop;
+    final bottom = inside
+        ? insideActionPaddingBottom
+        : outsideActionPaddingBottom;
+    final right = inside ? insideActionPaddingRight : outsideActionPaddingRight;
+    if (all == null && top == null && bottom == null && right == null) {
+      return null;
+    }
+    return EdgeInsets.fromLTRB(
+      all ?? base.left,
+      top ?? all ?? base.top,
+      right ?? all ?? base.right,
+      bottom ?? all ?? base.bottom,
+    );
   }
 
   EdgeInsets? resolvedPadding(EdgeInsets base) =>

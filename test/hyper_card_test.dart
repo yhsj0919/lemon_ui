@@ -15,7 +15,7 @@ void main() {
     ),
   );
 
-  testWidgets('手机默认 Card 使用 16 圆角和零内边距', (tester) async {
+  testWidgets('手机默认 Card 使用 16 圆角和内容内边距', (tester) async {
     await tester.pumpWidget(
       app(const HyperCard(child: SizedBox(width: 80, height: 40))),
     );
@@ -24,9 +24,9 @@ void main() {
       find.byType(AnimatedContainer),
     );
     final decoration = card.decoration! as BoxDecoration;
-    expect(card.padding, EdgeInsets.zero);
+    expect(card.padding, const EdgeInsets.all(16));
     expect(decoration.borderRadius, BorderRadius.circular(16));
-    expect(tester.getSize(find.byType(HyperCard)), const Size(240, 40));
+    expect(tester.getSize(find.byType(HyperCard)), const Size(240, 72));
   });
 
   testWidgets('Card 主题与 Container 主题隔离并支持实例覆盖', (tester) async {

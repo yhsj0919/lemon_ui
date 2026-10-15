@@ -1,3 +1,5 @@
+import 'editor_input_fields.dart';
+import 'editor_content_fields.dart';
 import 'editor_surface_fields.dart';
 import 'editor_dimension_limits.dart';
 import 'editor_basic_control_fields.dart';
@@ -28,6 +30,8 @@ import 'editor_selection_controller.dart';
 
 part 'editor_basic_control_workspace.dart';
 part 'editor_surface_workspace.dart';
+part 'editor_content_workspace.dart';
+part 'editor_input_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
 class ThemeEditor extends StatefulWidget {
@@ -78,6 +82,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
   String _chipState = 'common';
   String _buttonState = 'common';
   String _fieldState = 'common';
+  String _inputObject = 'standard',
+      _inputState = 'default',
+      _iconInputVariant = 'common';
   String _selectAnchorState = 'common';
   String _selectPanelState = 'common';
   String get _selectState =>
@@ -112,7 +119,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
 
   EditorMode get _mode => _document.mode(_dark);
   EditorDevice get _spec => _document.device(_device);
-  EditorComponent get _appearance => _isBasicControl
+  EditorComponent get _appearance => _isContentControl
+      ? _contentAppearance
+      : _isBasicControl
       ? _basicAppearance
       : switch (_component) {
           'button' =>
@@ -145,6 +154,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'button': 'Button',
     'tag': 'Tag',
     'chip': 'Chip',
+    'sliderInput': '滑块',
+    'segmentedInput': '分段按钮',
+    'iconButtonInput': '图标按钮',
+    'tree': 'tree-view',
+    'result': 'result',
+    'description': 'description-list',
+    'timeline': 'timeline',
+    'avatar': 'avatar',
+    'listTile': 'list-tile',
+    'text': 'text',
+    'icon': 'icon',
     'container': 'Container',
     'collapsible': 'Collapsible / Accordion',
     'group': 'WidgetGroup',
@@ -164,6 +184,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'button': 'hyper-button',
     'tag': 'hyper-tag',
     'chip': 'hyper-chip',
+    'sliderInput': 'hyper-slider',
+    'segmentedInput': 'hyper-segmented-button',
+    'iconButtonInput': 'hyper-icon-button',
+    'tree': 'hyper-tree-view',
+    'result': 'hyper-result',
+    'description': 'hyper-description-list',
+    'timeline': 'hyper-timeline',
+    'avatar': 'hyper-avatar',
+    'listTile': 'hyper-list-tile',
+    'text': 'hyper-text',
+    'icon': 'hyper-icon',
     'container': 'hyper-container',
     'collapsible': 'hyper-collapsible',
     'group': 'hyper-widget-group',
@@ -1222,26 +1253,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
         wholeNumbers: true,
       ),
       _number(
-        '列表标题行高',
-        typo.listTitleLineHeight,
-        0.5,
-        4,
-        (v) => _spec.typography.listTitleLineHeight = v,
-        () => _spec.typography.listTitleLineHeight = null,
-        _spec.typography.listTitleLineHeight != null,
-        wholeNumbers: false,
-      ),
-      _number(
-        '列表副标题行高',
-        typo.listSubtitleLineHeight,
-        0.5,
-        4,
-        (v) => _spec.typography.listSubtitleLineHeight = v,
-        () => _spec.typography.listSubtitleLineHeight = null,
-        _spec.typography.listSubtitleLineHeight != null,
-        wholeNumbers: false,
-      ),
-      _number(
         '卡片标题',
         typo.cardTitle,
         8,
@@ -1995,6 +2006,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
     if (sections != null) {
       return _globalPanel(sections: sections.isEmpty ? null : sections);
     }
+    if (_page == 'hyper-color-picker') {
+      return _panel('颜色选择器', [const HyperText('本页仅提供 Demo 预览，外观跟随主题。')]);
+    }
+    if (_isInputControl) return _inputPanel();
+    if (_isContentControl) return _contentPanel();
     if (_isBasicControl) return _basicControlPanel();
     if (const {
       'container',
@@ -2241,7 +2257,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       if (_component == 'field') ..._textFieldProperties(s, a),
       if (_component == 'menu') ...[
         _number(
-          '菜单行高',
+          '菜单项最小高度',
           s.menu.itemHeight,
           20,
           100,
@@ -2370,7 +2386,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '编辑标签的布局、文字、图标、配色、减淡比例、背景、边框和阴影。尺寸按设备保存；外观按亮暗方案保存，禁用覆盖由所有变体共用。',
         'chip' => '编辑 Chip 的通用、选中、悬停、聚焦、按下和禁用样式。尺寸按设备保存；文字、图标、删除与状态按对象分组，表面配置置底。多选摘要会显式覆盖标签紧凑高度。',
         'card' => '编辑卡片圆角、背景、边框、前景和阴影；未覆盖项继续继承。',
-        _ => '编辑菜单行高、圆角、表面、前景和阴影；未覆盖项继续继承。',
+        _ => '编辑菜单项最小高度、圆角、表面、前景和阴影；未覆盖项继续继承。',
       }),
     ]);
   }
@@ -3318,6 +3334,35 @@ class _ThemeEditorState extends State<ThemeEditor> {
   List<Widget> _textFieldProperties(HyperSizeScheme s, EditorComponent a) {
     final m = _spec.textFieldMetrics, v = a.textFieldStyle;
     final theme = _resolveTheme(_dark);
+    Widget weightControl(String label, int? value, void Function(int?) set) =>
+        _select(label, value?.toString() ?? 'inherit', const {
+          'inherit': '继承',
+          '100': '100',
+          '200': '200',
+          '300': '300',
+          '400': '400 常规',
+          '500': '500 中等',
+          '600': '600 半粗',
+          '700': '700 粗体',
+          '800': '800',
+          '900': '900',
+        }, (x) => _change(() => set(x == 'inherit' ? null : int.parse(x))));
+    Widget iconControl(
+      String label,
+      String? value,
+      void Function(String?) set,
+    ) => _select(label, value ?? 'inherit', const {
+      'inherit': '继承默认',
+      'close': '关闭',
+      'cancel': '圆形关闭',
+      'visibility': '显示',
+      'visibilityOff': '隐藏',
+      'lock': '锁定',
+      'lockOpen': '解锁',
+      'error': '错误',
+      'warning': '警告',
+      'info': '信息',
+    }, (x) => _change(() => set(x == 'inherit' ? null : x)));
     return [
       if (_fieldState == 'common') ...[
         _heading('输入框布局'),
@@ -3335,7 +3380,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '水平内边距',
           s.textField.horizontalPadding,
           0,
-          600,
+          editorLayoutInsetLimit,
           (value) => m.horizontalPadding = value,
           () => m.horizontalPadding = null,
           m.horizontalPadding != null,
@@ -3344,28 +3389,41 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '垂直内边距',
           s.textField.verticalPadding,
           0,
-          600,
+          editorLayoutInsetLimit,
           (value) => m.verticalPadding = value,
           () => m.verticalPadding = null,
           m.verticalPadding != null,
         ),
+        _select(
+          '文字垂直对齐',
+          v.verticalAlignment ?? 'inherit',
+          const {
+            'inherit': '继承（单行居中，多行顶部）',
+            'top': '顶部',
+            'center': '居中',
+            'bottom': '底部',
+          },
+          (x) => _change(() => v.verticalAlignment = x == 'inherit' ? null : x),
+        ),
         _heading('输入文字'),
+        weightControl('输入字重', v.textWeight, (x) => v.textWeight = x),
         _number(
           '输入字号',
           v.textFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
           8,
-          600,
+          editorContentIconLimit,
           (value) => v.textFontSize = value,
           () => v.textFontSize = null,
           v.textFontSize != null,
         ),
         _color('前景', a.foreground, (value) => a.foreground = value),
         _heading('占位文字'),
+        weightControl('占位字重', v.hintWeight, (x) => v.hintWeight = x),
         _number(
           '占位字号',
           v.hintFontSize ?? (theme.textTheme.labelLarge?.fontSize ?? 14),
           8,
-          600,
+          editorContentIconLimit,
           (value) => v.hintFontSize = value,
           () => v.hintFontSize = null,
           v.hintFontSize != null,
@@ -3379,11 +3437,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
               theme.colors.textTertiary,
         ),
         _heading('标签'),
+        weightControl('标签字重', v.labelWeight, (x) => v.labelWeight = x),
         _number(
           '标签字号',
           v.labelFontSize ?? (theme.textTheme.labelMedium?.fontSize ?? 12),
           8,
-          600,
+          editorContentIconLimit,
           (value) => v.labelFontSize = value,
           () => v.labelFontSize = null,
           v.labelFontSize != null,
@@ -3400,17 +3459,18 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '标签间距',
           s.textField.labelGap,
           0,
-          600,
+          editorLayoutInsetLimit,
           (value) => m.labelGap = value,
           () => m.labelGap = null,
           m.labelGap != null,
         ),
         _heading('字数计数'),
+        weightControl('计数字重', v.counterWeight, (x) => v.counterWeight = x),
         _number(
           '计数字号',
           v.counterFontSize ?? (theme.textTheme.labelSmall?.fontSize ?? 11),
           8,
-          600,
+          editorContentIconLimit,
           (value) => v.counterFontSize = value,
           () => v.counterFontSize = null,
           v.counterFontSize != null,
@@ -3428,7 +3488,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '图标尺寸',
           s.textField.iconSize,
           0,
-          600,
+          editorContentIconLimit,
           (value) => m.iconSize = value,
           () => m.iconSize = null,
           m.iconSize != null,
@@ -3445,10 +3505,21 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '操作区宽度',
           s.textField.actionWidth,
           0,
-          600,
+          editorLayoutInsetLimit,
           (value) => m.actionWidth = value,
           () => m.actionWidth = null,
           m.actionWidth != null,
+        ),
+        iconControl('清除图标', v.clearIconName, (x) => v.clearIconName = x),
+        iconControl(
+          '密码显示图标',
+          v.showPasswordIconName,
+          (x) => v.showPasswordIconName = x,
+        ),
+        iconControl(
+          '密码隐藏图标',
+          v.hidePasswordIconName,
+          (x) => v.hidePasswordIconName = x,
         ),
         _heading('光标'),
         _color(
@@ -3462,7 +3533,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '光标宽度',
           v.cursorWidth ?? (theme.textFieldTheme.style.cursorWidth ?? 2),
           0,
-          600,
+          editorSelectionStrokeLimit(s.textField.minimumHeight),
           (value) => v.cursorWidth = value,
           () => v.cursorWidth = null,
           v.cursorWidth != null,
@@ -3481,6 +3552,31 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ],
       if (_fieldState == 'error') ...[
         _heading('错误提示'),
+        iconControl('错误图标', v.errorIconName, (x) => v.errorIconName = x),
+        _number(
+          '错误文字字号',
+          m.errorFontSize ?? theme.typography.bodySmall,
+          8,
+          editorContentIconLimit,
+          (x) => m.errorFontSize = x,
+          () => m.errorFontSize = null,
+          m.errorFontSize != null,
+        ),
+        weightControl('错误文字字重', v.errorWeight, (x) => v.errorWeight = x),
+        _color(
+          '错误文字颜色',
+          v.errorTextColor,
+          (x) => v.errorTextColor = x,
+          inheritedColor: theme.colors.textPrimary,
+        ),
+        _select('错误浮层位置', v.errorPlacement ?? 'inherit', const {
+          'inherit': '继承默认',
+          'bottomStart': '下方起点',
+          'bottomEnd': '下方末端',
+          'topStart': '上方起点',
+          'sideStart': '侧边起点',
+          'sideEnd': '侧边末端',
+        }, (x) => _change(() => v.errorPlacement = x == 'inherit' ? null : x)),
         _color(
           '错误图标颜色',
           v.errorIconColor,
@@ -3492,10 +3588,58 @@ class _ThemeEditorState extends State<ThemeEditor> {
           '错误浮层最大宽度',
           s.textField.errorMaxWidth,
           0,
-          600,
+          editorContentWidthLimit,
           (value) => m.errorMaxWidth = value,
           () => m.errorMaxWidth = null,
           m.errorMaxWidth != null,
+        ),
+      ],
+      if (_fieldState == 'error') ...[
+        _heading('错误浮层表面'),
+        _color(
+          '错误浮层背景',
+          v.errorPopupBackground,
+          (x) => v.errorPopupBackground = x,
+          inheritedColor: theme.colors.surface,
+        ),
+        _number(
+          '错误浮层内边距',
+          m.errorPopupPadding ?? s.textField.horizontalPadding,
+          0,
+          editorLayoutInsetLimit,
+          (x) => m.errorPopupPadding = x,
+          () => m.errorPopupPadding = null,
+          m.errorPopupPadding != null,
+        ),
+        _radiusNumber(
+          '错误浮层圆角',
+          m.errorPopupRadius ?? s.menu.surfaceRadius,
+          0,
+          editorSurfaceRadiusLimit,
+          (x) => m.errorPopupRadius = x,
+          () => m.errorPopupRadius = null,
+          m.errorPopupRadius != null,
+        ),
+        _number(
+          '错误浮层边框宽度',
+          m.errorPopupBorderWidth ?? 0,
+          0,
+          editorLineThicknessLimit,
+          (x) => m.errorPopupBorderWidth = x,
+          () => m.errorPopupBorderWidth = null,
+          m.errorPopupBorderWidth != null,
+        ),
+        _color(
+          '错误浮层边框颜色',
+          v.errorPopupBorderColor,
+          (x) => v.errorPopupBorderColor = x,
+          inheritedColor: theme.colors.outline,
+        ),
+        ..._focusedShadowProperties(
+          a,
+          stateTarget: v.errorPopupShadow,
+          label: '错误浮层阴影',
+          description: '继承统一浮层阴影；空列表关闭错误浮层阴影。',
         ),
       ],
       if (_fieldState == 'disabled') ...[
@@ -3511,6 +3655,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ],
       if (_fieldState == 'common') ...[
         _heading('状态过渡'),
+        _select('状态过渡曲线', v.motionCurve ?? 'inherit', const {
+          'inherit': '继承默认',
+          'linear': '线性',
+          'easeInOut': '缓入缓出',
+          'fastOutSlowIn': '快出慢入',
+        }, (x) => _change(() => v.motionCurve = x == 'inherit' ? null : x)),
         _number(
           '状态过渡时长（毫秒）',
           v.durationMilliseconds ??
@@ -4203,7 +4353,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
       case 'error':
         v.errorBorder = EditorBorder();
         v.errorBorderColor = v.errorIconColor = null;
-        _spec.textFieldMetrics.errorMaxWidth = null;
+        v.errorTextColor = v.errorPopupBackground = v.errorPopupBorderColor =
+            null;
+        v.errorWeight = null;
+        v.errorPopupShadow.shadows = null;
+        v.errorPlacement = v.errorIconName = null;
+        _spec.textFieldMetrics
+          ..errorFontSize = null
+          ..errorPopupRadius = null
+          ..errorPopupPadding = null
+          ..errorPopupBorderWidth = null
+          ..errorMaxWidth = null;
       case 'disabled':
         v.disabledBorder = EditorBorder();
         v.disabledForegroundColor = null;
@@ -4538,14 +4698,16 @@ class _ThemeEditorState extends State<ThemeEditor> {
     EditorComponent a, {
     EditorComponentShadow? stateTarget,
     String label = '聚焦阴影 / 焦点环',
+    String? description,
   }) {
     final target = stateTarget ?? a.focusedShadow;
     return [
       _heading(label),
       HyperText(
-        stateTarget == null
-            ? '仅获得焦点时显示；零偏移、零模糊和正扩散可绘制焦点环。该配置替换聚焦时的普通阴影。'
-            : '仅在当前状态显示；未覆盖时继承普通阴影，空列表关闭当前状态阴影。',
+        description ??
+            (stateTarget == null
+                ? '仅获得焦点时显示；零偏移、零模糊和正扩散可绘制焦点环。该配置替换聚焦时的普通阴影。'
+                : '仅在当前状态显示；未覆盖时继承普通阴影，空列表关闭当前状态阴影。'),
       ),
       Wrap(
         spacing: 8,
@@ -4658,6 +4820,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
                       ?.key ??
                   value;
               if (value == 'hyper-dropdown') _component = 'select';
+              _inputObject = 'standard';
+              _inputState = 'default';
+              _iconInputVariant = 'common';
+              if (value == 'hyper-scrolling-text') _component = 'text';
               for (final entry in _pages.entries) {
                 if (entry.value == value) _component = entry.key;
               }

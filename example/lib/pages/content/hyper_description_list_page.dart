@@ -36,6 +36,60 @@ class _PageState extends State<HyperDescriptionListPage> {
       padding: EdgeInsets.all(size.pageHorizontalPadding),
       children: [
         DemoSection(
+          title: '分组分割线与任意内容',
+          child: HyperDescriptionList(
+            columns: 2,
+            items: [
+              const HyperDescriptionItem(
+                id: 'company',
+                label: Text('物业公司'),
+                value: Text('示例物业'),
+              ),
+              const HyperDescriptionItem(
+                id: 'contact',
+                label: Text('联系人'),
+                value: Text('安安'),
+              ),
+              const HyperDescriptionItem.divider(id: 'section-divider'),
+              const HyperDescriptionItem(
+                id: 'maintenance',
+                label: Text('维保公司'),
+                value: Text('示例维保'),
+              ),
+              const HyperDescriptionItem(
+                id: 'phone',
+                label: Text('联系电话'),
+                value: Text('13100000000'),
+              ),
+              HyperDescriptionItem.custom(
+                id: 'custom-content',
+                span: 2,
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    const Text('现场照片'),
+                    HyperButton.text(
+                      onPressed: () {},
+                      child: const Text('查看全部（1）'),
+                    ),
+                    const Icon(Icons.photo_outlined),
+                  ],
+                ),
+              ),
+              const HyperDescriptionItem(
+                id: 'vertical',
+                span: 2,
+                labelPlacement: HyperDescriptionLabelPlacement.above,
+                label: Text('备注（单项纵向）'),
+                value: Text('单项标签布局独立，任意内容可使用 Row、Column、Wrap 等组合。'),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: size.sectionSpacing),
+        DemoSection(
           title: '列数、跨列与自然换行',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +112,7 @@ class _PageState extends State<HyperDescriptionListPage> {
                   ),
                 ],
               ),
-              SizedBox(height: size.descriptionList.headerSpacing),
+              SizedBox(height: size.compactSectionSpacing),
               HyperDescriptionList(
                 columns: _columns,
                 labelPlacement: _above
@@ -111,28 +165,38 @@ class _PageState extends State<HyperDescriptionListPage> {
                 placeholder: '未填写',
               ),
             ),
-            child: HyperDescriptionList(
+            child: HyperTitledCard(
+              titlePosition: HyperCardTitlePosition.inside,
+              cardStyle: HyperCardStyle(
+                background: const HyperFill.none(),
+                material: const HyperSurfaceMaterial.solid(),
+                border: const Border(),
+                boxShadow: const [],
+              ),
               title: const Text('项目资料'),
-              extra: HyperButton.text(
+              action: HyperButton.text(
                 label: const Text('编辑'),
                 onPressed: () {},
               ),
-              items: [
-                HyperDescriptionItem(
-                  id: 'action',
-                  label: const Text('操作'),
-                  value: Wrap(
-                    children: [
-                      HyperButton.text(
-                        label: const Text('查看详情'),
-                        onPressed: () {},
-                      ),
-                      const Icon(Icons.check_circle_outline),
-                    ],
+              child: HyperDescriptionList(
+                items: [
+                  HyperDescriptionItem(
+                    id: 'action',
+                    label: const Text('操作'),
+                    value: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        HyperButton.text(
+                          label: const Text('查看详情'),
+                          onPressed: () {},
+                        ),
+                        const Icon(Icons.check_circle_outline),
+                      ],
+                    ),
                   ),
-                ),
-                const HyperDescriptionItem(id: 'empty', label: Text('联系方式')),
-              ],
+                  const HyperDescriptionItem(id: 'empty', label: Text('联系方式')),
+                ],
+              ),
             ),
           ),
         ),

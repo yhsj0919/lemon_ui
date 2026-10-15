@@ -27,6 +27,7 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
   double _stepped = .4;
   double _continuousWithPoints = .37;
   double _thin = .48;
+  double _indicatorPreview = .48;
   RangeValues _thinRange = const RangeValues(.3, .7);
   double _volumePanel = .48;
   double _brightnessPanel = .72;
@@ -189,6 +190,30 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
                       value: percent(_volumes[i]),
                       icon: _volumeIcons[i],
                     ),
+                ]),
+                section('数值提示 · 始终显示（提示显隐为实例覆盖）', [
+                  const HyperText('右侧“数值提示”设置直接作用于此气泡；拖动可更新数值。'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80, bottom: 16),
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        showValueIndicator: ShowValueIndicator.alwaysVisible,
+                      ),
+                      child: HyperSlider(
+                        key: const ValueKey('slider-value-indicator-preview'),
+                        variant: HyperSliderVariant.thin,
+                        value: _indicatorPreview,
+                        label: percent(_indicatorPreview),
+                        style: HyperSliderStyle(
+                          showValueIndicator:
+                              theme.sliderTheme.style.showValueIndicator ??
+                              ShowValueIndicator.alwaysVisible,
+                        ),
+                        onChanged: (value) =>
+                            setState(() => _indicatorPreview = value),
+                      ),
+                    ),
+                  ),
                 ]),
                 section('普通细轨道', [
                   example(

@@ -1,3 +1,4 @@
+import '../divider/hyper_divider.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:math' as math;
@@ -21,8 +22,6 @@ class HyperDescriptionList extends StatelessWidget {
     this.responsive = true,
     this.bordered = false,
     this.labelPlacement = HyperDescriptionLabelPlacement.inline,
-    this.title,
-    this.extra,
     this.style,
     this.transitionBuilder,
   });
@@ -30,7 +29,6 @@ class HyperDescriptionList extends StatelessWidget {
   final int columns;
   final bool responsive, bordered;
   final HyperDescriptionLabelPlacement labelPlacement;
-  final Widget? title, extra;
   final HyperDescriptionListStyle? style;
 
   /// 替换值变化的默认淡入淡出；不参与列宽计算。
@@ -59,7 +57,10 @@ class HyperDescriptionList extends StatelessWidget {
       columnSpacing: size.columnSpacing,
       rowSpacing: size.rowSpacing,
       labelValueSpacing: size.labelValueSpacing,
-      headerSpacing: size.headerSpacing,
+      labelAlign: TextAlign.start,
+      valueAlign: TextAlign.start,
+      contentHeight: size.contentHeight,
+      contentHeightMode: HyperDescriptionContentHeightMode.auto,
       minimumColumnWidth: size.minimumColumnWidth,
       labelFlex: 1,
       valueFlex: 2,
@@ -67,9 +68,6 @@ class HyperDescriptionList extends StatelessWidget {
         color: theme.colors.textSecondary,
       ),
       valueStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: theme.colors.textPrimary,
-      ),
-      titleStyle: theme.textTheme.titleMedium?.copyWith(
         color: theme.colors.textPrimary,
       ),
       placeholder: '—',
@@ -94,8 +92,27 @@ class HyperDescriptionList extends StatelessWidget {
         Widget cell(HyperDescriptionPlacement placement, bool last) {
           final item = placement.item;
           final cs = s.merge(item.style);
+          if (item.kind == HyperDescriptionItemKind.divider) {
+            return SizedBox(
+              width: placement.width,
+              child: HyperDivider(line: item.line),
+            );
+          }
+          if (item.kind == HyperDescriptionItemKind.custom) {
+            return SizedBox(
+              width: placement.width,
+              child: Padding(padding: cs.cellPadding!, child: item.child),
+            );
+          }
           assert(cs.labelFlex! > 0 && cs.valueFlex! > 0);
           final padding = cs.cellPadding!.resolve(direction);
+          AlignmentGeometry align(TextAlign value) => switch (value) {
+            TextAlign.center => AlignmentDirectional.center,
+            TextAlign.end => AlignmentDirectional.centerEnd,
+            TextAlign.right => Alignment.centerRight,
+            TextAlign.left => Alignment.centerLeft,
+            _ => AlignmentDirectional.centerStart,
+          };
           Widget part(
             Widget child,
             TextStyle text,
@@ -109,7 +126,9 @@ class HyperDescriptionList extends StatelessWidget {
               color: fill.color,
               gradient: fill.gradient,
             ),
+            alignment: align(value ? cs.valueAlign! : cs.labelAlign!),
             child: AnimatedDefaultTextStyle(
+              textAlign: value ? cs.valueAlign : cs.labelAlign,
               style: text,
               duration: duration(cs),
               curve: cs.curve!,
@@ -138,7 +157,8 @@ class HyperDescriptionList extends StatelessWidget {
               ? cs.borderThickness!
               : cs.labelValueSpacing!;
           Widget content;
-          if (labelPlacement == HyperDescriptionLabelPlacement.above) {
+          if ((item.labelPlacement ?? labelPlacement) ==
+              HyperDescriptionLabelPlacement.above) {
             content = Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -202,8 +222,22 @@ class HyperDescriptionList extends StatelessWidget {
             for (var r = 0; r < layout.rows.length; r++) ...[
               if (r > 0)
                 SizedBox(
-                  height: bordered ? s.borderThickness : s.rowSpacing,
-                  child: bordered ? ColoredBox(color: s.borderColor!) : null,
+                  height:
+                      bordered &&
+                          layout.rows[r].first.item.kind ==
+                              HyperDescriptionItemKind.field &&
+                          layout.rows[r - 1].first.item.kind ==
+                              HyperDescriptionItemKind.field
+                      ? s.borderThickness
+                      : s.rowSpacing,
+                  child:
+                      bordered &&
+                          layout.rows[r].first.item.kind ==
+                              HyperDescriptionItemKind.field &&
+                          layout.rows[r - 1].first.item.kind ==
+                              HyperDescriptionItemKind.field
+                      ? ColoredBox(color: s.borderColor!)
+                      : null,
                 ),
               IntrinsicHeight(
                 child: Row(
@@ -225,6 +259,19 @@ class HyperDescriptionList extends StatelessWidget {
             ],
           ],
         );
+        if (s.contentHeight != null &&
+            s.contentHeightMode != HyperDescriptionContentHeightMode.auto) {
+          body = ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  s.contentHeightMode == HyperDescriptionContentHeightMode.fixed
+                  ? s.contentHeight!
+                  : 0,
+              maxHeight: s.contentHeight!,
+            ),
+            child: SingleChildScrollView(primary: false, child: body),
+          );
+        }
         body = AnimatedContainer(
           duration: duration(s),
           curve: s.curve!,
@@ -263,27 +310,7 @@ class HyperDescriptionList extends StatelessWidget {
             child: body,
           );
         }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (title != null || extra != null) ...[
-              AnimatedDefaultTextStyle(
-                style: s.titleStyle!,
-                duration: duration(s),
-                curve: s.curve!,
-                child: Wrap(
-                  spacing: s.headerSpacing!,
-                  runSpacing: s.headerSpacing!,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [?title, ?extra],
-                ),
-              ),
-              SizedBox(height: s.headerSpacing),
-            ],
-            body,
-          ],
-        );
+        return body;
       },
     );
   }

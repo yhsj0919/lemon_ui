@@ -215,16 +215,6 @@ extension _BasicControlWorkspace on _ThemeEditorState {
         () => v.fontWeight = null,
         v.fontWeight != null,
       ),
-      _number(
-        '文字行高',
-        v.lineHeight ?? 1.2,
-        0.5,
-        4,
-        (value) => v.lineHeight = value,
-        () => v.lineHeight = null,
-        v.lineHeight != null,
-        wholeNumbers: false,
-      ),
       _color(
         '文字颜色',
         v.foregroundColor,

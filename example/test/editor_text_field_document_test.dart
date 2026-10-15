@@ -5,6 +5,65 @@ import 'package:lemon_ui_example/editor/editor_theme_document.dart';
 import 'package:lemon_ui_example/editor/editor_text_field_fields.dart';
 
 void main() {
+  test('新增输入文字、图标、错误浮层配置保存和设备隔离', () {
+    final d = EditorThemeDocument();
+    d.light.field.textFieldStyle
+      ..textWeight = 600
+      ..hintWeight = 500
+      ..labelWeight = 700
+      ..counterWeight = 300
+      ..verticalAlignment = 'bottom'
+      ..motionCurve = 'linear'
+      ..clearIconName = 'cancel'
+      ..showPasswordIconName = 'lockOpen'
+      ..hidePasswordIconName = 'lock'
+      ..errorIconName = 'warning'
+      ..errorWeight = 500
+      ..errorPlacement = 'topStart'
+      ..errorTextColor = const EditorColor(argb: 0xFF123456)
+      ..errorPopupBackground = const EditorColor(argb: 0xFF345678)
+      ..errorPopupBorderColor = const EditorColor(argb: 0xFF654321);
+    d.light.field.textFieldStyle.errorPopupShadow.shadows = [];
+    d.desktop.textFieldMetrics
+      ..errorFontSize = 19
+      ..errorPopupRadius = 12
+      ..errorPopupPadding = 15
+      ..errorPopupBorderWidth = 2;
+    final r = EditorThemeDocument.decode(d.encode());
+    expect(r.encode(), d.encode());
+    final style = r.resolve(false).textFieldTheme.style;
+    expect(style.textStyle!.fontWeight, FontWeight.w600);
+    expect(style.hintStyle!.fontWeight, FontWeight.w500);
+    expect(style.labelStyle!.fontWeight, FontWeight.w700);
+    expect(style.counterStyle!.fontWeight, FontWeight.w300);
+    expect(style.textAlignVertical, TextAlignVertical.bottom);
+    expect(style.curve, Curves.linear);
+    expect(style.clearIcon, Icons.cancel_outlined);
+    expect(style.errorIcon, Icons.warning_amber_outlined);
+    expect(style.errorPlacement, HyperOverlayPlacement.topStart);
+    expect(style.errorTextStyle!.fontSize, 19);
+    expect(style.errorTextStyle!.fontWeight, FontWeight.w500);
+    expect(style.errorTextStyle!.color, const Color(0xFF123456));
+    expect(style.errorPopupStyle!.padding, const EdgeInsets.all(15));
+    expect(style.errorPopupStyle!.boxShadow, isEmpty);
+    expect(style.errorPopupStyle!.borderRadius, BorderRadius.circular(12));
+    expect(style.errorPopupStyle!.background!.color, const Color(0xFF345678));
+    expect(style.errorPopupStyle!.border!.top.width, 2);
+    expect(style.errorPopupStyle!.border!.top.color, const Color(0xFF654321));
+    expect(
+      r
+          .resolve(false, deviceType: HyperDeviceType.phone)
+          .textFieldTheme
+          .style
+          .errorTextStyle!
+          .fontSize,
+      isNull,
+    );
+    expect(
+      () => EditorTextFieldVisual.fromJson({'errorPlacement': 'wrong'}),
+      throwsFormatException,
+    );
+  });
   test('输入框保存回读、四端隔离和亮暗状态覆盖', () {
     final doc = EditorThemeDocument();
     doc.desktop.textFieldMetrics.horizontalPadding = 23;

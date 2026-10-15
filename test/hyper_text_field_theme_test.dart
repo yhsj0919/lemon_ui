@@ -4,6 +4,32 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui/src/components/text_field/hyper_text_field_layout.dart';
 
 void main() {
+  test('局部输入文字和错误浮层只覆盖显式字段', () {
+    final base = HyperTextFieldStyle(
+      hintStyle: const TextStyle(fontSize: 16, color: Colors.red),
+      errorTextStyle: const TextStyle(color: Colors.blue),
+      errorPopupStyle: HyperCardStyle(
+        padding: const EdgeInsets.all(12),
+        boxShadow: const [BoxShadow(blurRadius: 4)],
+      ),
+    );
+    final merged = base.merge(
+      HyperTextFieldStyle(
+        hintStyle: const TextStyle(fontWeight: FontWeight.w600),
+        errorTextStyle: const TextStyle(fontSize: 18),
+        errorPopupStyle: HyperCardStyle(
+          background: const HyperFill.color(Colors.green),
+          boxShadow: const [],
+        ),
+      ),
+    );
+    expect(merged.hintStyle!.fontSize, 16);
+    expect(merged.hintStyle!.color, Colors.red);
+    expect(merged.hintStyle!.fontWeight, FontWeight.w600);
+    expect(merged.errorTextStyle!.color, Colors.blue);
+    expect(merged.errorPopupStyle!.padding, const EdgeInsets.all(12));
+    expect(merged.errorPopupStyle!.boxShadow, isEmpty);
+  });
   test('尾部图标留白只计算一次，计数保留完整内边距', () {
     expect(
       resolveHyperTextFieldSuffixPadding(

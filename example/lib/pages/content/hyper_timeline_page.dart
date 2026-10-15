@@ -139,9 +139,6 @@ class _PageState extends State<HyperTimelinePage> {
                 title: const Text('自定义图标'),
                 node: const Icon(Icons.local_shipping_outlined),
                 status: HyperTimelineStatus.active,
-                style: HyperTimelineStyle(
-                  nodeSize: sizes.stepIndicator.nodeSize,
-                ),
                 content: HyperButton.text(
                   label: const Text('查看详情'),
                   onPressed: () {},

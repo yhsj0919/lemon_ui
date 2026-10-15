@@ -10,6 +10,28 @@ HyperAccordionItem item(Object id, {bool enabled = true}) => HyperAccordionItem(
 );
 
 void main() {
+  testWidgets('横向收起保留完整高度且可关闭', (tester) async {
+    Widget app(bool expanded, bool reserve) => MaterialApp(
+      home: Center(
+        child: HyperCollapsible(
+          expanded: expanded,
+          axis: Axis.horizontal,
+          maintainCrossAxisSize: reserve,
+          style: const HyperCollapsibleStyle(contentPadding: EdgeInsets.zero),
+          child: const SizedBox(width: 160, height: 80),
+        ),
+      ),
+    );
+    await tester.pumpWidget(app(true, true));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HyperCollapsible)).height, 80);
+    await tester.pumpWidget(app(false, true));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HyperCollapsible)), const Size(0, 80));
+    await tester.pumpWidget(app(false, false));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HyperCollapsible)), Size.zero);
+  });
   test('互斥模式切换并可全部收起，输入集合不被改写', () {
     final ids = <Object>{1};
     final selection = HyperAccordionSelection(

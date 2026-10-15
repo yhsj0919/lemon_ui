@@ -1,3 +1,6 @@
+import 'hyper_slider_indicator_host.dart';
+import 'hyper_slider_value_indicator_shapes.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -560,77 +563,102 @@ Widget _sliderTheme(
         colors.stateLayer.withValues(alpha: .06),
         inactiveTrackColor,
       );
-  return SliderTheme(
-    data: inherited.copyWith(
-      padding: inherited.padding ?? EdgeInsets.zero,
-      trackHeight: trackHeight,
-      activeTrackColor: style.activeTrackColor ?? colors.primary,
-      inactiveTrackColor: Color.lerp(
-        inactiveTrackColor,
-        hoveredInactiveTrackColor,
-        hoverFactor,
+  return HyperSliderIndicatorHost(
+    style: style,
+    builder: (onLabel) => SliderTheme(
+      data: inherited.copyWith(
+        padding: inherited.padding ?? EdgeInsets.zero,
+        trackHeight: trackHeight,
+        activeTrackColor: style.activeTrackColor ?? colors.primary,
+        inactiveTrackColor: Color.lerp(
+          inactiveTrackColor,
+          hoveredInactiveTrackColor,
+          hoverFactor,
+        ),
+        disabledActiveTrackColor:
+            style.disabledActiveTrackColor ?? colors.disabled,
+        disabledInactiveTrackColor:
+            style.disabledInactiveTrackColor ?? colors.surfaceMuted,
+        minThumbSeparation: 0,
+        thumbColor: style.thumbColor ?? colors.surfaceElevated,
+        disabledThumbColor: style.disabledThumbColor ?? colors.disabled,
+        overlayColor: style.overlayColor ?? Colors.transparent,
+        valueIndicatorColor: style.valueIndicatorColor ?? colors.primary,
+        valueIndicatorTextStyle:
+            style.valueIndicatorTextStyle ??
+            theme.textTheme.bodySmall?.copyWith(color: colors.onPrimary),
+        activeTickMarkColor: Colors.transparent,
+        inactiveTickMarkColor: Colors.transparent,
+        disabledActiveTickMarkColor: Colors.transparent,
+        disabledInactiveTickMarkColor: Colors.transparent,
+        trackShape:
+            style.trackShape ??
+            HyperSliderTrackShape(
+              divisions: divisions,
+              pointRadius: pointRadius,
+              activePointColor: activePointColor,
+              inactivePointColor: inactivePointColor,
+            ),
+        thumbShape:
+            style.thumbShape ??
+            HyperSliderThumbShape(
+              radius: radius,
+              width: style.thumbWidth ?? metrics.thumbWidth,
+              height: style.thumbHeight ?? metrics.thumbHeight,
+              shadows: style.thumbShadows,
+              outlineWidth: style.thumbOutlineWidth ?? radius * .28,
+              outlineColor: style.thumbOutlineColor,
+              pressedScale: style.pressedThumbScale ?? 1.127,
+              pressFactor: pressFactor,
+              reduceMotion: reduceMotion,
+            ),
+        overlayShape:
+            style.overlayShape ??
+            RoundSliderOverlayShape(overlayRadius: overlayRadius),
+        rangeTrackShape:
+            style.rangeTrackShape ??
+            HyperRangeSliderTrackShape(
+              divisions: divisions,
+              pointRadius: pointRadius,
+              activePointColor: activePointColor,
+              inactivePointColor: inactivePointColor,
+            ),
+        rangeThumbShape:
+            style.rangeThumbShape ??
+            HyperRangeSliderThumbShape(
+              radius: radius,
+              width: style.thumbWidth ?? metrics.thumbWidth,
+              height: style.thumbHeight ?? metrics.thumbHeight,
+              shadows: style.thumbShadows,
+              outlineWidth: style.thumbOutlineWidth ?? radius * .28,
+              outlineColor: style.thumbOutlineColor,
+              pressedScale: style.pressedThumbScale ?? 1.127,
+              pressFactor: pressFactor,
+              reduceMotion: reduceMotion,
+              pressedThumb: pressedRangeThumb,
+            ),
+        rangeValueIndicatorShape:
+            style.rangeValueIndicatorShape ??
+            HyperRangeSliderValueIndicatorShape(
+              onLabel: onLabel,
+              padding: _indicatorPadding(context),
+              radius: HyperTheme.sizesOf(context).controlRadius,
+            ),
+        showValueIndicator:
+            style.showValueIndicator ?? ShowValueIndicator.never,
+        valueIndicatorShape:
+            style.valueIndicatorShape ??
+            HyperSliderValueIndicatorShape(
+              onLabel: onLabel,
+              padding: _indicatorPadding(context),
+              radius: HyperTheme.sizesOf(context).controlRadius,
+            ),
       ),
-      disabledActiveTrackColor:
-          style.disabledActiveTrackColor ?? colors.disabled,
-      disabledInactiveTrackColor:
-          style.disabledInactiveTrackColor ?? colors.surfaceMuted,
-      minThumbSeparation: 0,
-      thumbColor: style.thumbColor ?? colors.surfaceElevated,
-      disabledThumbColor: style.disabledThumbColor ?? colors.disabled,
-      overlayColor: style.overlayColor ?? Colors.transparent,
-      valueIndicatorColor: style.valueIndicatorColor ?? colors.primary,
-      valueIndicatorTextStyle:
-          style.valueIndicatorTextStyle ??
-          theme.textTheme.labelMedium?.copyWith(color: colors.onPrimary),
-      activeTickMarkColor: Colors.transparent,
-      inactiveTickMarkColor: Colors.transparent,
-      disabledActiveTickMarkColor: Colors.transparent,
-      disabledInactiveTickMarkColor: Colors.transparent,
-      trackShape:
-          style.trackShape ??
-          HyperSliderTrackShape(
-            divisions: divisions,
-            pointRadius: pointRadius,
-            activePointColor: activePointColor,
-            inactivePointColor: inactivePointColor,
-          ),
-      thumbShape:
-          style.thumbShape ??
-          HyperSliderThumbShape(
-            radius: radius,
-            outlineWidth: style.thumbOutlineWidth ?? radius * .28,
-            outlineColor: style.thumbOutlineColor,
-            pressedScale: style.pressedThumbScale ?? 1.127,
-            pressFactor: pressFactor,
-            reduceMotion: reduceMotion,
-          ),
-      overlayShape:
-          style.overlayShape ??
-          RoundSliderOverlayShape(overlayRadius: overlayRadius),
-      rangeTrackShape:
-          style.rangeTrackShape ??
-          HyperRangeSliderTrackShape(
-            divisions: divisions,
-            pointRadius: pointRadius,
-            activePointColor: activePointColor,
-            inactivePointColor: inactivePointColor,
-          ),
-      rangeThumbShape:
-          style.rangeThumbShape ??
-          HyperRangeSliderThumbShape(
-            radius: radius,
-            outlineWidth: style.thumbOutlineWidth ?? radius * .28,
-            outlineColor: style.thumbOutlineColor,
-            pressedScale: style.pressedThumbScale ?? 1.127,
-            pressFactor: pressFactor,
-            reduceMotion: reduceMotion,
-            pressedThumb: pressedRangeThumb,
-          ),
-      rangeValueIndicatorShape:
-          style.rangeValueIndicatorShape ??
-          const PaddleRangeSliderValueIndicatorShape(),
-      valueIndicatorShape: style.valueIndicatorShape,
+      child: HyperSemanticsGuard(containOverlay: true, child: child),
     ),
-    child: HyperSemanticsGuard(containOverlay: true, child: child),
   );
 }
+
+EdgeInsets _indicatorPadding(BuildContext context) =>
+    HyperTheme.sizesOf(context).controlPadding
+        .resolve(Directionality.of(context));

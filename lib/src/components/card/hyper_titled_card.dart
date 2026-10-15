@@ -1,3 +1,5 @@
+import 'hyper_card_theme.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -32,7 +34,12 @@ class HyperTitledCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final metrics = HyperTheme.sizesOf(context).card;
-    final themedStyle = HyperTitledCardTheme.of(context).style;
+    final cardTheme = HyperTitledCardTheme.of(context);
+    final themedStyle = (cardTheme.style ?? const HyperTitledCardStyle()).merge(
+      titlePosition == HyperCardTitlePosition.outside
+          ? cardTheme.outside
+          : cardTheme.inside,
+    );
     final outside = titlePosition == HyperCardTitlePosition.outside;
     final resolved = HyperTitledCardStyle(
       titlePadding: outside
@@ -42,6 +49,8 @@ class HyperTitledCard extends StatelessWidget {
           ? metrics.outsideTitleSpacing
           : metrics.titleSpacing,
       actionSpacing: metrics.actionSpacing,
+      actionPadding: metrics.actionPadding,
+      actionIconSize: HyperTheme.sizesOf(context).iconSize,
       // 卡片外的分组标签沿用较小的弱强调文字；卡片内仍是内容标题。
       titleTextStyle: outside
           ? theme.textTheme.titleSmall?.copyWith(
@@ -61,40 +70,49 @@ class HyperTitledCard extends StatelessWidget {
         Expanded(
           child: DefaultTextStyle.merge(
             style: resolved.titleTextStyle,
-            child: title,
+            child: Padding(padding: insets, child: title),
           ),
         ),
         if (action != null) ...[
           SizedBox(width: resolved.actionSpacing),
           DefaultTextStyle.merge(
             style: resolved.actionTextStyle,
-            child: IconTheme.merge(
-              data: IconThemeData(color: resolved.actionTextStyle?.color),
-              child: action!,
+            child: Padding(
+              padding: resolved.actionPadding!,
+              child: IconTheme.merge(
+                data: IconThemeData(
+                  color: resolved.actionTextStyle?.color,
+                  size: resolved.actionIconSize,
+                ),
+                child: action!,
+              ),
             ),
           ),
         ],
       ],
     );
     if (titlePosition == HyperCardTitlePosition.inside) {
+      final contentPadding =
+          cardStyle?.padding ??
+          HyperCardTheme.of(context).style?.padding ??
+          metrics.padding;
       return HyperCard(
-        style: cardStyle,
+        style: (cardStyle ?? HyperCardStyle()).merge(
+          HyperCardStyle(padding: EdgeInsets.zero),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 标题留在表面内；主体的内边距和排列由调用方决定。
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                insets.left,
-                insets.top,
-                insets.right,
-                0,
-              ),
-              child: header,
-            ),
+            header,
             SizedBox(height: resolved.titleSpacing),
-            child,
+            Padding(
+              padding: contentPadding
+                  .resolve(Directionality.of(context))
+                  .copyWith(top: 0),
+              child: child,
+            ),
           ],
         ),
       );
@@ -103,7 +121,7 @@ class HyperTitledCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(padding: resolved.titlePadding!, child: header),
+        header,
         SizedBox(height: resolved.titleSpacing),
         HyperCard(style: cardStyle, child: child),
       ],

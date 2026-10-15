@@ -131,10 +131,12 @@ class HyperListTile extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (leading != null) ...[
+                  if (leading != null && resolved.leadingSize! > 0) ...[
                     SizedBox.square(
                       dimension: resolved.leadingSize,
-                      child: Center(child: leading),
+                      child: ClipRect(
+                        child: FittedBox(fit: BoxFit.scaleDown, child: leading),
+                      ),
                     ),
                     SizedBox(width: resolved.leadingSpacing),
                   ],

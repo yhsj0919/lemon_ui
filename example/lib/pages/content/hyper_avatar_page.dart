@@ -8,6 +8,12 @@ import '../../gallery/demo_section.dart';
 
 import 'avatar_demo_images.dart';
 
+// 图片数据与组件尺寸无关，避免主题编辑重建时重新创建图片缓存键。
+final _avatarImages = [
+  for (final data in avatarDemoImages) MemoryImage(base64Decode(data)),
+];
+final _failedAvatarImage = MemoryImage(Uint8List.fromList([0]));
+
 class HyperAvatarPage extends StatelessWidget {
   const HyperAvatarPage({super.key});
   @override
@@ -30,11 +36,7 @@ class HyperAvatarPage extends StatelessWidget {
       ])
         HyperAvatar(text: name),
     ];
-    final image = MemoryImage(
-      base64Decode(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
-      ),
-    );
+    final image = _avatarImages.first;
     const palette = [
       Color(0xFF3B82F6),
       Color(0xFF8B5CF6),
@@ -53,8 +55,7 @@ class HyperAvatarPage extends StatelessWidget {
         ),
     ];
     final imageAvatars = [
-      for (final data in avatarDemoImages)
-        HyperAvatar(image: MemoryImage(base64Decode(data))),
+      for (final image in _avatarImages) HyperAvatar(image: image),
     ];
     Widget section(String title, Widget child) =>
         DemoSection(title: title, child: child);
@@ -64,18 +65,16 @@ class HyperAvatarPage extends StatelessWidget {
         padding: EdgeInsets.all(sizes.pageHorizontalPadding),
         children: [
           section(
-            'HyperAvatar',
+            '默认主题预览：文字、图标、图片与圆角头像',
             Wrap(
               spacing: sizes.widgetGroup.spacing,
               children: [
                 const HyperAvatar(text: '林'),
                 const HyperAvatar(icon: Icon(Icons.face_outlined)),
                 HyperAvatar(image: image, semanticsLabel: '本地图片示例'),
-                HyperAvatar(
-                  image: MemoryImage(Uint8List.fromList([0])),
-                  text: '回退',
-                ),
+                HyperAvatar(image: _failedAvatarImage, text: '回退'),
                 const HyperAvatar(child: Icon(Icons.pets_outlined)),
+                const HyperAvatar(text: '圆角', shape: HyperAvatarShape.rounded),
               ],
             ),
           ),

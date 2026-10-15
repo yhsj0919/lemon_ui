@@ -15,6 +15,44 @@ void main() {
     ),
   );
 
+  testWidgets('首部尺寸零隐藏内容与间距，小尺寸缩小图标不溢出', (tester) async {
+    for (final leading in [
+      const Icon(Icons.wifi, size: 48),
+      const HyperIcon(Icons.bluetooth, size: 48),
+    ]) {
+      await tester.pumpWidget(
+        app(
+          HyperListTile(
+            leading: leading,
+            title: const Text('标题'),
+            style: const HyperListTileStyle(leadingSize: 0),
+          ),
+        ),
+      );
+      expect(find.byType(Icon), findsNothing);
+      final hiddenX = tester.getTopLeft(find.text('标题')).dx;
+      await tester.pumpWidget(app(const HyperListTile(title: Text('标题'))));
+      expect(tester.getTopLeft(find.text('标题')).dx, hiddenX);
+      await tester.pumpWidget(
+        app(
+          HyperListTile(
+            leading: leading,
+            title: const Text('标题'),
+            style: const HyperListTileStyle(leadingSize: 8),
+          ),
+        ),
+      );
+      final box = tester.renderObject<RenderBox>(find.byType(Icon));
+      final left = box.localToGlobal(Offset.zero);
+      final right = box.localToGlobal(Offset(box.size.width, 0));
+      expect(right.dx - left.dx, closeTo(8, .01));
+      expect(
+        right.dx,
+        lessThanOrEqualTo(tester.getTopLeft(find.text('标题')).dx),
+      );
+      expect(tester.takeException(), isNull);
+    }
+  });
   testWidgets('手机默认列表项遵循 MIUIX 行高和内部间距', (tester) async {
     await tester.pumpWidget(
       app(

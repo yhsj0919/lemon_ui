@@ -1,8 +1,12 @@
+import '../../foundation/hyper_line.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
 import 'hyper_description_list_style.dart';
+
+enum HyperDescriptionItemKind { field, divider, custom }
 
 enum HyperDescriptionLabelPlacement { inline, above }
 
@@ -14,7 +18,32 @@ class HyperDescriptionItem {
     this.value,
     this.span = 1,
     this.style,
-  });
+    this.labelPlacement,
+  }) : kind = HyperDescriptionItemKind.field,
+       child = null,
+       line = null;
+
+  const HyperDescriptionItem.divider({required this.id, this.line, this.style})
+    : kind = HyperDescriptionItemKind.divider,
+      label = const SizedBox.shrink(),
+      value = null,
+      span = 1,
+      child = null,
+      labelPlacement = null;
+  const HyperDescriptionItem.custom({
+    required this.id,
+    required this.child,
+    this.style,
+    this.span = 1,
+  }) : kind = HyperDescriptionItemKind.custom,
+       label = const SizedBox.shrink(),
+       value = null,
+       line = null,
+       labelPlacement = null;
+  final HyperDescriptionItemKind kind;
+  final Widget? child;
+  final HyperLine? line;
+  final HyperDescriptionLabelPlacement? labelPlacement;
   final Object id;
   final Widget label;
   final Widget? value;
@@ -61,6 +90,17 @@ class HyperDescriptionListLayout {
     for (final item in items) {
       if (!ids.add(item.id) || item.span < 1) {
         throw ArgumentError('描述项 id 必须唯一，span 必须为正。');
+      }
+      if (item.kind == HyperDescriptionItemKind.divider) {
+        if (row.isNotEmpty) result.add(List.unmodifiable(row));
+        result.add(
+          List.unmodifiable([
+            HyperDescriptionPlacement(item, columnCount, width),
+          ]),
+        );
+        row = [];
+        used = 0;
+        continue;
       }
       final span = math.min(item.span, columnCount);
       if (used + span > columnCount) {

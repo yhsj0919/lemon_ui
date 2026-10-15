@@ -5,7 +5,35 @@ import 'package:lemon_ui/lemon_ui.dart';
 
 import 'editor_theme_document.dart';
 
+const editorFieldIcons = <String, IconData>{
+  'close': Icons.close,
+  'cancel': Icons.cancel_outlined,
+  'visibility': Icons.visibility_outlined,
+  'visibilityOff': Icons.visibility_off_outlined,
+  'lock': Icons.lock_outline,
+  'lockOpen': Icons.lock_open_outlined,
+  'error': Icons.error_outline,
+  'warning': Icons.warning_amber_outlined,
+  'info': Icons.info_outline,
+};
+
 class EditorTextFieldVisual {
+  final errorPopupShadow = EditorComponentShadow();
+  int? textWeight;
+  int? hintWeight;
+  int? labelWeight;
+  int? counterWeight;
+  int? errorWeight;
+  EditorColor? errorTextColor;
+  EditorColor? errorPopupBackground;
+  EditorColor? errorPopupBorderColor;
+  String? verticalAlignment;
+  String? motionCurve;
+  String? errorPlacement;
+  String? clearIconName;
+  String? showPasswordIconName;
+  String? hidePasswordIconName;
+  String? errorIconName;
   EditorBorder hoveredBorder = EditorBorder();
   EditorBorder focusedBorder = EditorBorder();
   EditorBorder errorBorder = EditorBorder();
@@ -28,6 +56,29 @@ class EditorTextFieldVisual {
   double? counterFontSize;
   double? durationMilliseconds;
   Map<String, Object?> toJson() => {
+    if (errorPopupShadow.shadows != null)
+      'errorPopupShadows': errorPopupShadow.shadows!
+          .map((v) => v.toJson())
+          .toList(),
+    if (textWeight != null) 'textWeight': textWeight,
+    if (hintWeight != null) 'hintWeight': hintWeight,
+    if (labelWeight != null) 'labelWeight': labelWeight,
+    if (counterWeight != null) 'counterWeight': counterWeight,
+    if (errorWeight != null) 'errorWeight': errorWeight,
+    if (errorTextColor != null) 'errorTextColor': errorTextColor!.toJson(),
+    if (errorPopupBackground != null)
+      'errorPopupBackground': errorPopupBackground!.toJson(),
+    if (errorPopupBorderColor != null)
+      'errorPopupBorderColor': errorPopupBorderColor!.toJson(),
+    if (verticalAlignment != null) 'verticalAlignment': verticalAlignment,
+    if (motionCurve != null) 'motionCurve': motionCurve,
+    if (errorPlacement != null) 'errorPlacement': errorPlacement,
+    if (clearIconName != null) 'clearIconName': clearIconName,
+    if (showPasswordIconName != null)
+      'showPasswordIconName': showPasswordIconName,
+    if (hidePasswordIconName != null)
+      'hidePasswordIconName': hidePasswordIconName,
+    if (errorIconName != null) 'errorIconName': errorIconName,
     if (disabledBorder.toJson().isNotEmpty)
       'disabledBorder': disabledBorder.toJson(),
     if (errorBorder.toJson().isNotEmpty) 'errorBorder': errorBorder.toJson(),
@@ -61,6 +112,22 @@ class EditorTextFieldVisual {
   static EditorTextFieldVisual fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'errorPopupShadows',
+        'textWeight',
+        'hintWeight',
+        'labelWeight',
+        'counterWeight',
+        'errorWeight',
+        'errorTextColor',
+        'errorPopupBackground',
+        'errorPopupBorderColor',
+        'verticalAlignment',
+        'motionCurve',
+        'errorPlacement',
+        'clearIconName',
+        'showPasswordIconName',
+        'hidePasswordIconName',
+        'errorIconName',
         'hoveredBorder',
         'focusedBorder',
         'errorBorder',
@@ -86,7 +153,61 @@ class EditorTextFieldVisual {
     )) {
       throw const FormatException('不支持的输入框属性');
     }
+    String? choice(String key, Set<String> values) {
+      final value = j[key];
+      if (value == null) return null;
+      if (value is! String || !values.contains(value)) {
+        throw FormatException('无效输入框选项：$key');
+      }
+      return value;
+    }
+
     return EditorTextFieldVisual()
+      ..errorPopupShadow.shadows = (j['errorPopupShadows'] as List?)
+          ?.map((v) => EditorShadow.fromJson(v as Map<String, dynamic>))
+          .toList()
+      ..textWeight = number(j['textWeight'], min: 100, max: 900)?.round()
+      ..hintWeight = number(j['hintWeight'], min: 100, max: 900)?.round()
+      ..labelWeight = number(j['labelWeight'], min: 100, max: 900)?.round()
+      ..counterWeight = number(j['counterWeight'], min: 100, max: 900)?.round()
+      ..errorWeight = number(j['errorWeight'], min: 100, max: 900)?.round()
+      ..errorTextColor = j['errorTextColor'] == null
+          ? null
+          : EditorColor.fromJson(j['errorTextColor'] as Map<String, dynamic>)
+      ..errorPopupBackground = j['errorPopupBackground'] == null
+          ? null
+          : EditorColor.fromJson(
+              j['errorPopupBackground'] as Map<String, dynamic>,
+            )
+      ..errorPopupBorderColor = j['errorPopupBorderColor'] == null
+          ? null
+          : EditorColor.fromJson(
+              j['errorPopupBorderColor'] as Map<String, dynamic>,
+            )
+      ..verticalAlignment = choice('verticalAlignment', {
+        'top',
+        'center',
+        'bottom',
+      })
+      ..motionCurve = choice('motionCurve', {
+        'linear',
+        'easeInOut',
+        'fastOutSlowIn',
+      })
+      ..errorPlacement = choice(
+        'errorPlacement',
+        HyperOverlayPlacement.values.map((v) => v.name).toSet(),
+      )
+      ..clearIconName = choice('clearIconName', editorFieldIcons.keys.toSet())
+      ..showPasswordIconName = choice(
+        'showPasswordIconName',
+        editorFieldIcons.keys.toSet(),
+      )
+      ..hidePasswordIconName = choice(
+        'hidePasswordIconName',
+        editorFieldIcons.keys.toSet(),
+      )
+      ..errorIconName = choice('errorIconName', editorFieldIcons.keys.toSet())
       ..disabledBorder = EditorBorder.fromJson(
         (j['disabledBorder'] as Map<String, dynamic>?) ?? {},
       )
@@ -156,26 +277,72 @@ class EditorTextFieldVisual {
       return EditorBorder.fromJson(values).resolve(c);
     }
 
+    FontWeight? weight(int? value) => value == null
+        ? null
+        : FontWeight.values[(value / 100).round().clamp(1, 9) - 1];
     return HyperTextFieldThemeData(
       style: HyperTextFieldStyle(
+        textAlignVertical: switch (verticalAlignment) {
+          'top' => TextAlignVertical.top,
+          'center' => TextAlignVertical.center,
+          'bottom' => TextAlignVertical.bottom,
+          _ => null,
+        },
+        curve: switch (motionCurve) {
+          'linear' => Curves.linear,
+          'easeInOut' => Curves.easeInOut,
+          'fastOutSlowIn' => Curves.fastOutSlowIn,
+          _ => null,
+        },
+        errorPlacement: errorPlacement == null
+            ? null
+            : HyperOverlayPlacement.values.byName(errorPlacement!),
+        clearIcon: editorFieldIcons[clearIconName],
+        showPasswordIcon: editorFieldIcons[showPasswordIconName],
+        hidePasswordIcon: editorFieldIcons[hidePasswordIconName],
+        errorIcon: editorFieldIcons[errorIconName],
+        errorTextStyle: TextStyle(
+          color: errorTextColor?.resolve(c),
+          fontWeight: weight(errorWeight),
+        ),
+        errorPopupStyle:
+            errorPopupBackground == null &&
+                errorPopupBorderColor == null &&
+                errorPopupShadow.shadows == null
+            ? null
+            : HyperCardStyle(
+                boxShadow: errorPopupShadow.shadows
+                    ?.map((v) => v.resolve(c))
+                    .toList(),
+                background: errorPopupBackground == null
+                    ? null
+                    : HyperFill.color(errorPopupBackground!.resolve(c)),
+                border: errorPopupBorderColor == null
+                    ? null
+                    : Border.all(color: errorPopupBorderColor!.resolve(c)),
+              ),
         iconColor: iconColor?.resolve(c),
         cursorColor: cursorColor?.resolve(c),
         errorIconColor: errorIconColor?.resolve(c),
-        textStyle: textFontSize == null
-            ? null
-            : TextStyle(fontSize: textFontSize),
-        hintStyle: hintFontSize == null && hintColor == null
-            ? null
-            : TextStyle(fontSize: hintFontSize, color: hintColor?.resolve(c)),
-        labelStyle: labelFontSize == null && labelColor == null
-            ? null
-            : TextStyle(fontSize: labelFontSize, color: labelColor?.resolve(c)),
-        counterStyle: counterFontSize == null && counterColor == null
-            ? null
-            : TextStyle(
-                fontSize: counterFontSize,
-                color: counterColor?.resolve(c),
-              ),
+        textStyle: TextStyle(
+          fontSize: textFontSize,
+          fontWeight: weight(textWeight),
+        ),
+        hintStyle: TextStyle(
+          fontSize: hintFontSize,
+          color: hintColor?.resolve(c),
+          fontWeight: weight(hintWeight),
+        ),
+        labelStyle: TextStyle(
+          fontSize: labelFontSize,
+          color: labelColor?.resolve(c),
+          fontWeight: weight(labelWeight),
+        ),
+        counterStyle: TextStyle(
+          fontSize: counterFontSize,
+          color: counterColor?.resolve(c),
+          fontWeight: weight(counterWeight),
+        ),
         cursorWidth: cursorWidth,
         cursorRadius: cursorRadius == null
             ? null
@@ -215,6 +382,10 @@ class EditorTextFieldVisual {
 }
 
 class EditorTextFieldMetrics {
+  double? errorFontSize;
+  double? errorPopupRadius;
+  double? errorPopupPadding;
+  double? errorPopupBorderWidth;
   double? horizontalPadding;
   double? verticalPadding;
   double? iconSize;
@@ -222,6 +393,11 @@ class EditorTextFieldMetrics {
   double? labelGap;
   double? errorMaxWidth;
   Map<String, Object?> toJson() => {
+    if (errorFontSize != null) 'errorFontSize': errorFontSize,
+    if (errorPopupRadius != null) 'errorPopupRadius': errorPopupRadius,
+    if (errorPopupPadding != null) 'errorPopupPadding': errorPopupPadding,
+    if (errorPopupBorderWidth != null)
+      'errorPopupBorderWidth': errorPopupBorderWidth,
     if (horizontalPadding != null) 'horizontalPadding': horizontalPadding,
     if (verticalPadding != null) 'verticalPadding': verticalPadding,
     if (iconSize != null) 'iconSize': iconSize,
@@ -232,6 +408,10 @@ class EditorTextFieldMetrics {
   static EditorTextFieldMetrics fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'errorFontSize',
+        'errorPopupRadius',
+        'errorPopupPadding',
+        'errorPopupBorderWidth',
         'horizontalPadding',
         'verticalPadding',
         'iconSize',
@@ -243,6 +423,14 @@ class EditorTextFieldMetrics {
       throw const FormatException('不支持的输入框属性');
     }
     return EditorTextFieldMetrics()
+      ..errorFontSize = number(j['errorFontSize'], min: 0, max: 600)
+      ..errorPopupRadius = number(j['errorPopupRadius'], min: 0, max: 600)
+      ..errorPopupPadding = number(j['errorPopupPadding'], min: 0, max: 600)
+      ..errorPopupBorderWidth = number(
+        j['errorPopupBorderWidth'],
+        min: 0,
+        max: 600,
+      )
       ..horizontalPadding = number(j['horizontalPadding'], min: 0, max: 600)
       ..verticalPadding = number(j['verticalPadding'], min: 0, max: 600)
       ..iconSize = number(j['iconSize'], min: 0, max: 600)

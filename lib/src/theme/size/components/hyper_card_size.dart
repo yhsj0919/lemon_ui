@@ -11,6 +11,7 @@ final class HyperCardSize {
     required this.outsideTitlePadding,
     required this.outsideTitleSpacing,
     required this.actionSpacing,
+    this.actionPadding = EdgeInsets.zero,
   });
 
   final EdgeInsetsGeometry padding;
@@ -24,6 +25,7 @@ final class HyperCardSize {
   final EdgeInsetsGeometry outsideTitlePadding;
   final double outsideTitleSpacing;
   final double actionSpacing;
+  final EdgeInsetsGeometry actionPadding;
 
   HyperCardSize copyWith({
     EdgeInsetsGeometry? padding,
@@ -33,6 +35,7 @@ final class HyperCardSize {
     EdgeInsetsGeometry? outsideTitlePadding,
     double? outsideTitleSpacing,
     double? actionSpacing,
+    EdgeInsetsGeometry? actionPadding,
   }) => HyperCardSize(
     padding: padding ?? this.padding,
     radius: radius ?? this.radius,
@@ -41,6 +44,7 @@ final class HyperCardSize {
     outsideTitlePadding: outsideTitlePadding ?? this.outsideTitlePadding,
     outsideTitleSpacing: outsideTitleSpacing ?? this.outsideTitleSpacing,
     actionSpacing: actionSpacing ?? this.actionSpacing,
+    actionPadding: actionPadding ?? this.actionPadding,
   );
 
   static HyperCardSize lerp(
@@ -48,6 +52,11 @@ final class HyperCardSize {
     HyperCardSize b,
     double t,
   ) => HyperCardSize(
+    actionPadding: EdgeInsetsGeometry.lerp(
+      a.actionPadding,
+      b.actionPadding,
+      t,
+    )!,
     padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t)!,
     radius: a.radius + (b.radius - a.radius) * t,
     titlePadding: EdgeInsetsGeometry.lerp(a.titlePadding, b.titlePadding, t)!,
@@ -72,7 +81,8 @@ final class HyperCardSize {
       other.titleSpacing == titleSpacing &&
       other.outsideTitlePadding == outsideTitlePadding &&
       other.outsideTitleSpacing == outsideTitleSpacing &&
-      other.actionSpacing == actionSpacing;
+      other.actionSpacing == actionSpacing &&
+      other.actionPadding == actionPadding;
 
   @override
   int get hashCode => Object.hash(
@@ -83,5 +93,6 @@ final class HyperCardSize {
     outsideTitlePadding,
     outsideTitleSpacing,
     actionSpacing,
+    actionPadding,
   );
 }

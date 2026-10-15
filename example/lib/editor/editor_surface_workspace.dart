@@ -60,7 +60,9 @@ extension _SurfaceWorkspace on _ThemeEditorState {
       if (_component == 'card') ...[
         pixel(
           '内容左边距',
-          m.paddingLeft ?? m.padding ?? 0,
+          m.paddingLeft ??
+              m.padding ??
+              s.card.padding.resolve(TextDirection.ltr).left,
           editorContentSpacingLimit,
           (x) => m.paddingLeft = x,
           () => m.paddingLeft = null,
@@ -68,7 +70,9 @@ extension _SurfaceWorkspace on _ThemeEditorState {
         ),
         pixel(
           '内容上边距',
-          m.paddingTop ?? m.padding ?? 0,
+          m.paddingTop ??
+              m.padding ??
+              s.card.padding.resolve(TextDirection.ltr).top,
           editorContentSpacingLimit,
           (x) => m.paddingTop = x,
           () => m.paddingTop = null,
@@ -76,7 +80,9 @@ extension _SurfaceWorkspace on _ThemeEditorState {
         ),
         pixel(
           '内容右边距',
-          m.paddingRight ?? m.padding ?? 0,
+          m.paddingRight ??
+              m.padding ??
+              s.card.padding.resolve(TextDirection.ltr).right,
           editorContentSpacingLimit,
           (x) => m.paddingRight = x,
           () => m.paddingRight = null,
@@ -84,7 +90,9 @@ extension _SurfaceWorkspace on _ThemeEditorState {
         ),
         pixel(
           '内容下边距',
-          m.paddingBottom ?? m.padding ?? 0,
+          m.paddingBottom ??
+              m.padding ??
+              s.card.padding.resolve(TextDirection.ltr).bottom,
           editorContentSpacingLimit,
           (x) => m.paddingBottom = x,
           () => m.paddingBottom = null,
@@ -131,33 +139,143 @@ extension _SurfaceWorkspace on _ThemeEditorState {
           () => m.actionSpacing = null,
           m.actionSpacing != null,
         ),
+        _heading('外部标题'),
         pixel(
-          '标题字号',
-          m.titleFontSize ?? theme.typography.cardTitle,
+          '外部操作区上边距',
+          m.outsideActionPaddingTop ??
+              m.outsideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).top,
           editorContentSpacingLimit,
-          (x) => m.titleFontSize = x,
-          () => m.titleFontSize = null,
-          m.titleFontSize != null,
+          (x) => m.outsideActionPaddingTop = x,
+          () => m.outsideActionPaddingTop = null,
+          m.outsideActionPaddingTop != null,
         ),
         pixel(
-          '操作文字字号',
-          m.actionFontSize ?? theme.typography.bodySmall,
+          '外部操作区下边距',
+          m.outsideActionPaddingBottom ??
+              m.outsideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).bottom,
           editorContentSpacingLimit,
-          (x) => m.actionFontSize = x,
-          () => m.actionFontSize = null,
-          m.actionFontSize != null,
+          (x) => m.outsideActionPaddingBottom = x,
+          () => m.outsideActionPaddingBottom = null,
+          m.outsideActionPaddingBottom != null,
+        ),
+        pixel(
+          '外部操作区右边距',
+          m.outsideActionPaddingRight ??
+              m.outsideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).right,
+          editorContentSpacingLimit,
+          (x) => m.outsideActionPaddingRight = x,
+          () => m.outsideActionPaddingRight = null,
+          m.outsideActionPaddingRight != null,
+        ),
+
+        pixel(
+          '外部标题字号',
+          m.outsideTitleFontSize ?? theme.typography.bodySmall,
+          editorContentIconLimit,
+          (x) => m.outsideTitleFontSize = x,
+          () => m.outsideTitleFontSize = null,
+          m.outsideTitleFontSize != null,
         ),
         _color(
-          '标题颜色',
-          v.titleColor,
-          (x) => v.titleColor = x,
+          '外部标题颜色',
+          v.outsideTitleColor,
+          (x) => v.outsideTitleColor = x,
+          inheritedColor: theme.colors.textTertiary,
+        ),
+        pixel(
+          '外部操作文字字号',
+          m.outsideActionFontSize ?? theme.typography.bodySmall,
+          editorContentIconLimit,
+          (x) => m.outsideActionFontSize = x,
+          () => m.outsideActionFontSize = null,
+          m.outsideActionFontSize != null,
+        ),
+        _color(
+          '外部操作文字颜色',
+          v.outsideActionColor,
+          (x) => v.outsideActionColor = x,
+          inheritedColor: theme.colors.primary,
+        ),
+
+        pixel(
+          '外部操作图标尺寸',
+          m.outsideActionIconSize ?? IconTheme.of(context).size ?? 24,
+          editorContentIconLimit,
+          (x) => m.outsideActionIconSize = x,
+          () => m.outsideActionIconSize = null,
+          m.outsideActionIconSize != null,
+        ),
+        _heading('内部标题'),
+        pixel(
+          '内部操作区上边距',
+          m.insideActionPaddingTop ??
+              m.insideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).top,
+          editorContentSpacingLimit,
+          (x) => m.insideActionPaddingTop = x,
+          () => m.insideActionPaddingTop = null,
+          m.insideActionPaddingTop != null,
+        ),
+        pixel(
+          '内部操作区下边距',
+          m.insideActionPaddingBottom ??
+              m.insideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).bottom,
+          editorContentSpacingLimit,
+          (x) => m.insideActionPaddingBottom = x,
+          () => m.insideActionPaddingBottom = null,
+          m.insideActionPaddingBottom != null,
+        ),
+        pixel(
+          '内部操作区右边距',
+          m.insideActionPaddingRight ??
+              m.insideActionPadding ??
+              s.card.actionPadding.resolve(TextDirection.ltr).right,
+          editorContentSpacingLimit,
+          (x) => m.insideActionPaddingRight = x,
+          () => m.insideActionPaddingRight = null,
+          m.insideActionPaddingRight != null,
+        ),
+
+        pixel(
+          '内部标题字号',
+          m.insideTitleFontSize ?? theme.typography.cardTitle,
+          editorContentIconLimit,
+          (x) => m.insideTitleFontSize = x,
+          () => m.insideTitleFontSize = null,
+          m.insideTitleFontSize != null,
+        ),
+        _color(
+          '内部标题颜色',
+          v.insideTitleColor,
+          (x) => v.insideTitleColor = x,
           inheritedColor: theme.colors.textPrimary,
         ),
+        pixel(
+          '内部操作文字字号',
+          m.insideActionFontSize ?? theme.typography.bodySmall,
+          editorContentIconLimit,
+          (x) => m.insideActionFontSize = x,
+          () => m.insideActionFontSize = null,
+          m.insideActionFontSize != null,
+        ),
         _color(
-          '操作文字颜色',
-          v.actionColor,
-          (x) => v.actionColor = x,
+          '内部操作文字颜色',
+          v.insideActionColor,
+          (x) => v.insideActionColor = x,
           inheritedColor: theme.colors.primary,
+        ),
+
+        pixel(
+          '内部操作图标尺寸',
+          m.insideActionIconSize ?? IconTheme.of(context).size ?? 24,
+          editorContentIconLimit,
+          (x) => m.insideActionIconSize = x,
+          () => m.insideActionIconSize = null,
+          m.insideActionIconSize != null,
         ),
       ],
       if (_component == 'collapsible') ...[
@@ -200,16 +318,6 @@ extension _SurfaceWorkspace on _ThemeEditorState {
           v.textColor,
           (x) => v.textColor = x,
           inheritedColor: theme.colors.textPrimary,
-        ),
-        _number(
-          '标题行高',
-          v.lineHeight ?? 1.2,
-          .5,
-          3,
-          (x) => v.lineHeight = x,
-          () => v.lineHeight = null,
-          v.lineHeight != null,
-          wholeNumbers: false,
         ),
         _heading('展开图标'),
         pixel(

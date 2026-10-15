@@ -13,6 +13,7 @@ class HyperAppBarPage extends StatefulWidget {
 class _HyperAppBarPageState extends State<HyperAppBarPage> {
   HyperAppBarVariant _variant = HyperAppBarVariant.large;
   bool _glass = true;
+  bool _showBottom = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +26,33 @@ class _HyperAppBarPageState extends State<HyperAppBarPage> {
               background: HyperFill.color(theme.colors.background),
             ),
           );
+    final bottom = _showBottom
+        ? PreferredSize(
+            preferredSize: Size.fromHeight(sizes.controlHeightMd),
+            child: SizedBox(
+              height: sizes.controlHeightMd,
+              child: const Center(child: Text('标题栏下部扩展区')),
+            ),
+          )
+        : null;
     final bar = switch (_variant) {
       HyperAppBarVariant.small => HyperAppBar(
         title: const Text('普通顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
+        bottom: bottom,
       ),
       HyperAppBarVariant.medium => HyperAppBar.medium(
         title: const Text('展开顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
+        bottom: bottom,
       ),
       HyperAppBarVariant.large => HyperAppBar.large(
         title: const Text('展开顶栏'),
         automaticallyImplyLeading: false,
         style: barStyle,
+        bottom: bottom,
       ),
     };
     return ListView(
@@ -65,6 +78,10 @@ class _HyperAppBarPageState extends State<HyperAppBarPage> {
               HyperButton.tonal(
                 onPressed: () => setState(() => _glass = !_glass),
                 label: Text(_glass ? '关闭玻璃' : '开启玻璃'),
+              ),
+              HyperButton.tonal(
+                onPressed: () => setState(() => _showBottom = !_showBottom),
+                label: Text(_showBottom ? '隐藏扩展区' : '显示扩展区'),
               ),
             ],
           ),

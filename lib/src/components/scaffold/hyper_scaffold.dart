@@ -59,7 +59,14 @@ class HyperScaffold extends StatelessWidget {
                 appBar is PreferredSizeWidget && appBar is! HyperAppBar
                 ? (appBar! as PreferredSizeWidget).preferredSize
                 : Size.fromHeight(
-                    HyperTheme.sizesOf(context).appBar.collapsedHeight,
+                    HyperTheme.sizesOf(context).appBar.collapsedHeight +
+                        (appBar is HyperAppBar
+                            ? (appBar! as HyperAppBar)
+                                      .bottom
+                                      ?.preferredSize
+                                      .height ??
+                                  0
+                            : 0),
                   ),
             child: appBar!,
           );

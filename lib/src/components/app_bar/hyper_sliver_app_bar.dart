@@ -13,6 +13,7 @@ class HyperSliverAppBar extends StatelessWidget {
     required this.title,
     this.leading,
     this.actions,
+    this.bottom,
     this.style,
     this.automaticallyImplyLeading = true,
     this.variant = HyperAppBarVariant.large,
@@ -21,6 +22,7 @@ class HyperSliverAppBar extends StatelessWidget {
   final Widget title;
   final Widget? leading;
   final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
   final HyperAppBarStyle? style;
   final bool automaticallyImplyLeading;
   final HyperAppBarVariant variant;
@@ -39,10 +41,11 @@ class HyperSliverAppBar extends StatelessWidget {
     return SliverAppBar(
       pinned: true,
       floating: false,
-      expandedHeight: expandedHeight,
+      expandedHeight: expandedHeight + (bottom?.preferredSize.height ?? 0),
       toolbarHeight: metrics.collapsedHeight,
       leading: leading,
       actions: actions,
+      bottom: bottom,
       automaticallyImplyLeading: automaticallyImplyLeading,
       title: isExpandedVariant
           ? Builder(
@@ -115,8 +118,12 @@ class HyperSliverAppBar extends StatelessWidget {
                             end: metrics.titleHorizontalPadding,
                             child: CustomSingleChildLayout(
                               delegate: _ExpandedTitleLayout(
-                                top: settings.minExtent,
-                                expandedHeight: settings.maxExtent,
+                                top:
+                                    settings.minExtent -
+                                    (bottom?.preferredSize.height ?? 0),
+                                expandedHeight:
+                                    settings.maxExtent -
+                                    (bottom?.preferredSize.height ?? 0),
                                 scrolledDistance: scrolledDistance,
                               ),
                               child: Opacity(

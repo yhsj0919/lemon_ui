@@ -13,6 +13,7 @@ class HyperAppBar extends StatelessWidget {
     required this.title,
     this.leading,
     this.actions,
+    this.bottom,
     this.style,
     this.automaticallyImplyLeading = true,
   }) : variant = HyperAppBarVariant.small;
@@ -22,6 +23,7 @@ class HyperAppBar extends StatelessWidget {
     required this.title,
     this.leading,
     this.actions,
+    this.bottom,
     this.style,
     this.automaticallyImplyLeading = true,
   }) : variant = HyperAppBarVariant.medium;
@@ -31,6 +33,7 @@ class HyperAppBar extends StatelessWidget {
     required this.title,
     this.leading,
     this.actions,
+    this.bottom,
     this.style,
     this.automaticallyImplyLeading = true,
   }) : variant = HyperAppBarVariant.large;
@@ -38,6 +41,7 @@ class HyperAppBar extends StatelessWidget {
   final Widget title;
   final Widget? leading;
   final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
   final HyperAppBarStyle? style;
   final bool automaticallyImplyLeading;
   final HyperAppBarVariant variant;
@@ -47,6 +51,7 @@ class HyperAppBar extends StatelessWidget {
     title: title,
     leading: leading,
     actions: actions,
+    bottom: bottom,
     style: style,
     automaticallyImplyLeading: automaticallyImplyLeading,
     variant: variant,
@@ -60,6 +65,7 @@ class HyperAppBar extends StatelessWidget {
       title: title,
       leading: leading,
       actions: actions,
+      bottom: bottom,
       automaticallyImplyLeading: automaticallyImplyLeading,
       toolbarHeight: metrics.collapsedHeight,
       titleSpacing: metrics.titleHorizontalPadding,

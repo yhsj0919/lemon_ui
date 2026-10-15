@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 
 import '../../adaptive/hyper_device_detector.dart';
+import '../../interaction/hyper_semantics_guard.dart';
 import '../../foundation/hyper_device_type.dart';
 import '../size/hyper_size_scheme.dart';
 import 'hyper_theme_data.dart';
@@ -120,7 +121,7 @@ class HyperTheme extends StatelessWidget {
           child: result,
         );
       }
-      return result;
+      return HyperSemanticsGuard(child: result);
     }
 
     if (effectiveDuration == Duration.zero) {

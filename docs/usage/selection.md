@@ -172,6 +172,14 @@ divisions 是区间数；snapToDivisions: true 吸附。
 只显示刻度但连续滑动：divisions 设置区间数，showDivisionPoints: true，
 snapToDivisions: false。onChangeStart/onChangeEnd 可开始/结束编辑或提交业务值。
 
+### 音乐播放器与持续外部更新
+
+普通、纵向、胶囊与范围滑块在手势期间保留本地拖动值，播放器定时更新 `value` / `values` 不抢占显示位置；即使业务只在松手时回写位置，拖动预览仍能响应。`onChanged` 持续通知预览值，`onChangeEnd` 返回最终拖动位置。未拖动时继续严格跟随受控值。
+
+播放器建议将 `onChanged` 用于临时播放时间展示，`onChangeEnd` 执行 seek 并立即更新本地显示。松手后控件恢复接收外部值，不猜测播放器是否已完成 seek，也不回放中途缓存的上报。业务需要忽略 seek 前仍在途的旧位置，或在 seek 确认前暂停接收位置流，避免松手后跳回旧值。切歌导致范围改变、组件禁用时取消旧的拖动值。
+
+Slider Demo 新增「播放进度 · 拖动期间持续上报」：打开模拟开关后每 500ms 上报一次位置，拖动时不写回播放器值，松手才提交位置，便于对照验证。
+
 ## HyperRangeSlider 范围滑块
 
 ~~~dart

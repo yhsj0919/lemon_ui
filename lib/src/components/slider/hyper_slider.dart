@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../../interaction/hyper_semantics_guard.dart';
 import 'hyper_slider_style.dart';
+import 'hyper_slider_semantics.dart';
+import 'hyper_slider_drag_value.dart';
 import 'hyper_slider_theme.dart';
 import 'hyper_slider_thumb_shapes.dart';
 import 'hyper_slider_track_shapes.dart';
@@ -9,7 +12,7 @@ import 'hyper_slider_track_shapes.dart';
 enum HyperSliderVariant { capsule, thin }
 
 /// 单值滑块；onChanged 为 null 时禁用。
-class HyperSlider extends StatelessWidget {
+class HyperSlider extends StatefulWidget {
   const HyperSlider({
     super.key,
     required this.value,
@@ -48,26 +51,67 @@ class HyperSlider extends StatelessWidget {
   final FocusNode? focusNode;
 
   @override
+  State<HyperSlider> createState() => _HyperSliderState();
+}
+
+class _HyperSliderState extends State<HyperSlider> {
+  final _drag = HyperSliderDragValue<double>();
+
+  @override
+  void didUpdateWidget(HyperSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.onChanged == null ||
+        widget.min != oldWidget.min ||
+        widget.max != oldWidget.max ||
+        widget.divisions != oldWidget.divisions ||
+        widget.snapToDivisions != oldWidget.snapToDivisions) {
+      _drag.cancel();
+    }
+  }
+
+  void _start(double value) {
+    setState(() => _drag.begin(widget.value));
+    widget.onChangeStart?.call(value);
+  }
+
+  void _change(double value) {
+    if (widget.onChanged == null) return;
+    if (_drag.active) setState(() => _drag.update(value));
+    widget.onChanged!(value);
+  }
+
+  void _end(double value) {
+    if (!_drag.active) return;
+    final result = _drag.end(value);
+    setState(() {});
+    widget.onChangeEnd?.call(result);
+  }
+
+  @override
   Widget build(BuildContext context) => _SliderInteraction(
-    enabled: onChanged != null,
+    enabled: widget.onChanged != null,
     builder: (context, hoverFactor, pressFactor) => _sliderTheme(
       context,
-      style,
+      widget.style,
       Slider(
-        value: value,
-        onChanged: onChanged,
-        min: min,
-        max: max,
-        divisions: snapToDivisions ? divisions : null,
-        label: label,
-        onChangeStart: onChangeStart,
-        onChangeEnd: onChangeEnd,
-        semanticFormatterCallback: semanticFormatterCallback,
-        autofocus: autofocus,
-        focusNode: focusNode,
+        value: _drag.resolve(widget.value),
+        onChanged: widget.onChanged == null ? null : _change,
+        min: widget.min,
+        max: widget.max,
+        divisions: widget.snapToDivisions ? widget.divisions : null,
+        label: widget.label,
+        onChangeStart: _start,
+        onChangeEnd: _end,
+        semanticFormatterCallback: hyperSliderSemanticFormatter(
+          widget.semanticFormatterCallback,
+          widget.min,
+          widget.max,
+        ),
+        autofocus: widget.autofocus,
+        focusNode: widget.focusNode,
       ),
-      divisions: showDivisionPoints ? divisions : null,
-      variant: variant,
+      divisions: widget.showDivisionPoints ? widget.divisions : null,
+      variant: widget.variant,
       hoverFactor: hoverFactor,
       pressFactor: pressFactor,
     ),
@@ -112,6 +156,46 @@ class HyperRangeSlider extends StatefulWidget {
 }
 
 class _HyperRangeSliderState extends State<HyperRangeSlider> {
+  bool _nativeDragging = false;
+  RangeValues get _displayValues => (_pointer != null || _nativeDragging)
+      ? _draggedValues ?? widget.values
+      : widget.values;
+
+  @override
+  void didUpdateWidget(HyperRangeSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.onChanged == null ||
+        widget.min != oldWidget.min ||
+        widget.max != oldWidget.max ||
+        widget.divisions != oldWidget.divisions ||
+        widget.snapToDivisions != oldWidget.snapToDivisions) {
+      _nativeDragging = false;
+      _pointer = null;
+      _pointerDownValue = null;
+      _draggedValues = null;
+      _draggedThumb = null;
+      _pointerMoved = false;
+    }
+  }
+
+  void _startNative(RangeValues values) {
+    setState(() {
+      _nativeDragging = true;
+      _draggedValues ??= widget.values;
+    });
+    widget.onChangeStart?.call(values);
+  }
+
+  void _endNative(RangeValues values) {
+    if (!_nativeDragging) return;
+    final result = _draggedValues ?? values;
+    setState(() {
+      _nativeDragging = false;
+      _draggedValues = null;
+    });
+    widget.onChangeEnd?.call(result);
+  }
+
   int? _pointer;
   Thumb? _draggedThumb;
   RangeValues? _draggedValues;
@@ -123,10 +207,12 @@ class _HyperRangeSliderState extends State<HyperRangeSlider> {
     _pointer = null;
     _pointerDownValue = null;
     _pointerMoved = false;
+    if (!_nativeDragging) setState(() => _draggedValues = null);
   }
 
   void _onNativeChanged(RangeValues values) {
     if (_pointer == null) {
+      if (_nativeDragging) setState(() => _draggedValues = values);
       widget.onChanged?.call(values);
       return;
     }
@@ -138,7 +224,7 @@ class _HyperRangeSliderState extends State<HyperRangeSlider> {
           ? RangeValues(tap.clamp(widget.min, current.end), current.end)
           : RangeValues(current.start, tap.clamp(current.start, widget.max));
       if (next != current) {
-        _draggedValues = next;
+        setState(() => _draggedValues = next);
         widget.onChanged?.call(next);
       }
       return;
@@ -147,8 +233,8 @@ class _HyperRangeSliderState extends State<HyperRangeSlider> {
     if (values == current) return;
     setState(() {
       _draggedThumb = values.start != current.start ? Thumb.start : Thumb.end;
+      _draggedValues = values;
     });
-    _draggedValues = values;
     widget.onChanged?.call(values);
   }
 
@@ -188,11 +274,11 @@ class _HyperRangeSliderState extends State<HyperRangeSlider> {
         nextThumb = Thumb.start;
       }
     }
-    if (_draggedThumb != nextThumb) {
-      setState(() => _draggedThumb = nextThumb);
-    }
-    if (next == current) return;
-    _draggedValues = next;
+    if (next == current && _draggedThumb == nextThumb) return;
+    setState(() {
+      _draggedThumb = nextThumb;
+      _draggedValues = next;
+    });
     widget.onChanged?.call(next);
   }
 
@@ -255,17 +341,19 @@ class _HyperRangeSliderState extends State<HyperRangeSlider> {
               onPointerUp: (event) => _releasePointer(event.pointer),
               onPointerCancel: (event) => _releasePointer(event.pointer),
               child: RangeSlider(
-                values: widget.values,
+                values: _displayValues,
                 onChanged: widget.onChanged == null ? null : _onNativeChanged,
                 min: widget.min,
                 max: widget.max,
                 divisions: widget.snapToDivisions ? widget.divisions : null,
                 labels: widget.labels,
-                onChangeStart: widget.onChangeStart,
-                onChangeEnd: (values) => widget.onChangeEnd?.call(
-                  _pointer == null ? values : (_draggedValues ?? values),
+                onChangeStart: _startNative,
+                onChangeEnd: _endNative,
+                semanticFormatterCallback: hyperSliderSemanticFormatter(
+                  widget.semanticFormatterCallback,
+                  widget.min,
+                  widget.max,
                 ),
-                semanticFormatterCallback: widget.semanticFormatterCallback,
               ),
             ),
             divisions: widget.showDivisionPoints ? widget.divisions : null,
@@ -543,6 +631,6 @@ Widget _sliderTheme(
           const PaddleRangeSliderValueIndicatorShape(),
       valueIndicatorShape: style.valueIndicatorShape,
     ),
-    child: child,
+    child: HyperSemanticsGuard(containOverlay: true, child: child),
   );
 }

@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../motion/hyper_elastic_overscroll.dart';
+import '../../interaction/hyper_semantics_guard.dart';
 import '../../theme/core/hyper_theme.dart';
 import 'hyper_slider_style.dart';
+import 'hyper_slider_semantics.dart';
+import 'hyper_slider_drag_value.dart';
 import 'hyper_slider_theme.dart';
 
 /// 整块填充的竖向胶囊滑块；顶部和底部可放置独立的图标操作。
@@ -52,8 +55,9 @@ class HyperCapsuleSlider extends StatefulWidget {
 
 class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
     with SingleTickerProviderStateMixin {
-  bool _dragging = false;
-  double? _dragValue;
+  final _drag = HyperSliderDragValue<double>();
+  bool get _dragging => _drag.active;
+  double get _value => _drag.resolve(widget.value);
   double _dragStartY = 0;
   double _dragStartValue = 0;
   late final HyperElasticOverscrollController _overscroll;
@@ -70,6 +74,16 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(HyperCapsuleSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_enabled ||
+        widget.min != oldWidget.min ||
+        widget.max != oldWidget.max) {
+      _drag.cancel();
+    }
+  }
+
   bool get _enabled => widget.onChanged != null && widget.max > widget.min;
 
   Color _readableColor(Color preferred, Color surface) {
@@ -84,22 +98,21 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
 
   double get _fraction => widget.max <= widget.min
       ? 0
-      : ((widget.value - widget.min) / (widget.max - widget.min)).clamp(
-          0.0,
-          1.0,
-        );
+      : ((_value - widget.min) / (widget.max - widget.min)).clamp(0.0, 1.0);
 
   void _change(double value) {
     if (!_enabled) return;
     final next = value.clamp(widget.min, widget.max);
-    _dragValue = next;
-    if (next != widget.value) widget.onChanged?.call(next);
+    final previous = _value;
+    if (_dragging) setState(() => _drag.update(next));
+    if (next != previous) widget.onChanged?.call(next);
   }
 
   void _step(bool increase) {
     if (!_enabled) return;
-    final delta = (widget.max - widget.min) / 20;
-    _change(widget.value + (increase ? delta : -delta));
+    _change(
+      HyperSliderSemanticsValues.step(_value, widget.min, widget.max, increase),
+    );
   }
 
   void _dragTo(double y, double maxExtent, bool reduceMotion) {
@@ -115,10 +128,11 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
   }
 
   void _endDrag(SpringDescription spring, bool reduceMotion) {
-    setState(() => _dragging = false);
+    if (!_dragging) return;
+    final result = _drag.end(widget.value);
+    setState(() {});
     _overscroll.release(spring: spring, disabled: reduceMotion);
-    widget.onChangeEnd?.call(_dragValue ?? widget.value);
-    _dragValue = null;
+    widget.onChangeEnd?.call(result);
   }
 
   @override
@@ -155,9 +169,12 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
         : (style.capsuleAnimationDuration ?? theme.motion.fastDuration);
     final curve = style.capsuleAnimationCurve ?? theme.motion.fastCurve;
     final fraction = _fraction;
-    final valueLabel =
-        widget.semanticFormatterCallback?.call(widget.value) ??
-        '${(fraction * 100).round()}%';
+    final semantics = HyperSliderSemanticsValues(
+      value: _value,
+      min: widget.min,
+      max: widget.max,
+      formatter: widget.semanticFormatterCallback,
+    );
 
     Widget iconAction({
       required Widget icon,
@@ -208,22 +225,12 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
       child: child,
     );
 
-    return Semantics(
+    final result = Semantics(
       slider: true,
       enabled: _enabled,
-      value: valueLabel,
-      increasedValue: widget.semanticFormatterCallback?.call(
-        (widget.value + (widget.max - widget.min) / 20).clamp(
-          widget.min,
-          widget.max,
-        ),
-      ),
-      decreasedValue: widget.semanticFormatterCallback?.call(
-        (widget.value - (widget.max - widget.min) / 20).clamp(
-          widget.min,
-          widget.max,
-        ),
-      ),
+      value: semantics.label,
+      increasedValue: semantics.increasedLabel,
+      decreasedValue: semantics.decreasedLabel,
       onIncrease: _enabled ? () => _step(true) : null,
       onDecrease: _enabled ? () => _step(false) : null,
       explicitChildNodes: true,
@@ -315,7 +322,7 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
                             _dragStartY = details.localPosition.dy;
                             _dragStartValue = widget.value;
                             _overscroll.stop();
-                            setState(() => _dragging = true);
+                            setState(() => _drag.begin(_dragStartValue));
                             widget.onChangeStart?.call(widget.value);
                           }
                         : null,
@@ -389,5 +396,6 @@ class _HyperCapsuleSliderState extends State<HyperCapsuleSlider>
         ),
       ),
     );
+    return HyperSemanticsGuard(child: result);
   }
 }

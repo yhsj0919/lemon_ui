@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
@@ -30,6 +32,27 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
   double _brightnessPanel = .72;
   bool _volumeMoreSelected = false;
   bool _headphonesMuted = false;
+
+  Timer? _playbackTimer;
+  double _playbackPosition = 24;
+  bool _playbackRunning = false;
+  double? _seekPreview;
+
+  void _togglePlayback(bool running) {
+    _playbackTimer?.cancel();
+    setState(() => _playbackRunning = running);
+    if (!running) return;
+    _playbackTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (!mounted) return;
+      setState(() => _playbackPosition = (_playbackPosition + .5) % 180);
+    });
+  }
+
+  @override
+  void dispose() {
+    _playbackTimer?.cancel();
+    super.dispose();
+  }
 
   String percent(double value) => '${(value * 100).round()}%';
   String rangeLabel(RangeValues values) =>
@@ -125,6 +148,34 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
               children: [
                 const HyperText('Slider', variant: HyperTextVariant.pageTitle),
                 SizedBox(height: sizes.sectionSpacing),
+                section('播放进度 · 拖动期间持续上报', [
+                  Row(
+                    children: [
+                      const Expanded(child: HyperText('模拟播放器位置流')),
+                      HyperSwitch(
+                        value: _playbackRunning,
+                        onChanged: _togglePlayback,
+                      ),
+                    ],
+                  ),
+                  HyperText(
+                    '播放器上报：${_playbackPosition.toStringAsFixed(1)} 秒；拖动预览：${_seekPreview?.toStringAsFixed(1) ?? '—'} 秒',
+                  ),
+                  HyperSlider(
+                    value: _playbackPosition,
+                    min: 0,
+                    max: 180,
+                    semanticFormatterCallback: (value) => '${value.round()} 秒',
+                    onChangeStart: (value) =>
+                        setState(() => _seekPreview = value),
+                    onChanged: (value) => setState(() => _seekPreview = value),
+                    onChangeEnd: (value) => setState(() {
+                      _playbackPosition = value;
+                      _seekPreview = null;
+                    }),
+                  ),
+                  const HyperText('开启模拟后，拖动期间上报值继续变化；滑块跟随手指或鼠标，松手才提交 seek。'),
+                ]),
                 section('音量调节', [
                   for (var i = 0; i < _volumes.length; i++)
                     example(

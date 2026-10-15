@@ -152,3 +152,12 @@ Tag 标签工作区复用 Chip 的配色规则，支持中性、浅色、实色�
 Container 基础默认值调整为无背景、零圆角、零内边距、无边框/阴影及不裁切；不再继承基础控件的 surface、controlRadius 或 controlPadding。容器主题与实例显式配置继续优先，编辑器默认显示与实际解析一致。
 
 基础能力页面的全局设置入口仅保留语义颜色、字体规格和动效主题；其余基础说明页不再附加全局表单。顶部全局工作区仍提供完整设置，组件工作区保留组件职责内的覆盖配置。
+
+
+## Windows 原生无障碍桥接临时隔离（2026-10-15）
+
+此问题不限于 Demo。用户授权先关闭无障碍以优先规避闪退后，保护统一放在 lemon_ui 公共 UI 层 `HyperSemanticsGuard`。HyperTheme 的 UI 子树以及可独立使用的普通、范围、纵向和胶囊滑块自动应用；公共调整区、组件工作区、嵌套预览和主题内弹窗复用同一边界，已有边界下不重复包装。Demo 没有专用开关，业务应用无需修改页面。
+
+仅按实际宿主关闭原生 Windows 的组件语义，不按窗口宽度或模拟设备判断；其他宿主及 Web 保留语义。库中的 Focus、Shortcuts、Actions、指针及手势处理保留。代价是 Windows 受保护 UI 暂不提供组件读屏信息。
+
+已知上游问题：[Slider / OverlayPortal #190357](https://github.com/flutter/flutter/issues/190357)、[Windows 桥接崩溃 #175041](https://github.com/flutter/flutter/issues/175041)。未修改 SDK 或 Windows runner。普通 / 范围滑块的内部 Portal 使用同一 UI 边界的局部 Overlay 留在排除范围内，避免独立使用时把值指示器语义送到祖先 Navigator 的 Overlay；该局部宿主仅在原生 Windows 使用。应用修复后必须完全退出旧进程再启动，热重载不能重建已损坏的原生 AXTree。仅在 SDK 修复并通过 Windows 路由、拖动、浮层和读屏验证后恢复。当前尚未运行设备或 Widget 验证，不能承诺所有原因的闪退均已解决。

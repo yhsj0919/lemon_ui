@@ -1,0 +1,96 @@
+name: Build macOS client
+
+on:
+  workflow_dispatch:
+    inputs:
+      flutter_version:
+        description: Flutter stable version (Dart >= 3.13 required)
+        required: true
+        default: '3.47.7'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build example client
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+        working-directory: example
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ inputs.flutter_version }}
+          cache: true
+
+      - name: Show toolchain
+        run: |
+          flutter --version
+          xcodebuild -version
+          flutter config --enable-macos-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Runner already uses ad-hoc signing (CODE_SIGN_IDENTITY = "-").
+      # No Apple account or distribution certificate is required for this build.
+      - name: Build release application
+        run: flutter build macos --release --build-number "$GITHUB_RUN_NUMBER"
+
+      - name: Package ZIP and DMG
+        run: |
+          set -euo pipefail
+          products="$PWD/build/macos/Build/Products/Release"
+          shopt -s nullglob
+          apps=("$products/"*.app)
+          if [[ ${#apps[@]} -ne 1 ]]; then
+            echo "Expected exactly one .app in $products, found ${#apps[@]}" >&2
+            exit 1
+          fi
+          app="${apps[0]}"
+          app_name="$(basename "$app")"
+          executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          archs="$(lipo -archs "$app/Contents/MacOS/$executable")"
+          echo "Built architectures: $archs"
+          codesign --verify --deep --strict --verbose=2 "$app"
+
+          dist="$GITHUB_WORKSPACE/dist"
+          stage="$RUNNER_TEMP/lemon-ui-dmg"
+          mkdir -p "$dist" "$stage"
+          ditto -c -k --sequesterRsrc --keepParent "$app" "$dist/lemon-ui-macos.app.zip"
+          ditto "$app" "$stage/$app_name"
+          ln -s /Applications "$stage/Applications"
+          hdiutil create -volname 'Lemon UI' -srcfolder "$stage" \
+            -ov -format UDZO "$dist/lemon-ui-macos.dmg"
+          (cd "$dist" && shasum -a 256 lemon-ui-macos.app.zip lemon-ui-macos.dmg > SHA256SUMS.txt)
+          {
+            echo '### macOS client'
+            echo "- Commit: $GITHUB_SHA"
+            echo "- Architectures: $archs"
+            echo '- Download the macOS-client artifact below for ZIP, DMG and checksums.'
+            echo '- Ad-hoc signed test build; not Apple-notarized.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload client packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS-client-${{ github.run_number }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0

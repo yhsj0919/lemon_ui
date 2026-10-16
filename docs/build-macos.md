@@ -11,6 +11,8 @@
 
 这是沿用项目 ad-hoc 签名的测试构建，无需配置 Apple 证书，也没有上传 App Store 或进行 Apple 公证。首次打开可能被 Gatekeeper 拦截；确认文件来自自己的构建后，可在系统“隐私与安全性”中允许打开。正式对外分发时再接入 Developer ID 签名和公证。
 
+macOS 默认使用 Skia：`example/macos/Runner/Info.plist` 设置 `FLTEnableImpeller=false`，工作流会核对最终应用中的配置。此项用于排查 Impeller 相关闪屏，仍需在出现问题的 Mac 上重新安装并验证；不影响其他平台。本机调试可用 `flutter run -d macos --no-enable-impeller` 保持一致。切换方式见 [Flutter Impeller 文档](https://docs.flutter.dev/perf/impeller)。
+
 依赖中的 `lemon_x` 从 GitHub 公共仓库的固定提交获取；如果未来改为私有仓库，需要另外提供只读依赖访问凭据。工作流仅手动触发，不会在每次提交时消耗 macOS 构建额度。
 
 参考：[Flutter macOS 构建与发布](https://docs.flutter.dev/deployment/macos)、[Flutter Action 配置](https://github.com/subosito/flutter-action)。

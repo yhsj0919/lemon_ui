@@ -65,6 +65,11 @@ jobs:
           app="${apps[0]}"
           app_name="$(basename "$app")"
           executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          impeller="$(/usr/libexec/PlistBuddy -c 'Print :FLTEnableImpeller' "$app/Contents/Info.plist")"
+          if [[ "$impeller" != "false" ]]; then
+            echo 'Expected macOS Skia renderer (FLTEnableImpeller=false)' >&2
+            exit 1
+          fi
           archs="$(lipo -archs "$app/Contents/MacOS/$executable")"
           echo "Built architectures: $archs"
           codesign --verify --deep --strict --verbose=2 "$app"
@@ -82,6 +87,7 @@ jobs:
             echo '### macOS client'
             echo "- Commit: $GITHUB_SHA"
             echo "- Architectures: $archs"
+            echo '- Renderer: Skia (Impeller disabled in Info.plist)'
             echo '- Download the macOS-client artifact below for ZIP, DMG and checksums.'
             echo '- Ad-hoc signed test build; not Apple-notarized.'
           } >> "$GITHUB_STEP_SUMMARY"

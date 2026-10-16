@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 面包屑颜色与文字样式；空字段继承上一层主题。
+import '../card/hyper_card_style.dart';
+
 @immutable
 final class HyperBreadcrumbStyle {
   const HyperBreadcrumbStyle({
@@ -12,8 +13,10 @@ final class HyperBreadcrumbStyle {
     this.separatorColor,
     this.disabledColor,
     this.textStyle,
+    this.itemStyle,
+    this.highlightStyle,
+    this.disabledStyle,
   });
-
   final Color? backgroundColor;
   final Color? highlightBackgroundColor;
   final Color? disabledBackgroundColor;
@@ -22,7 +25,36 @@ final class HyperBreadcrumbStyle {
   final Color? separatorColor;
   final Color? disabledColor;
   final TextStyle? textStyle;
-
+  final HyperCardStyle? itemStyle;
+  final HyperCardStyle? highlightStyle;
+  final HyperCardStyle? disabledStyle;
+  HyperBreadcrumbStyle copyWith({
+    Color? backgroundColor,
+    Color? highlightBackgroundColor,
+    Color? disabledBackgroundColor,
+    Color? foregroundColor,
+    Color? highlightForegroundColor,
+    Color? separatorColor,
+    Color? disabledColor,
+    TextStyle? textStyle,
+    HyperCardStyle? itemStyle,
+    HyperCardStyle? highlightStyle,
+    HyperCardStyle? disabledStyle,
+  }) => merge(
+    HyperBreadcrumbStyle(
+      backgroundColor: backgroundColor,
+      highlightBackgroundColor: highlightBackgroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      foregroundColor: foregroundColor,
+      highlightForegroundColor: highlightForegroundColor,
+      separatorColor: separatorColor,
+      disabledColor: disabledColor,
+      textStyle: textStyle,
+      itemStyle: itemStyle,
+      highlightStyle: highlightStyle,
+      disabledStyle: disabledStyle,
+    ),
+  );
   HyperBreadcrumbStyle merge(HyperBreadcrumbStyle? other) => other == null
       ? this
       : HyperBreadcrumbStyle(
@@ -36,9 +68,14 @@ final class HyperBreadcrumbStyle {
               other.highlightForegroundColor ?? highlightForegroundColor,
           separatorColor: other.separatorColor ?? separatorColor,
           disabledColor: other.disabledColor ?? disabledColor,
-          textStyle: other.textStyle ?? textStyle,
+          textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
+          itemStyle: itemStyle?.merge(other.itemStyle) ?? other.itemStyle,
+          highlightStyle:
+              highlightStyle?.merge(other.highlightStyle) ??
+              other.highlightStyle,
+          disabledStyle:
+              disabledStyle?.merge(other.disabledStyle) ?? other.disabledStyle,
         );
-
   static HyperBreadcrumbStyle lerp(
     HyperBreadcrumbStyle a,
     HyperBreadcrumbStyle b,
@@ -64,22 +101,32 @@ final class HyperBreadcrumbStyle {
     separatorColor: Color.lerp(a.separatorColor, b.separatorColor, t),
     disabledColor: Color.lerp(a.disabledColor, b.disabledColor, t),
     textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
+    itemStyle: a.itemStyle == null || b.itemStyle == null
+        ? (t < .5 ? a.itemStyle : b.itemStyle)
+        : HyperCardStyle.lerp(a.itemStyle!, b.itemStyle!, t),
+    highlightStyle: a.highlightStyle == null || b.highlightStyle == null
+        ? (t < .5 ? a.highlightStyle : b.highlightStyle)
+        : HyperCardStyle.lerp(a.highlightStyle!, b.highlightStyle!, t),
+    disabledStyle: a.disabledStyle == null || b.disabledStyle == null
+        ? (t < .5 ? a.disabledStyle : b.disabledStyle)
+        : HyperCardStyle.lerp(a.disabledStyle!, b.disabledStyle!, t),
   );
-
   @override
   bool operator ==(Object other) =>
       other is HyperBreadcrumbStyle &&
-      other.backgroundColor == backgroundColor &&
-      other.highlightBackgroundColor == highlightBackgroundColor &&
-      other.disabledBackgroundColor == disabledBackgroundColor &&
-      other.foregroundColor == foregroundColor &&
-      other.highlightForegroundColor == highlightForegroundColor &&
-      other.separatorColor == separatorColor &&
-      other.disabledColor == disabledColor &&
-      other.textStyle == textStyle;
-
+      backgroundColor == other.backgroundColor &&
+      highlightBackgroundColor == other.highlightBackgroundColor &&
+      disabledBackgroundColor == other.disabledBackgroundColor &&
+      foregroundColor == other.foregroundColor &&
+      highlightForegroundColor == other.highlightForegroundColor &&
+      separatorColor == other.separatorColor &&
+      disabledColor == other.disabledColor &&
+      textStyle == other.textStyle &&
+      itemStyle == other.itemStyle &&
+      highlightStyle == other.highlightStyle &&
+      disabledStyle == other.disabledStyle;
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     backgroundColor,
     highlightBackgroundColor,
     disabledBackgroundColor,
@@ -88,5 +135,8 @@ final class HyperBreadcrumbStyle {
     separatorColor,
     disabledColor,
     textStyle,
-  );
+    itemStyle,
+    highlightStyle,
+    disabledStyle,
+  ]);
 }

@@ -12,6 +12,7 @@ final class HyperMenuStyle {
     this.width,
     this.maxHeight,
     this.itemHeight,
+    this.itemVerticalPadding,
     this.padding,
     this.surfacePadding,
     this.itemSpacing,
@@ -42,6 +43,9 @@ final class HyperMenuStyle {
   final double? width;
   final double? maxHeight;
   final double? itemHeight;
+
+  /// 每项内容的上下内边距；与最小高度独立，描述增高时仍保留。
+  final double? itemVerticalPadding;
   final double? padding;
 
   /// 菜单表面到菜单项的内边距，独立于菜单项文字内边距。
@@ -84,6 +88,7 @@ final class HyperMenuStyle {
     double? width,
     double? maxHeight,
     double? itemHeight,
+    double? itemVerticalPadding,
     double? padding,
     double? surfacePadding,
     double? itemSpacing,
@@ -113,6 +118,7 @@ final class HyperMenuStyle {
     width: width ?? this.width,
     maxHeight: maxHeight ?? this.maxHeight,
     itemHeight: itemHeight ?? this.itemHeight,
+    itemVerticalPadding: itemVerticalPadding ?? this.itemVerticalPadding,
     padding: padding ?? this.padding,
     surfacePadding: surfacePadding ?? this.surfacePadding,
     itemSpacing: itemSpacing ?? this.itemSpacing,
@@ -149,6 +155,7 @@ final class HyperMenuStyle {
       width: other.width ?? width,
       maxHeight: other.maxHeight ?? maxHeight,
       itemHeight: other.itemHeight ?? itemHeight,
+      itemVerticalPadding: other.itemVerticalPadding ?? itemVerticalPadding,
       padding: other.padding ?? padding,
       surfacePadding: other.surfacePadding ?? surfacePadding,
       itemSpacing: other.itemSpacing ?? itemSpacing,
@@ -192,6 +199,7 @@ final class HyperMenuStyle {
       width: number(a.width, b.width),
       maxHeight: number(a.maxHeight, b.maxHeight),
       itemHeight: number(a.itemHeight, b.itemHeight),
+      itemVerticalPadding: number(a.itemVerticalPadding, b.itemVerticalPadding),
       padding: number(a.padding, b.padding),
       surfacePadding: number(a.surfacePadding, b.surfacePadding),
       itemSpacing: number(a.itemSpacing, b.itemSpacing),
@@ -247,6 +255,7 @@ final class HyperMenuStyle {
       other.width == width &&
       other.maxHeight == maxHeight &&
       other.itemHeight == itemHeight &&
+      other.itemVerticalPadding == itemVerticalPadding &&
       other.padding == padding &&
       other.surfacePadding == surfacePadding &&
       other.itemSpacing == itemSpacing &&
@@ -278,6 +287,7 @@ final class HyperMenuStyle {
     width,
     maxHeight,
     itemHeight,
+    itemVerticalPadding,
     padding,
     surfacePadding,
     itemSpacing,

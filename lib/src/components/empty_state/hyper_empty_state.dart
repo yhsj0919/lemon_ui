@@ -1,4 +1,5 @@
-import '../../painting/hyper_box_decoration.dart';
+import '../card/hyper_card_style.dart';
+import '../surface/hyper_navigation_surface.dart';
 
 import 'package:flutter/material.dart';
 
@@ -163,17 +164,15 @@ class HyperEmptyState extends StatelessWidget {
       heightFactor: 1,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: resolved.maxWidth!),
-        child: AnimatedContainer(
-          duration: duration,
-          curve: resolved.curve!,
-          padding: resolved.padding,
-          decoration: HyperBoxDecoration(
-            color: resolved.background?.color,
-            gradient: resolved.background?.gradient,
+        child: HyperNavigationSurface(
+          inheritMaterial: true,
+          style: HyperCardStyle(
+            background: resolved.background,
             border: resolved.border,
             borderRadius: resolved.borderRadius,
             boxShadow: resolved.boxShadow,
-          ),
+            padding: resolved.padding,
+          ).merge(resolved.surfaceStyle),
           child: AnimatedSize(
             duration: duration,
             curve: resolved.curve!,

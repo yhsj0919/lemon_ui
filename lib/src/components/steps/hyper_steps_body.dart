@@ -81,7 +81,7 @@ class HyperStepsBody extends StatelessWidget {
             descriptionStyle: theme.textTheme.bodySmall?.copyWith(
               color: theme.colors.textSecondary,
             ),
-            indexStyle: theme.textTheme.bodyMedium,
+            indexStyle: theme.textTheme.bodyMedium?.copyWith(color: foreground),
             statusLabel: switch (status) {
               HyperStepStatus.pending => '待开始',
               HyperStepStatus.current => '当前步骤',
@@ -142,9 +142,12 @@ class HyperStepsBody extends StatelessWidget {
           color: s.material == null ? s.nodeFill?.color : null,
           gradient: s.material == null ? s.nodeFill?.gradient : null,
           borderRadius: s.nodeBorderRadius,
+          boxShadow: s.material == null ? s.boxShadow : null,
         ),
         foregroundDecoration: HyperBoxDecoration(
-          border: Border.fromBorderSide(s.nodeBorder!),
+          border: s.material == null
+              ? Border.fromBorderSide(s.nodeBorder!)
+              : null,
           borderRadius: s.nodeBorderRadius,
         ),
         child: Center(
@@ -153,7 +156,7 @@ class HyperStepsBody extends StatelessWidget {
             child: AnimatedDefaultTextStyle(
               duration: duration,
               curve: s.curve!,
-              style: s.indexStyle!.copyWith(color: s.foregroundColor),
+              style: s.indexStyle!,
               child: AnimatedSwitcher(
                 duration: duration,
                 switchInCurve: s.curve!,
@@ -170,6 +173,10 @@ class HyperStepsBody extends StatelessWidget {
       if (s.material != null) {
         marker = HyperMaterialSurface(
           material: s.material,
+          boxShadow: s.boxShadow,
+          border: s.nodeBorder == null
+              ? null
+              : Border.fromBorderSide(s.nodeBorder!),
           semanticBackground: s.nodeFill,
           quality: s.materialQuality,
           reduceTransparency: s.reduceTransparency,

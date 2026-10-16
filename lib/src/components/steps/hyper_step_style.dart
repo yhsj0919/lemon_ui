@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -7,6 +8,7 @@ import '../../foundation/hyper_surface_material.dart';
 final class HyperStepStyle {
   const HyperStepStyle({
     this.nodeFill,
+    this.boxShadow,
     this.material,
     this.materialQuality,
     this.reduceTransparency,
@@ -36,6 +38,7 @@ final class HyperStepStyle {
     this.transitionBuilder,
   });
   final HyperFill? nodeFill;
+  final List<BoxShadow>? boxShadow;
   final HyperSurfaceMaterial? material;
   final HyperMaterialQuality? materialQuality;
   final bool? reduceTransparency;
@@ -65,6 +68,7 @@ final class HyperStepStyle {
   final AnimatedSwitcherTransitionBuilder? transitionBuilder;
   HyperStepStyle copyWith({
     HyperFill? nodeFill,
+    List<BoxShadow>? boxShadow,
     HyperSurfaceMaterial? material,
     HyperMaterialQuality? materialQuality,
     bool? reduceTransparency,
@@ -94,6 +98,7 @@ final class HyperStepStyle {
     AnimatedSwitcherTransitionBuilder? transitionBuilder,
   }) => HyperStepStyle(
     nodeFill: nodeFill ?? this.nodeFill,
+    boxShadow: boxShadow ?? this.boxShadow,
     material: material ?? this.material,
     materialQuality: materialQuality ?? this.materialQuality,
     reduceTransparency: reduceTransparency ?? this.reduceTransparency,
@@ -126,6 +131,7 @@ final class HyperStepStyle {
       ? this
       : HyperStepStyle(
           nodeFill: other.nodeFill ?? nodeFill,
+          boxShadow: other.boxShadow ?? boxShadow,
           material: other.material ?? material,
           materialQuality: other.materialQuality ?? materialQuality,
           reduceTransparency: other.reduceTransparency ?? reduceTransparency,
@@ -167,6 +173,7 @@ final class HyperStepStyle {
       nodeFill: a.nodeFill == null || b.nodeFill == null
           ? (t < .5 ? a.nodeFill : b.nodeFill)
           : HyperFill.lerp(a.nodeFill!, b.nodeFill!, t),
+      boxShadow: BoxShadow.lerpList(a.boxShadow, b.boxShadow, t),
       material: a.material == null || b.material == null
           ? (t < .5 ? a.material : b.material)
           : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
@@ -246,6 +253,7 @@ final class HyperStepStyle {
   bool operator ==(Object other) =>
       other is HyperStepStyle &&
       nodeFill == other.nodeFill &&
+      listEquals(boxShadow, other.boxShadow) &&
       material == other.material &&
       materialQuality == other.materialQuality &&
       reduceTransparency == other.reduceTransparency &&
@@ -276,6 +284,7 @@ final class HyperStepStyle {
   @override
   int get hashCode => Object.hashAll([
     nodeFill,
+    boxShadow == null ? null : Object.hashAll(boxShadow!),
     material,
     materialQuality,
     reduceTransparency,

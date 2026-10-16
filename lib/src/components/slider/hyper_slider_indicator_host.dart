@@ -25,7 +25,7 @@ class HyperSliderIndicatorHost extends StatefulWidget {
 
 class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
   final _portal = OverlayPortalController();
-  final _labels = <Thumb?, (Offset, InlineSpan, TextDirection)>{};
+  final _labels = <Thumb?, (RenderBox, Offset, InlineSpan, TextDirection)>{};
   bool _queued = false, _pressed = false;
   void _label(
     RenderBox parent,
@@ -33,11 +33,7 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
     TextPainter painter,
     Thumb? thumb,
   ) {
-    final next = (
-      parent.localToGlobal(center),
-      painter.text!,
-      painter.textDirection!,
-    );
+    final next = (parent, center, painter.text!, painter.textDirection!);
     if (_labels[thumb] == next && _portal.isShowing) return;
     _labels[thumb] = next;
     if (_queued) return;
@@ -58,9 +54,9 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
     onPointerDown: (_) => _pressed = true,
     onPointerUp: (_) => _end(),
     onPointerCancel: (_) => _end(),
-    child: OverlayPortal(
+    child: OverlayPortal.overlayChildLayoutBuilder(
       controller: _portal,
-      overlayChildBuilder: (overlayContext) {
+      overlayChildBuilder: (overlayContext, layoutInfo) {
         final metrics = HyperTheme.sizesOf(context);
         final style = widget.style;
         final surface = resolveHyperMenuSurface(
@@ -86,8 +82,8 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
                 Builder(
                   builder: (_) {
                     final painter = TextPainter(
-                      text: entry.$2,
-                      textDirection: entry.$3,
+                      text: entry.$3,
+                      textDirection: entry.$4,
                       textScaler: MediaQuery.textScalerOf(context),
                     )..layout();
                     final size = Size(
@@ -98,7 +94,29 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
                     final overlay =
                         Overlay.of(context).context.findRenderObject()!
                             as RenderBox;
-                    final anchor = overlay.globalToLocal(entry.$1);
+                    final parent = entry.$1;
+                    if (!parent.attached) return const SizedBox.shrink();
+                    final globalAnchor = parent.localToGlobal(entry.$2);
+                    // Overlay content escapes ancestor clips; explicitly hide a
+                    // label when its thumb is outside any ancestor paint clip.
+                    RenderObject child = parent;
+                    for (
+                      RenderObject? ancestor = child.parent;
+                      ancestor != null;
+                      child = ancestor, ancestor = ancestor.parent
+                    ) {
+                      final clip = ancestor.describeApproximatePaintClip(child);
+                      if (clip != null) {
+                        final localAnchor = MatrixUtils.transformPoint(
+                          Matrix4.inverted(ancestor.getTransformTo(null)),
+                          globalAnchor,
+                        );
+                        if (!clip.contains(localAnchor)) {
+                          return const SizedBox.shrink();
+                        }
+                      }
+                    }
+                    final anchor = overlay.globalToLocal(globalAnchor);
                     final width = overlay.size.width;
                     final left = (anchor.dx - size.width / 2).clamp(
                       0.0,
@@ -120,8 +138,8 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
                         child: HyperCard(
                           style: surface,
                           child: RichText(
-                            text: entry.$2,
-                            textDirection: entry.$3,
+                            text: entry.$3,
+                            textDirection: entry.$4,
                             textScaler: MediaQuery.textScalerOf(context),
                           ),
                         ),

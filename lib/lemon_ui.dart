@@ -216,11 +216,6 @@ export 'src/theme/size/components/hyper_bottom_sheet_size.dart';
 export 'src/components/dialog/hyper_dialog_style.dart';
 export 'src/components/dialog/hyper_dialog_theme.dart';
 export 'src/theme/size/components/hyper_dialog_size.dart';
-export 'src/components/notification/hyper_notification_center.dart';
-export 'src/components/notification/hyper_notification_center_style.dart';
-export 'src/components/notification/hyper_notification_center_theme.dart';
-export 'src/components/notification/hyper_notification_entry.dart';
-export 'src/theme/size/components/hyper_notification_center_size.dart';
 export 'src/components/collapsible/hyper_collapsible.dart';
 export 'src/components/collapsible/hyper_collapsible_style.dart';
 export 'src/components/collapsible/hyper_collapsible_theme.dart';
@@ -274,3 +269,6 @@ export 'src/theme/size/components/hyper_color_picker_size.dart';
 export 'src/components/select/hyper_dropdown.dart';
 
 export 'src/components/text/hyper_scrolling_text.dart';
+
+export 'src/components/tab/hyper_tab_bar_style.dart';
+export 'src/components/tab/hyper_tab_bar_theme.dart';

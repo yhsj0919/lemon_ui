@@ -28,7 +28,11 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(const LemonUiGalleryApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('打开组件菜单'));
+    await tester.tap(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperIconButton && widget.tooltip == '打开组件菜单',
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('基础能力'));
     await tester.pumpAndSettle();

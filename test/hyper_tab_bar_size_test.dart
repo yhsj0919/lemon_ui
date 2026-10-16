@@ -1,8 +1,91 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
+import 'package:lemon_ui/src/components/surface/hyper_navigation_surface.dart';
 
 void main() {
+  testWidgets('下划线保持内容宽度，独立标签保留相邻间距', (tester) async {
+    for (final underline in [true, false]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: DefaultTabController(
+              length: 2,
+              child: Center(
+                child: SizedBox(
+                  width: 600,
+                  child: HyperTabBar(
+                    variant: underline
+                        ? HyperTabBarVariant.underline
+                        : HyperTabBarVariant.separated,
+                    padding: EdgeInsets.zero,
+                    tabs: const [
+                      HyperTab(text: '短'),
+                      HyperTab(text: '第二项'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final surfaces = find.byType(HyperNavigationSurface);
+      final first = tester.getRect(surfaces.at(1));
+      final second = tester.getRect(surfaces.at(2));
+      if (underline) {
+        expect(first.width, lessThan(100));
+      } else {
+        expect(first.width, greaterThan(260));
+        expect(second.left - first.right, greaterThan(0));
+      }
+      expect(tester.takeException(), isNull);
+    }
+  });
+  testWidgets('固定标签的选中表面铺满标签区域并包住图文', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          child: const DefaultTabController(
+            length: 2,
+            child: Center(
+              child: SizedBox(
+                width: 600,
+                child: HyperTabBar(
+                  padding: EdgeInsets.zero,
+                  tabs: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Icon(Icons.grid_view), Text('完整 Demo')],
+                    ),
+                    Text('业务'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final selection = find.byKey(const ValueKey('hyper-tab-selection'));
+    final selected = tester.getRect(selection);
+    final label = tester.getRect(find.text('完整 Demo'));
+    expect(selected.width, greaterThan(260));
+    expect(selected.left, lessThan(label.left));
+    expect(selected.right, greaterThan(label.right));
+    await tester.tap(find.text('业务'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(selection).width, selected.width);
+    expect(
+      tester.getCenter(selection).dx,
+      closeTo(tester.getCenter(find.text('业务')).dx, 1),
+    );
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('边缘留白继承四端尺寸主题，实例可以关闭', (tester) async {
     for (final device in HyperDeviceType.values) {
       final base = HyperThemeData.light();

@@ -24,6 +24,11 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
   Duration? _duration;
   int? _browsingCategory;
   static final _categoryDefinitions = [
+    (
+      label: '业务',
+      icon: Icons.dashboard_customize_outlined,
+      sections: ['业务组合示例'],
+    ),
     (label: '未确认', icon: Icons.pending_outlined, sections: ['未确认']),
     (label: '基础', icon: Icons.tune, sections: ['基础能力', '交互基础']),
     (label: '容器', icon: Icons.view_agenda_outlined, sections: ['容器与表面']),
@@ -41,7 +46,7 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
     (
       label: '导航',
       icon: Icons.explore_outlined,
-      sections: ['页面框架', '抽屉导航', '侧边导航', '标签导航'],
+      sections: ['页面框架', '抽屉导航', '侧边导航', '标签导航', '顶部导航与菜单'],
     ),
   ];
   static final _categories = _categoryDefinitions

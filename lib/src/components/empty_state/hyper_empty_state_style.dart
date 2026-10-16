@@ -1,3 +1,4 @@
+import '../card/hyper_card_style.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:ui' show lerpDouble;
@@ -21,6 +22,7 @@ final class HyperEmptyStateStyle {
     this.actionRunSpacing,
     this.padding,
     this.background,
+    this.surfaceStyle,
     this.border,
     this.borderRadius,
     this.boxShadow,
@@ -44,6 +46,7 @@ final class HyperEmptyStateStyle {
   final double? actionRunSpacing;
   final EdgeInsetsGeometry? padding;
   final HyperFill? background;
+  final HyperCardStyle? surfaceStyle;
   final BoxBorder? border;
   final BorderRadiusGeometry? borderRadius;
   final List<BoxShadow>? boxShadow;
@@ -67,6 +70,7 @@ final class HyperEmptyStateStyle {
     double? actionRunSpacing,
     EdgeInsetsGeometry? padding,
     HyperFill? background,
+    HyperCardStyle? surfaceStyle,
     BoxBorder? border,
     BorderRadiusGeometry? borderRadius,
     List<BoxShadow>? boxShadow,
@@ -91,6 +95,7 @@ final class HyperEmptyStateStyle {
       actionRunSpacing: actionRunSpacing,
       padding: padding,
       background: background,
+      surfaceStyle:surfaceStyle,
       border: border,
       borderRadius: borderRadius,
       boxShadow: boxShadow,
@@ -118,6 +123,8 @@ final class HyperEmptyStateStyle {
           actionRunSpacing: other.actionRunSpacing ?? actionRunSpacing,
           padding: other.padding ?? padding,
           background: other.background ?? background,
+          surfaceStyle:
+              surfaceStyle?.merge(other.surfaceStyle) ?? other.surfaceStyle,
           border: other.border ?? border,
           borderRadius: other.borderRadius ?? borderRadius,
           boxShadow: other.boxShadow ?? boxShadow,
@@ -140,6 +147,9 @@ final class HyperEmptyStateStyle {
       ? b
       : HyperEmptyStateStyle(
           icon: t < .5 ? a.icon : b.icon,
+          surfaceStyle: a.surfaceStyle == null || b.surfaceStyle == null
+              ? (t < .5 ? a.surfaceStyle : b.surfaceStyle)
+              : HyperCardStyle.lerp(a.surfaceStyle!, b.surfaceStyle!, t),
           iconColor: Color.lerp(a.iconColor, b.iconColor, t),
           iconSize: lerpDouble(a.iconSize, b.iconSize, t),
           illustrationSize: lerpDouble(
@@ -203,6 +213,7 @@ final class HyperEmptyStateStyle {
       other.actionRunSpacing == actionRunSpacing &&
       other.padding == padding &&
       other.background == background &&
+      other.surfaceStyle==surfaceStyle&&
       other.border == border &&
       other.borderRadius == borderRadius &&
       listEquals(other.boxShadow, boxShadow) &&
@@ -227,6 +238,7 @@ final class HyperEmptyStateStyle {
     actionRunSpacing,
     padding,
     background,
+    surfaceStyle,
     border,
     borderRadius,
     boxShadow == null ? null : Object.hashAll(boxShadow!),

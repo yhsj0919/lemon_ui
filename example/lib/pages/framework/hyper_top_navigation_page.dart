@@ -75,24 +75,24 @@ class _HyperTopNavigationPageState extends State<HyperTopNavigationPage> {
       HyperText('当前选择：$_selected'),
       const SizedBox(height: 16),
       DemoSection(
-        title: '局部主题与实例覆盖',
+        title: '下拉菜单设置预览（持续显示）',
+        child: HyperMenu(
+          items: _items[1].children,
+          selectedId: _selected,
+          requestFocusOnOpen: false,
+          style: HyperTopNavigationTheme.of(context).style?.menuStyle,
+          onSelected: (id) => setState(() => _selected = id),
+        ),
+      ),
+      DemoSection(
+        title: '局部布局覆盖（仅导航项间距）',
         child: HyperTopNavigationTheme(
-          data: HyperTopNavigationThemeData(
-            style: HyperTopNavigationStyle(
-              selectedItemStyle: HyperButtonStyle(
-                foregroundColor: HyperTheme.of(context).colors.primary,
-              ),
-              menuStyle: HyperMenuStyle(
-                descriptionStyle: TextStyle(
-                  color: HyperTheme.of(context).colors.primary,
-                ),
-              ),
-            ),
+          data: const HyperTopNavigationThemeData(
+            style: HyperTopNavigationStyle(itemSpacing: 12),
           ),
           child: HyperTopNavigation(
             items: _items,
             selectedId: _selected,
-            style: const HyperTopNavigationStyle(itemSpacing: 12),
             onSelected: (id) => setState(() => _selected = id),
           ),
         ),

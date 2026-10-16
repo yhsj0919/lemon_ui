@@ -448,14 +448,6 @@ final List<GallerySection> gallerySections = [
         builder: (_) => const HyperProgressPage(),
       ),
       GalleryItem(
-        id: 'hyper-notification-center',
-        title: 'HyperNotificationCenter',
-        description: '受控通知列表、分组和批量操作。',
-        icon: Icons.notifications_active_outlined,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperNotificationCenterPage(),
-      ),
-      GalleryItem(
         id: 'hyper-notification',
         title: 'HyperNotification',
         description: '通知卡片、已读状态与独立操作。',
@@ -609,7 +601,7 @@ final List<GallerySection> gallerySections = [
     ],
   ),
   GallerySection(
-    title: '操作与提示',
+    title: '顶部导航与菜单',
     audience: GalleryAudience.desktop,
     items: [
       GalleryItem(
@@ -628,6 +620,12 @@ final List<GallerySection> gallerySections = [
         hasStyleOverrides: true,
         builder: (_) => const HyperMenuPage(),
       ),
+    ],
+  ),
+  GallerySection(
+    title: '操作与提示',
+    audience: GalleryAudience.desktop,
+    items: [
       GalleryItem(
         id: 'hyper-tooltip',
         title: 'HyperTooltip',
@@ -635,6 +633,19 @@ final List<GallerySection> gallerySections = [
         icon: Icons.info_outline,
         hasStyleOverrides: true,
         builder: (_) => const HyperTooltipPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '业务组合示例',
+    items: [
+      GalleryItem(
+        id: 'hyper-notification-center',
+        title: '通知中心组合示例',
+        description: '业务示例：组合单条通知，实现分组和批量操作。',
+        icon: Icons.notifications_active_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperNotificationCenterPage(),
       ),
     ],
   ),

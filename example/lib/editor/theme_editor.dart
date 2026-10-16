@@ -1,3 +1,11 @@
+// The first-party editor shares the pure component resolvers so inherited
+// swatches remain identical to the preview instead of duplicating defaults.
+// ignore: implementation_imports
+import 'package:lemon_ui/src/components/notice/hyper_notice_defaults.dart';
+// ignore: implementation_imports
+import 'package:lemon_ui/src/components/notification/hyper_notification_defaults.dart';
+
+import 'editor_review_fields.dart';
 import 'editor_input_fields.dart';
 import 'editor_content_fields.dart';
 import 'editor_surface_fields.dart';
@@ -32,6 +40,7 @@ part 'editor_basic_control_workspace.dart';
 part 'editor_surface_workspace.dart';
 part 'editor_content_workspace.dart';
 part 'editor_input_workspace.dart';
+part 'editor_review_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
 class ThemeEditor extends StatefulWidget {
@@ -77,6 +86,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
   String _radioVariant = 'common',
       _checkboxVariant = 'common',
       _progressObject = 'common';
+  String _reviewObject = '',
+      _reviewState = 'common',
+      _reviewPart = 'group',
+      _reviewVariant = 'common';
   String _tagState = 'common';
   String _tagVariant = 'common';
   String _chipState = 'common';
@@ -151,6 +164,24 @@ class _ThemeEditorState extends State<ThemeEditor> {
           _ => _mode.menu,
         };
   static const _components = {
+    'appBarReview': '应用顶栏',
+    'drawerReview': '抽屉',
+    'tooltipReview': '文字提示',
+    'notificationReview': '通知卡片',
+    'loadingOverlayReview': '加载遮罩',
+    'alertReview': '内联提示 / 横幅提示',
+    'bottomSheetReview': '底部弹窗',
+    'toastReview': '轻提示 / 操作提示',
+    'dialogReview': '对话框',
+    'emptyStateReview': '空状态',
+    'skeletonReview': '骨架屏',
+    'sidebarReview': '侧边导航',
+    'tabBarReview': '标签导航',
+    'stepIndicatorReview': '步骤指示器 / 步骤导航',
+    'paginationReview': '分页',
+    'pageIndicatorReview': '页面指示器',
+    'breadcrumbReview': '面包屑',
+    'topNavigationReview': '顶部导航',
     'button': 'Button',
     'tag': 'Tag',
     'chip': 'Chip',
@@ -181,6 +212,24 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'menu': 'Menu',
   };
   static const _pages = {
+    'appBarReview': 'hyper-app-bar',
+    'drawerReview': 'hyper-drawer',
+    'tooltipReview': 'hyper-tooltip',
+    'notificationReview': 'hyper-notification',
+    'loadingOverlayReview': 'hyper-loading-overlay',
+    'alertReview': 'hyper-notice',
+    'bottomSheetReview': 'hyper-bottom-sheet',
+    'toastReview': 'hyper-message',
+    'dialogReview': 'hyper-dialog',
+    'emptyStateReview': 'hyper-empty-state',
+    'skeletonReview': 'hyper-skeleton',
+    'sidebarReview': 'hyper-sidebar',
+    'tabBarReview': 'hyper-tab-bar',
+    'stepIndicatorReview': 'hyper-steps',
+    'paginationReview': 'hyper-pagination',
+    'pageIndicatorReview': 'hyper-page-indicator',
+    'breadcrumbReview': 'hyper-breadcrumb',
+    'topNavigationReview': 'hyper-top-navigation',
     'button': 'hyper-button',
     'tag': 'hyper-tag',
     'chip': 'hyper-chip',
@@ -835,7 +884,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     children: [
                       Expanded(
                         child: HyperText(
-                          '$label  ${value.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+                          '$label  ${sliderValue.toStringAsFixed(wholeNumbers ? 0 : 2)}',
                         ),
                       ),
                       const Icon(Icons.info_outline, size: 14),
@@ -2009,6 +2058,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     if (_page == 'hyper-color-picker') {
       return _panel('颜色选择器', [const HyperText('本页仅提供 Demo 预览，外观跟随主题。')]);
     }
+    if (_isReviewControl) return _reviewPanel();
     if (_isInputControl) return _inputPanel();
     if (_isContentControl) return _contentPanel();
     if (_isBasicControl) return _basicControlPanel();
@@ -4699,6 +4749,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     EditorComponentShadow? stateTarget,
     String label = '聚焦阴影 / 焦点环',
     String? description,
+    double? maxExtent,
   }) {
     final target = stateTarget ?? a.focusedShadow;
     return [
@@ -4732,7 +4783,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
         ],
       ),
       for (var i = 0; i < (target.shadows?.length ?? 0); i++)
-        _shadow(i, shadowTarget: target),
+        _shadow(i, shadowTarget: target, maxExtent: maxExtent),
     ];
   }
 
@@ -4740,6 +4791,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     int index, {
     EditorComponent? target,
     EditorComponentShadow? shadowTarget,
+    double? maxExtent,
   }) {
     final appearance = target ?? _appearance;
     final shadows = shadowTarget == null
@@ -4780,13 +4832,29 @@ class _ThemeEditorState extends State<ThemeEditor> {
           true,
           wholeNumbers: false,
         ),
-        _number('水平偏移', s.dx, -40, 40, (v) => s.dx = v, () => s.dx = 0, true),
-        _number('垂直偏移', s.dy, -40, 40, (v) => s.dy = v, () => s.dy = 4, true),
+        _number(
+          '水平偏移',
+          s.dx,
+          -(maxExtent == null ? 40.0 : (maxExtent / 2).floorToDouble()),
+          maxExtent == null ? 40.0 : (maxExtent / 2).floorToDouble(),
+          (v) => s.dx = v,
+          () => s.dx = 0,
+          true,
+        ),
+        _number(
+          '垂直偏移',
+          s.dy,
+          -(maxExtent == null ? 40.0 : (maxExtent / 2).floorToDouble()),
+          maxExtent == null ? 40.0 : (maxExtent / 2).floorToDouble(),
+          (v) => s.dy = v,
+          () => s.dy = 4,
+          true,
+        ),
         _number(
           '模糊',
           s.blur,
           0,
-          80,
+          maxExtent ?? 80,
           (v) => s.blur = v,
           () => s.blur = 16,
           true,
@@ -4794,8 +4862,8 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _number(
           '扩散',
           s.spread,
-          -20,
-          40,
+          -(maxExtent == null ? 20.0 : (maxExtent / 2).floorToDouble()),
+          maxExtent == null ? 40.0 : (maxExtent / 2).floorToDouble(),
           (v) => s.spread = v,
           () => s.spread = 0,
           true,
@@ -4820,6 +4888,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
                       ?.key ??
                   value;
               if (value == 'hyper-dropdown') _component = 'select';
+              if (value == 'hyper-notification-center') {
+                _component = 'notificationReview';
+              }
+              _reviewObject = '';
+              _reviewState = 'common';
+              _reviewPart = 'group';
+              _reviewVariant = 'common';
               _inputObject = 'standard';
               _inputState = 'default';
               _iconInputVariant = 'common';
@@ -4834,13 +4909,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) => Obx(() {
-              var size = switch (_device) {
-                HyperDeviceType.phone => const Size(390, 844),
-                HyperDeviceType.tablet => const Size(834, 1194),
-                HyperDeviceType.desktop => const Size(1280, 800),
-                HyperDeviceType.watch => const Size(220, 220),
-              };
-              if (_landscape != (size.width > size.height)) size = size.flipped;
+              final size = editorPreviewSize(_device, landscape: _landscape);
               final item = _page == 'all'
                   ? null
                   : galleryItems.firstWhere((item) => item.id == _page);

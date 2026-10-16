@@ -1,3 +1,4 @@
+import 'editor_review_fields.dart';
 import 'editor_input_fields.dart';
 import 'editor_content_fields.dart';
 import 'editor_surface_fields.dart';
@@ -310,6 +311,7 @@ class EditorShadow {
 
 /// 当前设备的显式规格覆盖，默认值始终来自 Hyper 主题。
 class EditorDevice {
+  EditorReviewCollection reviews = EditorReviewCollection();
   EditorInputFields sliderInput = EditorInputFields();
   EditorInputFields segmentedInput = EditorInputFields();
   EditorInputFields colorPickerInput = EditorInputFields();
@@ -349,6 +351,7 @@ class EditorDevice {
       menuHeight,
       menuRadius;
   Map<String, Object?> toJson() => {
+    if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (sliderInput.toJson().isNotEmpty) 'sliderInput': sliderInput.toJson(),
     if (segmentedInput.toJson().isNotEmpty)
       'segmentedInput': segmentedInput.toJson(),
@@ -407,6 +410,7 @@ class EditorDevice {
   };
   factory EditorDevice.fromJson(Map<String, dynamic> j) {
     _checkFields(j, {
+      'reviews',
       'typography',
       'buttonMetrics',
       'sliderInput',
@@ -447,6 +451,9 @@ class EditorDevice {
       'menuRadius',
     });
     return EditorDevice()
+      ..reviews = EditorReviewCollection.fromJson(
+        (j['reviews'] as Map<String, dynamic>?) ?? {},
+      )
       ..iconContent = EditorContentFields.fromJson(
         (j['iconContent'] as Map<String, dynamic>?) ?? {},
       )
@@ -560,6 +567,7 @@ double? number(dynamic value, {double? min, double? max}) {
 
 /// 亮暗方案独立编辑，共享一套四端布局规格。
 class EditorMode {
+  EditorReviewCollection reviews = EditorReviewCollection();
   String? fontFamily;
   final materialAppearance = EditorComponent();
   EditorColor? materialTint, materialBorder;
@@ -620,6 +628,7 @@ class EditorMode {
   final menu = EditorComponent();
   final select = EditorComponent(), selectAnchor = EditorComponent();
   Map<String, Object?> toJson() => {
+    if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (fontFamily != null) 'fontFamily': fontFamily,
     if (materialAppearance.toJson().isNotEmpty)
       'materialAppearance': materialAppearance.toJson(),
@@ -711,6 +720,7 @@ class EditorMode {
   EditorMode();
   factory EditorMode.fromJson(Map<String, dynamic> j) {
     _checkFields(j, {
+      'reviews',
       'fontFamily',
       'materialAppearance',
       'materialTint',
@@ -776,6 +786,9 @@ class EditorMode {
       'menu',
     });
     final result = EditorMode()
+      ..reviews = EditorReviewCollection.fromJson(
+        (j['reviews'] as Map<String, dynamic>?) ?? {},
+      )
       ..buttonVariants = EditorButtonVariants.fromJson(
         (j['buttonVariants'] as Map<String, dynamic>?) ?? {},
       )
@@ -2279,6 +2292,11 @@ class EditorThemeDocument {
             ),
       ),
     );
-    return applyEditorInputs(theme, m, device(deviceType), deviceType);
+    return applyEditorReviews(
+      applyEditorInputs(theme, m, device(deviceType), deviceType),
+      this,
+      m,
+      deviceType,
+    );
   }
 }

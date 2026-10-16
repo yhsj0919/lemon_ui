@@ -1,3 +1,4 @@
+import '../../components/tab/hyper_tab_bar_theme.dart';
 import '../../components/tooltip/hyper_tooltip_theme.dart';
 import '../../components/top_navigation/hyper_top_navigation_theme.dart';
 import '../../components/color_picker/hyper_color_picker_theme.dart';
@@ -13,7 +14,6 @@ import '../../components/steps/hyper_step_indicator_theme.dart';
 import '../../components/pagination/hyper_pagination_theme.dart';
 import '../../components/collapsible/hyper_accordion_theme.dart';
 import '../../components/collapsible/hyper_collapsible_theme.dart';
-import '../../components/notification/hyper_notification_center_theme.dart';
 import '../../components/notification/hyper_notification_theme.dart';
 import '../../components/loading_overlay/hyper_loading_overlay_theme.dart';
 import '../../components/notice/hyper_alert_theme.dart';
@@ -107,6 +107,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.topNavigationTheme = const HyperTopNavigationThemeData(),
     this.colorPickerTheme = const HyperColorPickerThemeData(),
     this.selectTheme = const HyperSelectThemeData(),
+    this.tabBarTheme = const HyperTabBarThemeData(),
     this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
     this.cardTheme = const HyperCardThemeData(),
     this.titledCardTheme = const HyperTitledCardThemeData(),
@@ -127,7 +128,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.toastTheme = const HyperToastThemeData(),
     this.snackbarTheme = const HyperSnackbarThemeData(),
     this.loadingOverlayTheme = const HyperLoadingOverlayThemeData(),
-    this.notificationCenterTheme = const HyperNotificationCenterThemeData(),
     this.collapsibleTheme = const HyperCollapsibleThemeData(),
     this.accordionTheme = const HyperAccordionThemeData(),
     this.paginationTheme = const HyperPaginationThemeData(),
@@ -365,6 +365,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperSelectThemeData selectTheme;
 
   /// 全局面包屑视觉主题。
+  final HyperTabBarThemeData tabBarTheme;
   final HyperBreadcrumbThemeData breadcrumbTheme;
 
   /// 全局 Card 主题，与 Container 主题相互独立。
@@ -393,7 +394,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperToastThemeData toastTheme;
   final HyperSnackbarThemeData snackbarTheme;
   final HyperLoadingOverlayThemeData loadingOverlayTheme;
-  final HyperNotificationCenterThemeData notificationCenterTheme;
   final HyperCollapsibleThemeData collapsibleTheme;
   final HyperAccordionThemeData accordionTheme;
   final HyperPaginationThemeData paginationTheme;
@@ -512,6 +512,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperTopNavigationThemeData? topNavigationTheme,
     HyperColorPickerThemeData? colorPickerTheme,
     HyperSelectThemeData? selectTheme,
+    HyperTabBarThemeData? tabBarTheme,
     HyperBreadcrumbThemeData? breadcrumbTheme,
     HyperCardThemeData? cardTheme,
     HyperTitledCardThemeData? titledCardTheme,
@@ -532,7 +533,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperToastThemeData? toastTheme,
     HyperSnackbarThemeData? snackbarTheme,
     HyperLoadingOverlayThemeData? loadingOverlayTheme,
-    HyperNotificationCenterThemeData? notificationCenterTheme,
     HyperCollapsibleThemeData? collapsibleTheme,
     HyperAccordionThemeData? accordionTheme,
     HyperPaginationThemeData? paginationTheme,
@@ -588,6 +588,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       topNavigationTheme: topNavigationTheme ?? this.topNavigationTheme,
       colorPickerTheme: colorPickerTheme ?? this.colorPickerTheme,
       selectTheme: selectTheme ?? this.selectTheme,
+      tabBarTheme: tabBarTheme ?? this.tabBarTheme,
       breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
       cardTheme: cardTheme ?? this.cardTheme,
       titledCardTheme: titledCardTheme ?? this.titledCardTheme,
@@ -608,8 +609,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       toastTheme: toastTheme ?? this.toastTheme,
       snackbarTheme: snackbarTheme ?? this.snackbarTheme,
       loadingOverlayTheme: loadingOverlayTheme ?? this.loadingOverlayTheme,
-      notificationCenterTheme:
-          notificationCenterTheme ?? this.notificationCenterTheme,
       collapsibleTheme: collapsibleTheme ?? this.collapsibleTheme,
       accordionTheme: accordionTheme ?? this.accordionTheme,
       paginationTheme: paginationTheme ?? this.paginationTheme,
@@ -679,11 +678,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.loadingOverlayTheme,
         t,
       ),
-      notificationCenterTheme: HyperNotificationCenterThemeData.lerp(
-        notificationCenterTheme,
-        other.notificationCenterTheme,
-        t,
-      ),
+
       collapsibleTheme: HyperCollapsibleThemeData.lerp(
         collapsibleTheme,
         other.collapsibleTheme,
@@ -748,6 +743,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       selectTheme: HyperSelectThemeData.lerp(selectTheme, other.selectTheme, t),
+      tabBarTheme: HyperTabBarThemeData.lerp(tabBarTheme, other.tabBarTheme, t),
       breadcrumbTheme: HyperBreadcrumbThemeData.lerp(
         breadcrumbTheme,
         other.breadcrumbTheme,
@@ -881,6 +877,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.topNavigationTheme == topNavigationTheme &&
           other.colorPickerTheme == colorPickerTheme &&
           other.selectTheme == selectTheme &&
+          other.tabBarTheme == tabBarTheme &&
           other.breadcrumbTheme == breadcrumbTheme &&
           other.cardTheme == cardTheme &&
           other.titledCardTheme == titledCardTheme &&
@@ -899,7 +896,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.toastTheme == toastTheme &&
           other.snackbarTheme == snackbarTheme &&
           other.loadingOverlayTheme == loadingOverlayTheme &&
-          other.notificationCenterTheme == notificationCenterTheme &&
           other.collapsibleTheme == collapsibleTheme &&
           other.accordionTheme == accordionTheme &&
           other.paginationTheme == paginationTheme &&
@@ -964,7 +960,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     toastTheme,
     snackbarTheme,
     loadingOverlayTheme,
-    notificationCenterTheme,
     collapsibleTheme,
     accordionTheme,
     paginationTheme,

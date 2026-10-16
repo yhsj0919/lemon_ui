@@ -8,14 +8,14 @@
 
 Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织。公共收录基础能力、
 容器、内容、交互、选择、反馈和按钮；手机／平板收录页面框架与抽屉导航；
-桌面收录侧边导航、操作与提示。这里的归类用于查找 Demo，不限制组件可运行的设备，
+桌面收录侧边导航、顶部导航与菜单、操作与提示；编辑器中的顶部导航和菜单统一归入“导航”。这里的归类用于查找 Demo，不限制组件可运行的设备，
 也不改变四端主题尺寸的解析。手表专属示例出现后再增设手表分组。
 
 ## 近期实施顺序
 
 进度同步（2026-10-01）：Tag、WidgetGroup、Avatar / AvatarGroup、Progress、Skeleton、EmptyState、Chip、SegmentedButton、Divider 和独立 TextField 已完成当前实现与使用文档。
 
-Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档，Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。表单、字段校验、提交状态和表单弹窗留到最后，见“当前推进顺序”。
+Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档，Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；通知中心已下沉为业务组合示例，组件库仅保留单条通知；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。表单、字段校验、提交状态和表单弹窗留到最后，见“当前推进顺序”。
 
 ## UI 审核状态
 
@@ -385,7 +385,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperSnackbarHost`：管理 Snackbar 队列、呈现位置和生命周期。
 - [x] `HyperBanner`：页面内横幅提示。
 - [x] `HyperNotification`：通知卡片。
-- [x] `HyperNotificationCenter`：应用内通知列表。
+- 通知中心：业务层组合示例，不作为公共组件导出。
 - [x] `HyperAlert`：内联提示块。
 - [x] `HyperLoadingOverlay`：区域或页面加载遮罩。
 - [x] `HyperProgress`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
@@ -788,7 +788,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 
 ### 当前推进顺序（2026-10-01）
 
-- Dialog、BottomSheet、Toast / Snackbar 及队列宿主当前实现、主题、Demo 和使用文档已完成；Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；NotificationCenter 页面内通知列表已完成当前实现、主题、Demo 与使用文档；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。
+- Dialog、BottomSheet、Toast / Snackbar 及队列宿主当前实现、主题、Demo 和使用文档已完成；Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；通知中心已下沉为业务组合示例，组件库仅保留单条通知；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。
 - 表单体系统一放到最后：`HyperForm`、`HyperTextFormField`、字段校验、异步校验与提交状态。
 - 表单弹窗后期基于 `HyperDialog` 的自由正文和操作区组合，复用位置、边框、圆角与按钮主题；不在 Dialog 内实现校验或提交状态。
 - 已有 `HyperTextField` 保持独立输入能力；暂不扩展表单封装。

@@ -27,6 +27,7 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
   double _stepped = .4;
   double _continuousWithPoints = .37;
   double _thin = .48;
+  double _bufferProgress = .25;
   double _indicatorPreview = .48;
   RangeValues _thinRange = const RangeValues(.3, .7);
   double _volumePanel = .48;
@@ -176,6 +177,43 @@ class _HyperSliderPageState extends State<HyperSliderPage> {
                     }),
                   ),
                   const HyperText('开启模拟后，拖动期间上报值继续变化；滑块跟随手指或鼠标，松手才提交 seek。'),
+                ]),
+                section('二级缓冲轨道', [
+                  example(
+                    '主进度与缓冲进度',
+                    HyperSlider(
+                      value: _bufferProgress,
+                      bufferValue: .75,
+                      onChanged: (value) =>
+                          setState(() => _bufferProgress = value),
+                    ),
+                    value: '主进度 ${percent(_bufferProgress)} · 缓冲 75%',
+                  ),
+                  example(
+                    '细轨道',
+                    HyperSlider(
+                      value: _bufferProgress,
+                      bufferValue: .75,
+                      variant: HyperSliderVariant.thin,
+                      onChanged: (value) =>
+                          setState(() => _bufferProgress = value),
+                    ),
+                  ),
+                  example(
+                    '缓冲渐变（实例 Style 覆盖）',
+                    HyperSlider(
+                      value: _bufferProgress,
+                      bufferValue: .75,
+                      style: const HyperSliderStyle(
+                        bufferGradient: LinearGradient(
+                          colors: [Color(0xFFB7D7FF), Color(0xFFBCA8FF)],
+                        ),
+                      ),
+                      onChanged: (value) =>
+                          setState(() => _bufferProgress = value),
+                    ),
+                  ),
+                  const HyperText('缓冲层只展示已加载位置，不限制拖动；拖过缓冲位置时主进度覆盖缓冲层。'),
                 ]),
                 section('音量调节', [
                   for (var i = 0; i < _volumes.length; i++)

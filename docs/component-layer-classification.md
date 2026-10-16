@@ -99,7 +99,7 @@
 - 提示与菜单：`HyperTooltip`、`HyperMenu`、`HyperMenuItem`、`HyperContextMenu`、`HyperSelect<T>`、`HyperPopup`、`HyperPopover`。
 - 页面浮层：`HyperActionSheet`、`HyperBottomSheet`、`HyperModalBottomSheet`、`HyperSideSheet`。
 - 对话框：`HyperDialog`、`HyperAlertDialog`、`HyperConfirmDialog`、`HyperInputDialog`、`HyperSelectionDialog<T>`、`HyperDialogActions`、`HyperProgressDialog`。
-- 队列反馈：`HyperToast`、`HyperSnackbar`、`HyperSnackbarHost`、`HyperNotification`、`HyperNotificationCenter`。
+- 队列反馈：`HyperToast`、`HyperSnackbar`、`HyperSnackbarHost`、`HyperNotification`。
 
 ### B7：页面结构与基础导航
 

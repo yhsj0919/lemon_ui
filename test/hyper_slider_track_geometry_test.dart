@@ -5,6 +5,60 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/src/components/slider/hyper_slider_track_shapes.dart';
 
 void main() {
+  testWidgets('提示跟随滚动并在滑块离开视口时隐藏，返回后恢复', (tester) async {
+    final controller = ScrollController();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: Scaffold(
+            body: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 400,
+                height: 300,
+                child: SingleChildScrollView(
+                  controller: controller,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 180),
+                      HyperSlider(
+                        value: .5,
+                        label: '50%',
+                        onChanged: (_) {},
+                        style: const HyperSliderStyle(
+                          showValueIndicator: ShowValueIndicator.alwaysVisible,
+                        ),
+                      ),
+                      const SizedBox(height: 700),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final initial = tester.getRect(find.byType(HyperCard));
+    controller.jumpTo(60);
+    await tester.pumpAndSettle();
+    expect(
+      tester.getRect(find.byType(HyperCard)).top,
+      closeTo(initial.top - 60, 1),
+    );
+    controller.jumpTo(350);
+    await tester.pumpAndSettle();
+    expect(find.byType(HyperCard), findsNothing);
+    controller.jumpTo(0);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.byType(HyperCard)).top, closeTo(initial.top, 1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    controller.dispose();
+  });
   testWidgets('嵌套缩放预览中的提示锚点不重复转换', (tester) async {
     final preview = MaterialApp(
       home: HyperTheme(

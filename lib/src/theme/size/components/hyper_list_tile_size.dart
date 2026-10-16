@@ -11,6 +11,7 @@ final class HyperListTileSize {
     required this.padding,
     required this.compactPadding,
     required this.leadingSize,
+    this.leadingIconSize,
     required this.leadingSpacing,
     required this.trailingSpacing,
     required this.trailingIconSize,
@@ -25,6 +26,9 @@ final class HyperListTileSize {
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry compactPadding;
   final double leadingSize;
+
+  /// Null inherits the supplied icon theme; leadingSize remains the slot size.
+  final double? leadingIconSize;
   final double leadingSpacing;
   final double trailingSpacing;
   final double trailingIconSize;
@@ -41,6 +45,7 @@ final class HyperListTileSize {
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? compactPadding,
     double? leadingSize,
+    double? leadingIconSize,
     double? leadingSpacing,
     double? trailingSpacing,
     double? trailingIconSize,
@@ -55,6 +60,7 @@ final class HyperListTileSize {
     padding: padding ?? this.padding,
     compactPadding: compactPadding ?? this.compactPadding,
     leadingSize: leadingSize ?? this.leadingSize,
+    leadingIconSize: leadingIconSize ?? this.leadingIconSize,
     leadingSpacing: leadingSpacing ?? this.leadingSpacing,
     trailingSpacing: trailingSpacing ?? this.trailingSpacing,
     trailingIconSize: trailingIconSize ?? this.trailingIconSize,
@@ -82,6 +88,9 @@ final class HyperListTileSize {
       t,
     )!,
     leadingSize: a.leadingSize + (b.leadingSize - a.leadingSize) * t,
+    leadingIconSize: a.leadingIconSize == null || b.leadingIconSize == null
+        ? (t < .5 ? a.leadingIconSize : b.leadingIconSize)
+        : a.leadingIconSize! + (b.leadingIconSize! - a.leadingIconSize!) * t,
     leadingSpacing:
         a.leadingSpacing + (b.leadingSpacing - a.leadingSpacing) * t,
     trailingSpacing:
@@ -105,6 +114,7 @@ final class HyperListTileSize {
       other.padding == padding &&
       other.compactPadding == compactPadding &&
       other.leadingSize == leadingSize &&
+      other.leadingIconSize == leadingIconSize &&
       other.leadingSpacing == leadingSpacing &&
       other.trailingSpacing == trailingSpacing &&
       other.trailingIconSize == trailingIconSize &&
@@ -120,6 +130,7 @@ final class HyperListTileSize {
     padding,
     compactPadding,
     leadingSize,
+    leadingIconSize,
     leadingSpacing,
     trailingSpacing,
     trailingIconSize,

@@ -246,6 +246,7 @@ class _HyperMenuState extends State<HyperMenu> {
     final style = HyperMenuStyle(
       width: metrics.width,
       itemHeight: metrics.itemHeight,
+      itemVerticalPadding: metrics.itemVerticalPadding ?? metrics.padding / 2,
       padding: metrics.padding,
       surfacePadding: metrics.padding,
       groupSpacing: metrics.groupSpacing,
@@ -275,7 +276,7 @@ class _HyperMenuState extends State<HyperMenu> {
     final surfaceStyle = resolveHyperMenuSurface(
       context,
       radius: style.surfaceRadius!,
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.all(style.surfacePadding!),
       style: style.surfaceStyle,
     );
     final viewport = MediaQuery.sizeOf(context);
@@ -284,9 +285,7 @@ class _HyperMenuState extends State<HyperMenu> {
         maxHeight: style.maxHeight ?? viewport.height,
       ),
       child: SingleChildScrollView(
-        padding: widget.showSurface
-            ? EdgeInsets.all(style.surfacePadding!)
-            : EdgeInsets.zero,
+        padding: EdgeInsets.zero,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -386,7 +385,10 @@ class _HyperMenuState extends State<HyperMenu> {
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(style.itemRadius!),
             ),
-            padding: EdgeInsets.symmetric(horizontal: style.padding!),
+            padding: EdgeInsets.symmetric(
+              horizontal: style.padding!,
+              vertical: style.itemVerticalPadding!,
+            ),
             child: Row(
               children: [
                 if (selected &&

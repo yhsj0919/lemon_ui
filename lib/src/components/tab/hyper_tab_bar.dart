@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../../foundation/hyper_fill.dart';
+import '../card/hyper_card_style.dart';
+import '../surface/hyper_navigation_surface.dart';
+import 'hyper_tab_bar_style.dart';
+import 'hyper_tab_bar_theme.dart';
+import 'hyper_tab_selection_track.dart';
+export 'hyper_tab_bar_style.dart';
+export 'hyper_tab_bar_theme.dart';
 
 /// 默认底槽、独立圆角标签与普通下划线标签。
-enum HyperTabBarVariant { segmented, separated, underline }
 
 /// 与 Flutter [TabController] 和 [DefaultTabController] 共用状态的标签项。
 class HyperTab extends Tab {
@@ -26,6 +33,7 @@ class HyperTabBar extends StatelessWidget {
     this.isScrollable = false,
     this.onTap,
     this.padding,
+    this.style,
   });
 
   const HyperTabBar.separated({
@@ -35,6 +43,7 @@ class HyperTabBar extends StatelessWidget {
     this.isScrollable = false,
     this.onTap,
     this.padding,
+    this.style,
   }) : variant = HyperTabBarVariant.separated;
 
   const HyperTabBar.underline({
@@ -44,10 +53,12 @@ class HyperTabBar extends StatelessWidget {
     this.isScrollable = false,
     this.onTap,
     this.padding,
+    this.style,
   }) : variant = HyperTabBarVariant.underline;
 
   /// 覆盖主题中的标签栏边缘留白；EdgeInsets.zero 可关闭。
   final EdgeInsetsGeometry? padding;
+  final HyperTabBarStyle? style;
 
   final List<Widget> tabs;
   final TabController? controller;
@@ -59,17 +70,18 @@ class HyperTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
+    final visual = HyperTabBarTheme.of(context).resolve(variant).merge(style);
     final segmented = variant == HyperTabBarVariant.segmented;
     final separated = variant == HyperTabBarVariant.separated;
     final effectiveController = controller ?? DefaultTabController.of(context);
     final radius = BorderRadius.circular(
       segmented ? sizes.tabBar.segmentedRadius : sizes.tabBar.separatedRadius,
     );
-    final style = theme.textTheme.labelLarge?.copyWith(
-      fontSize: theme.typography.control,
-    );
+    final textStyle = theme.textTheme.labelLarge
+        ?.copyWith(fontSize: theme.typography.control)
+        .merge(visual.textStyle);
     final painter = TextPainter(
-      text: TextSpan(text: 'Hg', style: style),
+      text: TextSpan(text: 'Hg', style: textStyle),
       textDirection: Directionality.of(context),
       textScaler: MediaQuery.textScalerOf(context),
     )..layout();
@@ -99,76 +111,118 @@ class HyperTabBar extends StatelessWidget {
             child: Center(child: tab),
           ),
     ];
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        // 独立标签各自绘制表面，只有底槽形态绘制整条背景。
-        color: segmented ? theme.colors.surfaceMuted : Colors.transparent,
+    Widget buildTabs(List<GlobalKey>? keys) => TabBar(
+      controller: effectiveController,
+      padding: padding ?? sizes.tabBar.padding,
+      tabs: [
+        for (final (index, tab) in tabContents.indexed)
+          HyperTabSelectionMarker(
+            key: keys?[index],
+            child: SizedBox(
+              width: isScrollable || variant == HyperTabBarVariant.underline
+                  ? null
+                  : double.infinity,
+              child: _IndependentTabSurface(
+                inset: segmented
+                    ? EdgeInsets.all(sizes.overlaySpacing)
+                    : separated
+                    ? EdgeInsets.symmetric(
+                        horizontal: sizes.tabBar.itemSpacing / 2,
+                      )
+                    : EdgeInsets.zero,
+                controller: effectiveController,
+                index: index,
+                animateSelection: !segmented,
+                color: separated
+                    ? theme.colors.surfaceMuted
+                    : Colors.transparent,
+                selectedColor: separated
+                    ? theme.colors.surface
+                    : Colors.transparent,
+                radius: radius,
+                normalStyle: visual.itemStyle,
+                selectedStyle: segmented ? null : visual.selectedItemStyle,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: separated
+                        ? (sizes.controlPadding.horizontal +
+                                  sizes.tabBar.itemSpacing) /
+                              2
+                        : segmented
+                        ? sizes.controlPadding.horizontal / 2
+                        : 0,
+                  ),
+                  child: tab,
+                ),
+              ),
+            ),
+          ),
+      ],
+      isScrollable: isScrollable,
+      onTap: onTap,
+      tabAlignment: isScrollable ? TabAlignment.start : TabAlignment.fill,
+      labelPadding: variant == HyperTabBarVariant.underline
+          ? EdgeInsets.symmetric(
+              horizontal: sizes.controlPadding.horizontal / 2,
+            )
+          : EdgeInsets.zero,
+      labelColor:
+          visual.selectedForegroundColor ??
+          (variant == HyperTabBarVariant.underline
+              ? theme.colors.primary
+              : theme.colors.textPrimary),
+      unselectedLabelColor:
+          visual.foregroundColor ?? theme.colors.textSecondary,
+      labelStyle: textStyle
+          ?.copyWith(fontWeight: FontWeight.w600)
+          .merge(visual.selectedTextStyle),
+      unselectedLabelStyle: textStyle,
+      splashFactory: NoSplash.splashFactory,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      dividerColor: variant == HyperTabBarVariant.underline
+          ? visual.dividerColor ?? theme.colors.outline
+          : Colors.transparent,
+      indicatorWeight: variant == HyperTabBarVariant.underline
+          ? sizes.tabBar.underlineThickness
+          : 0,
+      indicatorSize: variant == HyperTabBarVariant.underline
+          ? TabBarIndicatorSize.label
+          : TabBarIndicatorSize.tab,
+      indicatorPadding: EdgeInsets.all(segmented ? sizes.overlaySpacing : 0),
+      indicator: variant == HyperTabBarVariant.underline
+          ? UnderlineTabIndicator(
+              borderSide: BorderSide(
+                color: visual.indicatorColor ?? theme.colors.primary,
+                width: sizes.tabBar.underlineThickness,
+              ),
+            )
+          : const BoxDecoration(),
+      splashBorderRadius: radius,
+    );
+    return HyperNavigationSurface(
+      style: HyperCardStyle(
+        background: HyperFill.color(
+          segmented ? theme.colors.surfaceMuted : Colors.transparent,
+        ),
         borderRadius: radius,
-      ),
+        padding: EdgeInsets.zero,
+      ).merge(visual.trackStyle),
+      inheritMaterial: true,
       child: SizedBox(
         height: height,
-        child: TabBar(
-          controller: effectiveController,
-          padding: padding ?? sizes.tabBar.padding,
-          tabs: [
-            for (final (index, tab) in tabContents.indexed)
-              separated
-                  ? _IndependentTabSurface(
-                      controller: effectiveController,
-                      index: index,
-                      color: theme.colors.surfaceMuted,
-                      selectedColor: theme.colors.surface,
-                      radius: radius,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: sizes.controlPadding.horizontal / 2,
-                        ),
-                        child: tab,
-                      ),
-                    )
-                  : tab,
-          ],
-          isScrollable: isScrollable,
-          onTap: onTap,
-          tabAlignment: isScrollable ? TabAlignment.start : TabAlignment.fill,
-          labelPadding: EdgeInsets.symmetric(
-            horizontal: separated
-                ? sizes.tabBar.itemSpacing / 2
-                : sizes.controlPadding.horizontal / 2,
-          ),
-          labelColor: variant == HyperTabBarVariant.underline
-              ? theme.colors.primary
-              : theme.colors.textPrimary,
-          unselectedLabelColor: theme.colors.textSecondary,
-          labelStyle: style?.copyWith(fontWeight: FontWeight.w600),
-          unselectedLabelStyle: style,
-          splashFactory: NoSplash.splashFactory,
-          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-          dividerColor: variant == HyperTabBarVariant.underline
-              ? theme.colors.outline
-              : Colors.transparent,
-          indicatorWeight: variant == HyperTabBarVariant.underline
-              ? sizes.tabBar.underlineThickness
-              : 0,
-          indicatorSize: variant == HyperTabBarVariant.underline
-              ? TabBarIndicatorSize.label
-              : TabBarIndicatorSize.tab,
-          indicatorPadding: EdgeInsets.all(
-            segmented ? sizes.overlaySpacing : 0,
-          ),
-          indicator: variant == HyperTabBarVariant.underline
-              ? UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    color: theme.colors.primary,
-                    width: sizes.tabBar.underlineThickness,
-                  ),
-                )
-              : BoxDecoration(
-                  color: segmented ? theme.colors.surface : Colors.transparent,
+        child: segmented
+            ? HyperTabSelectionTrack(
+                controller: effectiveController,
+                count: tabs.length,
+                inset: EdgeInsets.all(sizes.overlaySpacing),
+                style: HyperCardStyle(
+                  background: HyperFill.color(theme.colors.surface),
                   borderRadius: radius,
-                ),
-          splashBorderRadius: radius,
-        ),
+                  padding: EdgeInsets.zero,
+                ).merge(visual.itemStyle).merge(visual.selectedItemStyle),
+                builder: buildTabs,
+              )
+            : buildTabs(null),
       ),
     );
   }
@@ -182,6 +236,10 @@ class _IndependentTabSurface extends StatelessWidget {
     required this.color,
     required this.selectedColor,
     required this.radius,
+    this.normalStyle,
+    this.inset = EdgeInsets.zero,
+    this.selectedStyle,
+    this.animateSelection = true,
     required this.child,
   });
 
@@ -190,7 +248,10 @@ class _IndependentTabSurface extends StatelessWidget {
   final Color color;
   final Color selectedColor;
   final BorderRadius radius;
+  final HyperCardStyle? normalStyle, selectedStyle;
+  final EdgeInsetsGeometry inset;
   final Widget child;
+  final bool animateSelection;
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -198,15 +259,32 @@ class _IndependentTabSurface extends StatelessWidget {
     builder: (context, child) {
       final position =
           controller.animation?.value ?? controller.index.toDouble();
-      final selected = (1 - (position - index).abs()).clamp(0.0, 1.0);
-      return Container(
-        // 固定标签栏中占满各自的分配宽度，滚动标签栏仍按内容自然宽度布局。
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Color.lerp(color, selectedColor, selected),
-          borderRadius: radius,
-        ),
-        child: child,
+      final selected = animateSelection
+          ? (1 - (position - index).abs()).clamp(0.0, 1.0)
+          : 0.0;
+      final normal = HyperCardStyle(
+        background: HyperFill.color(color),
+        borderRadius: radius,
+        padding: EdgeInsets.zero,
+      ).merge(normalStyle);
+      final active = normal
+          .merge(HyperCardStyle(background: HyperFill.color(selectedColor)))
+          .merge(selectedStyle);
+      final style = HyperCardStyle.lerp(normal, active, selected);
+      return Stack(
+        fit: StackFit.passthrough,
+        children: [
+          Positioned.fill(
+            child: Padding(
+              padding: inset,
+              child: HyperNavigationSurface(
+                style: style.merge(HyperCardStyle(padding: EdgeInsets.zero)),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+          Padding(padding: style.padding ?? EdgeInsets.zero, child: child!),
+        ],
       );
     },
     child: child,

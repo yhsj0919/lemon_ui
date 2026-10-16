@@ -6,6 +6,7 @@ final class HyperMenuSize {
   const HyperMenuSize({
     required this.width,
     required this.itemHeight,
+    this.itemVerticalPadding,
     required this.padding,
     this.itemSpacing,
     this.descriptionGap = 2,
@@ -18,6 +19,7 @@ final class HyperMenuSize {
 
   final double width;
   final double itemHeight;
+  final double? itemVerticalPadding;
   final double padding;
   final double? itemSpacing;
 
@@ -34,6 +36,7 @@ final class HyperMenuSize {
   HyperMenuSize copyWith({
     double? width,
     double? itemHeight,
+    double? itemVerticalPadding,
     double? padding,
     double? itemSpacing,
     double? descriptionGap,
@@ -45,6 +48,7 @@ final class HyperMenuSize {
   }) => HyperMenuSize(
     width: width ?? this.width,
     itemHeight: itemHeight ?? this.itemHeight,
+    itemVerticalPadding: itemVerticalPadding ?? this.itemVerticalPadding,
     padding: padding ?? this.padding,
     itemSpacing: itemSpacing ?? this.itemSpacing,
     descriptionGap: descriptionGap ?? this.descriptionGap,
@@ -60,6 +64,10 @@ final class HyperMenuSize {
     return HyperMenuSize(
       width: value(a.width, b.width),
       itemHeight: value(a.itemHeight, b.itemHeight),
+      itemVerticalPadding:
+          a.itemVerticalPadding == null || b.itemVerticalPadding == null
+          ? (t < .5 ? a.itemVerticalPadding : b.itemVerticalPadding)
+          : value(a.itemVerticalPadding!, b.itemVerticalPadding!),
       padding: value(a.padding, b.padding),
       itemSpacing: a.itemSpacing == null || b.itemSpacing == null
           ? (t < .5 ? a.itemSpacing : b.itemSpacing)
@@ -78,6 +86,7 @@ final class HyperMenuSize {
       other is HyperMenuSize &&
       other.width == width &&
       other.itemHeight == itemHeight &&
+      other.itemVerticalPadding == itemVerticalPadding &&
       other.padding == padding &&
       other.itemSpacing == itemSpacing &&
       other.descriptionGap == descriptionGap &&
@@ -91,6 +100,7 @@ final class HyperMenuSize {
   int get hashCode => Object.hash(
     width,
     itemHeight,
+    itemVerticalPadding,
     padding,
     itemSpacing,
     descriptionGap,

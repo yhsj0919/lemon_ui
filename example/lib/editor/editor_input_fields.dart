@@ -10,6 +10,7 @@ import 'editor_theme_document.dart';
 
 /// 输入与交互控件的显式编辑值；尺寸按设备保存，视觉按亮暗保存。
 class EditorInputFields {
+  EditorColor? bufferColor;
   double? indicatorPaddingHorizontal;
   double? indicatorPaddingVertical;
   double? indicatorRadius;
@@ -87,6 +88,7 @@ class EditorInputFields {
   String? valueIndicatorVisibility;
   bool? capsuleAutoIconContrast;
   Map<String, Object?> toJson() => {
+    if (bufferColor != null) 'bufferColor': bufferColor!.toJson(),
     if (indicatorPaddingHorizontal != null)
       'indicatorPaddingHorizontal': indicatorPaddingHorizontal,
     if (indicatorPaddingVertical != null)
@@ -196,6 +198,7 @@ class EditorInputFields {
   };
   static EditorInputFields fromJson(Map<String, dynamic> j) {
     const keys = {
+      'bufferColor',
       'indicatorPaddingHorizontal',
       'indicatorPaddingVertical',
       'indicatorRadius',
@@ -290,6 +293,9 @@ class EditorInputFields {
       throw const FormatException('无效数值提示显示方式');
     }
     return EditorInputFields()
+      ..bufferColor = j['bufferColor'] == null
+          ? null
+          : EditorColor.fromJson(j['bufferColor'] as Map<String, dynamic>)
       ..indicatorPaddingHorizontal = number(
         j['indicatorPaddingHorizontal'],
         min: 0,
@@ -681,6 +687,7 @@ HyperThemeData applyEditorInputs(
     sliderTheme: theme.sliderTheme.merge(
       HyperSliderThemeData(
         style: HyperSliderStyle(
+          bufferColor: sv.bufferColor?.resolve(c),
           activeTrackColor: sv.activeTrackColor?.resolve(c),
           inactiveTrackColor: sv.inactiveTrackColor?.resolve(c),
           hoverInactiveTrackColor: sv.hoverInactiveTrackColor?.resolve(c),

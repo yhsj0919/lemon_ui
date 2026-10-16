@@ -1,7 +1,45 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('菜单面板内边距只应用一次，表面覆盖直接替换默认值', (tester) async {
+    for (final explicit in [null, 0.0, 12.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: HyperCardTheme(
+              data: HyperCardThemeData(
+                style: HyperCardStyle(padding: const EdgeInsets.all(40)),
+              ),
+              child: Center(
+                child: HyperMenu(
+                  style: HyperMenuStyle(
+                    surfacePadding: 8,
+                    surfaceStyle: explicit == null
+                        ? null
+                        : HyperCardStyle(padding: EdgeInsets.all(explicit)),
+                  ),
+                  items: const [HyperMenuItem(id: 'one', label: '菜单项')],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final card = tester.getRect(find.byType(HyperCard));
+      final row = tester.getRect(
+        find.byKey(const ValueKey('hyper-menu-item-one')),
+      );
+      expect(row.left - card.left, explicit ?? 8);
+      expect(card.right - row.right, explicit ?? 8);
+      expect(row.top - card.top, explicit ?? 8);
+      expect(card.bottom - row.bottom, explicit ?? 8);
+      expect(tester.takeException(), isNull);
+    }
+  });
   test('菜单项间距可独立覆盖，参与主题合并和插值', () {
     const schemes = [
       HyperSizeScheme.phone(),

@@ -41,6 +41,13 @@ final class HyperMaterialThemeData {
     HyperFill? semanticBackground,
   }) {
     var recipe = material ?? this.material;
+    // An unspecified recipe background inherits the component semantic fill.
+    // HyperFill.none remains an explicit transparent override.
+    if (recipe != null &&
+        recipe.background == null && !recipe.usesBackdrop &&
+        semanticBackground != null) {
+      recipe = recipe.copyWith(background: semanticBackground);
+    }
     if (recipe?.usesBackdrop == true && semanticBackground != null) {
       if (semanticBackground.isNone) return null;
       final opacity =

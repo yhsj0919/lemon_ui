@@ -2,8 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui_example/editor/editor_component_navigation.dart';
+import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 
 void main() {
+  testWidgets('顶部导航与菜单统一放入导航分类，提示保留在反馈', (tester) async {
+    final section = gallerySections.firstWhere((s) => s.title == '顶部导航与菜单');
+    expect(section.items.map((i) => i.id), [
+      'hyper-top-navigation',
+      'hyper-menu',
+    ]);
+    for (final page in ['hyper-top-navigation', 'hyper-menu']) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            duration: Duration.zero,
+            child: Scaffold(
+              body: EditorComponentNavigation(page: page, onSelected: (_) {}),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('顶部导航'), findsOneWidget);
+      expect(find.text('菜单'), findsOneWidget);
+      expect(find.text('文字提示'), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+  });
   testWidgets('分类导航切换组件和完整 Demo，外部选择同步分类', (tester) async {
     String page = 'all';
     late StateSetter update;

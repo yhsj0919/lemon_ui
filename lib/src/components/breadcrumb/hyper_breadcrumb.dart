@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../../foundation/hyper_fill.dart';
+import '../card/hyper_card_style.dart';
+import '../surface/hyper_navigation_surface.dart';
 import 'hyper_breadcrumb_style.dart';
 import 'hyper_breadcrumb_theme.dart';
 
@@ -100,9 +103,13 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
     final disabledBackground =
         resolved.disabledBackgroundColor ?? normalBackground;
     final normalForeground =
-        resolved.foregroundColor ?? theme.colors.textSecondary;
+        resolved.foregroundColor ??
+        resolved.textStyle?.color ??
+        theme.colors.textSecondary;
     final highlightForeground =
-        resolved.highlightForegroundColor ?? theme.colors.warning;
+        resolved.highlightForegroundColor ??
+        resolved.textStyle?.color ??
+        theme.colors.warning;
     final separatorColor = resolved.separatorColor ?? theme.colors.textTertiary;
     final disabledColor = resolved.disabledColor ?? theme.colors.disabled;
     final radius = BorderRadius.circular(sizes.itemHeight / 2);
@@ -149,29 +156,50 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
                         constraints: BoxConstraints(
                           maxWidth: sizes.itemMaxWidth,
                         ),
-                        child: Material(
-                          color: !widget.enabled || !item.enabled
-                              ? disabledBackground
-                              : highlighted
-                              ? highlightBackground
-                              : normalBackground,
-                          borderRadius: radius,
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onTap: interactive
-                                ? () => widget.onItemTap!(index)
-                                : null,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: sizes.itemHorizontalPadding,
-                              ),
-                              child: Center(
-                                widthFactor: 1,
-                                child: Text(
-                                  item.displayLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: textStyle.copyWith(color: foreground),
+                        child: HyperNavigationSurface(
+                          inheritMaterial: true,
+                          style:
+                              HyperCardStyle(
+                                    background: HyperFill.color(
+                                      !widget.enabled || !item.enabled
+                                          ? disabledBackground
+                                          : highlighted
+                                          ? highlightBackground
+                                          : normalBackground,
+                                    ),
+                                    borderRadius: radius,
+                                    padding: EdgeInsets.zero,
+                                  )
+                                  .merge(resolved.itemStyle)
+                                  .merge(
+                                    !widget.enabled || !item.enabled
+                                        ? resolved.disabledStyle
+                                        : highlighted
+                                        ? resolved.highlightStyle
+                                        : null,
+                                  ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: radius,
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: interactive
+                                  ? () => widget.onItemTap!(index)
+                                  : null,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: sizes.itemHorizontalPadding,
+                                ),
+                                child: Center(
+                                  widthFactor: 1,
+                                  child: Text(
+                                    item.displayLabel,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textStyle.copyWith(
+                                      color: foreground,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

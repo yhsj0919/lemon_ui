@@ -118,7 +118,7 @@ class HyperMessageSurface extends StatelessWidget {
       decoration: BoxDecoration(
         color: style.material == null ? style.background?.color : null,
         gradient: style.material == null ? style.background?.gradient : null,
-        border: style.border,
+        border: style.material == null ? style.border : null,
         borderRadius: style.borderRadius,
         boxShadow: style.material == null ? style.boxShadow : null,
       ),
@@ -129,12 +129,10 @@ class HyperMessageSurface extends StatelessWidget {
     );
     if (style.material != null) {
       result = HyperMaterialSurface(
-        material: style.material!.copyWith(
-          boxShadow: style.boxShadow,
-          fallback: style.material!.fallback?.copyWith(
-            boxShadow: style.boxShadow,
-          ),
-        ),
+        material: style.material,
+        semanticBackground: style.background,
+        boxShadow: style.boxShadow,
+        border: style.border,
         quality: style.materialQuality,
         reduceTransparency: style.reduceTransparency,
         borderRadius: style.borderRadius,

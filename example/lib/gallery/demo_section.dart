@@ -16,11 +16,8 @@ class DemoSection extends StatelessWidget {
       child: HyperTitledCard(
         title: Text(title),
         titlePosition: HyperCardTitlePosition.inside,
-        cardStyle: HyperCardStyle(padding: EdgeInsets.zero),
-        child: Padding(
-          padding: sizes.card.titlePadding,
-          child: Align(alignment: AlignmentDirectional.topStart, child: child),
-        ),
+        cardStyle: HyperCardStyle(padding: sizes.card.titlePadding),
+        child: Align(alignment: AlignmentDirectional.topStart, child: child),
       ),
     );
   }

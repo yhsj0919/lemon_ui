@@ -135,9 +135,9 @@ class HyperNoticeBody extends StatelessWidget {
       decoration: HyperBoxDecoration(
         color: style.material == null ? style.background?.color : null,
         gradient: style.material == null ? style.background?.gradient : null,
-        border: style.border,
+        border: style.material == null ? style.border : null,
         borderRadius: style.borderRadius,
-        boxShadow: style.boxShadow,
+        boxShadow: style.material == null ? style.boxShadow : null,
       ),
       child: ClipRRect(
         borderRadius: style.borderRadius!,
@@ -147,6 +147,8 @@ class HyperNoticeBody extends StatelessWidget {
     if (style.material != null) {
       surface = HyperMaterialSurface(
         material: style.material,
+        boxShadow: style.boxShadow,
+        border: style.border,
         semanticBackground: style.background,
         quality: style.materialQuality,
         reduceTransparency: style.reduceTransparency,

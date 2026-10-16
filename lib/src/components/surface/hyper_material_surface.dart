@@ -1,3 +1,5 @@
+import '../../painting/hyper_surface_border.dart';
+
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
@@ -22,6 +24,7 @@ class HyperMaterialSurface extends StatelessWidget {
     this.alignment,
     this.borderRadius,
     this.border,
+    this.boxShadow,
     this.clipBehavior = Clip.none,
     this.child,
   });
@@ -34,6 +37,9 @@ class HyperMaterialSurface extends StatelessWidget {
 
   /// 显式轮廓（支持虚线）；空 Border 关闭材质轮廓，null 继承配方。
   final BoxBorder? border;
+
+  /// Explicit component shadows; an empty list disables material shadows.
+  final List<BoxShadow>? boxShadow;
 
   /// 当前表面的材质质量覆盖。
   final HyperMaterialQuality? quality;
@@ -70,21 +76,28 @@ class HyperMaterialSurface extends StatelessWidget {
     final hyperTheme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
     final materialTheme = HyperMaterialTheme.of(context);
+    final inherited = material == null || material == materialTheme.material;
+    final requested =
+        !inherited && material!.background == null && semanticBackground != null
+        ? material!.copyWith(
+            background: semanticBackground,
+            fallback: material!.fallback?.copyWith(
+              background: material!.fallback!.background ?? semanticBackground,
+            ),
+          )
+        : material;
     final resolved =
         materialTheme.resolveMaterial(
-          material: material,
-          semanticBackground:
-              material == null || material == materialTheme.material
-              ? semanticBackground
-              : null,
+          material: requested,
+          semanticBackground: inherited ? semanticBackground : null,
           quality: quality,
           reduceTransparency: reduceTransparency,
         ) ??
         HyperSurfaceMaterial.solid(
-          background: semanticBackground?.isNone == true
-              ? const HyperFill.none()
-              : HyperFill.color(hyperTheme.colors.surface),
+          background:
+              semanticBackground ?? HyperFill.color(hyperTheme.colors.surface),
         );
+    final effectiveShadows = boxShadow ?? resolved.boxShadow;
     final radius = (borderRadius ?? BorderRadius.circular(sizes.controlRadius))
         .resolve(Directionality.of(context));
     final fill = resolved.background;
@@ -98,9 +111,10 @@ class HyperMaterialSurface extends StatelessWidget {
         (resolved.border == null || resolved.border == BorderSide.none
             ? null
             : Border.fromBorderSide(resolved.border!));
-    final borderDecoration = effectiveBorder == null
-        ? null
-        : BoxDecoration(border: effectiveBorder, borderRadius: radius);
+    final borderDecoration = hyperSurfaceBorderDecoration(
+      effectiveBorder,
+      radius,
+    );
 
     if (resolved.usesBackdrop) {
       // 背景滤镜与前景内容必须是兄弟层。若把文字作为 BackdropFilter 的
@@ -138,11 +152,11 @@ class HyperMaterialSurface extends StatelessWidget {
           ],
         ),
       );
-      if (resolved.boxShadow.isNotEmpty) {
+      if (effectiveShadows.isNotEmpty) {
         content = DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: radius,
-            boxShadow: resolved.boxShadow,
+            boxShadow: effectiveShadows,
           ),
           child: content,
         );
@@ -175,7 +189,7 @@ class HyperMaterialSurface extends StatelessWidget {
       height: height,
       padding: padding,
       alignment: alignment,
-      decoration: backgroundDecoration.copyWith(boxShadow: resolved.boxShadow),
+      decoration: backgroundDecoration.copyWith(boxShadow: effectiveShadows),
       foregroundDecoration: borderDecoration,
       clipBehavior: Clip.none,
       child: surfaceChild,

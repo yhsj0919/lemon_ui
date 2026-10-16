@@ -168,9 +168,9 @@ class HyperBottomSheet extends StatelessWidget {
         gradient: resolved.material == null
             ? resolved.background?.gradient
             : null,
-        border: resolved.border,
+        border: resolved.material == null ? resolved.border : null,
         borderRadius: resolved.borderRadius,
-        boxShadow: resolved.boxShadow,
+        boxShadow: resolved.material == null ? resolved.boxShadow : null,
       ),
       child: ClipRRect(
         borderRadius: resolved.borderRadius!,
@@ -181,6 +181,8 @@ class HyperBottomSheet extends StatelessWidget {
     if (resolved.material != null) {
       surface = HyperMaterialSurface(
         material: resolved.material,
+        boxShadow: resolved.boxShadow,
+        border: resolved.border,
         semanticBackground: resolved.background,
         borderRadius: resolved.borderRadius,
         clipBehavior: resolved.clipBehavior!,

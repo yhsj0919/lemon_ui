@@ -64,7 +64,9 @@ final class HyperAppBarResolved {
         : null;
     final materialTheme = HyperMaterialTheme.of(context);
     final selectedMaterial =
+        instanceStyle?.surfaceStyle?.material ??
         instanceStyle?.material ??
+        themedStyle?.surfaceStyle?.material ??
         themedStyle?.material ??
         materialTheme.material ??
         (explicitBackground == null
@@ -90,6 +92,9 @@ final class HyperAppBarResolved {
     if (recipe != null && explicitBackground != null) {
       recipe = recipe.copyWith(background: HyperFill.color(explicitBackground));
     }
+    if (recipe != null && style.surfaceStyle?.background != null) {
+      recipe = recipe.copyWith(background: style.surfaceStyle!.background);
+    }
     material = recipe;
   }
 
@@ -102,10 +107,16 @@ final class HyperAppBarResolved {
   Color get backgroundColor =>
       material == null ? style.backgroundColor! : Colors.transparent;
 
-  Widget? get materialBackground => material == null
+  Widget? get materialBackground =>
+      material == null && style.surfaceStyle == null
       ? null
       : HyperMaterialSurface(
           material: material,
-          borderRadius: BorderRadius.zero,
+          semanticBackground:
+              style.surfaceStyle?.background ??
+              HyperFill.color(style.backgroundColor!),
+          border: style.surfaceStyle?.border,
+          boxShadow: style.surfaceStyle?.boxShadow,
+          borderRadius: style.surfaceStyle?.borderRadius ?? BorderRadius.zero,
         );
 }

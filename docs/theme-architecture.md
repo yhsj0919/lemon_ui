@@ -1,3 +1,26 @@
+## 通知业务边界与导航表面（2026-10-16）
+
+顶部导航的下拉菜单复用 HyperMenu，编辑器将面板与菜单项分开：面板宽度、最大高度、外层内边距和表面配置保存在 topNavigationPanel，菜单项布局、文字与状态配色保存在 topNavigationMenu；顶部按钮覆盖保持独立。
+菜单新增 itemVerticalPadding，进入 HyperMenuSize 四端规格以及 HyperMenuStyle 的主题、局部和实例覆盖。默认值暂由同端既有 menu.padding 的一半推导（phone/tablet 6、desktop 4、watch 2 逻辑像素），用于在描述内容增高后保留上下留白；这是既有语义尺寸的推导值，待视觉确认，不是新增官方规格。itemHeight 继续表示最小高度，内容随文字缩放增高，不裁切。
+
+菜单与折叠侧栏子菜单的面板内边距只由表面层应用一次，滚动内容不重复增加同一留白。菜单的 surfacePadding 与侧栏的 horizontalPadding 提供默认值，显式 surfaceStyle.padding / popupCardStyle.padding 直接替换；Card 的默认内容内边距不再叠加到菜单。顶部导航复用菜单，因此同时遵守此规则。
+
+桌面折叠侧栏子菜单默认宽度从 256 收紧为 192 逻辑像素，复用当前同端 menu.width 的既有规格；这是同类菜单的语义对齐，不是截图物理像素换算或新官方规格。其他设备规格与显式 popupWidth 覆盖保持原有配置。
+
+侧栏前置图标和展开箭头独立管理尺寸及默认、选中、祖先选中、禁用配色。expandIconSize 四端初值沿用该端既有 sidebar.iconSize，不新增视觉规格；编辑范围位于“导航项”，共用尺寸只在通用设置显示，颜色在当前状态下编辑。未覆盖图标颜色时继承对应状态的文字颜色。
+列表项的 leadingSize 是首部占位尺寸，leadingIconSize 是可选绘制尺寸，未指定时保留传入图标自身的主题规格；leadingColor 可独立覆盖。Icon 与 HyperIcon 通过各自的主题接收这两个绘制覆盖，仍尊重调用方图标实例的显式值。
+
+通知中心的分组、计数、已读管理和批量操作属于业务组合，已移至 example；公共组件仅保留 HyperNotification。
+移除 notificationCenterTheme 和 sizes.notificationCenter，旧编辑器覆盖仅兼容导入，不再驱动组件主题。
+
+TabBar 具有强类型 tabBarTheme，按 segmented / separated / underline 覆盖；局部 HyperTabBarTheme 与实例 Style 最后合并。
+侧栏、面包屑、抽屉和空状态的表面使用强类型 HyperCardStyle 字段复用配方结构，不读取 Card 的组件主题。
+非浮层导航表面复用 HyperNavigationSurface；浮层继续使用 resolveHyperMenuSurface，保持各自责任边界。
+HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴影列表同时关闭高级与降级阴影。
+空实色材质配方的未指定背景继承组件语义色，HyperFill.none 仍表示显式透明。
+
+抽屉新增四端 radius 规格，默认 16 逻辑像素用于保留当前 Flutter Material 3 Drawer 的既有圆角（本机 SDK drawer.dart 的 _DrawerDefaultsM3.shape/endShape），不是新的 HyperOS 官方视觉值。旧的只指定 width 的 HyperDrawerSize 仍接受，radius 为空时从统一默认尺寸主题回退。
+
 # Lemon UI 主题与尺寸架构
 
 ## 高级材质与透明度动画
@@ -554,11 +577,9 @@ transitionBuilder 替换图标过渡，errorTransitionBuilder 替换浮层进出
 
 卡片仅负责呈现与交互回调，日期格式化、数据、已读状态、显示状态和通知列表由上层管理。默认继承统一材质配方、质量及透明度策略，渲染复用 HyperMaterialSurface；不建立组件独立材质开关。状态动效来自 Motion，显隐过渡可替换。
 
-## NotificationCenter（2026-10-04）
+## 通知中心（业务组合）
 
-notificationCenterTheme 与 sizes.notificationCenter 独立强类型存储，支持 copyWith、合并、插值和值相等。中心只绘制标题、计数、组标题和布局，不自建表面；notificationTheme 子主题管理卡片，emptyStateStyle 管理空状态，buttonTheme 管理中心生成的操作。材质继承统一基础设施。
-
-父级持有 entries 和业务操作，中心仅发出单条/批量回调。Snapshot 固定输入列表、校验 id 唯一性并按首次出现组别排列，不做日期推断或异步数据存储。默认有限高度内使用惰性 ListView；shrinkWrap 嵌入布局仅用于少量内容。默认空状态过渡继承 Motion，可通过 transitionBuilder 替换。
+通知中心不再属于公共组件。示例页面自行管理分组、未读计数、列表与批量操作，复用单条 HyperNotification、按钮和空状态。旧专属 ThemeData 与 Size 模板已经移除，详见 usage/notification-center.md。
 
 ## Collapsible / Accordion（2026-10-05）
 
@@ -696,3 +717,7 @@ Divider 的稀疏 TextStyle 覆盖现在按字段合并，字重/行高覆盖不
 普通、纵向、胶囊及范围滑块在有效拖动期间使用本地临时值，onChanged 仍持续通知，播放器等外部值更新不抢占手势。松手时 onChangeEnd 使用最终本地值，之后恢复受控更新，不回放拖动中缓存的外部值。范围滑块保留原有越过交换角色的计算；禁用或修改范围 / 步进配置时取消旧临时值。胶囊的绘制进度、图标进度和语义值使用同一个当前显示值。状态仅负责交互，不纳入视觉 ThemeData 或新增定时器。
 
 播放器 seek 的异步确认与旧位置上报过滤由业务负责，组件不推测播放引擎的请求完成时机。Demo 增加持续上报的位置流复现，见 [使用方式](usage/selection.md)。单元检查覆盖拖动与外部状态竞争；Widget 回归已编写但本轮未执行，未启动设备。
+
+侧边导航的 `collapsedIconSize` 独立于展开态 `iconSize` 和箭头 `expandIconSize`，四端初值复用各端现有图标规格，未依据参考截图的物理像素改写默认尺寸。编辑器在导航项通用设置提供“折叠态图标尺寸”，按设备保存并遵循条目与折叠栏的几何上限。
+
+按用户确认，侧栏折叠态图标默认24逻辑像素，折叠态条目独立间距 `collapsedRowGap` 默认8（按用户指定调整），展开态行间距不变；局部主题与实例可分别覆盖。

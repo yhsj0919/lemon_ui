@@ -1,4 +1,3 @@
-import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'dart:math' as math;
@@ -10,14 +9,17 @@ import '../../interaction/hyper_pressable.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/motion/hyper_motion_theme.dart';
 import '../card/hyper_card.dart';
+import '../icon/hyper_icon_theme.dart';
+import '../icon/hyper_icon_style.dart';
+import '../../foundation/hyper_state_value.dart';
+import '../../foundation/hyper_fill.dart';
+import '../surface/hyper_navigation_surface.dart';
 import '../card/hyper_card_style.dart';
-import '../card/hyper_card_theme.dart';
 import '../list_tile/hyper_list_tile.dart';
 import '../list_tile/hyper_list_tile_style.dart';
 import '../overlay/hyper_anchored_overlay.dart';
-import '../overlay/hyper_overlay_material.dart';
+import '../menu/hyper_menu_surface.dart';
 import '../tooltip/hyper_tooltip.dart';
-import '../../theme/material/hyper_material_theme.dart';
 import 'hyper_sidebar_model.dart';
 import 'hyper_sidebar_style.dart';
 import 'hyper_sidebar_theme.dart';
@@ -166,6 +168,12 @@ class _HyperSidebarState extends State<HyperSidebar> {
       collapsedWidth: metrics.collapsedWidth,
       itemHeight: metrics.itemHeight,
       iconSize: metrics.iconSize,
+      expandIconSize: metrics.expandIconSize ?? metrics.iconSize,
+      collapsedIconSize: metrics.collapsedIconSize ?? metrics.iconSize,
+      collapsedRowGap:
+          metrics.collapsedRowGap ??
+          metrics.rowGap ??
+          HyperTheme.sizesOf(context).navigationItemSpacing,
       itemSpacing: metrics.itemSpacing,
       rowGap:
           metrics.rowGap ?? HyperTheme.sizesOf(context).navigationItemSpacing,
@@ -176,7 +184,10 @@ class _HyperSidebarState extends State<HyperSidebar> {
       itemRadius: metrics.itemRadius,
       backgroundColor: theme.colors.surface,
       borderColor: theme.colors.outline.withValues(alpha: .55),
-      foregroundColor: theme.colors.textPrimary,
+      foregroundColor:
+          widget.style?.itemTextStyle?.color ??
+          themedStyle?.itemTextStyle?.color ??
+          theme.colors.textPrimary,
       selectedForegroundColor: selectionStyle == HyperSidebarSelectionStyle.fill
           ? theme.colors.onPrimary
           : theme.colors.primary,
@@ -225,13 +236,16 @@ class _HyperSidebarState extends State<HyperSidebar> {
         return (resolved.widthTransitionBuilder ?? _defaultWidthTransition)(
           context,
           width,
-          DecoratedBox(
-            decoration: HyperBoxDecoration(
-              color: resolved.backgroundColor,
+          HyperNavigationSurface(
+            inheritMaterial: true,
+            style: HyperCardStyle(
+              background: HyperFill.color(resolved.backgroundColor!),
               border: BorderDirectional(
                 end: BorderSide(color: resolved.borderColor!),
               ),
-            ),
+              borderRadius: BorderRadius.zero,
+              padding: EdgeInsets.zero,
+            ).merge(resolved.surfaceStyle),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -332,6 +346,22 @@ class _HyperSidebarState extends State<HyperSidebar> {
         ? style.ancestorSelectedBackgroundColor!
         : Colors.transparent;
 
+    final iconColor = !enabled
+        ? style.disabledIconColor ?? style.iconColor ?? foreground
+        : exactSelected
+        ? style.selectedIconColor ?? style.iconColor ?? foreground
+        : selected
+        ? style.ancestorSelectedIconColor ?? style.iconColor ?? foreground
+        : style.iconColor ?? foreground;
+    final expandIconColor = !enabled
+        ? style.disabledExpandIconColor ?? style.expandIconColor ?? foreground
+        : exactSelected
+        ? style.selectedExpandIconColor ?? style.expandIconColor ?? foreground
+        : selected
+        ? style.ancestorSelectedExpandIconColor ??
+              style.expandIconColor ??
+              foreground
+        : style.expandIconColor ?? foreground;
     final row = HyperPressable(
       enabled: enabled,
       onTap: compact && hasChildren && !item.selectableParent
@@ -343,6 +373,15 @@ class _HyperSidebarState extends State<HyperSidebar> {
             states.contains(HyperControlState.hovered) ||
             states.contains(HyperControlState.focused);
         final pressed = states.contains(HyperControlState.pressed);
+        final stateSurface = !enabled
+            ? style.disabledItemSurfaceStyle
+            : exactSelected
+            ? style.selectedItemSurfaceStyle
+            : selected
+            ? style.ancestorItemSurfaceStyle
+            : null;
+        final itemSurface =
+            style.itemSurfaceStyle?.merge(stateSurface) ?? stateSurface;
         return Semantics(
           selected: selected,
           expanded: hasChildren ? expanded : null,
@@ -356,99 +395,130 @@ class _HyperSidebarState extends State<HyperSidebar> {
               ),
               width: compact ? style.itemHeight : null,
               constraints: BoxConstraints(minHeight: style.itemHeight!),
-              decoration: HyperBoxDecoration(
-                color: selected
-                    ? background
-                    : pressed || hovering
+              padding: EdgeInsets.zero,
+              child: HyperNavigationSurface(
+                style: HyperCardStyle(
+                  background: HyperFill.color(background),
+                  borderRadius: BorderRadius.circular(style.itemRadius!),
+                  padding: EdgeInsets.zero,
+                ).merge(itemSurface),
+                stateLayer: !selected && (pressed || hovering)
                     ? theme.colors.stateLayer.withValues(
                         alpha: pressed ? .10 : .06,
                       )
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(style.itemRadius!),
-              ),
-              padding: EdgeInsets.zero,
-              child: IconTheme(
-                data: IconThemeData(color: foreground, size: style.iconSize),
-                child: DefaultTextStyle.merge(
-                  style: style.itemTextStyle!.copyWith(color: foreground),
-                  child: compact
-                      ? Center(
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.center,
-                            children: [
-                              item.icon ??
-                                  Text(
-                                    item.label.isEmpty
-                                        ? ''
-                                        : item.label.characters.first,
+                child: IconTheme(
+                  data: IconThemeData(color: foreground, size: style.iconSize),
+                  child: DefaultTextStyle.merge(
+                    style: style.itemTextStyle!.copyWith(color: foreground),
+                    child: compact
+                        ? Center(
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.center,
+                              children: [
+                                (item.icon == null
+                                        ? null
+                                        : HyperIconTheme(
+                                            data: HyperIconThemeData(
+                                              style: HyperIconStyle(
+                                                size: HyperStateValue.all(
+                                                  style.collapsedIconSize!,
+                                                ),
+                                                color: HyperStateValue.all(
+                                                  iconColor,
+                                                ),
+                                              ),
+                                            ),
+                                            child: IconTheme.merge(
+                                              data: IconThemeData(
+                                                size: style.collapsedIconSize,
+                                                color: iconColor,
+                                              ),
+                                              child: item.icon!,
+                                            ),
+                                          )) ??
+                                    Text(
+                                      item.label.isEmpty
+                                          ? ''
+                                          : item.label.characters.first,
+                                    ),
+                                if (item.badge != null)
+                                  PositionedDirectional(
+                                    top: 0,
+                                    end: 0,
+                                    child: item.badge!,
                                   ),
-                              if (item.badge != null)
-                                PositionedDirectional(
-                                  top: 0,
-                                  end: 0,
-                                  child: item.badge!,
-                                ),
-                            ],
-                          ),
-                        )
-                      : HyperListTile(
-                          title: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: item.description == null
-                              ? null
-                              : Text(
-                                  item.description!,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                          leading: item.icon,
-                          trailing: item.badge == null && !hasChildren
-                              ? null
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (item.badge != null) item.badge!,
-                                    if (hasChildren) ...[
-                                      if (item.badge != null)
-                                        SizedBox(width: style.itemSpacing),
-                                      AnimatedRotation(
-                                        turns: expanded ? .25 : 0,
-                                        duration: expandDuration,
-                                        curve: theme.motion.fastCurve,
-                                        child: const Icon(Icons.chevron_right),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                          enabled: enabled,
-                          style: HyperListTileStyle(
-                            foregroundColor: foreground,
-                            subtitleColor: enabled
-                                ? theme.colors.textSecondary
-                                : style.disabledColor,
-                            trailingColor: foreground,
-                            overlayColor: Colors.transparent,
-                            titleStyle: style.itemTextStyle,
-                            subtitleStyle: style.descriptionTextStyle,
-                            padding: EdgeInsetsDirectional.symmetric(
-                              horizontal: style.itemSpacing!,
+                              ],
                             ),
-                            minHeight: item.description == null
-                                ? style.itemHeight
-                                : math.max(
-                                    style.itemHeight!,
-                                    listMetrics.subtitleMinHeight,
+                          )
+                        : HyperListTile(
+                            title: Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: item.description == null
+                                ? null
+                                : Text(
+                                    item.description!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                            leadingSize: style.iconSize,
-                            leadingSpacing: style.itemSpacing,
-                            trailingSpacing: style.itemSpacing,
-                            trailingIconSize: style.iconSize,
+                            leading: item.icon,
+                            trailing:
+                                item.badge == null &&
+                                    (!hasChildren || style.expandIconSize! <= 0)
+                                ? null
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (item.badge != null) item.badge!,
+                                      if (hasChildren &&
+                                          style.expandIconSize! > 0) ...[
+                                        if (item.badge != null)
+                                          SizedBox(width: style.itemSpacing),
+                                        AnimatedRotation(
+                                          turns: expanded ? .25 : 0,
+                                          duration: expandDuration,
+                                          curve: theme.motion.fastCurve,
+                                          child: Icon(
+                                            Icons.chevron_right,
+                                            size: style.expandIconSize,
+                                            color: expandIconColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                            enabled: enabled,
+                            style: HyperListTileStyle(
+                              foregroundColor: foreground,
+                              leadingColor: iconColor,
+                              subtitleColor: enabled
+                                  ? theme.colors.textSecondary
+                                  : style.disabledColor,
+                              trailingColor: foreground,
+                              overlayColor: Colors.transparent,
+                              titleStyle: style.itemTextStyle,
+                              subtitleStyle: style.descriptionTextStyle,
+                              padding: EdgeInsetsDirectional.symmetric(
+                                horizontal: style.itemSpacing!,
+                              ),
+                              minHeight: item.description == null
+                                  ? style.itemHeight
+                                  : math.max(
+                                      style.itemHeight!,
+                                      listMetrics.subtitleMinHeight,
+                                    ),
+                              leadingSize: style.iconSize,
+                              leadingIconSize: style.iconSize,
+                              leadingSpacing: style.itemSpacing,
+                              trailingSpacing: style.itemSpacing,
+                              trailingIconSize: style.iconSize,
+                            ),
                           ),
-                        ),
+                  ),
                 ),
               ),
             ),
@@ -468,35 +538,13 @@ class _HyperSidebarState extends State<HyperSidebar> {
         transitionBuilder: style.popupTransitionBuilder,
         anchor: built,
         overlayBuilder: (overlayContext, close) {
-          final cardStyle = HyperCardTheme.of(overlayContext).style;
-          final defaultMaterial = HyperOverlayMaterial.fallback(
+          final metrics = HyperTheme.sizesOf(overlayContext).menu;
+          final popupStyle = resolveHyperMenuSurface(
             overlayContext,
-            componentMaterial: cardStyle?.material,
-            instanceMaterial: style.popupCardStyle?.material,
-            hasExplicitBackground:
-                cardStyle?.background != null ||
-                style.popupCardStyle?.background != null,
+            radius: metrics.surfaceRadius,
+            padding: EdgeInsets.all(style.horizontalPadding!),
+            style: style.popupCardStyle,
           );
-          final hasMaterial =
-              HyperMaterialTheme.of(overlayContext).material != null ||
-              cardStyle?.material != null ||
-              style.popupCardStyle?.material != null ||
-              defaultMaterial != null;
-          // 使用方的 Card 主题或完整材质配方优先；普通表面补默认浮层阴影。
-          final defaultPopupStyle = HyperCardStyle(
-            material: defaultMaterial,
-            boxShadow: hasMaterial || cardStyle?.boxShadow != null
-                ? null
-                : [
-                    BoxShadow(
-                      color: HyperTheme.of(overlayContext).colors.scrim
-                          .withValues(alpha: .16),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-          );
-          final popupStyle = defaultPopupStyle.merge(style.popupCardStyle);
           return HyperCard(
             width: style.popupWidth,
             style: popupStyle,
@@ -505,7 +553,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                 maxHeight: MediaQuery.sizeOf(overlayContext).height,
               ),
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(style.horizontalPadding!),
+                padding: EdgeInsets.zero,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -546,7 +594,9 @@ class _HyperSidebarState extends State<HyperSidebar> {
         children: [
           // 行距属于当前菜单行，父项与展开的第一个子项也需要保留它。
           Padding(
-            padding: EdgeInsetsDirectional.only(bottom: style.rowGap!),
+            padding: EdgeInsetsDirectional.only(
+              bottom: compact ? style.collapsedRowGap! : style.rowGap!,
+            ),
             child: built,
           ),
           if (!compact && hasChildren)

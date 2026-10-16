@@ -192,6 +192,8 @@ class HyperPageIndicator extends StatelessWidget {
     if (s.material != null) {
       content = HyperMaterialSurface(
         material: s.material,
+        boxShadow: s.boxShadow,
+        border: s.border,
         semanticBackground: s.background,
         quality: s.materialQuality,
         reduceTransparency: s.reduceTransparency,
@@ -208,11 +210,11 @@ class HyperPageIndicator extends StatelessWidget {
         curve: s.curve!,
         decoration: HyperBoxDecoration(
           borderRadius: s.borderRadius,
-          boxShadow: s.boxShadow,
+          boxShadow: s.material == null ? s.boxShadow : null,
         ),
         foregroundDecoration: HyperBoxDecoration(
           borderRadius: s.borderRadius,
-          border: s.border,
+          border: s.material == null ? s.border : null,
         ),
         child: content,
       ),

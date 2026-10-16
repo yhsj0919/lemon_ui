@@ -8,6 +8,9 @@ final class HyperSidebarSize {
     required this.collapsedWidth,
     required this.itemHeight,
     required this.iconSize,
+    this.expandIconSize,
+    this.collapsedIconSize,
+    this.collapsedRowGap,
     required this.itemSpacing,
     this.rowGap,
     required this.indent,
@@ -21,6 +24,9 @@ final class HyperSidebarSize {
   final double collapsedWidth;
   final double itemHeight;
   final double iconSize;
+  final double? expandIconSize;
+  final double? collapsedIconSize;
+  final double? collapsedRowGap;
   final double itemSpacing;
   final double? rowGap;
   final double indent;
@@ -34,6 +40,9 @@ final class HyperSidebarSize {
     double? collapsedWidth,
     double? itemHeight,
     double? iconSize,
+    double? expandIconSize,
+    double? collapsedIconSize,
+    double? collapsedRowGap,
     double? itemSpacing,
     double? rowGap,
     double? indent,
@@ -46,6 +55,9 @@ final class HyperSidebarSize {
     collapsedWidth: collapsedWidth ?? this.collapsedWidth,
     itemHeight: itemHeight ?? this.itemHeight,
     iconSize: iconSize ?? this.iconSize,
+    expandIconSize: expandIconSize ?? this.expandIconSize,
+    collapsedIconSize: collapsedIconSize ?? this.collapsedIconSize,
+    collapsedRowGap: collapsedRowGap ?? this.collapsedRowGap,
     itemSpacing: itemSpacing ?? this.itemSpacing,
     rowGap: rowGap ?? this.rowGap,
     indent: indent ?? this.indent,
@@ -66,6 +78,16 @@ final class HyperSidebarSize {
       collapsedWidth: value(a.collapsedWidth, b.collapsedWidth),
       itemHeight: value(a.itemHeight, b.itemHeight),
       iconSize: value(a.iconSize, b.iconSize),
+      expandIconSize: a.expandIconSize == null || b.expandIconSize == null
+          ? (t < .5 ? a.expandIconSize : b.expandIconSize)
+          : value(a.expandIconSize!, b.expandIconSize!),
+      collapsedIconSize:
+          a.collapsedIconSize == null || b.collapsedIconSize == null
+          ? (t < .5 ? a.collapsedIconSize : b.collapsedIconSize)
+          : value(a.collapsedIconSize!, b.collapsedIconSize!),
+      collapsedRowGap: a.collapsedRowGap == null || b.collapsedRowGap == null
+          ? (t < .5 ? a.collapsedRowGap : b.collapsedRowGap)
+          : value(a.collapsedRowGap!, b.collapsedRowGap!),
       itemSpacing: value(a.itemSpacing, b.itemSpacing),
       rowGap: a.rowGap == null || b.rowGap == null
           ? (t < .5 ? a.rowGap : b.rowGap)
@@ -86,6 +108,9 @@ final class HyperSidebarSize {
           other.collapsedWidth == collapsedWidth &&
           other.itemHeight == itemHeight &&
           other.iconSize == iconSize &&
+          other.expandIconSize == expandIconSize &&
+          other.collapsedIconSize == collapsedIconSize &&
+          other.collapsedRowGap == collapsedRowGap &&
           other.itemSpacing == itemSpacing &&
           other.rowGap == rowGap &&
           other.indent == indent &&
@@ -100,6 +125,9 @@ final class HyperSidebarSize {
     collapsedWidth,
     itemHeight,
     iconSize,
+    expandIconSize,
+    collapsedIconSize,
+    collapsedRowGap,
     itemSpacing,
     rowGap,
     indent,

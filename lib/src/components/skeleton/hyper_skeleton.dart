@@ -127,41 +127,32 @@ class _HyperSkeletonState extends State<HyperSkeleton>
         final radius = circle ? width / 2 : style.radius ?? metrics.radius;
         Widget surface = ColoredBox(color: background);
         if (!reduced && effect != HyperSkeletonEffect.none) {
-          surface = AnimatedBuilder(
-            animation: _controller,
-            child: surface,
-            builder: (context, child) {
-              final progress = (style.curve ?? Curves.linear).transform(
-                _controller.value,
-              );
-              if (style.effectBuilder != null) {
-                return style.effectBuilder!(context, child!, progress);
-              }
-              if (effect == HyperSkeletonEffect.pulse) {
-                final minOpacity = (style.pulseMinOpacity ?? .6).clamp(
-                  0.0,
-                  1.0,
-                );
-                return Opacity(
-                  opacity:
-                      minOpacity +
-                      (1 - minOpacity) *
-                          (.5 - .5 * math.cos(progress * math.pi * 2)),
-                  child: child,
-                );
-              }
-              return CustomPaint(
-                foregroundPainter: HyperSkeletonShimmerPainter(
-                  progress: progress,
-                  color: highlight,
-                  bandWidth: style.shimmerWidth ?? .28,
-                  angle: style.shimmerAngle ?? .18,
-                  direction: Directionality.of(context),
-                ),
-                child: child,
-              );
-            },
-          );
+          if (style.effectBuilder != null) {
+            surface = AnimatedBuilder(
+              animation: _controller,
+              child: surface,
+              builder: (context, child) => style.effectBuilder!(
+                context,
+                child!,
+                (style.curve ?? Curves.linear).transform(_controller.value),
+              ),
+            );
+          } else {
+            surface = CustomPaint(
+              willChange: true,
+              painter: _SkeletonEffectPainter(
+                animation: _controller,
+                curve: style.curve ?? Curves.linear,
+                effect: effect,
+                background: background,
+                highlight: highlight,
+                bandWidth: style.shimmerWidth ?? .28,
+                angle: style.shimmerAngle ?? .18,
+                minOpacity: style.pulseMinOpacity ?? .6,
+                direction: Directionality.of(context),
+              ),
+            );
+          }
         }
         return SizedBox(
           width: width,
@@ -176,16 +167,18 @@ class _HyperSkeletonState extends State<HyperSkeleton>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(radius),
                 border:
-                    style.borderColor == null || (style.borderWidth ?? 1) <= 0
+                    (style.borderWidth ??
+                            (style.borderColor != null ? 1 : 0)) <=
+                        0
                     ? null
                     : Border.all(
-                        color: style.borderColor!,
+                        color: style.borderColor ?? theme.colors.outline,
                         width: style.borderWidth ?? 1,
                       ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(radius),
-                child: surface,
+                child: RepaintBoundary(child: surface),
               ),
             ),
           ),
@@ -199,10 +192,11 @@ class _HyperSkeletonState extends State<HyperSkeleton>
     if (widget.child == null) {
       return widget.loading ? placeholder : const SizedBox.shrink();
     }
+    if (reduced) {
+      return widget.loading ? placeholder : widget.child!;
+    }
     return AnimatedSwitcher(
-      duration: reduced
-          ? Duration.zero
-          : style.transitionDuration ?? theme.motion.fastDuration,
+      duration: style.transitionDuration ?? theme.motion.fastDuration,
       switchInCurve: theme.motion.standardCurve,
       switchOutCurve: theme.motion.standardCurve,
       transitionBuilder:
@@ -230,30 +224,10 @@ class HyperSkeletonShimmerPainter extends CustomPainter {
   final TextDirection direction;
   @override
   void paint(Canvas canvas, Size size) {
-    if (size.isEmpty || bandWidth <= 0) return;
-    final extent = size.width + size.height;
-    final phase = direction == TextDirection.rtl ? 1 - progress : progress;
-    final width = extent * bandWidth.clamp(0.0, 1.0);
-    final center = (phase * 2 - 1) * (extent + width);
-    final band = Rect.fromLTWH(center - width / 2, -extent, width, extent * 2);
-    canvas.save();
-    canvas.clipRect(Offset.zero & size);
-    canvas.translate(size.width / 2, size.height / 2);
-    canvas.rotate(angle);
-    canvas.drawRect(
-      band,
-      Paint()
-        ..isAntiAlias = true
-        ..shader = LinearGradient(
-          colors: [
-            color.withValues(alpha: 0),
-            color.withValues(alpha: color.a * .7),
-            color.withValues(alpha: 0),
-          ],
-          stops: const [0, .5, 1],
-        ).createShader(band),
-    );
-    canvas.restore();
+    _SkeletonShimmerBand(
+      color,
+      bandWidth,
+    ).paint(canvas, size, progress, angle, direction);
   }
 
   @override
@@ -263,4 +237,105 @@ class HyperSkeletonShimmerPainter extends CustomPainter {
       bandWidth != old.bandWidth ||
       angle != old.angle ||
       direction != old.direction;
+}
+
+// Default effects listen at the paint layer. Widget/layout and ancestor material
+// surfaces stay unchanged throughout the animation; custom builders opt in to
+// rebuilding only their own isolated subtree.
+class _SkeletonEffectPainter extends CustomPainter {
+  _SkeletonEffectPainter({
+    required this.animation,
+    required this.curve,
+    required this.effect,
+    required this.background,
+    required Color highlight,
+    required double bandWidth,
+    required this.angle,
+    required this.minOpacity,
+    required this.direction,
+  }) : band = _SkeletonShimmerBand(highlight, bandWidth),
+       super(repaint: animation);
+  final Animation<double> animation;
+  final Curve curve;
+  final HyperSkeletonEffect effect;
+  final Color background;
+  final double angle, minOpacity;
+  final TextDirection direction;
+  final _SkeletonShimmerBand band;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final progress = curve.transform(animation.value);
+    final alpha = effect == HyperSkeletonEffect.pulse
+        ? minOpacity.clamp(0.0, 1.0) +
+              (1 - minOpacity.clamp(0.0, 1.0)) *
+                  (.5 - .5 * math.cos(progress * math.pi * 2))
+        : 1.0;
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = background.withValues(alpha: background.a * alpha),
+    );
+    if (effect == HyperSkeletonEffect.shimmer) {
+      band.paint(canvas, size, progress, angle, direction);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SkeletonEffectPainter old) =>
+      animation != old.animation ||
+      curve != old.curve ||
+      effect != old.effect ||
+      background != old.background ||
+      band.color != old.band.color ||
+      band.bandWidth != old.band.bandWidth ||
+      angle != old.angle ||
+      minOpacity != old.minOpacity ||
+      direction != old.direction;
+}
+
+class _SkeletonShimmerBand {
+  _SkeletonShimmerBand(this.color, this.bandWidth);
+  final Color color;
+  final double bandWidth;
+  Size? _size;
+  Rect _rect = Rect.zero;
+  Shader? _shader;
+
+  void paint(
+    Canvas canvas,
+    Size size,
+    double progress,
+    double angle,
+    TextDirection direction,
+  ) {
+    if (size.isEmpty || bandWidth <= 0) return;
+    final extent = size.width + size.height;
+    final width = extent * bandWidth.clamp(0.0, 1.0);
+    if (_size != size) {
+      _size = size;
+      _rect = Rect.fromLTWH(-width / 2, -extent, width, extent * 2);
+      _shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: 0),
+          color.withValues(alpha: color.a * .7),
+          color.withValues(alpha: 0),
+        ],
+        stops: const [0, .5, 1],
+      ).createShader(_rect);
+    }
+    final phase = direction == TextDirection.rtl ? 1 - progress : progress;
+    final center = (phase * 2 - 1) * (extent + width);
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    canvas.translate(size.width / 2, size.height / 2);
+    canvas.rotate(angle);
+    canvas.translate(center, 0);
+    canvas.drawRect(
+      _rect,
+      Paint()
+        ..isAntiAlias = true
+        ..shader = _shader,
+    );
+    canvas.restore();
+  }
 }

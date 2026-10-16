@@ -132,7 +132,7 @@
 | `HyperSnackbarHost` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperBanner` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperNotification` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
-| `HyperNotificationCenter` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
+| 通知中心组合示例（业务层） | 示例 | — | — | — | — |
 | `HyperAlert` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperLoadingOverlay` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperProgress` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |

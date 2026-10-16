@@ -12,6 +12,17 @@ final class HyperSidebarStyle {
     this.collapsedWidth,
     this.itemHeight,
     this.iconSize,
+    this.expandIconSize,
+    this.collapsedIconSize,
+    this.collapsedRowGap,
+    this.iconColor,
+    this.selectedIconColor,
+    this.ancestorSelectedIconColor,
+    this.disabledIconColor,
+    this.expandIconColor,
+    this.selectedExpandIconColor,
+    this.ancestorSelectedExpandIconColor,
+    this.disabledExpandIconColor,
     this.itemSpacing,
     this.rowGap,
     this.indent,
@@ -32,6 +43,11 @@ final class HyperSidebarStyle {
     this.descriptionTextStyle,
     this.selectionStyle,
     this.popupCardStyle,
+    this.disabledItemSurfaceStyle,
+    this.ancestorItemSurfaceStyle,
+    this.selectedItemSurfaceStyle,
+    this.itemSurfaceStyle,
+    this.surfaceStyle,
     this.widthTransitionBuilder,
     this.contentTransitionBuilder,
     this.childrenTransitionBuilder,
@@ -42,6 +58,17 @@ final class HyperSidebarStyle {
   final double? collapsedWidth;
   final double? itemHeight;
   final double? iconSize;
+  final double? expandIconSize;
+  final double? collapsedIconSize;
+  final double? collapsedRowGap;
+  final Color? iconColor;
+  final Color? selectedIconColor;
+  final Color? ancestorSelectedIconColor;
+  final Color? disabledIconColor;
+  final Color? expandIconColor;
+  final Color? selectedExpandIconColor;
+  final Color? ancestorSelectedExpandIconColor;
+  final Color? disabledExpandIconColor;
   final double? itemSpacing;
   final double? rowGap;
   final double? indent;
@@ -64,6 +91,11 @@ final class HyperSidebarStyle {
 
   /// 折叠子菜单的卡片样式；阴影等视觉配置由侧栏消费者决定。
   final HyperCardStyle? popupCardStyle;
+  final HyperCardStyle? disabledItemSurfaceStyle;
+  final HyperCardStyle? ancestorItemSurfaceStyle;
+  final HyperCardStyle? selectedItemSurfaceStyle;
+  final HyperCardStyle? itemSurfaceStyle;
+  final HyperCardStyle? surfaceStyle;
 
   /// 自定义宽度过渡的布局；需根据传入宽度约束侧栏内容。
   final HyperSidebarWidthTransitionBuilder? widthTransitionBuilder;
@@ -82,6 +114,17 @@ final class HyperSidebarStyle {
     double? collapsedWidth,
     double? itemHeight,
     double? iconSize,
+    double? expandIconSize,
+    double? collapsedIconSize,
+    double? collapsedRowGap,
+    Color? iconColor,
+    Color? selectedIconColor,
+    Color? ancestorSelectedIconColor,
+    Color? disabledIconColor,
+    Color? expandIconColor,
+    Color? selectedExpandIconColor,
+    Color? ancestorSelectedExpandIconColor,
+    Color? disabledExpandIconColor,
     double? itemSpacing,
     double? rowGap,
     double? indent,
@@ -102,6 +145,11 @@ final class HyperSidebarStyle {
     TextStyle? descriptionTextStyle,
     HyperSidebarSelectionStyle? selectionStyle,
     HyperCardStyle? popupCardStyle,
+    HyperCardStyle? disabledItemSurfaceStyle,
+    HyperCardStyle? ancestorItemSurfaceStyle,
+    HyperCardStyle? selectedItemSurfaceStyle,
+    HyperCardStyle? itemSurfaceStyle,
+    HyperCardStyle? surfaceStyle,
     HyperSidebarWidthTransitionBuilder? widthTransitionBuilder,
     HyperSidebarContentTransitionBuilder? contentTransitionBuilder,
     HyperSidebarChildrenTransitionBuilder? childrenTransitionBuilder,
@@ -111,6 +159,21 @@ final class HyperSidebarStyle {
     collapsedWidth: collapsedWidth ?? this.collapsedWidth,
     itemHeight: itemHeight ?? this.itemHeight,
     iconSize: iconSize ?? this.iconSize,
+    expandIconSize: expandIconSize ?? this.expandIconSize,
+    collapsedIconSize: collapsedIconSize ?? this.collapsedIconSize,
+    collapsedRowGap: collapsedRowGap ?? this.collapsedRowGap,
+    iconColor: iconColor ?? this.iconColor,
+    selectedIconColor: selectedIconColor ?? this.selectedIconColor,
+    ancestorSelectedIconColor:
+        ancestorSelectedIconColor ?? this.ancestorSelectedIconColor,
+    disabledIconColor: disabledIconColor ?? this.disabledIconColor,
+    expandIconColor: expandIconColor ?? this.expandIconColor,
+    selectedExpandIconColor:
+        selectedExpandIconColor ?? this.selectedExpandIconColor,
+    ancestorSelectedExpandIconColor:
+        ancestorSelectedExpandIconColor ?? this.ancestorSelectedExpandIconColor,
+    disabledExpandIconColor:
+        disabledExpandIconColor ?? this.disabledExpandIconColor,
     itemSpacing: itemSpacing ?? this.itemSpacing,
     rowGap: rowGap ?? this.rowGap,
     indent: indent ?? this.indent,
@@ -135,6 +198,14 @@ final class HyperSidebarStyle {
     descriptionTextStyle: descriptionTextStyle ?? this.descriptionTextStyle,
     selectionStyle: selectionStyle ?? this.selectionStyle,
     popupCardStyle: popupCardStyle ?? this.popupCardStyle,
+    disabledItemSurfaceStyle:
+        disabledItemSurfaceStyle ?? this.disabledItemSurfaceStyle,
+    ancestorItemSurfaceStyle:
+        ancestorItemSurfaceStyle ?? this.ancestorItemSurfaceStyle,
+    selectedItemSurfaceStyle:
+        selectedItemSurfaceStyle ?? this.selectedItemSurfaceStyle,
+    itemSurfaceStyle: itemSurfaceStyle ?? this.itemSurfaceStyle,
+    surfaceStyle: surfaceStyle ?? this.surfaceStyle,
     widthTransitionBuilder:
         widthTransitionBuilder ?? this.widthTransitionBuilder,
     contentTransitionBuilder:
@@ -152,6 +223,22 @@ final class HyperSidebarStyle {
           collapsedWidth: other.collapsedWidth ?? collapsedWidth,
           itemHeight: other.itemHeight ?? itemHeight,
           iconSize: other.iconSize ?? iconSize,
+          expandIconSize: other.expandIconSize ?? expandIconSize,
+          collapsedIconSize: other.collapsedIconSize ?? collapsedIconSize,
+          collapsedRowGap: other.collapsedRowGap ?? collapsedRowGap,
+          iconColor: other.iconColor ?? iconColor,
+          selectedIconColor: other.selectedIconColor ?? selectedIconColor,
+          ancestorSelectedIconColor:
+              other.ancestorSelectedIconColor ?? ancestorSelectedIconColor,
+          disabledIconColor: other.disabledIconColor ?? disabledIconColor,
+          expandIconColor: other.expandIconColor ?? expandIconColor,
+          selectedExpandIconColor:
+              other.selectedExpandIconColor ?? selectedExpandIconColor,
+          ancestorSelectedExpandIconColor:
+              other.ancestorSelectedExpandIconColor ??
+              ancestorSelectedExpandIconColor,
+          disabledExpandIconColor:
+              other.disabledExpandIconColor ?? disabledExpandIconColor,
           itemSpacing: other.itemSpacing ?? itemSpacing,
           rowGap: other.rowGap ?? rowGap,
           indent: other.indent ?? indent,
@@ -178,6 +265,20 @@ final class HyperSidebarStyle {
           descriptionTextStyle:
               other.descriptionTextStyle ?? descriptionTextStyle,
           selectionStyle: other.selectionStyle ?? selectionStyle,
+          surfaceStyle:
+              surfaceStyle?.merge(other.surfaceStyle) ?? other.surfaceStyle,
+          itemSurfaceStyle:
+              itemSurfaceStyle?.merge(other.itemSurfaceStyle) ??
+              other.itemSurfaceStyle,
+          selectedItemSurfaceStyle:
+              selectedItemSurfaceStyle?.merge(other.selectedItemSurfaceStyle) ??
+              other.selectedItemSurfaceStyle,
+          ancestorItemSurfaceStyle:
+              ancestorItemSurfaceStyle?.merge(other.ancestorItemSurfaceStyle) ??
+              other.ancestorItemSurfaceStyle,
+          disabledItemSurfaceStyle:
+              disabledItemSurfaceStyle?.merge(other.disabledItemSurfaceStyle) ??
+              other.disabledItemSurfaceStyle,
           popupCardStyle:
               popupCardStyle?.merge(other.popupCardStyle) ??
               other.popupCardStyle,
@@ -196,6 +297,9 @@ final class HyperSidebarStyle {
     HyperSidebarStyle b,
     double t,
   ) {
+    if (a == b) {
+      return a;
+    }
     double? number(double? x, double? y) =>
         x == null || y == null ? (t < .5 ? x : y) : x + (y - x) * t;
     return HyperSidebarStyle(
@@ -203,6 +307,41 @@ final class HyperSidebarStyle {
       collapsedWidth: number(a.collapsedWidth, b.collapsedWidth),
       itemHeight: number(a.itemHeight, b.itemHeight),
       iconSize: number(a.iconSize, b.iconSize),
+      expandIconSize: number(a.expandIconSize, b.expandIconSize),
+      collapsedIconSize: number(a.collapsedIconSize, b.collapsedIconSize),
+      collapsedRowGap: number(a.collapsedRowGap, b.collapsedRowGap),
+      iconColor: Color.lerp(a.iconColor, b.iconColor, t),
+      selectedIconColor: Color.lerp(
+        a.selectedIconColor,
+        b.selectedIconColor,
+        t,
+      ),
+      ancestorSelectedIconColor: Color.lerp(
+        a.ancestorSelectedIconColor,
+        b.ancestorSelectedIconColor,
+        t,
+      ),
+      disabledIconColor: Color.lerp(
+        a.disabledIconColor,
+        b.disabledIconColor,
+        t,
+      ),
+      expandIconColor: Color.lerp(a.expandIconColor, b.expandIconColor, t),
+      selectedExpandIconColor: Color.lerp(
+        a.selectedExpandIconColor,
+        b.selectedExpandIconColor,
+        t,
+      ),
+      ancestorSelectedExpandIconColor: Color.lerp(
+        a.ancestorSelectedExpandIconColor,
+        b.ancestorSelectedExpandIconColor,
+        t,
+      ),
+      disabledExpandIconColor: Color.lerp(
+        a.disabledExpandIconColor,
+        b.disabledExpandIconColor,
+        t,
+      ),
       itemSpacing: number(a.itemSpacing, b.itemSpacing),
       rowGap: number(a.rowGap, b.rowGap),
       indent: number(a.indent, b.indent),
@@ -241,6 +380,39 @@ final class HyperSidebarStyle {
         b.descriptionTextStyle,
         t,
       ),
+      surfaceStyle: a.surfaceStyle == null || b.surfaceStyle == null
+          ? (t < .5 ? a.surfaceStyle : b.surfaceStyle)
+          : HyperCardStyle.lerp(a.surfaceStyle!, b.surfaceStyle!, t),
+      itemSurfaceStyle: a.itemSurfaceStyle == null || b.itemSurfaceStyle == null
+          ? (t < .5 ? a.itemSurfaceStyle : b.itemSurfaceStyle)
+          : HyperCardStyle.lerp(a.itemSurfaceStyle!, b.itemSurfaceStyle!, t),
+      selectedItemSurfaceStyle:
+          a.selectedItemSurfaceStyle == null ||
+              b.selectedItemSurfaceStyle == null
+          ? (t < .5 ? a.selectedItemSurfaceStyle : b.selectedItemSurfaceStyle)
+          : HyperCardStyle.lerp(
+              a.selectedItemSurfaceStyle!,
+              b.selectedItemSurfaceStyle!,
+              t,
+            ),
+      ancestorItemSurfaceStyle:
+          a.ancestorItemSurfaceStyle == null ||
+              b.ancestorItemSurfaceStyle == null
+          ? (t < .5 ? a.ancestorItemSurfaceStyle : b.ancestorItemSurfaceStyle)
+          : HyperCardStyle.lerp(
+              a.ancestorItemSurfaceStyle!,
+              b.ancestorItemSurfaceStyle!,
+              t,
+            ),
+      disabledItemSurfaceStyle:
+          a.disabledItemSurfaceStyle == null ||
+              b.disabledItemSurfaceStyle == null
+          ? (t < .5 ? a.disabledItemSurfaceStyle : b.disabledItemSurfaceStyle)
+          : HyperCardStyle.lerp(
+              a.disabledItemSurfaceStyle!,
+              b.disabledItemSurfaceStyle!,
+              t,
+            ),
       selectionStyle: t < .5 ? a.selectionStyle : b.selectionStyle,
       popupCardStyle: a.popupCardStyle == null || b.popupCardStyle == null
           ? (t < .5 ? a.popupCardStyle : b.popupCardStyle)
@@ -268,6 +440,18 @@ final class HyperSidebarStyle {
           other.collapsedWidth == collapsedWidth &&
           other.itemHeight == itemHeight &&
           other.iconSize == iconSize &&
+          other.expandIconSize == expandIconSize &&
+          other.collapsedIconSize == collapsedIconSize &&
+          other.collapsedRowGap == collapsedRowGap &&
+          other.iconColor == iconColor &&
+          other.selectedIconColor == selectedIconColor &&
+          other.ancestorSelectedIconColor == ancestorSelectedIconColor &&
+          other.disabledIconColor == disabledIconColor &&
+          other.expandIconColor == expandIconColor &&
+          other.selectedExpandIconColor == selectedExpandIconColor &&
+          other.ancestorSelectedExpandIconColor ==
+              ancestorSelectedExpandIconColor &&
+          other.disabledExpandIconColor == disabledExpandIconColor &&
           other.itemSpacing == itemSpacing &&
           other.rowGap == rowGap &&
           other.indent == indent &&
@@ -301,6 +485,17 @@ final class HyperSidebarStyle {
     collapsedWidth,
     itemHeight,
     iconSize,
+    expandIconSize,
+    collapsedIconSize,
+    collapsedRowGap,
+    iconColor,
+    selectedIconColor,
+    ancestorSelectedIconColor,
+    disabledIconColor,
+    expandIconColor,
+    selectedExpandIconColor,
+    ancestorSelectedExpandIconColor,
+    disabledExpandIconColor,
     itemSpacing,
     rowGap,
     indent,
@@ -321,6 +516,11 @@ final class HyperSidebarStyle {
     descriptionTextStyle,
     selectionStyle,
     popupCardStyle,
+    disabledItemSurfaceStyle,
+    ancestorItemSurfaceStyle,
+    selectedItemSurfaceStyle,
+    itemSurfaceStyle,
+    surfaceStyle,
     widthTransitionBuilder,
     contentTransitionBuilder,
     childrenTransitionBuilder,

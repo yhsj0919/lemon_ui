@@ -1,3 +1,9 @@
+import '../../theme/size/hyper_size_theme_data.dart';
+import '../../theme/material/hyper_material_theme.dart';
+import '../../foundation/hyper_fill.dart';
+import '../card/hyper_card_style.dart';
+import '../surface/hyper_navigation_surface.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -35,11 +41,33 @@ class HyperDrawer extends StatelessWidget {
       width: HyperTheme.sizesOf(context).drawer.width,
       backgroundColor: theme.colors.surfaceElevated,
     ).merge(HyperDrawerTheme.of(context).style).merge(style);
-    final drawer = Drawer(
+    final sizes = HyperTheme.sizesOf(context);
+    final radius =
+        sizes.drawer.radius ??
+        const HyperSizeThemeData().resolve(sizes.deviceType).drawer.radius!;
+    final defaultRadius =
+        DrawerController.maybeOf(context)?.alignment == DrawerAlignment.end
+        ? BorderRadiusDirectional.horizontal(start: Radius.circular(radius))
+        : BorderRadiusDirectional.horizontal(end: Radius.circular(radius));
+    final effectiveRadius =
+        resolved.surfaceStyle?.borderRadius ?? defaultRadius;
+    final useSurface =
+        resolved.surfaceStyle != null ||
+        HyperMaterialTheme.of(context).material != null;
+    final content = Drawer(
       width: resolved.width,
-      backgroundColor: resolved.backgroundColor,
-      elevation: resolved.elevation,
-      shape: resolved.shape,
+      backgroundColor: useSurface
+          ? Colors.transparent
+          : resolved.backgroundColor,
+      elevation: resolved.surfaceStyle?.boxShadow != null
+          ? 0
+          : (HyperMaterialTheme.of(context).material != null ||
+                    resolved.surfaceStyle?.material != null
+                ? resolved.elevation ?? 0
+                : resolved.elevation),
+      shape:
+          resolved.shape ??
+          RoundedRectangleBorder(borderRadius: effectiveRadius),
       semanticLabel: semanticLabel,
       clipBehavior: clipBehavior,
       child: header == null && footer == null
@@ -54,6 +82,17 @@ class HyperDrawer extends StatelessWidget {
               ],
             ),
     );
+    final drawer = !useSurface
+        ? content
+        : HyperNavigationSurface(
+            inheritMaterial: true,
+            style: HyperCardStyle(
+              background: HyperFill.color(resolved.backgroundColor!),
+              borderRadius: effectiveRadius,
+              padding: EdgeInsets.zero,
+            ).merge(resolved.surfaceStyle),
+            child: content,
+          );
     // Flutter 的 DrawerController 在桌面端不安装拖动识别器。
     final desktop = switch (Theme.of(context).platform) {
       TargetPlatform.windows ||

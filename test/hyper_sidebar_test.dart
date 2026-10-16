@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
+import 'package:lemon_ui/src/components/surface/hyper_navigation_surface.dart';
 
 Widget app(Widget child, {HyperThemeData? data}) => MaterialApp(
   home: HyperTheme(
@@ -77,6 +78,119 @@ Widget customPopupTransition(
 ) => FadeTransition(opacity: animation, child: child);
 
 void main() {
+  testWidgets('折叠子菜单只有一层内容内边距，独立于 Card 默认留白', (tester) async {
+    for (final explicit in [null, 0.0, 12.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperDeviceDetector(
+            deviceType: HyperDeviceType.desktop,
+            builder: (context, device, child) => HyperTheme(
+              data: HyperThemeData.light(),
+              duration: Duration.zero,
+              child: HyperCardTheme(
+                data: HyperCardThemeData(
+                  style: HyperCardStyle(padding: const EdgeInsets.all(40)),
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: HyperSidebar(
+                    collapsed: true,
+                    items: menu,
+                    style: HyperSidebarStyle(
+                      popupCardStyle: explicit == null
+                          ? null
+                          : HyperCardStyle(padding: EdgeInsets.all(explicit)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(
+        tester.getCenter(find.byIcon(Icons.folder_outlined).first),
+      );
+      await tester.pumpAndSettle();
+      final surface = tester.getRect(find.byType(HyperCard).last);
+      expect(surface.width, 192);
+      final row = tester.getRect(
+        find.byKey(const ValueKey('hyper-sidebar-item-saved')),
+      );
+      final inherited = HyperTheme.sizesOf(
+        tester.element(find.byType(HyperSidebar)),
+      ).sidebar.horizontalPadding;
+      expect(row.left - surface.left, explicit ?? inherited);
+      expect(surface.right - row.right, explicit ?? inherited);
+      final label = tester.getRect(find.text('收藏'));
+      final badge = tester.getRect(find.text('3'));
+      expect(label.right, lessThan(badge.left));
+      expect(badge.right, lessThan(row.right));
+      expect(tester.takeException(), isNull);
+      await mouse.removePointer();
+      await tester.pumpWidget(const SizedBox());
+    }
+  });
+  testWidgets('自定义背景保留悬停反馈，祖先和选中表面分别解析', (tester) async {
+    await tester.pumpWidget(
+      app(
+        HyperSidebar(
+          items: menu,
+          selectedId: 'saved',
+          selectParentWhenChildSelected: true,
+          style: HyperSidebarStyle(
+            itemSurfaceStyle: HyperCardStyle(
+              background: HyperFill.color(Colors.yellow),
+            ),
+            selectedItemSurfaceStyle: HyperCardStyle(
+              background: HyperFill.color(Colors.red),
+            ),
+            ancestorItemSurfaceStyle: HyperCardStyle(
+              background: HyperFill.color(Colors.green),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    HyperNavigationSurface surface(String id) =>
+        tester.widget<HyperNavigationSurface>(
+          find
+              .descendant(
+                of: find.byKey(ValueKey('hyper-sidebar-item-$id')),
+                matching: find.byType(HyperNavigationSurface),
+              )
+              .first,
+        );
+    expect(surface('library').style.background?.color, Colors.green);
+    expect(surface('saved').style.background?.color, Colors.red);
+    await tester.pumpWidget(
+      app(
+        HyperSidebar(
+          items: [HyperSidebarItem(id: 'normal', label: '普通项')],
+          style: HyperSidebarStyle(
+            itemSurfaceStyle: HyperCardStyle(
+              background: HyperFill.color(Colors.yellow),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(find.text('普通项')));
+    await tester.pumpAndSettle();
+    expect(surface('normal').style.background?.color, Colors.yellow);
+    expect(surface('normal').stateLayer?.a, greaterThan(0));
+    await mouse.moveTo(const Offset(790, 590));
+    await tester.pumpAndSettle();
+    expect(surface('normal').stateLayer, Colors.transparent);
+    await mouse.removePointer();
+  });
   test('四端侧栏尺寸和强类型覆盖', () {
     const sizes = HyperSizeThemeData();
     expect(sizes.phone.sidebar.width, 280);
@@ -292,20 +406,27 @@ void main() {
     await tester.pumpAndSettle();
     expect(parentState!.ancestorSelected, isTrue);
     expect(parentState!.selected, isTrue);
-    final selection = tester.widget<AnimatedContainer>(
-      find.byKey(const ValueKey('hyper-sidebar-item-library')),
+    final selection = tester.widget<HyperNavigationSurface>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('hyper-sidebar-item-library')),
+            matching: find.byType(HyperNavigationSurface),
+          )
+          .first,
     );
     expect(
-      (selection.decoration as BoxDecoration).color,
+      selection.style.background?.color,
       base.colors.primary.withValues(alpha: .05),
     );
-    final childSelection = tester.widget<AnimatedContainer>(
-      find.byKey(const ValueKey('hyper-sidebar-item-saved')),
+    final childSelection = tester.widget<HyperNavigationSurface>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('hyper-sidebar-item-saved')),
+            matching: find.byType(HyperNavigationSurface),
+          )
+          .first,
     );
-    expect(
-      (childSelection.decoration as BoxDecoration).color,
-      base.colors.primary,
-    );
+    expect(childSelection.style.background?.color, base.colors.primary);
   });
 
   testWidgets('外部展开状态、禁用项与自定义行', (tester) async {
@@ -381,7 +502,10 @@ void main() {
     expect(find.text('收藏'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
     final popup = tester.widget<HyperCard>(find.byType(HyperCard).last);
-    expect(popup.style?.boxShadow, isNotEmpty);
+    expect(
+      popup.style?.boxShadow ?? popup.style?.material?.boxShadow,
+      isNotEmpty,
+    );
     await tester.tap(find.text('收藏'));
     await tester.pumpAndSettle();
     expect(selected, 'saved');
@@ -486,9 +610,14 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(HyperSidebar)).width, 270);
-    final selection = tester.widget<AnimatedContainer>(
-      find.byKey(const ValueKey('hyper-sidebar-item-saved')),
+    final selection = tester.widget<HyperNavigationSurface>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('hyper-sidebar-item-saved')),
+            matching: find.byType(HyperNavigationSurface),
+          )
+          .first,
     );
-    expect((selection.decoration as BoxDecoration).color, Colors.green);
+    expect(selection.style.background?.color, Colors.green);
   });
 }

@@ -10,7 +10,6 @@ import 'components/hyper_step_size.dart';
 import 'components/hyper_pagination_size.dart';
 import 'components/hyper_accordion_size.dart';
 import 'components/hyper_collapsible_size.dart';
-import 'components/hyper_notification_center_size.dart';
 import 'components/hyper_notification_size.dart';
 import 'components/hyper_loading_overlay_size.dart';
 import 'components/hyper_notice_size.dart';
@@ -124,7 +123,6 @@ final class HyperSizeScheme {
     required this.toast,
     required this.snackbar,
     required this.loadingOverlay,
-    required this.notificationCenter,
     required this.collapsible,
     required this.accordion,
     required this.pagination,
@@ -188,7 +186,7 @@ final class HyperSizeScheme {
           expandedHeight: 96,
           titleHorizontalPadding: 26,
         ),
-        drawer: const HyperDrawerSize(width: 304),
+        drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 320,
           radius: 28,
@@ -209,11 +207,7 @@ final class HyperSizeScheme {
           maxContentWidth: 320,
           spacing: 8,
         ),
-        notificationCenter: const HyperNotificationCenterSize(
-          padding: EdgeInsets.all(16),
-          spacing: 8,
-          groupSpacing: 16,
-        ),
+
         collapsible: const HyperCollapsibleSize(
           radius: 16,
           headerPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -338,6 +332,9 @@ final class HyperSizeScheme {
           collapsedWidth: 72,
           itemHeight: 48,
           iconSize: 24,
+          expandIconSize: 24,
+          collapsedIconSize: 24,
+          collapsedRowGap: 8,
           itemSpacing: 12,
           rowGap: null,
           indent: 16,
@@ -348,6 +345,7 @@ final class HyperSizeScheme {
         ),
         menu: const HyperMenuSize(
           itemSpacing: null,
+          itemVerticalPadding: 6,
           width: 280,
           itemHeight: 48,
           padding: 12,
@@ -614,7 +612,7 @@ final class HyperSizeScheme {
           expandedHeight: 160,
           titleHorizontalPadding: 26,
         ),
-        drawer: const HyperDrawerSize(width: 304),
+        drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 400,
           radius: 28,
@@ -635,11 +633,7 @@ final class HyperSizeScheme {
           maxContentWidth: 400,
           spacing: 12,
         ),
-        notificationCenter: const HyperNotificationCenterSize(
-          padding: EdgeInsets.all(20),
-          spacing: 12,
-          groupSpacing: 20,
-        ),
+
         collapsible: const HyperCollapsibleSize(
           radius: 20,
           headerPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -763,6 +757,9 @@ final class HyperSizeScheme {
           collapsedWidth: 72,
           itemHeight: 48,
           iconSize: 24,
+          expandIconSize: 24,
+          collapsedIconSize: 24,
+          collapsedRowGap: 8,
           itemSpacing: 12,
           rowGap: null,
           indent: 16,
@@ -773,6 +770,7 @@ final class HyperSizeScheme {
         ),
         menu: const HyperMenuSize(
           itemSpacing: null,
+          itemVerticalPadding: 6,
           width: 280,
           itemHeight: 48,
           padding: 12,
@@ -1039,7 +1037,7 @@ final class HyperSizeScheme {
           expandedHeight: 120,
           titleHorizontalPadding: 16,
         ),
-        drawer: const HyperDrawerSize(width: 304),
+        drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 360,
           radius: 18,
@@ -1060,11 +1058,7 @@ final class HyperSizeScheme {
           maxContentWidth: 360,
           spacing: 8,
         ),
-        notificationCenter: const HyperNotificationCenterSize(
-          padding: EdgeInsets.all(12),
-          spacing: 8,
-          groupSpacing: 12,
-        ),
+
         collapsible: const HyperCollapsibleSize(
           radius: 8,
           headerPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1188,16 +1182,20 @@ final class HyperSizeScheme {
           collapsedWidth: 64,
           itemHeight: 32,
           iconSize: 16,
+          expandIconSize: 16,
+          collapsedIconSize: 24,
+          collapsedRowGap: 8,
           itemSpacing: 12,
           rowGap: null,
           indent: 16,
           sectionSpacing: 12,
           horizontalPadding: 8,
-          popupWidth: 256,
+          popupWidth: 192,
           itemRadius: 6,
         ),
         menu: const HyperMenuSize(
           itemSpacing: null,
+          itemVerticalPadding: 4,
           width: 192,
           itemHeight: 32,
           padding: 8,
@@ -1464,7 +1462,7 @@ final class HyperSizeScheme {
           expandedHeight: 96,
           titleHorizontalPadding: 12,
         ),
-        drawer: const HyperDrawerSize(width: 200),
+        drawer: const HyperDrawerSize(width: 200, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 180,
           radius: 32,
@@ -1485,11 +1483,7 @@ final class HyperSizeScheme {
           maxContentWidth: 180,
           spacing: 6,
         ),
-        notificationCenter: const HyperNotificationCenterSize(
-          padding: EdgeInsets.all(12),
-          spacing: 6,
-          groupSpacing: 12,
-        ),
+
         collapsible: const HyperCollapsibleSize(
           radius: 20,
           headerPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1613,6 +1607,9 @@ final class HyperSizeScheme {
           collapsedWidth: 56,
           itemHeight: 48,
           iconSize: 20,
+          expandIconSize: 20,
+          collapsedIconSize: 24,
+          collapsedRowGap: 8,
           itemSpacing: 8,
           rowGap: null,
           indent: 12,
@@ -1623,6 +1620,7 @@ final class HyperSizeScheme {
         ),
         menu: const HyperMenuSize(
           itemSpacing: null,
+          itemVerticalPadding: 2,
           width: 200,
           itemHeight: 48,
           padding: 4,
@@ -1899,7 +1897,6 @@ final class HyperSizeScheme {
   final HyperMessageSize toast;
   final HyperMessageSize snackbar;
   final HyperLoadingOverlaySize loadingOverlay;
-  final HyperNotificationCenterSize notificationCenter;
   final HyperCollapsibleSize collapsible;
   final HyperAccordionSize accordion;
   final HyperPaginationSize pagination;
@@ -1970,7 +1967,6 @@ final class HyperSizeScheme {
     HyperMessageSize? toast,
     HyperMessageSize? snackbar,
     HyperLoadingOverlaySize? loadingOverlay,
-    HyperNotificationCenterSize? notificationCenter,
     HyperCollapsibleSize? collapsible,
     HyperAccordionSize? accordion,
     HyperPaginationSize? pagination,
@@ -2042,7 +2038,7 @@ final class HyperSizeScheme {
     toast: toast ?? this.toast,
     snackbar: snackbar ?? this.snackbar,
     loadingOverlay: loadingOverlay ?? this.loadingOverlay,
-    notificationCenter: notificationCenter ?? this.notificationCenter,
+
     collapsible: collapsible ?? this.collapsible,
     accordion: accordion ?? this.accordion,
     pagination: pagination ?? this.pagination,
@@ -2114,11 +2110,7 @@ final class HyperSizeScheme {
         b.loadingOverlay,
         t,
       ),
-      notificationCenter: HyperNotificationCenterSize.lerp(
-        a.notificationCenter,
-        b.notificationCenter,
-        t,
-      ),
+
       collapsible: HyperCollapsibleSize.lerp(a.collapsible, b.collapsible, t),
       accordion: HyperAccordionSize.lerp(a.accordion, b.accordion, t),
       pagination: HyperPaginationSize.lerp(a.pagination, b.pagination, t),
@@ -2248,7 +2240,6 @@ final class HyperSizeScheme {
           other.toast == toast &&
           other.snackbar == snackbar &&
           other.loadingOverlay == loadingOverlay &&
-          other.notificationCenter == notificationCenter &&
           other.collapsible == collapsible &&
           other.accordion == accordion &&
           other.pagination == pagination &&
@@ -2320,7 +2311,6 @@ final class HyperSizeScheme {
     toast,
     snackbar,
     loadingOverlay,
-    notificationCenter,
     collapsible,
     accordion,
     pagination,

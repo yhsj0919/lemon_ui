@@ -75,6 +75,7 @@ void main() {
   });
   test('四类输入设置保存导入、设备尺寸与亮暗隔离', () {
     final d = EditorThemeDocument();
+    d.light.sliderInput.input.bufferColor = const EditorColor(argb: 0xFF123456);
     d.desktop.sliderInput
       ..trackHeight = 10
       ..thinTrackHeight = 3
@@ -113,6 +114,7 @@ void main() {
     final t = r.resolve(false);
     final sizes = t.sizes.resolve(HyperDeviceType.desktop);
     expect(sizes.slider.trackHeight, 10);
+    expect(t.sliderTheme.style.bufferColor, const Color(0xFF123456));
     expect(sizes.slider.thinTrackHeight, 3);
     expect(sizes.slider.capsuleWidth, 56);
     expect(t.sliderTheme.style.activeTrackColor, const Color(0xFFFF0000));

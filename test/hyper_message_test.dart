@@ -123,15 +123,17 @@ void main() {
             ),
           ),
         );
-        final material = tester
-            .widget<HyperMaterialSurface>(find.byType(HyperMaterialSurface))
-            .material!;
+        final surface = tester.widget<HyperMaterialSurface>(
+          find.byType(HyperMaterialSurface),
+        );
+        final material = surface.material!;
         expect(material.kind, HyperSurfaceMaterialKind.softLightGlass);
-        expect(material.boxShadow.isEmpty, clearShadow);
+        expect((surface.boxShadow ?? material.boxShadow).isEmpty, clearShadow);
         expect(
-          material
-              .resolve(quality: HyperMaterialQuality.standard)
-              .boxShadow
+          (surface.boxShadow ??
+                  material
+                      .resolve(quality: HyperMaterialQuality.standard)
+                      .boxShadow)
               .isEmpty,
           clearShadow,
         );

@@ -214,6 +214,7 @@ extension _InputWorkspace on _ThemeEditorState {
                       v.activeStepPointColor = v.inactiveStepPointColor = null;
               m.thumbWidth = m.thumbHeight = null;
               a.shadows = null;
+              v.bufferColor = null;
               v.fontWeight = null;
               v.foregroundColor = null;
               m.trackHeight = m.thumbRadius = m.thinTrackHeight =
@@ -276,6 +277,12 @@ extension _InputWorkspace on _ThemeEditorState {
           (x) => v.inactiveTrackColor = x,
           theme.sliderTheme.style.inactiveTrackColor ??
               theme.colors.surfaceMuted,
+        ),
+        color(
+          '缓冲轨道颜色',
+          v.bufferColor,
+          (x) => v.bufferColor = x,
+          theme.sliderTheme.style.bufferColor ?? theme.colors.primaryContainer,
         ),
         _heading('滑块'),
         n(

@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class HyperSliderTrackShape extends RoundedRectSliderTrackShape {
   const HyperSliderTrackShape({
     this.divisions,
+    this.bufferGradient,
     this.pointRadius = 0,
     this.activePointColor = const Color(0xA3FFFFFF),
     this.inactivePointColor = const Color(0x6B000000),
   });
 
   final int? divisions;
+  final Gradient? bufferGradient;
   final double pointRadius;
   final Color activePointColor;
   final Color inactivePointColor;
@@ -60,6 +62,26 @@ class HyperSliderTrackShape extends RoundedRectSliderTrackShape {
         ..isAntiAlias = true
         ..color = inactive,
     );
+    if (secondaryOffset != null) {
+      final edge = secondaryOffset.dx.clamp(travel.left, travel.right);
+      final bufferRect = textDirection == TextDirection.ltr
+          ? Rect.fromLTRB(travel.left, travel.top, edge, travel.bottom)
+          : Rect.fromLTRB(edge, travel.top, travel.right, travel.bottom);
+      final paint = Paint()
+        ..isAntiAlias = true
+        ..color = Color.lerp(
+          sliderTheme.disabledSecondaryActiveTrackColor,
+          sliderTheme.secondaryActiveTrackColor,
+          enableAnimation.value,
+        )!;
+      if (bufferGradient != null && isEnabled) {
+        paint.shader = bufferGradient!.createShader(
+          travel,
+          textDirection: textDirection,
+        );
+      }
+      canvas.drawRRect(RRect.fromRectAndRadius(bufferRect, radius), paint);
+    }
     final selected = textDirection == TextDirection.ltr
         ? Rect.fromLTRB(
             travel.left,

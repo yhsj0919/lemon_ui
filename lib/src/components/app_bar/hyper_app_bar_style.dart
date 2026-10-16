@@ -1,3 +1,5 @@
+import '../card/hyper_card_style.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -8,6 +10,7 @@ import '../../foundation/hyper_surface_material.dart';
 final class HyperAppBarStyle {
   const HyperAppBarStyle({
     this.backgroundColor,
+    this.surfaceStyle,
     this.foregroundColor,
     this.titleTextStyle,
     this.expandedTitleTextStyle,
@@ -18,6 +21,7 @@ final class HyperAppBarStyle {
   });
 
   final Color? backgroundColor;
+  final HyperCardStyle? surfaceStyle;
   final Color? foregroundColor;
   final TextStyle? titleTextStyle;
   final TextStyle? expandedTitleTextStyle;
@@ -34,6 +38,8 @@ final class HyperAppBarStyle {
       ? this
       : HyperAppBarStyle(
           backgroundColor: other.backgroundColor ?? backgroundColor,
+          surfaceStyle:
+              surfaceStyle?.merge(other.surfaceStyle) ?? other.surfaceStyle,
           foregroundColor: other.foregroundColor ?? foregroundColor,
           titleTextStyle:
               titleTextStyle?.merge(other.titleTextStyle) ??
@@ -49,6 +55,7 @@ final class HyperAppBarStyle {
 
   HyperAppBarStyle copyWith({
     Color? backgroundColor,
+    HyperCardStyle? surfaceStyle,
     Color? foregroundColor,
     TextStyle? titleTextStyle,
     TextStyle? expandedTitleTextStyle,
@@ -59,6 +66,7 @@ final class HyperAppBarStyle {
   }) => merge(
     HyperAppBarStyle(
       backgroundColor: backgroundColor,
+      surfaceStyle: surfaceStyle,
       foregroundColor: foregroundColor,
       titleTextStyle: titleTextStyle,
       expandedTitleTextStyle: expandedTitleTextStyle,
@@ -75,6 +83,9 @@ final class HyperAppBarStyle {
     double t,
   ) => HyperAppBarStyle(
     backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+    surfaceStyle: a.surfaceStyle == null || b.surfaceStyle == null
+        ? (t < .5 ? a.surfaceStyle : b.surfaceStyle)
+        : HyperCardStyle.lerp(a.surfaceStyle!, b.surfaceStyle!, t),
     foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
     titleTextStyle: TextStyle.lerp(a.titleTextStyle, b.titleTextStyle, t),
     expandedTitleTextStyle: TextStyle.lerp(
@@ -107,6 +118,7 @@ final class HyperAppBarStyle {
   @override
   int get hashCode => Object.hash(
     backgroundColor,
+    surfaceStyle,
     foregroundColor,
     titleTextStyle,
     expandedTitleTextStyle,

@@ -210,7 +210,7 @@ class HyperNotification extends StatelessWidget {
               ? resolved.background?.gradient
               : null,
           borderRadius: resolved.borderRadius,
-          boxShadow: resolved.boxShadow,
+          boxShadow: resolved.material == null ? resolved.boxShadow : null,
         ),
         foregroundDecoration: HyperBoxDecoration(
           color: resolved.overlayColor!.withValues(alpha: opacity.clamp(0, 1)),
@@ -225,6 +225,8 @@ class HyperNotification extends StatelessWidget {
       if (resolved.material != null) {
         surface = HyperMaterialSurface(
           material: resolved.material,
+          boxShadow: resolved.boxShadow,
+          border: resolved.border,
           semanticBackground: resolved.background,
           quality: resolved.materialQuality,
           reduceTransparency: resolved.reduceTransparency,

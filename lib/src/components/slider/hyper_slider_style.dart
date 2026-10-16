@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 final class HyperSliderStyle {
   const HyperSliderStyle({
     this.activeTrackColor,
+    this.bufferColor,
+    this.bufferGradient,
     this.inactiveTrackColor,
     this.hoverInactiveTrackColor,
     this.disabledActiveTrackColor,
@@ -60,6 +62,8 @@ final class HyperSliderStyle {
   });
 
   final Color? activeTrackColor;
+  final Color? bufferColor;
+  final Gradient? bufferGradient;
   final Color? inactiveTrackColor;
   final Color? hoverInactiveTrackColor;
   final Color? disabledActiveTrackColor;
@@ -113,6 +117,10 @@ final class HyperSliderStyle {
       ? this
       : HyperSliderStyle(
           activeTrackColor: other.activeTrackColor ?? activeTrackColor,
+          bufferColor: other.bufferColor ?? bufferColor,
+          bufferGradient:
+              other.bufferGradient ??
+              (other.bufferColor != null ? null : bufferGradient),
           inactiveTrackColor: other.inactiveTrackColor ?? inactiveTrackColor,
           hoverInactiveTrackColor:
               other.hoverInactiveTrackColor ?? hoverInactiveTrackColor,
@@ -186,153 +194,177 @@ final class HyperSliderStyle {
     HyperSliderStyle a,
     HyperSliderStyle b,
     double t,
-  ) => HyperSliderStyle(
-    activeTrackColor: Color.lerp(a.activeTrackColor, b.activeTrackColor, t),
-    inactiveTrackColor: Color.lerp(
-      a.inactiveTrackColor,
-      b.inactiveTrackColor,
-      t,
-    ),
-    hoverInactiveTrackColor: Color.lerp(
-      a.hoverInactiveTrackColor,
-      b.hoverInactiveTrackColor,
-      t,
-    ),
-    disabledActiveTrackColor: Color.lerp(
-      a.disabledActiveTrackColor,
-      b.disabledActiveTrackColor,
-      t,
-    ),
-    disabledInactiveTrackColor: Color.lerp(
-      a.disabledInactiveTrackColor,
-      b.disabledInactiveTrackColor,
-      t,
-    ),
-    thumbColor: Color.lerp(a.thumbColor, b.thumbColor, t),
-    disabledThumbColor: Color.lerp(
-      a.disabledThumbColor,
-      b.disabledThumbColor,
-      t,
-    ),
-    overlayColor: Color.lerp(a.overlayColor, b.overlayColor, t),
-    valueIndicatorColor: Color.lerp(
-      a.valueIndicatorColor,
-      b.valueIndicatorColor,
-      t,
-    ),
-    valueIndicatorTextStyle: TextStyle.lerp(
-      a.valueIndicatorTextStyle,
-      b.valueIndicatorTextStyle,
-      t,
-    ),
-    trackHeight: _lerpDouble(a.trackHeight, b.trackHeight, t),
-    thumbRadius: _lerpDouble(a.thumbRadius, b.thumbRadius, t),
-    thumbWidth: _lerpDouble(a.thumbWidth, b.thumbWidth, t),
-    thumbHeight: _lerpDouble(a.thumbHeight, b.thumbHeight, t),
-    thumbShadows: BoxShadow.lerpList(a.thumbShadows, b.thumbShadows, t),
-    overlayRadius: _lerpDouble(a.overlayRadius, b.overlayRadius, t),
-    thumbOutlineColor: Color.lerp(a.thumbOutlineColor, b.thumbOutlineColor, t),
-    thumbOutlineWidth: _lerpDouble(a.thumbOutlineWidth, b.thumbOutlineWidth, t),
-    pressedThumbScale: _lerpDouble(a.pressedThumbScale, b.pressedThumbScale, t),
-    stepPointRadius: _lerpDouble(a.stepPointRadius, b.stepPointRadius, t),
-    activeStepPointColor: Color.lerp(
-      a.activeStepPointColor,
-      b.activeStepPointColor,
-      t,
-    ),
-    inactiveStepPointColor: Color.lerp(
-      a.inactiveStepPointColor,
-      b.inactiveStepPointColor,
-      t,
-    ),
-    trackShape: t < .5 ? a.trackShape : b.trackShape,
-    rangeTrackShape: t < .5 ? a.rangeTrackShape : b.rangeTrackShape,
-    thumbShape: t < .5 ? a.thumbShape : b.thumbShape,
-    overlayShape: t < .5 ? a.overlayShape : b.overlayShape,
-    valueIndicatorSurface:
-        a.valueIndicatorSurface == null || b.valueIndicatorSurface == null
-        ? (t < .5 ? a.valueIndicatorSurface : b.valueIndicatorSurface)
-        : HyperCardStyle.lerp(
-            a.valueIndicatorSurface!,
-            b.valueIndicatorSurface!,
-            t,
-          ),
-    valueIndicatorGap: _lerpDouble(a.valueIndicatorGap, b.valueIndicatorGap, t),
-    showValueIndicator: t < .5 ? a.showValueIndicator : b.showValueIndicator,
-    valueIndicatorShape: t < .5 ? a.valueIndicatorShape : b.valueIndicatorShape,
-    rangeThumbShape: t < .5 ? a.rangeThumbShape : b.rangeThumbShape,
-    rangeValueIndicatorShape: t < .5
-        ? a.rangeValueIndicatorShape
-        : b.rangeValueIndicatorShape,
-    capsuleBackgroundColor: Color.lerp(
-      a.capsuleBackgroundColor,
-      b.capsuleBackgroundColor,
-      t,
-    ),
-    capsuleFillColor: Color.lerp(a.capsuleFillColor, b.capsuleFillColor, t),
-    capsuleBorderColor: Color.lerp(
-      a.capsuleBorderColor,
-      b.capsuleBorderColor,
-      t,
-    ),
-    capsuleBorderWidth: _lerpDouble(
-      a.capsuleBorderWidth,
-      b.capsuleBorderWidth,
-      t,
-    ),
-    capsuleTopIconColor: Color.lerp(
-      a.capsuleTopIconColor,
-      b.capsuleTopIconColor,
-      t,
-    ),
-    capsuleBottomIconColor: Color.lerp(
-      a.capsuleBottomIconColor,
-      b.capsuleBottomIconColor,
-      t,
-    ),
-    capsuleAutoIconContrast: t < .5
-        ? a.capsuleAutoIconContrast
-        : b.capsuleAutoIconContrast,
-    capsuleTopIconTurns: _lerpDouble(
-      a.capsuleTopIconTurns,
-      b.capsuleTopIconTurns,
-      t,
-    ),
-    capsuleBottomIconTurns: _lerpDouble(
-      a.capsuleBottomIconTurns,
-      b.capsuleBottomIconTurns,
-      t,
-    ),
-    capsuleWidth: _lerpDouble(a.capsuleWidth, b.capsuleWidth, t),
-    capsuleCornerRadius: _lerpDouble(
-      a.capsuleCornerRadius,
-      b.capsuleCornerRadius,
-      t,
-    ),
-    capsuleIconSize: _lerpDouble(a.capsuleIconSize, b.capsuleIconSize, t),
-    capsuleIconInset: _lerpDouble(a.capsuleIconInset, b.capsuleIconInset, t),
-    capsuleOverscrollExtent: _lerpDouble(
-      a.capsuleOverscrollExtent,
-      b.capsuleOverscrollExtent,
-      t,
-    ),
-    capsuleOverscrollScale: _lerpDouble(
-      a.capsuleOverscrollScale,
-      b.capsuleOverscrollScale,
-      t,
-    ),
-    capsuleOverscrollSpring: _lerpSpring(
-      a.capsuleOverscrollSpring,
-      b.capsuleOverscrollSpring,
-      t,
-    ),
-    capsuleAnimationDuration: t < .5
-        ? a.capsuleAnimationDuration
-        : b.capsuleAnimationDuration,
-    capsuleAnimationCurve: t < .5
-        ? a.capsuleAnimationCurve
-        : b.capsuleAnimationCurve,
-  );
+  ) {
+    if (t == 0 || a == b) return a;
+    if (t == 1) return b;
+    return HyperSliderStyle(
+      bufferColor: Color.lerp(a.bufferColor, b.bufferColor, t),
+      bufferGradient: Gradient.lerp(a.bufferGradient, b.bufferGradient, t),
+      activeTrackColor: Color.lerp(a.activeTrackColor, b.activeTrackColor, t),
+      inactiveTrackColor: Color.lerp(
+        a.inactiveTrackColor,
+        b.inactiveTrackColor,
+        t,
+      ),
+      hoverInactiveTrackColor: Color.lerp(
+        a.hoverInactiveTrackColor,
+        b.hoverInactiveTrackColor,
+        t,
+      ),
+      disabledActiveTrackColor: Color.lerp(
+        a.disabledActiveTrackColor,
+        b.disabledActiveTrackColor,
+        t,
+      ),
+      disabledInactiveTrackColor: Color.lerp(
+        a.disabledInactiveTrackColor,
+        b.disabledInactiveTrackColor,
+        t,
+      ),
+      thumbColor: Color.lerp(a.thumbColor, b.thumbColor, t),
+      disabledThumbColor: Color.lerp(
+        a.disabledThumbColor,
+        b.disabledThumbColor,
+        t,
+      ),
+      overlayColor: Color.lerp(a.overlayColor, b.overlayColor, t),
+      valueIndicatorColor: Color.lerp(
+        a.valueIndicatorColor,
+        b.valueIndicatorColor,
+        t,
+      ),
+      valueIndicatorTextStyle: TextStyle.lerp(
+        a.valueIndicatorTextStyle,
+        b.valueIndicatorTextStyle,
+        t,
+      ),
+      trackHeight: _lerpDouble(a.trackHeight, b.trackHeight, t),
+      thumbRadius: _lerpDouble(a.thumbRadius, b.thumbRadius, t),
+      thumbWidth: _lerpDouble(a.thumbWidth, b.thumbWidth, t),
+      thumbHeight: _lerpDouble(a.thumbHeight, b.thumbHeight, t),
+      thumbShadows: BoxShadow.lerpList(a.thumbShadows, b.thumbShadows, t),
+      overlayRadius: _lerpDouble(a.overlayRadius, b.overlayRadius, t),
+      thumbOutlineColor: Color.lerp(
+        a.thumbOutlineColor,
+        b.thumbOutlineColor,
+        t,
+      ),
+      thumbOutlineWidth: _lerpDouble(
+        a.thumbOutlineWidth,
+        b.thumbOutlineWidth,
+        t,
+      ),
+      pressedThumbScale: _lerpDouble(
+        a.pressedThumbScale,
+        b.pressedThumbScale,
+        t,
+      ),
+      stepPointRadius: _lerpDouble(a.stepPointRadius, b.stepPointRadius, t),
+      activeStepPointColor: Color.lerp(
+        a.activeStepPointColor,
+        b.activeStepPointColor,
+        t,
+      ),
+      inactiveStepPointColor: Color.lerp(
+        a.inactiveStepPointColor,
+        b.inactiveStepPointColor,
+        t,
+      ),
+      trackShape: t < .5 ? a.trackShape : b.trackShape,
+      rangeTrackShape: t < .5 ? a.rangeTrackShape : b.rangeTrackShape,
+      thumbShape: t < .5 ? a.thumbShape : b.thumbShape,
+      overlayShape: t < .5 ? a.overlayShape : b.overlayShape,
+      valueIndicatorSurface:
+          a.valueIndicatorSurface == null || b.valueIndicatorSurface == null
+          ? (t < .5 ? a.valueIndicatorSurface : b.valueIndicatorSurface)
+          : HyperCardStyle.lerp(
+              a.valueIndicatorSurface!,
+              b.valueIndicatorSurface!,
+              t,
+            ),
+      valueIndicatorGap: _lerpDouble(
+        a.valueIndicatorGap,
+        b.valueIndicatorGap,
+        t,
+      ),
+      showValueIndicator: t < .5 ? a.showValueIndicator : b.showValueIndicator,
+      valueIndicatorShape: t < .5
+          ? a.valueIndicatorShape
+          : b.valueIndicatorShape,
+      rangeThumbShape: t < .5 ? a.rangeThumbShape : b.rangeThumbShape,
+      rangeValueIndicatorShape: t < .5
+          ? a.rangeValueIndicatorShape
+          : b.rangeValueIndicatorShape,
+      capsuleBackgroundColor: Color.lerp(
+        a.capsuleBackgroundColor,
+        b.capsuleBackgroundColor,
+        t,
+      ),
+      capsuleFillColor: Color.lerp(a.capsuleFillColor, b.capsuleFillColor, t),
+      capsuleBorderColor: Color.lerp(
+        a.capsuleBorderColor,
+        b.capsuleBorderColor,
+        t,
+      ),
+      capsuleBorderWidth: _lerpDouble(
+        a.capsuleBorderWidth,
+        b.capsuleBorderWidth,
+        t,
+      ),
+      capsuleTopIconColor: Color.lerp(
+        a.capsuleTopIconColor,
+        b.capsuleTopIconColor,
+        t,
+      ),
+      capsuleBottomIconColor: Color.lerp(
+        a.capsuleBottomIconColor,
+        b.capsuleBottomIconColor,
+        t,
+      ),
+      capsuleAutoIconContrast: t < .5
+          ? a.capsuleAutoIconContrast
+          : b.capsuleAutoIconContrast,
+      capsuleTopIconTurns: _lerpDouble(
+        a.capsuleTopIconTurns,
+        b.capsuleTopIconTurns,
+        t,
+      ),
+      capsuleBottomIconTurns: _lerpDouble(
+        a.capsuleBottomIconTurns,
+        b.capsuleBottomIconTurns,
+        t,
+      ),
+      capsuleWidth: _lerpDouble(a.capsuleWidth, b.capsuleWidth, t),
+      capsuleCornerRadius: _lerpDouble(
+        a.capsuleCornerRadius,
+        b.capsuleCornerRadius,
+        t,
+      ),
+      capsuleIconSize: _lerpDouble(a.capsuleIconSize, b.capsuleIconSize, t),
+      capsuleIconInset: _lerpDouble(a.capsuleIconInset, b.capsuleIconInset, t),
+      capsuleOverscrollExtent: _lerpDouble(
+        a.capsuleOverscrollExtent,
+        b.capsuleOverscrollExtent,
+        t,
+      ),
+      capsuleOverscrollScale: _lerpDouble(
+        a.capsuleOverscrollScale,
+        b.capsuleOverscrollScale,
+        t,
+      ),
+      capsuleOverscrollSpring: _lerpSpring(
+        a.capsuleOverscrollSpring,
+        b.capsuleOverscrollSpring,
+        t,
+      ),
+      capsuleAnimationDuration: t < .5
+          ? a.capsuleAnimationDuration
+          : b.capsuleAnimationDuration,
+      capsuleAnimationCurve: t < .5
+          ? a.capsuleAnimationCurve
+          : b.capsuleAnimationCurve,
+    );
+  }
 
   static double? _lerpDouble(double? a, double? b, double t) =>
       a == null || b == null ? (t < .5 ? a : b) : a + (b - a) * t;
@@ -361,6 +393,8 @@ final class HyperSliderStyle {
   bool operator ==(Object other) =>
       other is HyperSliderStyle &&
       other.activeTrackColor == activeTrackColor &&
+      other.bufferColor == bufferColor &&
+      other.bufferGradient == bufferGradient &&
       other.inactiveTrackColor == inactiveTrackColor &&
       other.hoverInactiveTrackColor == hoverInactiveTrackColor &&
       other.disabledActiveTrackColor == disabledActiveTrackColor &&
@@ -414,6 +448,8 @@ final class HyperSliderStyle {
   @override
   int get hashCode => Object.hashAll([
     activeTrackColor,
+    bufferColor,
+    bufferGradient,
     inactiveTrackColor,
     hoverInactiveTrackColor,
     disabledActiveTrackColor,

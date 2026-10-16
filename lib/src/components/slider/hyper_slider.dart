@@ -19,6 +19,7 @@ class HyperSlider extends StatefulWidget {
   const HyperSlider({
     super.key,
     required this.value,
+    this.bufferValue,
     required this.onChanged,
     this.min = 0,
     this.max = 1,
@@ -36,6 +37,9 @@ class HyperSlider extends StatefulWidget {
   });
 
   final double value;
+
+  /// 二级缓冲值，与 min/max 使用同一范围；null 不绘制缓冲轨道。
+  final double? bufferValue;
   final ValueChanged<double>? onChanged;
   final double min;
   final double max;
@@ -98,6 +102,7 @@ class _HyperSliderState extends State<HyperSlider> {
       widget.style,
       Slider(
         value: _drag.resolve(widget.value),
+        secondaryTrackValue: widget.bufferValue?.clamp(widget.min, widget.max),
         onChanged: widget.onChanged == null ? null : _change,
         min: widget.min,
         max: widget.max,
@@ -376,6 +381,7 @@ class HyperVerticalSlider extends StatelessWidget {
   const HyperVerticalSlider({
     super.key,
     required this.value,
+    this.bufferValue,
     required this.onChanged,
     required this.height,
     this.min = 0,
@@ -395,6 +401,9 @@ class HyperVerticalSlider extends StatelessWidget {
   });
 
   final double value;
+
+  /// 二级缓冲值，与 min/max 使用同一范围；null 不绘制缓冲轨道。
+  final double? bufferValue;
   final ValueChanged<double>? onChanged;
   final double height;
   final double min;
@@ -429,6 +438,7 @@ class HyperVerticalSlider extends StatelessWidget {
         quarterTurns: reverseDirection ? 1 : 3,
         child: HyperSlider(
           value: value,
+          bufferValue: bufferValue,
           onChanged: onChanged,
           min: min,
           max: max,
@@ -570,6 +580,8 @@ Widget _sliderTheme(
         padding: inherited.padding ?? EdgeInsets.zero,
         trackHeight: trackHeight,
         activeTrackColor: style.activeTrackColor ?? colors.primary,
+        secondaryActiveTrackColor: style.bufferColor ?? colors.primaryContainer,
+        disabledSecondaryActiveTrackColor: colors.disabled,
         inactiveTrackColor: Color.lerp(
           inactiveTrackColor,
           hoveredInactiveTrackColor,
@@ -594,6 +606,7 @@ Widget _sliderTheme(
         trackShape:
             style.trackShape ??
             HyperSliderTrackShape(
+              bufferGradient: style.bufferGradient,
               divisions: divisions,
               pointRadius: pointRadius,
               activePointColor: activePointColor,

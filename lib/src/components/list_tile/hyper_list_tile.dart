@@ -80,6 +80,7 @@ class HyperListTile extends StatelessWidget {
               : metrics.compactSubtitleMinHeight,
       },
       leadingSize: metrics.leadingSize,
+      leadingIconSize: metrics.leadingIconSize,
       leadingSpacing: metrics.leadingSpacing,
       trailingSpacing: metrics.trailingSpacing,
       trailingIconSize: metrics.trailingIconSize,
@@ -135,7 +136,30 @@ class HyperListTile extends StatelessWidget {
                     SizedBox.square(
                       dimension: resolved.leadingSize,
                       child: ClipRect(
-                        child: FittedBox(fit: BoxFit.scaleDown, child: leading),
+                        child: HyperIconTheme(
+                          data: HyperIconThemeData(
+                            style: HyperIconStyle(
+                              size: resolved.leadingIconSize == null
+                                  ? null
+                                  : HyperStateValue.all(
+                                      resolved.leadingIconSize!,
+                                    ),
+                              color: HyperStateValue.all(
+                                resolved.leadingColor ?? foreground,
+                              ),
+                            ),
+                          ),
+                          child: IconTheme.merge(
+                            data: IconThemeData(
+                              size: resolved.leadingIconSize,
+                              color: resolved.leadingColor ?? foreground,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: leading,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(width: resolved.leadingSpacing),

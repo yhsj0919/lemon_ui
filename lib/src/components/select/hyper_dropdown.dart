@@ -18,6 +18,7 @@ class HyperDropdown extends StatefulWidget {
   const HyperDropdown({
     super.key,
     required this.panelBuilder,
+    this.modalTitle,
     this.label = const Text('请选择'),
     this.enabled = true,
     this.isOpen,
@@ -31,6 +32,7 @@ class HyperDropdown extends StatefulWidget {
   });
   final Widget Function(BuildContext context, VoidCallback close) panelBuilder;
   final Widget label;
+  final Widget? modalTitle;
   final bool enabled;
   final bool? isOpen;
   final ValueChanged<bool>? onOpenChanged;
@@ -104,7 +106,11 @@ class _HyperDropdownState extends State<HyperDropdown> {
       context: context,
       presentation: presentation,
       title: '选择',
+      titleWidget: widget.modalTitle,
       style: style.selectionStyle,
+      surfaceStyle:
+          (style.selectionStyle?.surfaceStyle)?.merge(widget.surfaceStyle) ??
+          widget.surfaceStyle,
       builder: (routeContext) {
         final route = ModalRoute.of(routeContext)!;
         final navigator = Navigator.of(routeContext);
@@ -123,6 +129,16 @@ class _HyperDropdownState extends State<HyperDropdown> {
     final selection = HyperSelectionTheme.of(context).style
         .merge(style.selectionStyle);
     final menu = selection.menuStyle;
+    if (!constrained) {
+      return ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: selection.maxPanelHeight ?? double.infinity,
+        ),
+        child: SingleChildScrollView(
+          child: widget.panelBuilder(context, () => _setOpen(false)),
+        ),
+      );
+    }
     return HyperCard(
       style: resolveHyperMenuSurface(
         context,

@@ -11,6 +11,7 @@ import '../menu/hyper_menu_theme.dart';
 import '../menu/hyper_menu_surface.dart';
 import 'hyper_select_model.dart';
 import 'hyper_selection_style.dart';
+import 'hyper_selection_layout.dart';
 
 /// 面板只处理选项展示；输入、已选值和呈现方式由上层管理。
 class HyperSelectPanel<T> extends StatelessWidget {
@@ -26,6 +27,8 @@ class HyperSelectPanel<T> extends StatelessWidget {
     this.maximumSelection,
     this.requestFocusOnOpen = true,
     this.navigationController,
+    this.editing = false,
+    this.showSurface = true,
   });
   final HyperSelectOptionsController<T> controller;
   final ValueListenable<Set<T>> selection;
@@ -35,6 +38,8 @@ class HyperSelectPanel<T> extends StatelessWidget {
   final Widget? header, footer;
   final int? maximumSelection;
   final bool requestFocusOnOpen;
+  final bool editing;
+  final bool showSurface;
   final HyperMenuNavigationController? navigationController;
 
   @override
@@ -95,19 +100,26 @@ class HyperSelectPanel<T> extends StatelessWidget {
           onSelected: (id) => onSelected(options[int.parse(id)]),
         );
       }
-      return HyperCard(
-        width: width,
-        style: resolveHyperMenuSurface(
-          context,
-          padding: EdgeInsets.all(
-            menuVisual?.surfacePadding ?? sizes.menu.padding,
-          ),
-          radius: menuVisual?.surfaceRadius ?? sizes.menu.surfaceRadius,
-          style:
-              menuVisual?.surfaceStyle?.merge(style.surfaceStyle) ??
-              style.surfaceStyle,
-        ),
-        child: SizedBox(
+      Widget surface(Widget child) => !showSurface
+          ? child
+          : HyperCard(
+              width: width,
+              style: resolveHyperMenuSurface(
+                context,
+                padding: menuVisual?.surfacePadding == null
+                    ? hyperSelectionPadding(context, editing: editing)
+                    : EdgeInsets.all(
+                        menuVisual?.surfacePadding ?? sizes.menu.padding,
+                      ),
+                radius: menuVisual?.surfaceRadius ?? sizes.menu.surfaceRadius,
+                style:
+                    menuVisual?.surfaceStyle?.merge(style.surfaceStyle) ??
+                    style.surfaceStyle,
+              ),
+              child: child,
+            );
+      return surface(
+        SizedBox(
           width: width,
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -177,7 +189,10 @@ class HyperSelectPanel<T> extends StatelessWidget {
                     ),
                   ),
                 ),
-                ?footer,
+                if (footer != null) ...[
+                  SizedBox(height: sizes.menu.padding),
+                  footer!,
+                ],
               ],
             ),
           ),

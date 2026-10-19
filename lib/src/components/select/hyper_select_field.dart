@@ -28,6 +28,7 @@ import 'hyper_select_presenter.dart';
 import 'hyper_selection_style.dart';
 import 'hyper_selection_tags.dart';
 import 'hyper_selection_theme.dart';
+import 'hyper_selection_layout.dart';
 
 /// 下拉框与自动填充共用状态宿主，选择始终由调用方控制。
 class HyperSelectField<T> extends StatefulWidget {
@@ -265,6 +266,9 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
       presentation: presentation,
       title: widget.placeholder,
       style: _resolved,
+      surfaceStyle:
+          _resolved.menuStyle?.surfaceStyle?.merge(_resolved.surfaceStyle) ??
+          _resolved.surfaceStyle,
       builder: (modalContext) {
         final navigator = Navigator.of(modalContext);
         final route = ModalRoute.of(modalContext)!;
@@ -526,6 +530,8 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
     return Focus(
       onKeyEvent: _key,
       child: HyperSelectPanel<T>(
+        editing: widget.multiple,
+        showSurface: !modal,
         navigationController: _navigation,
         controller: _options,
         selection: _selection,
@@ -540,28 +546,21 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
             ? _editor(modal: modal)
             : null,
         footer: widget.multiple
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  HyperButton.text(
-                    label: Text(_resolved.clearText ?? '清空'),
-                    onPressed: _enabled
-                        ? () {
-                            widget.onChanged?.call(
-                              Set.unmodifiable(
-                                widget.values.where(
-                                  (value) => _labels[value]?.enabled == false,
-                                ),
-                              ),
-                            );
-                          }
-                        : null,
-                  ),
-                  HyperButton.text(
-                    label: Text(_resolved.doneText ?? '完成'),
-                    onPressed: _close,
-                  ),
-                ],
+            ? HyperSelectionActions(
+                clearText: _resolved.clearText ?? '清空',
+                confirmText: _resolved.doneText ?? '完成',
+                onClear: _enabled
+                    ? () {
+                        widget.onChanged?.call(
+                          Set.unmodifiable(
+                            widget.values.where(
+                              (value) => _labels[value]?.enabled == false,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                onConfirm: _close,
               )
             : null,
       ),

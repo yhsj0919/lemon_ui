@@ -11,6 +11,7 @@ void main() {
           child: Scaffold(
             body: Center(
               child: HyperDropdown(
+                presentation: HyperSelectPresentation.anchored,
                 surfaceStyle: HyperCardStyle(boxShadow: []),
                 panelBuilder: (context, close) => Column(
                   mainAxisSize: MainAxisSize.min,

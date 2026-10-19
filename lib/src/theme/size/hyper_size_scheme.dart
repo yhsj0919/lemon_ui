@@ -1,3 +1,6 @@
+import 'components/hyper_form_size.dart';
+import 'components/hyper_calendar_size.dart';
+import 'components/hyper_wheel_picker_size.dart';
 import 'components/hyper_top_navigation_size.dart';
 import 'components/hyper_color_picker_size.dart';
 import 'components/hyper_selection_size.dart';
@@ -100,6 +103,9 @@ final class HyperSizeScheme {
     required this.topNavigation,
     required this.colorPicker,
     required this.select,
+    this.wheelPicker = const HyperWheelPickerSize(),
+    this.calendar = const HyperCalendarSize(),
+    this.form = const HyperFormSize(),
     required this.popupListTile,
     required this.tabBar,
     required this.breadcrumb,
@@ -354,6 +360,25 @@ final class HyperSizeScheme {
           iconSpacing: 12,
           itemRadius: 12,
           surfaceRadius: 16,
+        ),
+        form: const HyperFormSize(
+          labelWidth: 120,
+          gap: 12,
+          fieldSpacing: 16,
+          messageSpacing: 6,
+          minimumControlWidth: 120,
+        ),
+        calendar: const HyperCalendarSize(
+          dayMinHeight: 48,
+          width: 336,
+          spacing: 4,
+          radius: 12,
+        ),
+        wheelPicker: const HyperWheelPickerSize(
+          itemExtent: 48,
+          width: 280,
+          horizontalPadding: 12,
+          selectionRadius: 12,
         ),
         select: const HyperSelectSize(
           width: 280,
@@ -780,6 +805,25 @@ final class HyperSizeScheme {
           itemRadius: 12,
           surfaceRadius: 20,
         ),
+        form: const HyperFormSize(
+          labelWidth: 120,
+          gap: 12,
+          fieldSpacing: 16,
+          messageSpacing: 6,
+          minimumControlWidth: 120,
+        ),
+        calendar: const HyperCalendarSize(
+          dayMinHeight: 52,
+          width: 364,
+          spacing: 4,
+          radius: 12,
+        ),
+        wheelPicker: const HyperWheelPickerSize(
+          itemExtent: 52,
+          width: 280,
+          horizontalPadding: 12,
+          selectionRadius: 12,
+        ),
         select: const HyperSelectSize(
           width: 280,
           arrowSize: 28,
@@ -1204,6 +1248,25 @@ final class HyperSizeScheme {
           iconSpacing: 12,
           itemRadius: 6,
           surfaceRadius: 8,
+        ),
+        form: const HyperFormSize(
+          labelWidth: 96,
+          gap: 8,
+          fieldSpacing: 12,
+          messageSpacing: 4,
+          minimumControlWidth: 96,
+        ),
+        calendar: const HyperCalendarSize(
+          dayMinHeight: 32,
+          width: 280,
+          spacing: 4,
+          radius: 6,
+        ),
+        wheelPicker: const HyperWheelPickerSize(
+          itemExtent: 32,
+          width: 192,
+          horizontalPadding: 8,
+          selectionRadius: 6,
         ),
         select: const HyperSelectSize(
           width: 192,
@@ -1630,6 +1693,25 @@ final class HyperSizeScheme {
           itemRadius: 10,
           surfaceRadius: 20,
         ),
+        form: const HyperFormSize(
+          labelWidth: 80,
+          gap: 8,
+          fieldSpacing: 8,
+          messageSpacing: 4,
+          minimumControlWidth: 80,
+        ),
+        calendar: const HyperCalendarSize(
+          dayMinHeight: 48,
+          width: 200,
+          spacing: 2,
+          radius: 10,
+        ),
+        wheelPicker: const HyperWheelPickerSize(
+          itemExtent: 48,
+          width: 200,
+          horizontalPadding: 4,
+          selectionRadius: 10,
+        ),
         select: const HyperSelectSize(
           width: 200,
           arrowSize: 24,
@@ -1874,6 +1956,9 @@ final class HyperSizeScheme {
   final HyperTopNavigationSize topNavigation;
   final HyperColorPickerSize colorPicker;
   final HyperSelectSize select;
+  final HyperWheelPickerSize wheelPicker;
+  final HyperCalendarSize calendar;
+  final HyperFormSize form;
   final HyperPopupListTileSize popupListTile;
   final HyperTabBarSize tabBar;
   final HyperBreadcrumbSize breadcrumb;
@@ -1944,6 +2029,9 @@ final class HyperSizeScheme {
     HyperTopNavigationSize? topNavigation,
     HyperColorPickerSize? colorPicker,
     HyperSelectSize? select,
+    HyperWheelPickerSize? wheelPicker,
+    HyperCalendarSize? calendar,
+    HyperFormSize? form,
     HyperPopupListTileSize? popupListTile,
     HyperTabBarSize? tabBar,
     HyperBreadcrumbSize? breadcrumb,
@@ -2014,6 +2102,9 @@ final class HyperSizeScheme {
     topNavigation: topNavigation ?? this.topNavigation,
     colorPicker: colorPicker ?? this.colorPicker,
     select: select ?? this.select,
+    wheelPicker: wheelPicker ?? this.wheelPicker,
+    calendar: calendar ?? this.calendar,
+    form: form ?? this.form,
     popupListTile: popupListTile ?? this.popupListTile,
     tabBar: tabBar ?? this.tabBar,
     breadcrumb: breadcrumb ?? this.breadcrumb,
@@ -2143,6 +2234,9 @@ final class HyperSizeScheme {
       ),
       colorPicker: HyperColorPickerSize.lerp(a.colorPicker, b.colorPicker, t),
       select: HyperSelectSize.lerp(a.select, b.select, t),
+      wheelPicker: HyperWheelPickerSize.lerp(a.wheelPicker, b.wheelPicker, t),
+      calendar: HyperCalendarSize.lerp(a.calendar, b.calendar, t),
+      form: HyperFormSize.lerp(a.form, b.form, t),
       popupListTile: HyperPopupListTileSize.lerp(
         a.popupListTile,
         b.popupListTile,
@@ -2217,6 +2311,9 @@ final class HyperSizeScheme {
           other.topNavigation == topNavigation &&
           other.colorPicker == colorPicker &&
           other.select == select &&
+          other.wheelPicker == wheelPicker &&
+          other.calendar == calendar &&
+          other.form == form &&
           other.popupListTile == popupListTile &&
           other.tabBar == tabBar &&
           other.breadcrumb == breadcrumb &&
@@ -2288,6 +2385,9 @@ final class HyperSizeScheme {
     topNavigation,
     colorPicker,
     select,
+    form,
+    calendar,
+    wheelPicker,
     popupListTile,
     tabBar,
     breadcrumb,

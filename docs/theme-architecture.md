@@ -23,6 +23,26 @@ HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴
 
 # Lemon UI 主题与尺寸架构
 
+## 选择面板统一布局（2026-10-19）
+
+下拉、自动完成和日期时间编辑面板共用 hyper_selection_layout.dart 的内边距及动作区。
+左右留白取当前端 menu.padding；编辑面板上下留白取 dialog.padding，纯选项列表取
+menu.padding。此为 D 级既有语义规格组合，不新增设备常量。显式 menu.surfacePadding
+及 surfaceStyle.padding 仍优先。清空为文字按钮，取消为描边，确定/完成为实色；
+圆角、文字和尺寸均继承按钮主题，动作区不足宽度时自动换行。
+手机下拉和自动完成不再在底部弹窗内绘制 HyperCard，表面覆盖转交同一个外层弹窗；
+桌面仍沿用 resolveHyperMenuSurface，保留材质质量及空阴影等显式覆盖。
+
+## NumberInput（2026-10-19，未确认）
+
+首版数字输入为 HyperTextField 与 HyperIconButton 的组合，继承 textFieldTheme、
+iconButtonTheme 和 sizes.textField 的四端规格，不增加独立重复的输入表面默认值。
+步进按钮尺寸从当前端 textField.minimumHeight 的一半推导，实例 stepperStyle 可覆盖；
+输入表面、文字、状态和材质通过 HyperTextFieldStyle 覆盖。来源为 D 级同端语义推导，
+尚待用户视觉确认，未声明为官方 NumberInput 尺寸。
+编辑器“未确认”提供独立预览入口，外观参数继续在文本输入框与图标按钮主题中管理。
+数字范围、步长和精度属于实例交互约束，不写入全局视觉主题。
+
 ## 高级材质与透明度动画
 
 录屏对照确认：整个模糊表面置于 Fade/Opacity 的离屏层内时，部分桌面后端在动画中无法采样真实背景，达到完全不透明后才恢复模糊。混合模式修改不能单独解决背景采样隔离。内部材质容器与浮层统一使用 `hyper_backdrop_safe_opacity.dart`：高级质量且未减少透明度时，先关闭背景滤镜并使用降级配方淡入，再保持外层完全不透明，连续恢复背景、模糊、染色、边框和阴影参数；关闭按同一进度反向运行。`materialTheme.transitionFadeFraction` 配置两阶段占比（默认 .6），动画提供临时 `transitionProgress`，嵌套动画取较小恢复进度，避免祖先淡入未结束时提前开启模糊。布局与内容状态保留；普通质量维持淡入淡出。自定义 transitionBuilder 仍由调用者管理，模糊表面不得整体包在分数透明度的离屏层内。
@@ -721,3 +741,89 @@ Divider 的稀疏 TextStyle 覆盖现在按字段合并，字重/行高覆盖不
 侧边导航的 `collapsedIconSize` 独立于展开态 `iconSize` 和箭头 `expandIconSize`，四端初值复用各端现有图标规格，未依据参考截图的物理像素改写默认尺寸。编辑器在导航项通用设置提供“折叠态图标尺寸”，按设备保存并遵循条目与折叠栏的几何上限。
 
 按用户确认，侧栏折叠态图标默认24逻辑像素，折叠态条目独立间距 `collapsedRowGap` 默认8（按用户指定调整），展开态行间距不变；局部主题与实例可分别覆盖。
+
+## 日期与时间选择器（未确认，2026-10-19）
+
+`HyperDatePicker`、`HyperTimePicker` 和 `HyperDateTimePicker` 共用受控的日期时间编辑核心。
+日期为公历年/月/日分项，时间为时/分分项；面板中保留草稿，只有确认才回调，取消、返回和点外部关闭不提交。
+当前精度为分钟，不包括范围选择、秒、农历与时区换算。日期返回本地零点，日期时间返回本地民用时间；调用方负责业务时区。
+默认日期范围 1900-01-01 至 2100-12-31，仅为初版可浏览范围，不是视觉规格。
+闰年、大小月、范围端点、分钟步进共同限制可选项；切换年月先收敛到当月末日，再收敛到业务范围。
+分钟间隔必须为 60 的正整数约数。范围与步进没有交集时抛出 ArgumentError，避免提交不可用值。
+
+当前是现有选择器的组合控件，不引入独立的绘制配方或设备尺寸常量。
+默认尺寸、排版、交互、动效与表面分别继承 Select / Selection、Button、统一 Motion 与材质主题。
+全局、局部使用现有强类型主题，实例 `style` 使用 HyperSelectStyle，`surfaceStyle` 使用 HyperCardStyle。
+尺寸由 HyperSizeScheme 对应四端规格统一解析；内部纵向间隔复用同端 menu.padding。
+外层复用 HyperDropdown 和 resolveHyperMenuSurface，显式空阴影列表优先；默认按真实设备呈现，desktop 锚定、phone/tablet 底部、watch 全屏。
+主题编辑器在“未确认”分类提供入口，当前复用 Select 工作区，不另存一套与 Select 相同的配置。
+
+视觉来源为 D 级同端既有语义规格，尚未得到用户样式确认。
+2026-10-19 核对了小米官方组件目录 https://dev.mi.com/xiaomihyperos/documentation/detail?pId=1874 ，其列出日期与时间 picker，但没有可直接移植的 Flutter 布局尺寸；HiUI 官方仓库 https://github.com/XiaoMi/hiui 的发布记录确认有 date-picker/time-picker，当前未获得可核实的同状态尺寸源码，不声称复刻 HiUI 或 HyperOS 日期面板。
+日历网格、滚轮与各端专用外观可在后续样式确认阶段替换，共享数据职责及受控提交接口保持独立。
+
+## 滚轮选择器（未确认，2026-10-19）
+
+`HyperWheelPicker<T>` 是单列、受控的有限选项滚轮；父组件负责多列联动、日期合法性和确认提交。
+`items/value/labelBuilder/onChanged` 定义数据；`onChanged` 随中心项改变通知，`onChangeEnd` 在发生改变的滚动停止后通知。外部更新值或替换列表只同步显示，不反向回调；空列表保留空视口并关闭交互。值不在列表时展示第一项，不自动提交；调用方应提供唯一值。
+支持触摸/鼠标拖动、鼠标滚轮、相邻项点击、上下键、Home/End 和可选循环。使用 Flutter `ListWheelScrollView`、`FixedExtentScrollController`、`FixedExtentScrollPhysics` 的约束与吸附，不自建手势物理。循环跨界返回真实值。可见行数为正奇数，默认五行，这是项目初始布局选择，不是小米官方规范。
+
+全局 `wheelPickerTheme`、局部 `HyperWheelPickerTheme`、实例 `HyperWheelPickerStyle` 逐字段合并；四端规格集中在 `HyperSizeScheme.wheelPicker`，均包含 copyWith、插值与值相等。背景、选中区域颜色与边框、文字与选中文字、禁用颜色、曲率、透视、密度、淡化比例及切换动效可覆盖。`selectionOverlayBuilder` 可替换选中区域。滚轮本身为内嵌编辑内容，没有浮层表面或独立高级材质配方；未来表单浮层仍须使用统一菜单/模态基础设施。
+
+四端默认尺寸为 D 级同端语义推导（逻辑像素），不是截图物理像素换算：
+- phone：行最小高度 48（controlHeightMd），宽 280（select.width），文字水平内边距 12（menu.padding），选中圆角 12（menu.itemRadius）。
+- tablet：行最小高度 52（controlHeightMd），宽 280、内边距 12、圆角 12（同端 Select/Menu）。
+- desktop：行最小高度 44（controlHeightMd），宽 192、内边距 8、圆角 6（同端 Select/Menu）。
+- watch：行最小高度 48（controlHeightMd），宽 200、内边距 4、圆角 10（同端 Select/Menu）。
+文字继承当前端 bodyLarge；默认选中 textPrimary、未选中 textSecondary、区域底色 surfaceMuted。曲率 2、透视 .003、密度 1 和非选中透明度 1 保留 Flutter ListWheelScrollView 当前 SDK 默认值。切换动画使用 Motion fast，系统减少动画时程序化切换立即完成。
+
+每行以原始 TextScaler 测量默认与选中字体下全部标签的实际换行高度，取所需最大值与主题最小高度的较大者；不截断系统非线性缩放。文字缩放、宽度和行高改变后重新对齐当前选中项。父级仍应提供能容纳文字的可用视口，滚轮不会关闭缩放以适应过小的固定高度。
+
+2026-10-19 查阅小米 Vela 官方 picker 文档 https://iot.mi.com/vela/quickapp/zh/components/form/picker.html ，确认普通/时间滚动选择器的行为与文字、选中背景配置角色；其 30px/20px 字号属于 Vela 文档，未直接作为 Flutter 默认值。HiUI picker README https://github.com/XiaoMi/hiui/blob/master/packages/ui/picker/README.md 未提供可核实的滚轮视觉参数。手机、桌面和手表的目标状态实机对照与视觉确认仍待完成。
+
+编辑器“未确认”入口按通用/默认/选中/禁用状态组织，文字和布局在前、表面在底部；设备尺寸与亮暗外观分别保存。像素滑块及持续时间写入整数，圆角范围随宽度和行最小高度动态变化，历史小数导入保持兼容。操作边界统一记于 editor_dimension_limits.dart，不能回写为组件默认值。
+
+2026-10-19 调整：desktop 滚轮行最小高度由 44 改为同端 menu.itemHeight 的 32 逻辑像素（D 级语义推导，待确认）。新增非选中项 unselectedScale（0–1，默认 1），选中保持 1，使用 Motion 连续过渡；不缩小布局或命中尺寸。编辑器补齐字重、非选中缩放与透明度、直径比、透视、挤压比例、选中区域边框和切换曲线；非像素参数保留小数。
+
+2026-10-19 鼠标滚轮平滑修复：Flutter ScrollPosition.pointerScroll 默认先 forcePixels，再 goBallistic，连续离散输入会反复瞬移和吸附。滚轮视口提前通过 pointerSignalResolver 接收垂直滚轮信号，累积目标项并使用现有 Motion/实例 duration、curve 驱动到整项；事件保留完整原生命中路径，触摸拖动与点击职责不变。外部同步及开始拖动清理累积目标。减少动画仍立即完成。回归覆盖首个信号与动画中连续信号没有即时像素跳变，以及结束吸附、拖动、点击、循环和键盘。
+
+2026-10-19 鼠标滚轮步进修正：之前将 PointerScrollEvent 的逻辑像素除以行高后累计取整，导致相同输入在 32px 行高下可能交替跨一项/两项。现每个非零垂直滚轮信号按方向移动一项，连续信号累计整数目标并沿用平滑动画；停止或外部同步后清理目标。Flutter 未提供硬件刻度数量，系统将多个刻度合并为一个事件时无法从像素值可靠还原刻度，此策略明确按事件计步。测试覆盖不同增量、正反方向及动画中连续输入。
+
+## 独立日历（未确认，2026-10-19）
+
+HyperCalendar 为内嵌公历单日选择，HyperCalendar.range 为包含首尾的日期区间选择。
+区间首次点击只在组件中保留起点，第二次点击提交有序 DateTimeRange，支持反向、同日与跨月。
+firstDate/lastDate 默认 1900-01-01 至 2100-12-31；只比较民用日期，不进行时区转换。selectableDayPredicate 可禁用日期，区间不能跨过禁用日；遇到被阻断区间时以第二次点击作为新的起点。清空/提交由调用方管理，不自带浮层、确认按钮或业务表单状态。
+周起点和日期文字默认跟随 MaterialLocalizations；默认当前月份来自选中值或当前日期，initialMonth 可指定。按钮复用 HyperButton 原生焦点、键盘和 Motion 过渡；导航和标题采用 Wrap，日期行测量保留原始 TextScaler，窄宽、大字可增高，不关闭缩放。
+全局 calendarTheme、局部 HyperCalendarTheme、实例 HyperCalendarStyle 逐字段覆盖；四端尺寸由 HyperSizeScheme.calendar 管理，支持 copyWith、lerp 和值相等。普通和区间使用同一日期语义及主题，区间只改变选择行为。
+当前视觉来源 D 级项目推导，尚无目标截图或同状态官方参数验证：日期最小高度沿用同端 controlHeightMd（desktop 沿用 menu.itemHeight=32）；phone/tablet 宽度分别 336/364 为七列对应 controlHeightMd 的布局推导，desktop 280 和 watch 200 复用同端菜单宽度。间距 phone/tablet/desktop 为现有 spaceXs=4，watch spaceXxs=2；圆角复用同端菜单项。所有值为逻辑像素，非官方日历 token，待实机确认。背景默认透明，不创建独立材质配方。
+Demo 与编辑器先注册“未确认”；编辑配置保留四端尺寸和亮暗外观归属，暂复用编辑数据 DTO 字段形状，解析到独立的强类型 calendarTheme / sizes.calendar，不读取 wheelPicker 主题。
+
+2026-10-19 双月面板：HyperCalendarPanels.adaptive/single/doubleMonth 提供公开呈现配置，默认普通日历单月，区间日历 desktop 双月、其他真实设备类别单月。共享同一 month/pending/range 状态和单月绘制函数，两个面板展示连续月份，跨面板端点仍通过同一合法性校验。width 表示单面板宽度，间距复用 calendar.spacing；父约束不足时 Wrap 纵向排列，不重分类设备。达到 lastDate 所在月时只显示合法月份，不生成超出上限的第二个月。Demo 增加显式双月区间，仍留在未确认。
+
+2026-10-19 基础日期时间选择器完成组合：HyperDatePicker 面板使用单月 HyperCalendar（含年月导航），HyperTimePicker 使用并排时/分 HyperWheelPicker，HyperDateTimePicker 在同一可滚动面板中组合单日日历和时分滚轮。不再保留年/月/日/时/分多层 Select 面板路径。日历与滚轮分别继承 calendarTheme / wheelPickerTheme，触发器与浮层继续复用 Select/Selection 强类型主题和统一菜单表面；面板默认宽度从当前端 calendar.width 解析，实例 selectionStyle 可覆盖。
+选择过程只改变本地草稿，确认返回分钟精度的本地 DateTime/TimeOfDay，取消与外部关闭不提交。日期变更保留时分，再按当前边界收敛，时/分可选项同步过滤；分钟步进和日期上下限继续统一由 _Bounds 处理。日期时间范围选择尚未加入。
+组合回归覆盖日历选闰日确认、滚轮取消重开、跨日边界时分过滤、三档文字缩放滚动至操作区、phone/tablet/watch 呈现以及实例空阴影。
+
+2026-10-19 桌面日期时间面板采用紧凑数字编辑：真实 desktop 的时/分使用 HyperTextField 与 HyperButton 增减按钮，支持数字输入、上下方向键和分钟步进；phone/tablet/watch 保留 HyperWheelPicker。数字输入立即将解析值收敛到当前可选列表，失焦/提交时规范化为两位数字；空输入保留上一个有效草稿，按钮在上下限禁用。不另存设备尺寸，输入与按钮复用当前端强类型主题，外层日历与确认流程保持不变。
+
+2026-10-19 桌面时间数字输入参考本地 E:/lemon_shadcn/lib/src/components/forms/app_time_stepper_picker.dart 的 _TimeUnitControl 与 _AppNumberInputState：采用 Stack 中普通输入框加 PositionedDirectional 末端增减区域，避免依赖 trailing 附件的额外间距。数字内容预留 actionWidth，上下按钮直角，标签单独对齐、取消为描边。仅迁移结构，尺寸与排版继续来自 HyperTextField/HyperIconButton 当前端主题，未复制参考项目 72/44/24px 等固定规格。保留当前 API 的非空提交类型与范围边界，不新增会破坏调用方类型的清空提交。
+
+2026-10-19 移动日期编辑改为横排滚轮：非 desktop 呈现不再组合日历，按 date/time/dateTime 模式分别显示年月日、时分、年月日时分；showSeconds 可开启秒列（DateTime 与区间 API，默认 false 保持分钟兼容，TimeOfDay 包装不暴露秒）。Demo 日期时间示例开启秒列。所有列共享草稿与上下限，切换年月先收敛到当月末；分钟步进与秒端点一起过滤。窄宽/文字放大时允许横向滚动，不关闭缩放。列内边距复用同端 menu.padding 的一半，最小列宽用实际 TextScaler 测量四位年份加对应留白；列宽随可用宽度均分，布局不重新分类真实设备。
+
+## Form / Field（未确认，2026-10-19）
+
+用户确认 docs/form-specification.md 的方向后实现 HyperForm、HyperFormController、HyperFormField<T>、HyperField、HyperTextFormField、HyperFormSection 与 HyperFormErrorSummary。
+Form 保留原生 FormField 的 save/reset/validate，Controller 维护具名值、dirty/touched、异步与跨字段校验、版本失效、提交错误及重复提交合并。字段卸载解除注册；重置和编辑使旧校验结果失效。自定义值通过 valueSnapshot/valueEquals 提供业务快照和比较；默认递归冻结 List/Map/Set，value<T> 保留原字段类型。提交异常不删除输入，错误摘要完整换行。
+布局 vertical / horizontal / labelHidden 表示标签与控件的关系；窄约束无法容纳横排时重排竖排，真实设备类别不变。labelHidden 不绘制标签占位，语义名称仍保留。多列由 HyperFormSection.columns 独立组合，按可用宽度和字段最小几何关系重排。基础字段不绘制默认背景或额外卡片。
+全局 formTheme/fieldTheme、局部 HyperFormTheme/HyperFieldTheme、实例 HyperFieldStyle 逐字段解析；sizes.form 集中管理四端标签宽度、对象间距和控件最小可用宽度。字段局部主题保留稀疏覆盖，避免全局 Field 样式反向覆盖 Form 实例配置。主题和尺寸具备 copyWith、lerp、值相等与哈希。
+错误 auto 采用有标题竖排 inline，否则 below；trailingIcon 只有适配器使用子控件原生 errorText 插槽时才交给子控件，通用 builder 没有插槽时降级 below，不以 Stack 遮挡尾部操作。HyperTextFormField 的 trailingIcon 复用 HyperTextField 原有错误入口，普通布局由 HyperField 展示一次。
+
+默认规格来源为 D 级项目候选，使用用户指定的本地 lemon_shadcn 的字段关系作结构参考，单位均为逻辑像素，不是 HyperOS 官方 token：
+- phone/tablet：标签列宽与控件最低可用宽度 120（AppFieldConfig.labelWidth 的可审阅起点），标签间距12、字段间距16、说明间距6复用同端语义留白。
+- desktop：标签列宽/控件最低宽度96（同端 select.width=192 的半宽用于短字段标签与布局重排），间距8/12/4复用同端菜单与语义留白。
+- watch：标签列宽/控件最低宽度80 为窄视口候选布局边界，间距8/8/4复用同端语义留白，待实机验证。默认竖排，不保证横排标签永远适合所有内容。
+这些都是可通过主题修改的初始布局参数，不从参考截图物理像素推导。所有文字使用当前端 bodyMedium/bodySmall/titleMedium，保留系统 TextScaler，不编辑文字行高倍率。
+
+Gallery 预留“表单”正式分类；Form Demo 与编辑入口暂位于“未确认”，id hyper-form 保持稳定。编辑器采用独立 EditorFormMetrics/EditorFormVisual 保存四端尺寸与亮暗外观，恢复继承和历史配置导入兼容；像素滑块写入整数，公共操作上限位于 editor_dimension_limits.dart。
+阶段一采用通用 builder 完整接入现有 Select/DatePicker/Checkbox，提供专门 HyperTextFormField 文本适配。其余专用命名 FormField 包装属于第二阶段，不阻塞表单组合使用。

@@ -1,3 +1,5 @@
+import '../card/hyper_card_style.dart';
+import '../bottom_sheet/hyper_bottom_sheet_style.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import '../overlay/hyper_navigator_scope.dart';
@@ -18,13 +20,24 @@ Future<void> showHyperSelectModal({
   required HyperSelectPresentation presentation,
   required WidgetBuilder builder,
   required String title,
+  Widget? titleWidget,
   HyperSelectionStyle? style,
+  HyperCardStyle? surfaceStyle,
 }) async {
   if (presentation == HyperSelectPresentation.bottomSheet) {
     await showHyperBottomSheet<void>(
       context: context,
       builder: (context) => HyperBottomSheet(
-        title: Text(title),
+        title: titleWidget ?? Text(title),
+        style: surfaceStyle == null
+            ? null
+            : HyperBottomSheetStyle(
+                background: surfaceStyle.background,
+                material: surfaceStyle.material,
+                border: surfaceStyle.border,
+                borderRadius: surfaceStyle.borderRadius,
+                boxShadow: surfaceStyle.boxShadow,
+              ),
         scrollable: false,
         showCloseButton: true,
         onClose: () => Navigator.of(context).pop(),
@@ -56,7 +69,7 @@ Future<void> showHyperSelectModal({
             source: context,
             destination: navigator.context,
             child: HyperScaffold(
-              appBar: HyperAppBar(title: Text(title)),
+              appBar: HyperAppBar(title: titleWidget ?? Text(title)),
               body: SafeArea(child: Builder(builder: builder)),
             ),
           ),

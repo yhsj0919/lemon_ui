@@ -149,3 +149,36 @@ Size editorPreviewSize(HyperDeviceType type, {required bool landscape}) {
   }
   return (min: min.ceilToDouble(), max: max.floorToDouble());
 }
+
+// Wheel editor operation boundaries, pending device review. Width allows a
+// standalone column; row height permits 5 rows in the existing 960px preview
+// operation extent. These are not HyperOS/HiUI defaults or component API limits.
+const editorWheelWidthLimit = 512.0;
+const editorWheelItemExtentLimit = editorContentHeightLimit / 5;
+
+// Wheel shape operation bounds: positive curvature/density and SDK-valid
+// perspective (0, .01]. These are editor exploration limits, pending visual review.
+const editorWheelDiameterRatioMin = 1.0;
+const editorWheelDiameterRatioMax = 10.0;
+const editorWheelPerspectiveMin = .001;
+const editorWheelPerspectiveMax = .01;
+const editorWheelSqueezeMin = .5;
+const editorWheelSqueezeMax = 2.0;
+
+// Calendar day minimum-height operation bound: six week rows fit within the
+// existing 960px content preview operation extent, before header and spacing.
+// This is a pending-review editor limit, independent of device defaults.
+const editorCalendarDayExtentLimit = editorContentHeightLimit / 6;
+
+// Form label/control bounds follow the preview's usable content width. These
+// constrain editor operations, not API legality or platform default tokens.
+double editorFormControlWidthLimit(double viewportWidth) =>
+    viewportWidth.floorToDouble().clamp(1, double.infinity);
+double editorFormLabelWidthLimit(
+  double viewportWidth,
+  double minimumControlWidth,
+  double gap,
+) => (viewportWidth - minimumControlWidth - gap).floorToDouble().clamp(
+  0,
+  double.infinity,
+);

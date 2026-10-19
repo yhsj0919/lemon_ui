@@ -1,3 +1,7 @@
+import '../pages/form/hyper_form_page.dart';
+import '../pages/selection/hyper_calendar_page.dart';
+import '../pages/selection/hyper_wheel_picker_page.dart';
+import '../pages/selection/hyper_date_time_picker_page.dart';
 import '../pages/content/hyper_scrolling_text_page.dart';
 import '../pages/selection/hyper_dropdown_page.dart';
 import '../pages/framework/hyper_top_navigation_page.dart';
@@ -61,6 +65,8 @@ import '../pages/interaction/hyper_tooltip_page.dart';
 import '../pages/surface/hyper_material_surface_page.dart';
 import '../pages/selection/hyper_switch_page.dart';
 import '../pages/selection/hyper_slider_page.dart';
+import '../pages/selection/hyper_number_input_page.dart';
+import '../pages/selection/hyper_file_picker_page.dart';
 import '../pages/selection/hyper_chip_page.dart';
 import '../pages/selection/hyper_checkbox_page.dart';
 import '../pages/selection/hyper_radio_page.dart';
@@ -649,7 +655,55 @@ final List<GallerySection> gallerySections = [
       ),
     ],
   ),
-  GallerySection(title: '未确认', items: []),
+  // New Form demos remain under 未确认 until explicitly approved.
+  GallerySection(title: '表单', items: []),
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-form',
+        title: '表单 Form',
+        description: '横排、竖排与无标题布局，校验与提交。',
+        icon: Icons.assignment_outlined,
+        builder: (_) => const HyperFormPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-file-picker',
+        title: '文件选择 Upload',
+        description: '第三方系统选择与拖放适配，简洁界面和 Form。',
+        icon: Icons.attach_file,
+        builder: (_) => const HyperFilePickerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-number-input',
+        title: '数字输入 NumberInput',
+        description: '范围、步长、精度及 Form 校验。',
+        icon: Icons.pin_outlined,
+        builder: (_) => const HyperNumberInputPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-calendar',
+        title: '日历',
+        description: '普通日历和日期区间。',
+        icon: Icons.calendar_month,
+        builder: (_) => const HyperCalendarPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-wheel-picker',
+        title: '滚轮选择器',
+        description: '单列吸附、循环与受控更新。',
+        icon: Icons.swap_vert,
+        builder: (_) => const HyperWheelPickerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-date-time-picker',
+        title: '日期与时间选择器',
+        description: '日期、时间与日期时间；确认提交与四端呈现。',
+        icon: Icons.date_range_outlined,
+        builder: (_) => const HyperDateTimePickerPage(),
+      ),
+    ],
+  ),
 ];
 
 /// 按注册顺序展开全部演示页。

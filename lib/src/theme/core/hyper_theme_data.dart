@@ -1,3 +1,7 @@
+import '../../components/form/hyper_form_theme.dart';
+import '../../components/form/hyper_field_theme.dart';
+import '../../components/calendar/hyper_calendar_theme.dart';
+import '../../components/wheel_picker/hyper_wheel_picker_theme.dart';
 import '../../components/tab/hyper_tab_bar_theme.dart';
 import '../../components/tooltip/hyper_tooltip_theme.dart';
 import '../../components/top_navigation/hyper_top_navigation_theme.dart';
@@ -120,6 +124,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.treeViewTheme = const HyperTreeViewThemeData(),
     this.selectionTheme = const HyperSelectionThemeData(),
     this.autocompleteTheme = const HyperAutocompleteThemeData(),
+    this.wheelPickerTheme = const HyperWheelPickerThemeData(),
+    this.calendarTheme = const HyperCalendarThemeData(),
+    this.formTheme = const HyperFormThemeData(),
+    this.fieldTheme = const HyperFieldThemeData(),
     this.resultTheme = const HyperResultThemeData(),
     this.emptyStateTheme = const HyperEmptyStateThemeData(),
     this.segmentedButtonTheme = const HyperSegmentedButtonThemeData(),
@@ -386,6 +394,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperTreeViewThemeData treeViewTheme;
   final HyperSelectionThemeData selectionTheme;
   final HyperAutocompleteThemeData autocompleteTheme;
+  final HyperWheelPickerThemeData wheelPickerTheme;
+  final HyperCalendarThemeData calendarTheme;
+  final HyperFormThemeData formTheme;
+  final HyperFieldThemeData fieldTheme;
   final HyperResultThemeData resultTheme;
   final HyperEmptyStateThemeData emptyStateTheme;
   final HyperSegmentedButtonThemeData segmentedButtonTheme;
@@ -525,6 +537,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperTreeViewThemeData? treeViewTheme,
     HyperSelectionThemeData? selectionTheme,
     HyperAutocompleteThemeData? autocompleteTheme,
+    HyperWheelPickerThemeData? wheelPickerTheme,
+    HyperCalendarThemeData? calendarTheme,
+    HyperFormThemeData? formTheme,
+    HyperFieldThemeData? fieldTheme,
     HyperResultThemeData? resultTheme,
     HyperEmptyStateThemeData? emptyStateTheme,
     HyperSegmentedButtonThemeData? segmentedButtonTheme,
@@ -601,6 +617,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       treeViewTheme: treeViewTheme ?? this.treeViewTheme,
       selectionTheme: selectionTheme ?? this.selectionTheme,
       autocompleteTheme: autocompleteTheme ?? this.autocompleteTheme,
+      wheelPickerTheme: wheelPickerTheme ?? this.wheelPickerTheme,
+      calendarTheme: calendarTheme ?? this.calendarTheme,
+      formTheme: formTheme ?? this.formTheme,
+      fieldTheme: fieldTheme ?? this.fieldTheme,
       resultTheme: resultTheme ?? this.resultTheme,
       emptyStateTheme: emptyStateTheme ?? this.emptyStateTheme,
       segmentedButtonTheme: segmentedButtonTheme ?? this.segmentedButtonTheme,
@@ -785,6 +805,18 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.selectionTheme,
         t,
       ),
+      fieldTheme: HyperFieldThemeData.lerp(fieldTheme, other.fieldTheme, t),
+      formTheme: HyperFormThemeData.lerp(formTheme, other.formTheme, t),
+      calendarTheme: HyperCalendarThemeData.lerp(
+        calendarTheme,
+        other.calendarTheme,
+        t,
+      ),
+      wheelPickerTheme: HyperWheelPickerThemeData.lerp(
+        wheelPickerTheme,
+        other.wheelPickerTheme,
+        t,
+      ),
       autocompleteTheme: HyperAutocompleteThemeData.lerp(
         autocompleteTheme,
         other.autocompleteTheme,
@@ -888,6 +920,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.treeViewTheme == treeViewTheme &&
           other.selectionTheme == selectionTheme &&
           other.autocompleteTheme == autocompleteTheme &&
+          other.wheelPickerTheme == wheelPickerTheme &&
+          other.calendarTheme == calendarTheme &&
+          other.formTheme == formTheme &&
+          other.fieldTheme == fieldTheme &&
           other.resultTheme == resultTheme &&
           other.emptyStateTheme == emptyStateTheme &&
           other.segmentedButtonTheme == segmentedButtonTheme &&
@@ -952,6 +988,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     treeViewTheme,
     selectionTheme,
     autocompleteTheme,
+    fieldTheme,
+    formTheme,
+    calendarTheme,
+    wheelPickerTheme,
     resultTheme,
     emptyStateTheme,
     segmentedButtonTheme,

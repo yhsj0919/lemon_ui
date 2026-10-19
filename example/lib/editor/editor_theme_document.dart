@@ -1,3 +1,5 @@
+import 'editor_form_fields.dart';
+import 'editor_wheel_fields.dart';
 import 'editor_review_fields.dart';
 import 'editor_input_fields.dart';
 import 'editor_content_fields.dart';
@@ -337,6 +339,9 @@ class EditorDevice {
   EditorTagMetrics tagMetrics = EditorTagMetrics();
   EditorChipMetrics chipMetrics = EditorChipMetrics();
   EditorSelectMetrics selectMetrics = EditorSelectMetrics();
+  EditorWheelMetrics wheelMetrics = EditorWheelMetrics();
+  EditorWheelMetrics calendarMetrics = EditorWheelMetrics();
+  EditorFormMetrics formMetrics = EditorFormMetrics();
   EditorTextFieldMetrics textFieldMetrics = EditorTextFieldMetrics();
   EditorButtonMetrics buttonMetrics = EditorButtonMetrics();
   EditorTypography typography = EditorTypography();
@@ -390,6 +395,10 @@ class EditorDevice {
       'switchMetrics': switchMetrics.toJson(),
     if (tagMetrics.toJson().isNotEmpty) 'tagMetrics': tagMetrics.toJson(),
     if (chipMetrics.toJson().isNotEmpty) 'chipMetrics': chipMetrics.toJson(),
+    if (formMetrics.toJson().isNotEmpty) 'formMetrics': formMetrics.toJson(),
+    if (calendarMetrics.toJson().isNotEmpty)
+      'calendarMetrics': calendarMetrics.toJson(),
+    if (wheelMetrics.toJson().isNotEmpty) 'wheelMetrics': wheelMetrics.toJson(),
     if (selectMetrics.toJson().isNotEmpty)
       'selectMetrics': selectMetrics.toJson(),
     if (textFieldMetrics.toJson().isNotEmpty)
@@ -438,6 +447,9 @@ class EditorDevice {
       'tagMetrics',
       'chipMetrics',
       'selectMetrics',
+      'formMetrics',
+      'calendarMetrics',
+      'wheelMetrics',
       'textFieldMetrics',
       'layout',
       'body',
@@ -525,6 +537,15 @@ class EditorDevice {
       )
       ..chipMetrics = EditorChipMetrics.fromJson(
         (j['chipMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..formMetrics = EditorFormMetrics.fromJson(
+        (j['formMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..calendarMetrics = EditorWheelMetrics.fromJson(
+        (j['calendarMetrics'] as Map<String, dynamic>?) ?? {},
+      )
+      ..wheelMetrics = EditorWheelMetrics.fromJson(
+        (j['wheelMetrics'] as Map<String, dynamic>?) ?? {},
       )
       ..selectMetrics = EditorSelectMetrics.fromJson(
         (j['selectMetrics'] as Map<String, dynamic>?) ?? {},
@@ -627,6 +648,9 @@ class EditorMode {
   final field = EditorComponent();
   final menu = EditorComponent();
   final select = EditorComponent(), selectAnchor = EditorComponent();
+  EditorWheelVisual wheel = EditorWheelVisual();
+  EditorWheelVisual calendar = EditorWheelVisual();
+  EditorFormVisual formFields = EditorFormVisual();
   Map<String, Object?> toJson() => {
     if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (fontFamily != null) 'fontFamily': fontFamily,
@@ -713,6 +737,9 @@ class EditorMode {
     if (group.toJson().isNotEmpty) 'group': group.toJson(),
     if (card.toJson().isNotEmpty) 'card': card.toJson(),
     if (field.toJson().isNotEmpty) 'field': field.toJson(),
+    if (formFields.toJson().isNotEmpty) 'formFields': formFields.toJson(),
+    if (calendar.toJson().isNotEmpty) 'calendar': calendar.toJson(),
+    if (wheel.toJson().isNotEmpty) 'wheel': wheel.toJson(),
     if (select.toJson().isNotEmpty) 'select': select.toJson(),
     if (selectAnchor.toJson().isNotEmpty) 'selectAnchor': selectAnchor.toJson(),
     if (menu.toJson().isNotEmpty) 'menu': menu.toJson(),
@@ -783,6 +810,9 @@ class EditorMode {
       'field',
       'select',
       'selectAnchor',
+      'formFields',
+      'calendar',
+      'wheel',
       'menu',
     });
     final result = EditorMode()
@@ -897,6 +927,15 @@ class EditorMode {
     read('menu', result.menu);
     read('select', result.select);
     read('selectAnchor', result.selectAnchor);
+    result.formFields = EditorFormVisual.fromJson(
+      (j['formFields'] as Map<String, dynamic>?) ?? {},
+    );
+    result.calendar = EditorWheelVisual.fromJson(
+      (j['calendar'] as Map<String, dynamic>?) ?? {},
+    );
+    result.wheel = EditorWheelVisual.fromJson(
+      (j['wheel'] as Map<String, dynamic>?) ?? {},
+    );
     return result;
   }
 }
@@ -1019,6 +1058,15 @@ class EditorThemeDocument {
               radius: d.buttonRadius,
             ),
           ),
+          form: d.formMetrics.resolve(s.form),
+          calendar: s.calendar.copyWith(
+            width: d.calendarMetrics.width,
+            dayMinHeight: d.calendarMetrics.itemExtent,
+            spacing: d.calendarMetrics.horizontalPadding,
+            radius: d.calendarMetrics.selectionRadius,
+            selectionSize: d.calendarMetrics.selectionSize,
+          ),
+          wheelPicker: d.wheelMetrics.resolve(s.wheelPicker),
           select: s.select.copyWith(
             itemHeight: d.selectMetrics.itemHeight,
             itemPadding: d.selectMetrics.itemPadding,
@@ -2157,6 +2205,26 @@ class EditorThemeDocument {
                   ),
                 ),
           ),
+      fieldTheme: theme.fieldTheme.copyWith(
+        style: m.formFields.resolve(colors),
+      ),
+      calendarTheme: theme.calendarTheme.copyWith(
+        style: HyperCalendarStyle(
+          textStyle: m.calendar.fontSize == null
+              ? null
+              : TextStyle(fontSize: m.calendar.fontSize),
+          foregroundColor: m.calendar.foreground?.resolve(colors),
+          selectedColor: m.calendar.selection?.resolve(colors),
+          selectedForegroundColor: m.calendar.selectedForeground?.resolve(
+            colors,
+          ),
+          backgroundColor: m.calendar.background?.resolve(colors),
+          disabledColor: m.calendar.disabledForeground?.resolve(colors),
+        ),
+      ),
+      wheelPickerTheme: theme.wheelPickerTheme.copyWith(
+        style: m.wheel.resolve(colors),
+      ),
       selectTheme: theme.selectTheme.copyWith(
         style: HyperSelectStyle(
           foregroundColor: m.selectAnchor.foreground?.resolve(colors),

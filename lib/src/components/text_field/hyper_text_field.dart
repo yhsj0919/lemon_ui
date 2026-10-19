@@ -30,6 +30,7 @@ class HyperTextField extends StatefulWidget {
     this.errorText,
     this.leading,
     this.trailing,
+    this.trailingAtEnd = false,
     this.enabled = true,
     this.readOnly = false,
     this.showClearButton = false,
@@ -70,6 +71,9 @@ class HyperTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final String? label, hintText, errorText, semanticLabel;
   final Widget? leading, trailing;
+
+  /// Places custom trailing content after clear, password, error and counter actions.
+  final bool trailingAtEnd;
   final bool enabled,
       readOnly,
       showClearButton,
@@ -276,6 +280,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
             : padding.left;
         final hasCounter = widget.showCounter && widget.maxLength != null;
         final endsWithAction =
+            !(widget.trailingAtEnd && widget.trailing != null) &&
             !hasCounter &&
             ((widget.obscureText && widget.showPasswordToggle) ||
                 widget.showClearButton ||
@@ -288,7 +293,8 @@ class _HyperTextFieldState extends State<HyperTextField> {
           endsWithAction: endsWithAction,
         );
         final actions = <Widget>[
-          if (widget.trailing != null) widget.trailing!,
+          if (widget.trailing != null && !widget.trailingAtEnd)
+            widget.trailing!,
           if (widget.showClearButton)
             _action(
               resolved,
@@ -325,6 +331,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
                 style: resolved.counterStyle,
               ),
             ),
+          if (widget.trailing != null && widget.trailingAtEnd) widget.trailing!,
         ];
         // 错误提示始终挂载以完成退出动画，无错误时自身宽度为零。
         final suffix = IconTheme(

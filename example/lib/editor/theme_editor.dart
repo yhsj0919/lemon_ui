@@ -834,6 +834,470 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ],
     ),
   );
+  Widget _formPanel() {
+    final theme = _resolveTheme(_dark),
+        s = _resolveTheme(_dark).sizes.resolve(_device).form;
+    final m = _spec.formMetrics, v = _mode.formFields;
+    final viewport = editorPreviewSize(_device, landscape: _landscape);
+    final maxLabel = editorFormLabelWidthLimit(
+      viewport.width,
+      s.minimumControlWidth,
+      s.gap,
+    );
+    final fontLimit = editorReviewFontSizeLimit(
+      theme.textTheme.displayLarge!.fontSize!,
+    );
+    return _panel('表单 · 未确认', [
+      const HyperText('三种布局在 Demo 分别预览。字段不绘制额外表面，子控件外观在其各自工作区配置。'),
+      _heading('标签'),
+      _number(
+        '标签列宽',
+        s.labelWidth,
+        0,
+        maxLabel,
+        (n) => m.labelWidth = n,
+        () => m.labelWidth = null,
+        m.labelWidth != null,
+      ),
+      _number(
+        '标签字号',
+        v.labelFontSize ?? theme.textTheme.bodyMedium!.fontSize!,
+        1,
+        fontLimit,
+        (n) => v.labelFontSize = n,
+        () => v.labelFontSize = null,
+        v.labelFontSize != null,
+      ),
+      _color(
+        '标签文字颜色',
+        v.labelColor,
+        (c) => v.labelColor = c,
+        inheritedColor: theme.colors.textPrimary,
+      ),
+      _color(
+        '必填标识颜色',
+        v.requiredColor,
+        (c) => v.requiredColor = c,
+        inheritedColor: theme.colors.error,
+      ),
+      _heading('内容布局'),
+      _number(
+        '标签与控件间距',
+        s.gap,
+        0,
+        editorContentSpacingLimit,
+        (n) => m.gap = n,
+        () => m.gap = null,
+        m.gap != null,
+      ),
+      _number(
+        '字段间距',
+        s.fieldSpacing,
+        0,
+        editorContentSpacingLimit,
+        (n) => m.fieldSpacing = n,
+        () => m.fieldSpacing = null,
+        m.fieldSpacing != null,
+      ),
+      _number(
+        '控件最小可用宽度',
+        s.minimumControlWidth,
+        1,
+        editorFormControlWidthLimit(viewport.width),
+        (n) => m.minimumControlWidth = n,
+        () => m.minimumControlWidth = null,
+        m.minimumControlWidth != null,
+      ),
+      _heading('说明与错误'),
+      _number(
+        '辅助文字间距',
+        s.messageSpacing,
+        0,
+        editorContentSpacingLimit,
+        (n) => m.messageSpacing = n,
+        () => m.messageSpacing = null,
+        m.messageSpacing != null,
+      ),
+      _number(
+        '说明字号',
+        v.descriptionFontSize ?? theme.textTheme.bodySmall!.fontSize!,
+        1,
+        fontLimit,
+        (n) => v.descriptionFontSize = n,
+        () => v.descriptionFontSize = null,
+        v.descriptionFontSize != null,
+      ),
+      _color(
+        '说明文字颜色',
+        v.descriptionColor,
+        (c) => v.descriptionColor = c,
+        inheritedColor: theme.colors.textSecondary,
+      ),
+      _number(
+        '错误字号',
+        v.errorFontSize ?? theme.textTheme.bodySmall!.fontSize!,
+        1,
+        fontLimit,
+        (n) => v.errorFontSize = n,
+        () => v.errorFontSize = null,
+        v.errorFontSize != null,
+      ),
+      _color(
+        '错误文字颜色',
+        v.errorColor,
+        (c) => v.errorColor = c,
+        inheritedColor: theme.colors.error,
+      ),
+    ]);
+  }
+
+  Widget _calendarPanel() {
+    final theme = _resolveTheme(_dark),
+        s = _resolveTheme(_dark).sizes.resolve(_device).calendar;
+    final m = _spec.calendarMetrics, v = _mode.calendar;
+    return _panel('日历 · 未确认', [
+      _heading('文字'),
+      _number(
+        '日历字号',
+        v.fontSize ?? theme.textTheme.bodyMedium!.fontSize!,
+        1,
+        editorReviewFontSizeLimit(theme.textTheme.displayLarge!.fontSize!),
+        (n) => v.fontSize = n,
+        () => v.fontSize = null,
+        v.fontSize != null,
+      ),
+      _color(
+        '日期文字颜色',
+        v.foreground,
+        (c) => v.foreground = c,
+        inheritedColor: theme.colors.textPrimary,
+      ),
+      _color(
+        '选中日期文字颜色',
+        v.selectedForeground,
+        (c) => v.selectedForeground = c,
+        inheritedColor: theme.colors.onPrimary,
+      ),
+      _color(
+        '禁用日期文字颜色',
+        v.disabledForeground,
+        (c) => v.disabledForeground = c,
+        inheritedColor: theme.colors.disabled,
+      ),
+      _heading('布局'),
+      _number(
+        '日历宽度',
+        s.width,
+        1,
+        editorContentWidthLimit,
+        (n) => m.width = n,
+        () => m.width = null,
+        m.width != null,
+      ),
+      _number(
+        '日期最小高度',
+        s.dayMinHeight,
+        1,
+        editorCalendarDayExtentLimit,
+        (n) => m.itemExtent = n,
+        () => m.itemExtent = null,
+        m.itemExtent != null,
+      ),
+      _number(
+        '日期间距',
+        s.spacing,
+        0,
+        (s.width / 6).floorToDouble(),
+        (n) => m.horizontalPadding = n,
+        () => m.horizontalPadding = null,
+        m.horizontalPadding != null,
+      ),
+      _heading('表面'),
+      _number(
+        '选中框边长',
+        s.selectionSize ?? s.dayMinHeight,
+        0,
+        ((s.width - s.spacing * 6) / 7).floorToDouble().clamp(
+          0,
+          double.infinity,
+        ),
+        (n) => m.selectionSize = n,
+        () => m.selectionSize = null,
+        m.selectionSize != null,
+      ),
+      _color(
+        '日历背景',
+        v.background,
+        (c) => v.background = c,
+        inheritedColor: Colors.transparent,
+      ),
+      _color(
+        '选中日期背景',
+        v.selection,
+        (c) => v.selection = c,
+        inheritedColor: theme.colors.primary,
+      ),
+      _radiusNumber(
+        '日期圆角',
+        s.radius,
+        0,
+        editorRadiusLimit(
+          ((s.width - s.spacing * 6) / 7).clamp(0, s.dayMinHeight),
+        ),
+        (n) => m.selectionRadius = n,
+        () => m.selectionRadius = null,
+        m.selectionRadius != null,
+      ),
+    ]);
+  }
+
+  String _wheelState = 'common';
+  Widget _wheelPanel() {
+    final theme = _resolveTheme(_dark);
+    final s = theme.sizes.resolve(_device).wheelPicker;
+    final m = _spec.wheelMetrics;
+    final v = _mode.wheel;
+    final visual = theme.wheelPickerTheme.style;
+    final baseFont =
+        theme.textTheme.bodyLarge?.fontSize ?? theme.typography.bodyLarge;
+    final fontLimit = editorReviewFontSizeLimit(
+      theme.textTheme.displayLarge?.fontSize ?? baseFont,
+    );
+    final radiusLimit = editorRadiusLimit(
+      s.width < s.itemExtent ? s.width : s.itemExtent,
+    );
+    return _panel('滚轮选择器 · 未确认', [
+      const HyperText('尺寸按设备保存，外观按亮暗模式保存。行最小高度随文字缩放自动增高。'),
+      _select('交互状态', _wheelState, const {
+        'common': '通用（所有状态）',
+        'default': '默认',
+        'selected': '选中',
+        'disabled': '禁用',
+      }, (value) => _updateState(() => _wheelState = value)),
+      if (_wheelState == 'common') ...[
+        _heading('文字'),
+        _number(
+          '字号',
+          v.fontSize ?? baseFont,
+          1,
+          fontLimit,
+          (n) => v.fontSize = n,
+          () => v.fontSize = null,
+          v.fontSize != null,
+        ),
+        _number(
+          '字重',
+          v.fontWeight ?? 400,
+          100,
+          900,
+          (n) => v.fontWeight = (n / 100).round() * 100.0,
+          () => v.fontWeight = null,
+          v.fontWeight != null,
+        ),
+        _heading('布局'),
+        _number(
+          '滚轮宽度',
+          s.width,
+          1,
+          editorWheelWidthLimit,
+          (n) {
+            m.width = n;
+            if (m.horizontalPadding != null) {
+              m.horizontalPadding = m.horizontalPadding!.roundToDouble().clamp(
+                0,
+                (n / 2).floorToDouble(),
+              );
+            }
+            if (m.selectionRadius != null) {
+              m.selectionRadius = m.selectionRadius!.roundToDouble().clamp(
+                0,
+                editorRadiusLimit(n < s.itemExtent ? n : s.itemExtent),
+              );
+            }
+          },
+          () => m.width = null,
+          m.width != null,
+        ),
+        _number(
+          '行最小高度',
+          s.itemExtent,
+          1,
+          editorWheelItemExtentLimit,
+          (n) {
+            m.itemExtent = n;
+            if (m.selectionRadius != null) {
+              m.selectionRadius = m.selectionRadius!.roundToDouble().clamp(
+                0,
+                editorRadiusLimit(n < s.width ? n : s.width),
+              );
+            }
+          },
+          () => m.itemExtent = null,
+          m.itemExtent != null,
+        ),
+        _number(
+          '文字水平内边距',
+          s.horizontalPadding,
+          0,
+          (s.width / 2).floorToDouble(),
+          (n) => m.horizontalPadding = n,
+          () => m.horizontalPadding = null,
+          m.horizontalPadding != null,
+        ),
+        _number(
+          '直径比',
+          v.diameterRatio ?? 2,
+          editorWheelDiameterRatioMin,
+          editorWheelDiameterRatioMax,
+          (n) => v.diameterRatio = n,
+          () => v.diameterRatio = null,
+          v.diameterRatio != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '透视',
+          v.perspective ?? .003,
+          editorWheelPerspectiveMin,
+          editorWheelPerspectiveMax,
+          (n) => v.perspective = n,
+          () => v.perspective = null,
+          v.perspective != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '挤压比例',
+          v.squeeze ?? 1,
+          editorWheelSqueezeMin,
+          editorWheelSqueezeMax,
+          (n) => v.squeeze = n,
+          () => v.squeeze = null,
+          v.squeeze != null,
+          wholeNumbers: false,
+        ),
+        _number(
+          '非选中透明度',
+          v.unselectedOpacity ?? 1,
+          0,
+          1,
+          (n) => v.unselectedOpacity = n,
+          () => v.unselectedOpacity = null,
+          v.unselectedOpacity != null,
+          wholeNumbers: false,
+        ),
+        _heading('动效'),
+        _select('切换曲线', v.curve ?? 'inherit', const {
+          'inherit': '继承 Motion',
+          'linear': '线性',
+          'easeOut': '缓出',
+          'easeOutCubic': '三次缓出',
+          'easeInOutCubic': '三次缓入缓出',
+        }, (n) => _change(() => v.curve = n == 'inherit' ? null : n)),
+        _number(
+          '切换时长',
+          v.duration ?? theme.motion.fastDuration.inMilliseconds.toDouble(),
+          0,
+          editorReviewDurationLimit,
+          (n) => v.duration = n,
+          () => v.duration = null,
+          v.duration != null,
+        ),
+        _heading('表面'),
+        _color(
+          '选中区域边框颜色',
+          v.borderColor,
+          (c) => v.borderColor = c,
+          inheritedColor: theme.colors.outline,
+        ),
+        _number(
+          '选中区域边框宽度',
+          v.borderWidth ?? 0,
+          0,
+          radiusLimit,
+          (n) => v.borderWidth = n,
+          () => v.borderWidth = null,
+          v.borderWidth != null,
+        ),
+        _color(
+          '滚轮背景',
+          v.background,
+          (c) => v.background = c,
+          inheritedColor: visual.backgroundColor ?? Colors.transparent,
+        ),
+        _color(
+          '选中区域背景',
+          v.selection,
+          (c) => v.selection = c,
+          inheritedColor: visual.selectionColor ?? theme.colors.surfaceMuted,
+        ),
+        _radiusNumber(
+          '选中区域圆角',
+          s.selectionRadius,
+          0,
+          radiusLimit,
+          (n) => m.selectionRadius = n,
+          () => m.selectionRadius = null,
+          m.selectionRadius != null,
+        ),
+      ],
+      if (_wheelState == 'default') ...[
+        _number(
+          '非选中缩放比例',
+          v.unselectedScale ?? 1,
+          0,
+          1,
+          (n) => v.unselectedScale = n,
+          () => v.unselectedScale = null,
+          v.unselectedScale != null,
+          wholeNumbers: false,
+        ),
+        _heading('文字'),
+        _color(
+          '文字颜色',
+          v.foreground,
+          (c) => v.foreground = c,
+          inheritedColor: visual.foregroundColor ?? theme.colors.textSecondary,
+        ),
+      ],
+      if (_wheelState == 'selected') ...[
+        _number(
+          '选中文字字重',
+          v.selectedFontWeight ?? v.fontWeight ?? 400,
+          100,
+          900,
+          (n) => v.selectedFontWeight = (n / 100).round() * 100.0,
+          () => v.selectedFontWeight = null,
+          v.selectedFontWeight != null,
+        ),
+        _heading('文字'),
+        _number(
+          '选中文字字号',
+          v.selectedFontSize ?? v.fontSize ?? baseFont,
+          1,
+          fontLimit,
+          (n) => v.selectedFontSize = n,
+          () => v.selectedFontSize = null,
+          v.selectedFontSize != null,
+        ),
+        _color(
+          '选中文字颜色',
+          v.selectedForeground,
+          (c) => v.selectedForeground = c,
+          inheritedColor:
+              visual.selectedForegroundColor ?? theme.colors.primary,
+        ),
+      ],
+      if (_wheelState == 'disabled') ...[
+        _heading('文字'),
+        _color(
+          '禁用文字颜色',
+          v.disabledForeground,
+          (c) => v.disabledForeground = c,
+          inheritedColor: visual.disabledColor ?? theme.colors.disabled,
+        ),
+      ],
+    ]);
+  }
+
   Widget _radiusNumber(
     String label,
     double value,
@@ -2055,6 +2519,19 @@ class _ThemeEditorState extends State<ThemeEditor> {
     if (sections != null) {
       return _globalPanel(sections: sections.isEmpty ? null : sections);
     }
+    if (_page == 'hyper-form') return _formPanel();
+    if (_page == 'hyper-file-picker') {
+      return _panel('文件选择 · 继承现有主题', [
+        const HyperText('默认界面复用卡片、按钮、图标按钮和文字主题；实例 pickerStyle 可覆盖表面。文件选择和拖放由第三方适配层提供。'),
+      ]);
+    }
+    if (_page == 'hyper-number-input') {
+      return _panel('数字输入 · 继承现有主题', [
+        const HyperText('输入框外观与四端尺寸继承文本输入框；步进图标继承图标按钮。实例可通过 style 和 stepperStyle 分别覆盖。'),
+      ]);
+    }
+    if (_page == 'hyper-calendar') return _calendarPanel();
+    if (_page == 'hyper-wheel-picker') return _wheelPanel();
     if (_page == 'hyper-color-picker') {
       return _panel('颜色选择器', [const HyperText('本页仅提供 Demo 预览，外观跟随主题。')]);
     }
@@ -4887,7 +5364,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
                       .firstOrNull
                       ?.key ??
                   value;
-              if (value == 'hyper-dropdown') _component = 'select';
+              if (value == 'hyper-dropdown' ||
+                  value == 'hyper-date-time-picker') {
+                _component = 'select';
+              }
               if (value == 'hyper-notification-center') {
                 _component = 'notificationReview';
               }

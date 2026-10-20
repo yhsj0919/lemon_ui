@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
 import '../button/hyper_button.dart';
+import '../text/hyper_scrolling_text.dart';
 import '../button/hyper_button_style.dart';
 import '../card/hyper_card.dart';
 import '../card/hyper_card_style.dart';
@@ -174,10 +175,9 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
                   HyperColorPickerFieldDisplay.colorAndValue) ...[
                 SizedBox(width: gap),
                 Flexible(
-                  child: Text(
+                  child: HyperScrollingText(
                     hex,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    trigger: HyperTextScrollTrigger.hover,
                   ),
                 ),
                 SizedBox(

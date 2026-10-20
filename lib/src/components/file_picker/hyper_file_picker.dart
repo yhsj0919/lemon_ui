@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../text/hyper_scrolling_text.dart';
+
 import '../../theme/core/hyper_theme.dart';
 import '../button/hyper_button.dart';
 import '../card/hyper_card.dart';
@@ -117,7 +119,10 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(file.name),
+                  HyperScrollingText(
+                    file.name,
+                    trigger: HyperTextScrollTrigger.hover,
+                  ),
                   if (file.size != null)
                     Text('${file.size} 字节', style: theme.textTheme.bodySmall),
                   if (message != null)

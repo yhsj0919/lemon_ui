@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
 import '../button/hyper_button.dart';
+import '../text/hyper_scrolling_text.dart';
 import '../button/hyper_button_style.dart';
 import '../card/hyper_card.dart';
 import '../card/hyper_card_style.dart';
@@ -19,7 +20,10 @@ class HyperDropdown extends StatefulWidget {
     super.key,
     required this.panelBuilder,
     this.modalTitle,
-    this.label = const Text('请选择'),
+    this.label = const HyperScrollingText(
+      '请选择',
+      trigger: HyperTextScrollTrigger.hover,
+    ),
     this.enabled = true,
     this.isOpen,
     this.onOpenChanged,

@@ -1,5 +1,6 @@
 import '../../foundation/hyper_fill.dart';
 import '../text_field/hyper_text_field_theme.dart';
+import '../text/hyper_scrolling_text.dart';
 import '../chip/hyper_chip_style.dart';
 
 import 'dart:async';
@@ -764,12 +765,11 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
             Expanded(
               child: widget.multiple && widget.values.isNotEmpty
                   ? _tags()
-                  : Text(
+                  : HyperScrollingText(
                       widget.values.isEmpty
                           ? widget.placeholder
                           : _label(widget.values.first),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      trigger: HyperTextScrollTrigger.hover,
                     ),
             ),
             SizedBox(width: dropdown.arrowSpacing),

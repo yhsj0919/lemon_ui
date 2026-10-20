@@ -9,7 +9,7 @@ class HyperFormPage extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText('表单 · 未确认：横排指标签与控件的关系。布局与业务校验独立，日期、选择器等继续使用现有控件。'),
+      const HyperText('横排指标签与控件的关系。布局与业务校验独立，日期、选择器等继续使用现有控件。'),
       DemoSection(title: '弹窗表单 · 确定时校验', child: const _ModalExamples()),
       for (final layout in HyperFieldLayout.values)
         DemoSection(

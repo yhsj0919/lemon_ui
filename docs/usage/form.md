@@ -1,6 +1,6 @@
 # 表单
 
-Form Demo 位于“未确认 → 表单 Form”，展示竖排、横排和无标题布局。正式目标分类为“表单”，默认外观尚待确认。
+Form Demo 位于“表单 → 表单 Form”，展示竖排、横排和无标题布局。表单与操作区的默认样式及行为已确认；各字段控件仍沿用自身的确认状态。
 
 ```dart
 final controller = HyperFormController(); // 在拥有它的 State.dispose 中释放。
@@ -140,4 +140,19 @@ Select 和 Radio 使用 `HyperSelectOption<T>` 作为选项；Radio 整组注册
 Switch 默认值为 false。视觉样式分别通过 `selectStyle`、`checkboxStyle`、
 `radioStyle` 和 `switchStyle` 覆盖，字段标签及错误使用通用 `style`。
 横排和无标题布局默认在控件右侧显示错误提示图标。
+
+`HyperFormActions` 统一组合提交、重置和可选取消按钮。提交调用 controller.submit，先运行
+字段与跨字段校验，再把不可变 values 交给 onSubmit；异步期间操作按钮禁用并显示加载态。
+重置恢复各字段 initialValue 并清除错误，取消行为由 onCancel 提供。将 `HyperFormErrorSummary`
+放在操作区附近可显示提交回调抛出的错误。按钮样式通过 `submitStyle`、`resetStyle`、
+`cancelStyle` 覆盖，间距继承 Form 主题；窄宽度会自动换行。
+
+`HyperCascaderFormField<T>` 保存不可变的完整路径 `List<T>`，支持 `nodes` 与
+`loadChildren`、清空、具名提交、同步/异步校验、禁用和重置。字段 `style` 用于
+标签和错误，`cascaderStyle` / `surfaceStyle` 用于控件及浮层；
+浏览分支与手机滚轮草稿不会改变表单值；列表选择末级或手机点击确定后提交路径。
+详见 [级联选择 Form 适配](cascader.md#form-适配)。
+
+`HyperTreeSelectFormField<T>` 保存单个树节点值，支持 `leafOnly`、异步子节点、
+同步/异步校验、禁用与重置。详见 [树形选择 Form 适配](tree-select.md#form-适配)。
 

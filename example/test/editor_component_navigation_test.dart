@@ -5,6 +5,90 @@ import 'package:lemon_ui_example/editor/editor_component_navigation.dart';
 import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 
 void main() {
+  testWidgets('树形选择入口归入未确认分类并能从编辑器导航显示', (tester) async {
+    final pending = gallerySections.singleWhere((s) => s.title == '未确认');
+    expect(
+      pending.items.where((i) => i.id == 'hyper-tree-select'),
+      hasLength(1),
+    );
+    expect(
+      gallerySections
+          .where((s) => s.title != '未确认')
+          .expand((s) => s.items)
+          .where((i) => i.id == 'hyper-tree-select'),
+      isEmpty,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: const Scaffold(
+            body: EditorComponentNavigation(
+              page: 'hyper-tree-select',
+              onSelected: _ignoreSelection,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('树形选择 · 未确认'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('多行文本入口登记在表单分类并显示编辑器入口', (tester) async {
+    final pending = gallerySections.singleWhere((s) => s.title == '未确认');
+    expect(pending.items.where((i) => i.id == 'hyper-text-area'), isEmpty);
+    final forms = gallerySections.singleWhere((s) => s.title == '表单');
+    expect(forms.items.where((i) => i.id == 'hyper-text-area'), hasLength(1));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: const Scaffold(
+            body: EditorComponentNavigation(
+              page: 'hyper-text-area',
+              onSelected: _ignoreSelection,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('多行文本'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('表单示例归入表单分类并显示编辑器入口', (tester) async {
+    final forms = gallerySections.singleWhere((s) => s.title == '表单');
+    expect(forms.items.map((i) => i.id), [
+      'hyper-form',
+      'hyper-form-actions',
+      'hyper-text-area',
+    ]);
+    final pending = gallerySections.singleWhere((s) => s.title == '未确认');
+    expect(pending.items.where((i) => i.id.startsWith('hyper-form')), isEmpty);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: const Scaffold(
+            body: EditorComponentNavigation(
+              page: 'hyper-form-actions',
+              onSelected: _ignoreSelection,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('表单操作'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('顶部导航与菜单统一放入导航分类，提示保留在反馈', (tester) async {
     final section = gallerySections.firstWhere((s) => s.title == '顶部导航与菜单');
     expect(section.items.map((i) => i.id), [
@@ -87,3 +171,5 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 }
+
+void _ignoreSelection(String _) {}

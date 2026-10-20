@@ -79,6 +79,25 @@ maxLength 限制由原生 TextField 执行，maxLengthEnforcement 可控制输�
 
 ## 多行与自定义主题
 
+显式需要多行时优先使用 `HyperTextArea`；普通表单字段继续使用单行 `HyperTextField`。
+TextArea 默认最少显示 3 行并随内容增长；`minLines` / `maxLines` 可调整增长区间，
+`maxLength` 与 `showCounter` 可限制并展示长度。它复用 `HyperTextField` 的文字、光标、状态、
+错误提示和表面主题，不单独维护一套视觉配置。
+
+~~~dart
+HyperTextArea(
+  label: '备注',
+  hintText: '输入补充说明',
+  minLines: 3,
+  maxLines: 6,
+  maxLength: 500,
+  showCounter: true,
+)
+~~~
+
+表单场景使用 `HyperTextAreaFormField`，支持 `initialValue`、同步/异步校验、禁用、提交和重置；
+`requiredIndicator` 只显示标记，必填规则仍由 validator 定义。
+
 ~~~dart
 HyperTextFieldTheme(
   data: const HyperTextFieldThemeData(

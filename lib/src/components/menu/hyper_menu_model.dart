@@ -11,6 +11,10 @@ final class HyperMenuItem {
     this.trailing,
     this.children = const [],
     this.enabled = true,
+    this.onSubmenuOpened,
+    this.onPressed,
+    this.submenuIcon,
+    this.wrapLabel = false,
   });
 
   final String id;
@@ -24,6 +28,20 @@ final class HyperMenuItem {
   /// 子菜单项；非空时当前项负责展开子菜单。
   final List<HyperMenuItem> children;
   final bool enabled;
+
+  /// Called when this branch opens, including pointer and keyboard activation.
+  final VoidCallback? onSubmenuOpened;
+
+  /// A leaf action handled locally without dismissing ancestor menus.
+  ///
+  /// Useful for retry actions embedded in asynchronous submenus.
+  final VoidCallback? onPressed;
+
+  /// The branch indicator override; otherwise uses the directional chevron.
+  final IconData? submenuIcon;
+
+  /// Whether the label wraps instead of using the menu's single-line default.
+  final bool wrapLabel;
 }
 
 /// 菜单分组；标题可省略，相邻分组仍保持分隔。

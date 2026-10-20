@@ -1,4 +1,5 @@
 import '../number_input/hyper_number_input.dart';
+import '../text/hyper_scrolling_text.dart';
 import '../select/hyper_selection_layout.dart';
 import '../wheel_picker/hyper_wheel_picker_style.dart';
 
@@ -159,7 +160,7 @@ class HyperDateTimePicker extends StatelessWidget {
         ),
       ).merge(style),
       surfaceStyle: _pickerSurface(context, style, surfaceStyle),
-      label: Text(
+      label: HyperScrollingText(
         value == null
             ? placeholder ??
                   switch (mode) {
@@ -168,6 +169,7 @@ class HyperDateTimePicker extends StatelessWidget {
                     HyperDateTimePickerMode.dateTime => '选择日期和时间',
                   }
             : (labelBuilder ?? format)(value!),
+        trigger: HyperTextScrollTrigger.hover,
       ),
       panelBuilder: (context, close) => _PickerPanel(
         bounds: bounds,
@@ -872,7 +874,7 @@ class _RangePickerHostState extends State<HyperDateTimeRangePicker> {
         ),
       ).merge(style),
       surfaceStyle: _pickerSurface(context, style, surfaceStyle),
-      label: Text(
+      label: HyperScrollingText(
         value == null
             ? switch (mode) {
                 HyperDateTimePickerMode.date => '选择日期区间',
@@ -880,6 +882,7 @@ class _RangePickerHostState extends State<HyperDateTimeRangePicker> {
                 HyperDateTimePickerMode.dateTime => '选择日期时间区间',
               }
             : '${format(value!.start)} — ${format(value!.end)}',
+        trigger: HyperTextScrollTrigger.hover,
       ),
       panelBuilder: (context, close) => _RangePanel(
         bounds: bounds,

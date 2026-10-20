@@ -1,4 +1,6 @@
 import '../../components/form/hyper_form_theme.dart';
+import '../../components/cascader/hyper_cascader_theme.dart';
+import '../../components/tree_select/hyper_tree_select_theme.dart';
 import '../../components/form/hyper_field_theme.dart';
 import '../../components/calendar/hyper_calendar_theme.dart';
 import '../../components/wheel_picker/hyper_wheel_picker_theme.dart';
@@ -111,6 +113,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.topNavigationTheme = const HyperTopNavigationThemeData(),
     this.colorPickerTheme = const HyperColorPickerThemeData(),
     this.selectTheme = const HyperSelectThemeData(),
+    this.cascaderTheme = const HyperCascaderThemeData(),
+    this.treeSelectTheme = const HyperTreeSelectThemeData(),
     this.tabBarTheme = const HyperTabBarThemeData(),
     this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
     this.cardTheme = const HyperCardThemeData(),
@@ -371,6 +375,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   /// 全局下拉选择器主题。
   final HyperSelectThemeData selectTheme;
+  final HyperCascaderThemeData cascaderTheme;
+  final HyperTreeSelectThemeData treeSelectTheme;
 
   /// 全局面包屑视觉主题。
   final HyperTabBarThemeData tabBarTheme;
@@ -524,6 +530,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperTopNavigationThemeData? topNavigationTheme,
     HyperColorPickerThemeData? colorPickerTheme,
     HyperSelectThemeData? selectTheme,
+    HyperCascaderThemeData? cascaderTheme,
+    HyperTreeSelectThemeData? treeSelectTheme,
     HyperTabBarThemeData? tabBarTheme,
     HyperBreadcrumbThemeData? breadcrumbTheme,
     HyperCardThemeData? cardTheme,
@@ -604,6 +612,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       topNavigationTheme: topNavigationTheme ?? this.topNavigationTheme,
       colorPickerTheme: colorPickerTheme ?? this.colorPickerTheme,
       selectTheme: selectTheme ?? this.selectTheme,
+      cascaderTheme: cascaderTheme ?? this.cascaderTheme,
+      treeSelectTheme: treeSelectTheme ?? this.treeSelectTheme,
       tabBarTheme: tabBarTheme ?? this.tabBarTheme,
       breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
       cardTheme: cardTheme ?? this.cardTheme,
@@ -763,6 +773,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       selectTheme: HyperSelectThemeData.lerp(selectTheme, other.selectTheme, t),
+      cascaderTheme: HyperCascaderThemeData.lerp(
+        cascaderTheme,
+        other.cascaderTheme,
+        t,
+      ),
+      treeSelectTheme: HyperTreeSelectThemeData.lerp(
+        treeSelectTheme,
+        other.treeSelectTheme,
+        t,
+      ),
       tabBarTheme: HyperTabBarThemeData.lerp(tabBarTheme, other.tabBarTheme, t),
       breadcrumbTheme: HyperBreadcrumbThemeData.lerp(
         breadcrumbTheme,
@@ -909,6 +929,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.topNavigationTheme == topNavigationTheme &&
           other.colorPickerTheme == colorPickerTheme &&
           other.selectTheme == selectTheme &&
+          other.cascaderTheme == cascaderTheme &&
+          other.treeSelectTheme == treeSelectTheme &&
           other.tabBarTheme == tabBarTheme &&
           other.breadcrumbTheme == breadcrumbTheme &&
           other.cardTheme == cardTheme &&
@@ -978,6 +1000,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     topNavigationTheme,
     colorPickerTheme,
     selectTheme,
+    cascaderTheme,
+    treeSelectTheme,
     breadcrumbTheme,
     cardTheme,
     titledCardTheme,

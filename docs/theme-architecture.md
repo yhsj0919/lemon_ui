@@ -23,6 +23,37 @@ HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴
 
 # Lemon UI 主题与尺寸架构
 
+## Cascader（2026-10-20，未确认）
+
+HyperCascader 的锚定呈现直接复用 HyperMenu 多级浮层，悬停或点击在右侧展开子级，
+父级保留可见；异步分支的加载、错误和重试在对应子浮层中处理，不混入祖先路径按钮。
+手机模态呈现复用 HyperWheelPicker 实现联动草稿，确认后提交；标题与主色清空同排。
+滚轮尺寸继承 sizes.wheelPicker，列间距继承 menu.padding，最小列宽复用同端最小交互尺寸；
+wheelStyle / clearButtonStyle 纳入 cascaderTheme、局部主题及实例的合并/插值/值相等。
+平板与手表模态呈现保留单页逐级导航，顶部只提供当前层返回按钮。
+组件复用 HyperDropdown 的触发与呈现、HyperMenu 的选项与键盘导航和
+HyperButton 的路径操作。全局 cascaderTheme、局部 HyperCascaderTheme 与实例
+HyperCascaderStyle 逐字段合并；selectStyle / navigationStyle 分别复用现有强类型样式。
+所有默认几何取解析后的 sizes.select、selection、menu、button 和 navigationItemSpacing，
+不在组件内分设备保存常量，也不为相同语义重复添加设备规格。默认来源为 D 级项目语义组合，
+尚未取得同代官方级联选择器的直接尺寸，待用户视觉确认。
+
+锚定面板通过公共 HyperDropdown 的 resolveHyperMenuSurface，手机和平板复用
+BottomSheet 的唯一表面，手表全屏；材质配置与安全过渡由公共基础设施负责。
+异步模型只保存浏览路径与分支缓存，选择始终归调用方；数据源替换销毁旧模型，
+关闭面板停止路径恢复，旧分支结果不改变当前导航。实现与验证边界见 [级联选择](usage/cascader.md)。
+
+## TreeSelect（2026-10-20，未确认）
+
+HyperTreeSelect 复用 HyperDropdown 的锚定呈现与公共下拉表面解析，树内容复用
+HyperTreeView 的行状态、键盘导航、异步加载与重试。展开箭头独立于节点选择，
+leafOnly 通过树适配层约束可选项；phone/tablet 使用底部弹窗，watch 使用全屏页面。
+尺寸继承 sizes.select、selection、treeView 与 button，不增加重复的设备尺寸。
+treeSelectTheme、局部 HyperTreeSelectTheme 与实例 HyperTreeSelectStyle 按强类型字段
+合并、插值并参与值相等；节点 value 唯一性和动态加载结果由公共 HyperTreeController
+校验。默认外观来自 D 级既有语义组合，官方精确尺寸与目标截图待确认。
+实现边界见 [树形选择](usage/tree-select.md)。
+
 ## 选择面板统一布局（2026-10-19）
 
 下拉、自动完成和日期时间编辑面板共用 hyper_selection_layout.dart 的内边距及动作区。

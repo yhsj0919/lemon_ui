@@ -1,4 +1,7 @@
 import '../pages/form/hyper_form_page.dart';
+import '../pages/form/hyper_form_actions_page.dart';
+import '../pages/selection/hyper_cascader_page.dart';
+import '../pages/selection/hyper_tree_select_page.dart';
 import '../pages/selection/hyper_calendar_page.dart';
 import '../pages/selection/hyper_wheel_picker_page.dart';
 import '../pages/selection/hyper_date_time_picker_page.dart';
@@ -18,6 +21,7 @@ import '../pages/container/hyper_collapsible_page.dart';
 import '../pages/feedback/hyper_notification_center_page.dart';
 import '../pages/feedback/hyper_notification_page.dart';
 import '../pages/selection/hyper_text_field_page.dart';
+import '../pages/selection/hyper_text_area_page.dart';
 import '../pages/feedback/hyper_dialog_page.dart';
 import '../pages/feedback/hyper_bottom_sheet_page.dart';
 import '../pages/feedback/hyper_message_page.dart';
@@ -655,17 +659,50 @@ final List<GallerySection> gallerySections = [
       ),
     ],
   ),
-  // New Form demos remain under 未确认 until explicitly approved.
-  GallerySection(title: '表单', items: []),
   GallerySection(
-    title: '未确认',
+    title: '表单',
     items: [
       GalleryItem(
         id: 'hyper-form',
         title: '表单 Form',
-        description: '横排、竖排与无标题布局，校验与提交。',
+        description: '横排、竖排与无标题布局，字段校验与提交。',
         icon: Icons.assignment_outlined,
         builder: (_) => const HyperFormPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-form-actions',
+        title: '表单操作 FormActions',
+        description: '统一提交、重置、取消与加载状态。',
+        icon: Icons.rule_folder_outlined,
+        builder: (_) => const HyperFormActionsPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-text-area',
+        title: '多行文本 TextArea',
+        description: '内容增长、字数限制与 Form 校验。',
+        icon: Icons.notes_outlined,
+        builder: (_) => const HyperTextAreaPage(),
+      ),
+    ],
+  ),
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-tree-select',
+        title: '树形选择 TreeSelect',
+        description: '树形单选、仅叶节点、异步分支与 Form 校验。',
+        icon: Icons.account_tree_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperTreeSelectPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-cascader',
+        title: '级联选择 Cascader',
+        description: '完整路径单选、异步分支、失败重试及 Form 校验与提交。',
+        icon: Icons.account_tree_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperCascaderPage(),
       ),
       GalleryItem(
         id: 'hyper-file-picker',

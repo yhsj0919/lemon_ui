@@ -41,10 +41,10 @@ class HyperMenu extends StatefulWidget {
     this.requestFocusOnOpen, {
     required this.items,
     required this.selectedId,
+    required this.selectedIds,
     required this.onSelected,
     required this.style,
   }) : groups = const [],
-       selectedIds = const {},
        showSurface = true,
        navigationController = null;
 
@@ -182,12 +182,20 @@ class _HyperMenuState extends State<HyperMenu> {
     _setActive(enabled[next].id);
   }
 
-  void _openSubmenu(String id) {
+  void _openSubmenu(String id, {bool keyboard = true}) {
+    final newlyOpened = _openSubmenuId != id;
     setState(() {
       _activeId = id;
       _openSubmenuId = id;
-      _keyboardActive = true;
+      _keyboardActive = keyboard;
     });
+    if (newlyOpened) {
+      _enabledItems
+          .where((item) => item.id == id)
+          .firstOrNull
+          ?.onSubmenuOpened
+          ?.call();
+    }
   }
 
   void _closeSubmenu() {
@@ -199,7 +207,11 @@ class _HyperMenuState extends State<HyperMenu> {
     if (item.children.isNotEmpty) {
       _openSubmenu(item.id);
     } else {
-      widget.onSelected?.call(item.id);
+      if (item.onPressed != null) {
+        item.onPressed!();
+      } else {
+        widget.onSelected?.call(item.id);
+      }
     }
   }
 
@@ -353,15 +365,19 @@ class _HyperMenuState extends State<HyperMenu> {
           if (item.description != null) item.description!,
         ].join('，'),
         onEnter: item.enabled
-            ? (_) => setState(() {
-                _activeId = item.id;
-                _keyboardActive = false;
-                _openSubmenuId = item.children.isEmpty ? null : item.id;
-              })
+            ? (_) {
+                if (item.children.isNotEmpty) {
+                  _openSubmenu(item.id, keyboard: false);
+                } else {
+                  setState(() {
+                    _activeId = item.id;
+                    _keyboardActive = false;
+                    _openSubmenuId = null;
+                  });
+                }
+              }
             : null,
-        onTap: item.children.isEmpty
-            ? () => widget.onSelected?.call(item.id)
-            : () => _openSubmenu(item.id),
+        onTap: () => _activate(item),
         builder: (context, states, _) => Semantics(
           selected: selected,
           enabled: item.enabled,
@@ -419,8 +435,8 @@ class _HyperMenuState extends State<HyperMenu> {
                     children: [
                       Text(
                         item.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: item.wrapLabel ? null : 1,
+                        overflow: item.wrapLabel ? null : TextOverflow.ellipsis,
                         style: style.itemTextStyle!.copyWith(color: foreground),
                       ),
                       if (item.description != null) ...[
@@ -455,9 +471,10 @@ class _HyperMenuState extends State<HyperMenu> {
                 if (item.children.isNotEmpty) ...[
                   SizedBox(width: style.iconSpacing),
                   Icon(
-                    Directionality.of(context) == TextDirection.ltr
-                        ? Icons.chevron_right
-                        : Icons.chevron_left,
+                    item.submenuIcon ??
+                        (Directionality.of(context) == TextDirection.ltr
+                            ? Icons.chevron_right
+                            : Icons.chevron_left),
                     size: style.iconSize,
                     color: foreground,
                   ),
@@ -488,6 +505,7 @@ class _HyperMenuState extends State<HyperMenu> {
         _keyboardActive,
         items: item.children,
         selectedId: widget.selectedId,
+        selectedIds: widget.selectedIds,
         onSelected: (id) {
           close();
           widget.onSelected?.call(id);

@@ -218,8 +218,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 ## 八、文本输入与编辑
 
 - [x] `HyperTextField`：单行、多行、密码、清空、字数限制及尾部错误提示；支持独立主题与四端规格。
-- [ ] `HyperTextFormField`：表单文本字段。
-- [ ] `HyperTextArea`：多行文本输入。
+- [x] `HyperTextFormField`：单行文本表单适配；字段样式由 HyperTextField 主题管理。
+- [x] `HyperTextArea`：内容增长、行数约束、长度提示与 Form 适配；默认样式与交互已由用户确认，Demo 位于“表单”。
 - [ ] `HyperSearchField`：搜索输入。
 - [ ] `HyperPasswordField`：密码输入。
 - [ ] `HyperNumberField`：数值输入。
@@ -228,8 +228,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperUrlField`：URL 输入便捷配置。
 - [ ] `HyperPinInput`：PIN 输入。
 - [ ] `HyperOtpInput`：验证码输入。
-- [~] `HyperAutocomplete<T>`：主输入搜索、单多选、异步分页与可选自由值；设备视觉验证待补齐。
-- [~] `HyperSelect<T>`：受控单多选、搜索、异步分页与多种呈现；Form 适配后置。
+- [x] `HyperAutocomplete<T>`：主输入搜索、单多选、异步分页与可选自由值；默认样式与交互已由用户确认。
+- [x] `HyperSelect<T>`：受控单多选、搜索、异步分页与多种呈现；单选与多选 Form 适配已提供，默认样式与交互已由用户确认。
 - [ ] `HyperComboBox<T>`：输入与选择组合。
 - [ ] `HyperEditableText`：低层级可编辑文本封装。
 - [ ] `HyperSearchBar`：搜索栏。
@@ -240,17 +240,22 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 
 ## 九、表单体系
 
-- [ ] `HyperForm`：字段注册、校验、提交和错误定位。
-- [ ] `HyperFormField<T>`：通用字段基础类。
-- [ ] `HyperFormSection`：表单分区。
+- [x] `HyperForm`：字段注册、同步/异步校验、提交、重置和错误定位；默认样式与行为已由用户确认。
+- [x] `HyperFormField<T>`：通用字段基础类，支持值快照、字段状态与 Form 生命周期。
+- [x] `HyperCascaderFormField<T>`：完整路径表单适配、同步/异步校验、不可变值收集、禁用与重置；Form 适配已确认，级联选择 Demo 仍待控件样式确认。
+- [x] `HyperTreeSelectFormField<T>`：树节点单值表单适配、叶节点限制、同步/异步校验与重置；Form 适配已确认，树形选择 Demo 仍待控件样式确认。
+- [x] `HyperTextAreaFormField`：多行文本表单适配，支持同步/异步校验、禁用与重置。
+- [x] `HyperFormActions`：统一表单提交校验、提交中禁用、重置与可选取消；默认样式与行为已由用户确认，Demo 位于“表单”。
+- [x] `HyperSelectFormField<T>`：单值 Select 表单适配，支持选项/异步数据源、同步/异步校验、禁用与重置。
+- [x] `HyperMultiSelectFormField<T>`：不可变 `Set<T>` 多选表单适配，支持选项/异步数据源、数量校验、禁用与重置。
+- [x] `HyperFormSection`：表单字段分区与响应式列布局。
 - [ ] `HyperFormGroup`：关联字段组。
 - [ ] `HyperFieldLabel`：标签、必填标记和帮助入口。
 - [ ] `HyperFieldMessage`：helper、validating、success、warning 和 error 共用区域。
 - [ ] `HyperValidationMessage`：校验信息。
-- [ ] `HyperFormActions`：提交、重置和取消区域。
 - [ ] `HyperFormSummary`：表单错误摘要。
 - [ ] `HyperAsyncValidator<T>`：异步校验协议。
-- [ ] `HyperFormController`：受控表单管理。
+- [x] `HyperFormController`：受控表单管理、校验、提交与重置。
 - [ ] `HyperFormScope`：表单上下文。
 
 ## 十、日期、时间与日程
@@ -713,7 +718,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperMultipleChoice<T>`：单题单选或多选题式输入。
 - [~] `HyperMultiSelect<T>`：由 DropdownMenu.multiple / Autocomplete.multiple 提供，不另建重复接口。
 - [ ] `HyperCheckboxGroup<T>`：复选框组。
-- [ ] `HyperCascader<T>`：级联选择器。
+- [x] `HyperCascader<T>`：完整路径受控单选、逐级导航、异步分支缓存及重试、四端呈现与主题；默认样式未确认，见 [使用文档](usage/cascader.md)。
+- [x] `HyperTreeSelect<T>`：树形单选、分离的展开入口、叶节点限制、异步分支重试、设备适配与主题；默认样式未确认，见 [使用文档](usage/tree-select.md)。
 - [ ] `HyperTransfer<T>`：双栏穿梭选择器，主要用于平板和桌面。
 - [ ] `HyperInlineEdit<T>`：展示态和编辑态原位切换。
 - [ ] `HyperInputGroup`：多个输入框或操作的组合边界。

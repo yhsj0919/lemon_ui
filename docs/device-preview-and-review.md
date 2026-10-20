@@ -52,6 +52,7 @@
 
 | 组件 / 能力 | 实现 | 手机 UI | 平板 UI | 桌面 UI | 手表 UI |
 | --- | --- | --- | --- | --- | --- |
+| `HyperCascader<T>` | 已创建（2026-10-20，未确认） | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperTheme` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperThemeData` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperColorScheme` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
@@ -97,8 +98,11 @@
 | `HyperVerticalSlider` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperCapsuleSlider` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperTextField` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
-| `HyperAutocomplete<T>` | 创建中 | 未审核 | 未审核 | 未审核 | 未审核 |
-| `HyperSelect<T>` | 创建中 | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperAutocomplete<T>` | 已创建（样式与交互已由用户确认） | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperTextArea` | 已创建（默认样式与交互已由用户确认） | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperForm` | 已创建（表单默认样式与行为已由用户确认） | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperFormActions` | 已创建（默认样式与行为已由用户确认） | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperSelect<T>` | 已创建（样式与交互已由用户确认） | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperListTile` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperNavigationListTile` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperCheckboxListTile` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |

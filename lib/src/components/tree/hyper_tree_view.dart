@@ -1,5 +1,7 @@
 import '../../painting/hyper_box_decoration.dart';
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,6 +43,9 @@ class HyperTreeView<T> extends StatefulWidget {
     this.errorBuilder,
     this.empty,
     this.style,
+    this.separateExpansion = false,
+    this.selectOnTap = true,
+    this.showSurface = true,
   }) : assert(
          controller == null || (nodes.length == 0 && loadChildren == null),
        );
@@ -53,6 +58,20 @@ class HyperTreeView<T> extends StatefulWidget {
   final HyperTreeErrorBuilder<T>? errorBuilder;
   final Widget? empty;
   final HyperTreeViewStyle? style;
+
+  /// Whether branches have a distinct expand control, separate from selection.
+  ///
+  /// Nonselectable branches still expand when their label is activated.
+  final bool separateExpansion;
+
+  /// Whether row activation updates the controller's selected node.
+  ///
+  /// Set false when selection is managed by the host, while keeping row tap
+  /// callbacks and expansion behavior available.
+  final bool selectOnTap;
+
+  /// Whether to paint the outer surface; embedded trees use their host surface.
+  final bool showSurface;
   @override
   State<HyperTreeView<T>> createState() => _TreeState<T>();
 }
@@ -181,12 +200,14 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
         if (!node.enabled) {
           return;
         }
-        final before = _controller.selectedId;
-        _controller.select(node.id);
-        if (before != _controller.selectedId) {
-          widget.onSelectionChanged?.call(node);
+        if (widget.selectOnTap) {
+          final before = _controller.selectedId;
+          _controller.select(node.id);
+          if (before != _controller.selectedId) {
+            widget.onSelectionChanged?.call(node);
+          }
         }
-        if (branch) {
+        if (branch && (!widget.separateExpansion || !node.selectable)) {
           _expand(node, !expanded);
         }
         widget.onNodeTap?.call(node);
@@ -242,6 +263,19 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
         return KeyEventResult.handled;
       }
 
+      final expandIcon = ExcludeSemantics(
+        child: AnimatedRotation(
+          turns: expanded
+              ? (readingDirection == TextDirection.rtl ? -.25 : .25)
+              : 0,
+          duration: duration,
+          curve: s.curve!,
+          child: Icon(s.expandIcon, textDirection: readingDirection),
+        ),
+      );
+      final expandSize = widget.separateExpansion
+          ? math.max(s.iconSize!, s.rowHeight!)
+          : s.iconSize!;
       Widget content = Semantics(
         selected: selected,
         expanded: branch ? expanded : null,
@@ -291,23 +325,33 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
                     child: Row(
                       children: [
                         SizedBox.square(
-                          dimension: s.iconSize,
+                          dimension: expandSize,
                           child: branch
-                              ? ExcludeSemantics(
-                                  child: AnimatedRotation(
-                                    turns: expanded
-                                        ? (readingDirection == TextDirection.rtl
-                                              ? -.25
-                                              : .25)
-                                        : 0,
-                                    duration: duration,
-                                    curve: s.curve!,
-                                    child: Icon(
-                                      s.expandIcon,
-                                      textDirection: readingDirection,
-                                    ),
-                                  ),
-                                )
+                              ? widget.separateExpansion
+                                    ? HyperPressable(
+                                        enabled: node.enabled,
+                                        semanticButton: true,
+                                        semanticLabel: expanded
+                                            ? '收起子节点'
+                                            : '展开子节点',
+                                        onTap: () => _expand(node, !expanded),
+                                        builder: (context, states, _) =>
+                                            DecoratedBox(
+                                              decoration: HyperBoxDecoration(
+                                                borderRadius: s.rowRadius,
+                                                border:
+                                                    states.contains(
+                                                      HyperControlState.focused,
+                                                    )
+                                                    ? Border.all(
+                                                        color: s.focusColor!,
+                                                      )
+                                                    : null,
+                                              ),
+                                              child: Center(child: expandIcon),
+                                            ),
+                                      )
+                                    : expandIcon
                               : null,
                         ),
                         SizedBox(width: s.contentSpacing),
@@ -419,6 +463,7 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
           alignment: Alignment.topCenter,
           child: body,
         );
+    if (!widget.showSurface) return body;
     body = AnimatedContainer(
       duration: duration,
       curve: s.curve!,

@@ -33,6 +33,7 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
     (label: '基础', icon: Icons.tune, sections: ['基础能力', '交互基础']),
     (label: '容器', icon: Icons.view_agenda_outlined, sections: ['容器与表面']),
     (label: '内容', icon: Icons.text_fields, sections: ['文字与内容']),
+    (label: '表单', icon: Icons.assignment_outlined, sections: ['表单']),
     (
       label: '输入',
       icon: Icons.touch_app_outlined,
@@ -243,6 +244,9 @@ String _label(String id) => switch (id) {
   'hyper-widget-group' => '控件组',
   'hyper-material-surface' => '材质表面',
   'hyper-tree-view' => '树形列表',
+  'hyper-tree-select' => '树形选择 · 未确认',
+  'hyper-text-area' => '多行文本',
+  'hyper-form-actions' => '表单操作',
   'hyper-result' => '结果页',
   'hyper-description-list' => '描述列表',
   'hyper-timeline' => '时间线',

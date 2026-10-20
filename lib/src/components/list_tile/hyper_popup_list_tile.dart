@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/motion/hyper_motion_theme.dart';
 import '../select/hyper_select.dart';
+import '../text/hyper_scrolling_text.dart';
 import '../menu/hyper_menu.dart';
 import '../menu/hyper_menu_model.dart';
 import '../menu/hyper_menu_style.dart';
@@ -389,10 +390,9 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
                         ? constraints.maxWidth / 2
                         : HyperTheme.sizesOf(context).menu.width,
                   ),
-                  child: Text(
+                  child: HyperScrollingText(
                     selected?.label ?? widget.placeholder,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    trigger: HyperTextScrollTrigger.hover,
                   ),
                 ),
                 SizedBox(width: metrics.trailingSpacing),

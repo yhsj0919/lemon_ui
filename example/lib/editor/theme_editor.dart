@@ -189,6 +189,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'segmentedInput': '分段按钮',
     'iconButtonInput': '图标按钮',
     'tree': 'tree-view',
+    'treeSelect': 'tree-select',
     'result': 'result',
     'description': 'description-list',
     'timeline': 'timeline',
@@ -237,6 +238,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'segmentedInput': 'hyper-segmented-button',
     'iconButtonInput': 'hyper-icon-button',
     'tree': 'hyper-tree-view',
+    'treeSelect': 'hyper-tree-select',
     'result': 'hyper-result',
     'description': 'hyper-description-list',
     'timeline': 'hyper-timeline',
@@ -847,8 +849,8 @@ class _ThemeEditorState extends State<ThemeEditor> {
     final fontLimit = editorReviewFontSizeLimit(
       theme.textTheme.displayLarge!.fontSize!,
     );
-    return _panel('表单 · 未确认', [
-      const HyperText('三种布局在 Demo 分别预览。字段不绘制额外表面，子控件外观在其各自工作区配置。'),
+    return _panel('表单', [
+      const HyperText('字段布局、标签和校验信息由表单主题统一配置；字段外观沿用子控件自身主题。'),
       _heading('标签'),
       _number(
         '标签列宽',
@@ -2520,14 +2522,109 @@ class _ThemeEditorState extends State<ThemeEditor> {
       return _globalPanel(sections: sections.isEmpty ? null : sections);
     }
     if (_page == 'hyper-form') return _formPanel();
+    if (_page == 'hyper-form-actions') {
+      return _panel('表单操作', [
+        const HyperText(
+          '操作按钮沿用 HyperButton 的主题和实例样式；按钮间距继承 Form 主题，本组件不增加独立表面配置。',
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-form';
+            _component = 'form';
+          }),
+          label: const Text('编辑表单布局主题'),
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-button';
+            _component = 'button';
+          }),
+          label: const Text('编辑按钮主题'),
+        ),
+      ]);
+    }
+    if (_page == 'hyper-cascader') {
+      return _panel('级联选择 · 未确认', [
+        const HyperText(
+          '触发器与面板继承下拉选择器，选项继承菜单，路径导航继承文字按钮。四端尺寸与亮暗外观在对应主题中编辑；实例 Style 与局部主题覆盖在 Demo 中明确标记。',
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-select-fields';
+            _component = 'select';
+          }),
+          label: const Text('编辑下拉选择器主题'),
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-menu';
+            _component = 'menu';
+          }),
+          label: const Text('编辑选项菜单主题'),
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-button';
+            _component = 'button';
+          }),
+          label: const Text('编辑路径导航按钮主题'),
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-wheel-picker';
+            _component = 'hyper-wheel-picker';
+          }),
+          label: const Text('编辑手机滚轮主题'),
+        ),
+      ]);
+    }
+    if (_page == 'hyper-tree-select') {
+      return _panel('树形选择 · 未确认', [
+        const HyperText(
+          '触发器与面板沿用下拉选择器和公共浮层，树行与异步状态沿用树形列表规格。尺寸、选项、按钮和表面外观在对应主题中配置；实例覆盖在 Demo 中展示。',
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-select-fields';
+            _component = 'select';
+          }),
+          label: const Text('编辑下拉选择器主题'),
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-tree-view';
+            _component = 'tree';
+          }),
+          label: const Text('编辑树形列表主题'),
+        ),
+      ]);
+    }
+    if (_page == 'hyper-text-area') {
+      return _panel('多行文本', [
+        const HyperText(
+          '多行文本沿用 HyperTextField 的字体、光标、状态、表面和尺寸主题；默认行数、内容增长与 Form 行为已确认。',
+        ),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-text-field';
+            _component = 'field';
+          }),
+          label: const Text('编辑文本输入主题'),
+        ),
+      ]);
+    }
     if (_page == 'hyper-file-picker') {
       return _panel('文件选择 · 继承现有主题', [
-        const HyperText('默认界面复用卡片、按钮、图标按钮和文字主题；实例 pickerStyle 可覆盖表面。文件选择和拖放由第三方适配层提供。'),
+        const HyperText(
+          '默认界面复用卡片、按钮、图标按钮和文字主题；实例 pickerStyle 可覆盖表面。文件选择和拖放由第三方适配层提供。',
+        ),
       ]);
     }
     if (_page == 'hyper-number-input') {
       return _panel('数字输入 · 继承现有主题', [
-        const HyperText('输入框外观与四端尺寸继承文本输入框；步进图标继承图标按钮。实例可通过 style 和 stepperStyle 分别覆盖。'),
+        const HyperText(
+          '输入框外观与四端尺寸继承文本输入框；步进图标继承图标按钮。实例可通过 style 和 stepperStyle 分别覆盖。',
+        ),
       ]);
     }
     if (_page == 'hyper-calendar') return _calendarPanel();
@@ -5371,6 +5468,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
               if (value == 'hyper-notification-center') {
                 _component = 'notificationReview';
               }
+              if (value == 'hyper-text-area') _component = 'field';
               _reviewObject = '';
               _reviewState = 'common';
               _reviewPart = 'group';

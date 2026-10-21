@@ -1,3 +1,5 @@
+import 'hyper_select_focus.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -203,36 +205,45 @@ class _HyperDropdownState extends State<HyperDropdown> {
       transitionBuilder: visual.selectionStyle?.transitionBuilder,
       anchorBuilder: (context, toggle, isOpen) =>
           widget.anchorBuilder?.call(context, _toggle, open) ??
-          HyperButton.outlined(
-            onPressed: widget.enabled ? _toggle : null,
-            focusHighlight: open ? true : null,
-            style: HyperButtonStyle(
-              width: visual.width ?? sizes.select.width,
-              minimumSize: Size(
-                0,
-                sizes.select.minimumHeight ?? sizes.textField.minimumHeight,
+          HyperSelectFocus(
+            open: open,
+            enabled: widget.enabled,
+            builder: (focusStyle) => HyperButton.outlined(
+              onPressed: widget.enabled ? _toggle : null,
+              focusHighlight: open ? true : null,
+              style:
+                  HyperButtonStyle(
+                        width: visual.width ?? sizes.select.width,
+                        minimumSize: Size(
+                          0,
+                          sizes.select.minimumHeight ??
+                              sizes.textField.minimumHeight,
+                        ),
+                        borderRadius: sizes.select.radius == null
+                            ? null
+                            : BorderRadius.circular(sizes.select.radius!),
+                        foregroundColor: visual.foregroundColor,
+                      )
+                      .merge(focusStyle)
+                      .merge(visual.buttonStyle)
+                      .merge(widget.buttonStyle),
+              child: Row(
+                children: [
+                  Expanded(child: widget.label),
+                  SizedBox(
+                    width: visual.arrowSpacing ?? sizes.select.arrowSpacing,
+                  ),
+                  Icon(
+                    open ? Icons.expand_less : Icons.expand_more,
+                    size: visual.arrowSize ?? sizes.select.arrowSize,
+                    color: widget.enabled
+                        ? visual.arrowColor ??
+                              HyperTheme.of(context).colors.textSecondary
+                        : visual.disabledArrowColor ??
+                              HyperTheme.of(context).colors.disabled,
+                  ),
+                ],
               ),
-              borderRadius: sizes.select.radius == null
-                  ? null
-                  : BorderRadius.circular(sizes.select.radius!),
-              foregroundColor: visual.foregroundColor,
-            ).merge(visual.buttonStyle).merge(widget.buttonStyle),
-            child: Row(
-              children: [
-                Expanded(child: widget.label),
-                SizedBox(
-                  width: visual.arrowSpacing ?? sizes.select.arrowSpacing,
-                ),
-                Icon(
-                  open ? Icons.expand_less : Icons.expand_more,
-                  size: visual.arrowSize ?? sizes.select.arrowSize,
-                  color: widget.enabled
-                      ? visual.arrowColor ??
-                            HyperTheme.of(context).colors.textSecondary
-                      : visual.disabledArrowColor ??
-                            HyperTheme.of(context).colors.disabled,
-                ),
-              ],
             ),
           ),
       overlayBuilder: (context, close) => _panel(context),

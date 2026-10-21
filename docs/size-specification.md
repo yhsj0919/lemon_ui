@@ -725,3 +725,26 @@ Tree 视觉为 D 级同端 Sidebar 语义推导；已尝试官方 HIUI Tree 入�
 ## 2026-10-14：基础设置的可选中央几何
 
 Radio、Checkbox、Switch、Progress 和 Divider 的尺寸模板补充可选几何字段，详见 [主题编辑器字段清单](theme-editor.md)。所有四端模板分别持有字段；默认 null 继续采用原有同端推导，不新增物理像素规格或跨端倍率。Radio 命中区域、内部圆点/对勾/线宽/圆角，Checkbox 命中区域/圆形圆角，Switch 命中/轨道与滑块圆角/两端偏移，Progress 线性长度/轨道和填充圆角/无限线宽，Divider 长度/缩进/圆角均可通过强类型 copyWith 覆盖。可选数值的插值在两端有值时连续，两端有 null 时按既有离散策略切换；值相等与哈希均包括新增字段。
+
+
+## HyperTable（2026-10-21，未确认）
+
+已核对 HiUI 官方仓库的表格功能与设计入口（https://github.com/XiaoMi/hiui/tree/master/packages/ui/table），本次未取得可验证的对应 SCSS 尺寸源，不能把候选数字称为 HiUI 官方规格。手机端未取得同代 HyperOS 数据网格截图和逻辑尺寸。首版全部为 D 级同端既有规格组合，单位为 Flutter 逻辑像素，待用户与设备对照。
+
+| 字段 | phone | tablet | desktop | watch | 推导来源 |
+| --- | --- | --- | --- | --- | --- |
+| rowHeight / headerHeight | 48 | 48 | 36 | 48 | 同端 menu.itemHeight 与 minimumInteractiveDimension 的较大值，容纳选择及展开控件 |
+| columnWidth | 280 | 280 | 192 | 200 | 同端 menu.width，可承载一组文本或编辑控件的起始宽度 |
+| minimumColumnWidth / controlColumnWidth | 48 | 48 | 36 | 48 | 同端 minimumInteractiveDimension |
+| horizontalPadding | 12 | 12 | 8 | 4 | 同端 menu.padding |
+| verticalPadding | 6 | 6 | 4 | 2 | 同端 menu.itemVerticalPadding |
+| iconSize | 24 | 24 | 16 | 20 | 同端 menu.iconSize |
+| treeIndent | 16 | 16 | 16 | 12 | 同端 treeView.indent |
+| radius | 16 | 20 | 8 | 20 | 同端既有普通表面圆角 |
+| borderWidth | 1 | 1 | 1 | 1 | 既有组件轮廓规格 |
+
+rowHeight/headerHeight 为最小高度，实际至少容纳当前 TextScaler 解析出的单行字高及上下留白。外部高度与页面留白由父布局负责。编辑器操作边界单独位于 editor_dimension_limits.dart，不作为组件默认值。
+
+表格行状态颜色（D 级语义推导）：表头 surfaceMuted，斑马底色取 surface 与 surfaceMuted 的中间色，悬停按全局 Material hoverColor 的透明度将 primary 覆盖 surface，选中 primaryContainer。背景配方共用纯解析函数供组件及编辑器继承预览使用。颜色比例属于非像素值，不改变四端尺寸。
+
+表格浮起圆角 liftRadius 默认固定为 4 逻辑像素（用户指定范围内取值），四端由 HyperTableSize 集中维护，不由行高推导。编辑器恢复继承回到主题原值；编辑操作范围仍受表面几何限制。

@@ -215,6 +215,14 @@ class _FormExampleState extends State<_FormExample> {
           hintText: '再次输入密码',
           obscureText: true,
         ),
+        HyperColorPickerFormField(
+          name: 'accentColor',
+          label: '颜色选择',
+          initialValue: const Color(0xFF3482FF),
+          description: '随表单保存和重置，透明度不足时显示校验错误。',
+          validator: (value) =>
+              value != null && value.a < .2 ? '透明度至少为 20%' : null,
+        ),
         HyperSelectFormField<String>(
           name: 'role',
           label: '角色',

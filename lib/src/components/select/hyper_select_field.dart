@@ -1,3 +1,4 @@
+import 'hyper_select_focus.dart';
 import '../../foundation/hyper_fill.dart';
 import '../text_field/hyper_text_field_theme.dart';
 import '../text/hyper_scrolling_text.dart';
@@ -720,67 +721,76 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
         ),
       );
     } else {
-      anchor = HyperButton.outlined(
-        onPressed: _enabled ? () => _open ? _close() : _show() : null,
-        focusNode: _focus,
-        focusHighlight: _open ? true : null,
-        size: widget.size,
-        style: HyperButtonStyle(
-          width: width,
-          minimumSize: Size(
-            0,
-            sizes.select.minimumHeight ??
-                (widget.size == HyperButtonSizeVariant.medium
-                    ? sizes.textField.minimumHeight
-                    : sizes.button.heightFor(widget.size)),
-          ),
-          padding:
-              sizes.select.paddingHorizontal == null &&
-                  sizes.select.paddingVertical == null
-              ? null
-              : EdgeInsets.symmetric(
-                  horizontal:
-                      sizes.select.paddingHorizontal ??
-                      sizes.button
-                          .paddingFor(widget.size)
-                          .resolve(Directionality.of(context))
-                          .left,
-                  vertical:
-                      sizes.select.paddingVertical ??
-                      sizes.button
-                          .paddingFor(widget.size)
-                          .resolve(Directionality.of(context))
-                          .top,
-                ),
-          borderRadius: sizes.select.radius == null
-              ? null
-              : BorderRadius.circular(sizes.select.radius!),
-          minimumTapTargetSize: sizes.select.minimumTapTargetSize == null
-              ? null
-              : Size.square(sizes.select.minimumTapTargetSize!),
-          foregroundColor: dropdown.foregroundColor,
-        ).merge(dropdown.buttonStyle).merge(widget.buttonStyle),
-        child: Row(
-          children: [
-            Expanded(
-              child: widget.multiple && widget.values.isNotEmpty
-                  ? _tags()
-                  : HyperScrollingText(
-                      widget.values.isEmpty
-                          ? widget.placeholder
-                          : _label(widget.values.first),
-                      trigger: HyperTextScrollTrigger.hover,
+      anchor = HyperSelectFocus(
+        open: _open,
+        enabled: _enabled,
+        builder: (focusStyle) => HyperButton.outlined(
+          onPressed: _enabled ? () => _open ? _close() : _show() : null,
+          focusNode: _focus,
+          focusHighlight: _open ? true : null,
+          size: widget.size,
+          style:
+              HyperButtonStyle(
+                    width: width,
+                    minimumSize: Size(
+                      0,
+                      sizes.select.minimumHeight ??
+                          (widget.size == HyperButtonSizeVariant.medium
+                              ? sizes.textField.minimumHeight
+                              : sizes.button.heightFor(widget.size)),
                     ),
-            ),
-            SizedBox(width: dropdown.arrowSpacing),
-            Icon(
-              _open ? Icons.expand_less : Icons.expand_more,
-              size: widget.buttonStyle?.iconSize ?? dropdown.arrowSize,
-              color: _enabled
-                  ? dropdown.arrowColor
-                  : dropdown.disabledArrowColor,
-            ),
-          ],
+                    padding:
+                        sizes.select.paddingHorizontal == null &&
+                            sizes.select.paddingVertical == null
+                        ? null
+                        : EdgeInsets.symmetric(
+                            horizontal:
+                                sizes.select.paddingHorizontal ??
+                                sizes.button
+                                    .paddingFor(widget.size)
+                                    .resolve(Directionality.of(context))
+                                    .left,
+                            vertical:
+                                sizes.select.paddingVertical ??
+                                sizes.button
+                                    .paddingFor(widget.size)
+                                    .resolve(Directionality.of(context))
+                                    .top,
+                          ),
+                    borderRadius: sizes.select.radius == null
+                        ? null
+                        : BorderRadius.circular(sizes.select.radius!),
+                    minimumTapTargetSize:
+                        sizes.select.minimumTapTargetSize == null
+                        ? null
+                        : Size.square(sizes.select.minimumTapTargetSize!),
+                    foregroundColor: dropdown.foregroundColor,
+                  )
+                  .merge(focusStyle)
+                  .merge(dropdown.buttonStyle)
+                  .merge(widget.buttonStyle),
+          child: Row(
+            children: [
+              Expanded(
+                child: widget.multiple && widget.values.isNotEmpty
+                    ? _tags()
+                    : HyperScrollingText(
+                        widget.values.isEmpty
+                            ? widget.placeholder
+                            : _label(widget.values.first),
+                        trigger: HyperTextScrollTrigger.hover,
+                      ),
+              ),
+              SizedBox(width: dropdown.arrowSpacing),
+              Icon(
+                _open ? Icons.expand_less : Icons.expand_more,
+                size: widget.buttonStyle?.iconSize ?? dropdown.arrowSize,
+                color: _enabled
+                    ? dropdown.arrowColor
+                    : dropdown.disabledArrowColor,
+              ),
+            ],
+          ),
         ),
       );
     }

@@ -1,3 +1,8 @@
+// ignore: implementation_imports
+import 'package:lemon_ui/src/components/table/hyper_table_defaults.dart';
+
+import 'editor_table_fields.dart';
+
 // The first-party editor shares the pure component resolvers so inherited
 // swatches remain identical to the preview instead of duplicating defaults.
 // ignore: implementation_imports
@@ -39,6 +44,7 @@ import 'editor_selection_controller.dart';
 part 'editor_basic_control_workspace.dart';
 part 'editor_surface_workspace.dart';
 part 'editor_content_workspace.dart';
+part 'editor_table_workspace.dart';
 part 'editor_input_workspace.dart';
 part 'editor_review_workspace.dart';
 
@@ -50,6 +56,7 @@ class ThemeEditor extends StatefulWidget {
 }
 
 class _ThemeEditorState extends State<ThemeEditor> {
+  String _tableState = 'hover';
   EditorThemeDocument _document = EditorThemeDocument();
   String _saved = EditorThemeDocument().encode();
   final List<String> _undo = [], _redo = [];
@@ -188,6 +195,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'sliderInput': '滑块',
     'segmentedInput': '分段按钮',
     'iconButtonInput': '图标按钮',
+    'table': '数据表格',
     'tree': 'tree-view',
     'treeSelect': 'tree-select',
     'result': 'result',
@@ -237,6 +245,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'sliderInput': 'hyper-slider',
     'segmentedInput': 'hyper-segmented-button',
     'iconButtonInput': 'hyper-icon-button',
+    'table': 'hyper-table',
     'tree': 'hyper-tree-view',
     'treeSelect': 'hyper-tree-select',
     'result': 'hyper-result',
@@ -957,7 +966,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     final theme = _resolveTheme(_dark),
         s = _resolveTheme(_dark).sizes.resolve(_device).calendar;
     final m = _spec.calendarMetrics, v = _mode.calendar;
-    return _panel('日历 · 未确认', [
+    return _panel('日历', [
       _heading('文字'),
       _number(
         '日历字号',
@@ -1068,7 +1077,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     final radiusLimit = editorRadiusLimit(
       s.width < s.itemExtent ? s.width : s.itemExtent,
     );
-    return _panel('滚轮选择器 · 未确认', [
+    return _panel('滚轮选择器', [
       const HyperText('尺寸按设备保存，外观按亮暗模式保存。行最小高度随文字缩放自动增高。'),
       _select('交互状态', _wheelState, const {
         'common': '通用（所有状态）',
@@ -2544,7 +2553,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ]);
     }
     if (_page == 'hyper-cascader') {
-      return _panel('级联选择 · 未确认', [
+      return _panel('级联选择', [
         const HyperText(
           '触发器与面板继承下拉选择器，选项继承菜单，路径导航继承文字按钮。四端尺寸与亮暗外观在对应主题中编辑；实例 Style 与局部主题覆盖在 Demo 中明确标记。',
         ),
@@ -2579,7 +2588,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ]);
     }
     if (_page == 'hyper-tree-select') {
-      return _panel('树形选择 · 未确认', [
+      return _panel('树形选择', [
         const HyperText(
           '触发器与面板沿用下拉选择器和公共浮层，树行与异步状态沿用树形列表规格。尺寸、选项、按钮和表面外观在对应主题中配置；实例覆盖在 Demo 中展示。',
         ),
@@ -2634,6 +2643,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     }
     if (_isReviewControl) return _reviewPanel();
     if (_isInputControl) return _inputPanel();
+    if (_component == 'table') return _tablePanel();
     if (_isContentControl) return _contentPanel();
     if (_isBasicControl) return _basicControlPanel();
     if (const {

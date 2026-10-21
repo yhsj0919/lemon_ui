@@ -288,12 +288,9 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 十二、数据展示
 
-- [ ] `HyperTable`：基础表格。
-- [ ] `HyperDataTable`：排序、选择和操作的数据表格。
-- [ ] `HyperPaginatedDataTable`：分页数据表格。
-- [ ] `HyperDataGrid`：高密度可编辑数据网格。
+- [x] `HyperTable<T>`：TrinaGrid 数据表格，支持固定列、拖动、多选、列显隐、排序、分页、无限加载、就地编辑及同步/异步树形；默认外观未确认。
 - [x] `HyperTreeView<T>`：静态与动态子树、展开单选、加载重试、缓存和键盘操作。
-- [ ] `HyperTreeTable<T>`：树形表格。
+- 树形表格由 `HyperTable<T>` 的同步子级与异步子级接口提供，不另建重复组件。
 - [ ] `HyperKeyValueTable`：键值信息表。
 - [x] `HyperDescriptionList`：描述列表，支持响应式多列、跨列、键值和表格式布局。
 - [x] `HyperTimeline`：时间线。
@@ -687,8 +684,8 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 - [ ] `HyperMultipleChoice<T>`：单题单选或多选题式输入。
 - [~] `HyperMultiSelect<T>`：由 DropdownMenu.multiple / Autocomplete.multiple 提供，不另建重复接口。
 - [ ] `HyperCheckboxGroup<T>`：复选框组。
-- [x] `HyperCascader<T>`：完整路径受控单选、逐级导航、异步分支缓存及重试、四端呈现与主题；默认样式未确认，见 [使用文档](usage/cascader.md)。
-- [x] `HyperTreeSelect<T>`：树形单选、分离的展开入口、叶节点限制、异步分支重试、设备适配与主题；默认样式未确认，见 [使用文档](usage/tree-select.md)。
+- [x] `HyperCascader<T>`：完整路径受控单选、逐级导航、异步分支缓存及重试、四端呈现与主题；默认样式已由用户确认，见 [使用文档](usage/cascader.md)。
+- [x] `HyperTreeSelect<T>`：树形单选、分离的展开入口、叶节点限制、异步分支重试、设备适配与主题；默认样式已由用户确认，见 [使用文档](usage/tree-select.md)。
 - [ ] `HyperTransfer<T>`：双栏穿梭选择器，主要用于平板和桌面。
 - [ ] `HyperInlineEdit<T>`：展示态和编辑态原位切换。
 - [ ] `HyperInputGroup`：多个输入框或操作的组合边界。

@@ -1,3 +1,4 @@
+import '../../components/table/hyper_table_theme.dart';
 import '../../components/form/hyper_form_theme.dart';
 import '../../components/cascader/hyper_cascader_theme.dart';
 import '../../components/tree_select/hyper_tree_select_theme.dart';
@@ -122,6 +123,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.avatarTheme = const HyperAvatarThemeData(),
     this.skeletonTheme = const HyperSkeletonThemeData(),
     this.pageIndicatorTheme = const HyperPageIndicatorThemeData(),
+    this.tableTheme = const HyperTableThemeData(),
     this.treeViewTheme = const HyperTreeViewThemeData(),
     this.selectionTheme = const HyperSelectionThemeData(),
     this.autocompleteTheme = const HyperAutocompleteThemeData(),
@@ -391,6 +393,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperAvatarThemeData avatarTheme;
   final HyperSkeletonThemeData skeletonTheme;
   final HyperPageIndicatorThemeData pageIndicatorTheme;
+  final HyperTableThemeData tableTheme;
   final HyperTreeViewThemeData treeViewTheme;
   final HyperSelectionThemeData selectionTheme;
   final HyperAutocompleteThemeData autocompleteTheme;
@@ -533,6 +536,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperAvatarThemeData? avatarTheme,
     HyperSkeletonThemeData? skeletonTheme,
     HyperPageIndicatorThemeData? pageIndicatorTheme,
+    HyperTableThemeData? tableTheme,
     HyperTreeViewThemeData? treeViewTheme,
     HyperSelectionThemeData? selectionTheme,
     HyperAutocompleteThemeData? autocompleteTheme,
@@ -612,6 +616,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       avatarTheme: avatarTheme ?? this.avatarTheme,
       skeletonTheme: skeletonTheme ?? this.skeletonTheme,
       pageIndicatorTheme: pageIndicatorTheme ?? this.pageIndicatorTheme,
+      tableTheme: tableTheme ?? this.tableTheme,
       treeViewTheme: treeViewTheme ?? this.treeViewTheme,
       selectionTheme: selectionTheme ?? this.selectionTheme,
       autocompleteTheme: autocompleteTheme ?? this.autocompleteTheme,
@@ -793,6 +798,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.pageIndicatorTheme,
         t,
       ),
+      tableTheme: HyperTableThemeData.lerp(tableTheme, other.tableTheme, t),
       treeViewTheme: HyperTreeViewThemeData.lerp(
         treeViewTheme,
         other.treeViewTheme,
@@ -912,6 +918,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.badgeTheme == badgeTheme &&
           other.skeletonTheme == skeletonTheme &&
           other.pageIndicatorTheme == pageIndicatorTheme &&
+          other.tableTheme == tableTheme &&
           other.treeViewTheme == treeViewTheme &&
           other.selectionTheme == selectionTheme &&
           other.autocompleteTheme == autocompleteTheme &&
@@ -979,6 +986,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     badgeTheme,
     skeletonTheme,
     pageIndicatorTheme,
+    tableTheme,
     treeViewTheme,
     selectionTheme,
     autocompleteTheme,

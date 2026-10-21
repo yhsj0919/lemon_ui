@@ -184,3 +184,14 @@ double editorFormLabelWidthLimit(
   0,
   double.infinity,
 );
+
+// Table editor operation boundaries, pending large-screen review.
+// Columns may contain compound controls; 640 logical pixels allows an extended
+// text field. Row extents allow multiline custom content up to the same height.
+// These are editor limits, not official dimensions or component defaults.
+const editorTableColumnWidthLimit = 640.0;
+const editorTableRowExtentLimit = 320.0;
+
+/// Icons must fit the row, header and control slot without scaling with text.
+double editorTableIconLimit(double row, double header, double control) =>
+    [row, header, control].reduce((a, b) => a < b ? a : b).floorToDouble();

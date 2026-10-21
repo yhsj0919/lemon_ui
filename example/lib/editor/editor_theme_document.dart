@@ -1,3 +1,4 @@
+import 'editor_table_fields.dart';
 import 'editor_form_fields.dart';
 import 'editor_wheel_fields.dart';
 import 'editor_review_fields.dart';
@@ -341,6 +342,7 @@ class EditorDevice {
   EditorSelectMetrics selectMetrics = EditorSelectMetrics();
   EditorWheelMetrics wheelMetrics = EditorWheelMetrics();
   EditorWheelMetrics calendarMetrics = EditorWheelMetrics();
+  EditorTableMetrics tableMetrics = EditorTableMetrics();
   EditorFormMetrics formMetrics = EditorFormMetrics();
   EditorTextFieldMetrics textFieldMetrics = EditorTextFieldMetrics();
   EditorButtonMetrics buttonMetrics = EditorButtonMetrics();
@@ -395,6 +397,7 @@ class EditorDevice {
       'switchMetrics': switchMetrics.toJson(),
     if (tagMetrics.toJson().isNotEmpty) 'tagMetrics': tagMetrics.toJson(),
     if (chipMetrics.toJson().isNotEmpty) 'chipMetrics': chipMetrics.toJson(),
+    if (tableMetrics.toJson().isNotEmpty) 'tableMetrics': tableMetrics.toJson(),
     if (formMetrics.toJson().isNotEmpty) 'formMetrics': formMetrics.toJson(),
     if (calendarMetrics.toJson().isNotEmpty)
       'calendarMetrics': calendarMetrics.toJson(),
@@ -447,6 +450,7 @@ class EditorDevice {
       'tagMetrics',
       'chipMetrics',
       'selectMetrics',
+      'tableMetrics',
       'formMetrics',
       'calendarMetrics',
       'wheelMetrics',
@@ -538,6 +542,9 @@ class EditorDevice {
       ..chipMetrics = EditorChipMetrics.fromJson(
         (j['chipMetrics'] as Map<String, dynamic>?) ?? {},
       )
+      ..tableMetrics = EditorTableMetrics.fromJson(
+        (j['tableMetrics'] as Map<String, dynamic>?) ?? {},
+      )
       ..formMetrics = EditorFormMetrics.fromJson(
         (j['formMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -588,6 +595,7 @@ double? number(dynamic value, {double? min, double? max}) {
 
 /// 亮暗方案独立编辑，共享一套四端布局规格。
 class EditorMode {
+  EditorTableVisual tableVisual = EditorTableVisual();
   EditorReviewCollection reviews = EditorReviewCollection();
   String? fontFamily;
   final materialAppearance = EditorComponent();
@@ -652,6 +660,7 @@ class EditorMode {
   EditorWheelVisual calendar = EditorWheelVisual();
   EditorFormVisual formFields = EditorFormVisual();
   Map<String, Object?> toJson() => {
+    if (tableVisual.toJson().isNotEmpty) 'tableVisual': tableVisual.toJson(),
     if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (fontFamily != null) 'fontFamily': fontFamily,
     if (materialAppearance.toJson().isNotEmpty)
@@ -795,6 +804,7 @@ class EditorMode {
       'iconButtonTonalInput',
       'iconButtonOutlinedInput',
       'iconButtonGhostInput',
+      'tableVisual',
       'treeContent',
       'resultContent',
       'descriptionContent',
@@ -911,6 +921,9 @@ class EditorMode {
     read('iconButtonTonalInput', result.iconButtonTonalInput);
     read('iconButtonOutlinedInput', result.iconButtonOutlinedInput);
     read('iconButtonGhostInput', result.iconButtonGhostInput);
+    result.tableVisual = EditorTableVisual.fromJson(
+      (j['tableVisual'] as Map<String, dynamic>?) ?? {},
+    );
     read('treeContent', result.treeContent);
     read('resultContent', result.resultContent);
     read('descriptionContent', result.descriptionContent);
@@ -1058,6 +1071,7 @@ class EditorThemeDocument {
               radius: d.buttonRadius,
             ),
           ),
+          table: d.tableMetrics.resolve(s.table),
           form: d.formMetrics.resolve(s.form),
           calendar: s.calendar.copyWith(
             width: d.calendarMetrics.width,
@@ -1528,6 +1542,15 @@ class EditorThemeDocument {
                       .toList(),
                 ),
               ),
+        ),
+      ),
+      tableTheme: theme.tableTheme.merge(
+        HyperTableThemeData(
+          style: m.tableVisual.resolve(
+            colors,
+            device(deviceType).tableMetrics,
+            inherited: theme.sizes.resolve(deviceType).table,
+          ),
         ),
       ),
       treeViewTheme: theme.treeViewTheme.copyWith(

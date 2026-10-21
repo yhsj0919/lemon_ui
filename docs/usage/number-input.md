@@ -8,4 +8,4 @@ step、precision（0–15）、enabled、readOnly、showClearButton、focusNode�
 
 四端外观继承文本输入框与图标按钮主题；style 与 stepperStyle 是对应实例覆盖。
 `HyperNumberFormField` 直接支持 Form 校验、重置与错误提示，inputStyle 配置输入外观，
-通用 style 配置字段标签布局。示例位于“未确认 → 数字输入 NumberInput”和表单页面。
+通用 style 配置字段标签布局。示例位于“输入控件 → 数字输入 NumberInput”和表单页面。

@@ -207,11 +207,12 @@ class _HyperMenuState extends State<HyperMenu> {
     if (item.children.isNotEmpty) {
       _openSubmenu(item.id);
     } else {
-      if (item.onPressed != null) {
-        item.onPressed!();
-      } else {
+      // Notify first so an action that mutates its anchor cannot leave the
+      // ancestor menu open on a recycled row.
+      if (item.onPressed == null || item.dismissOnPressed) {
         widget.onSelected?.call(item.id);
       }
+      item.onPressed?.call();
     }
   }
 

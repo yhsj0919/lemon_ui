@@ -1,3 +1,4 @@
+import 'components/hyper_table_size.dart';
 import 'components/hyper_form_size.dart';
 import 'components/hyper_calendar_size.dart';
 import 'components/hyper_wheel_picker_size.dart';
@@ -119,6 +120,7 @@ final class HyperSizeScheme {
     required this.avatar,
     required this.skeleton,
     required this.pageIndicator,
+    required this.table,
     required this.treeView,
     required this.selection,
     required this.result,
@@ -311,6 +313,20 @@ final class HyperSizeScheme {
           closeIconSize: 20,
           padding: EdgeInsets.all(16),
           insetPadding: EdgeInsets.all(16),
+        ),
+        table: const HyperTableSize(
+          liftRadius: 4,
+          treeIndent: 16,
+          rowHeight: 48,
+          headerHeight: 48,
+          columnWidth: 280,
+          minimumColumnWidth: 48,
+          controlColumnWidth: 48,
+          horizontalPadding: 12,
+          verticalPadding: 6,
+          iconSize: 24,
+          borderWidth: 1,
+          radius: 16,
         ),
         treeView: const HyperTreeViewSize(
           rowHeight: 48,
@@ -737,6 +753,20 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(20),
           insetPadding: EdgeInsets.all(16),
         ),
+        table: const HyperTableSize(
+          liftRadius: 4,
+          treeIndent: 16,
+          rowHeight: 48,
+          headerHeight: 48,
+          columnWidth: 280,
+          minimumColumnWidth: 48,
+          controlColumnWidth: 48,
+          horizontalPadding: 12,
+          verticalPadding: 6,
+          iconSize: 24,
+          borderWidth: 1,
+          radius: 20,
+        ),
         treeView: const HyperTreeViewSize(
           rowHeight: 48,
           indent: 16,
@@ -1161,6 +1191,20 @@ final class HyperSizeScheme {
           closeIconSize: 16,
           padding: EdgeInsets.all(16),
           insetPadding: EdgeInsets.all(16),
+        ),
+        table: const HyperTableSize(
+          liftRadius: 4,
+          treeIndent: 16,
+          rowHeight: 36,
+          headerHeight: 36,
+          columnWidth: 192,
+          minimumColumnWidth: 36,
+          controlColumnWidth: 36,
+          horizontalPadding: 8,
+          verticalPadding: 4,
+          iconSize: 16,
+          borderWidth: 1,
+          radius: 8,
         ),
         treeView: const HyperTreeViewSize(
           rowHeight: 32,
@@ -1587,6 +1631,20 @@ final class HyperSizeScheme {
           padding: EdgeInsets.all(12),
           insetPadding: EdgeInsets.all(12),
         ),
+        table: const HyperTableSize(
+          liftRadius: 4,
+          treeIndent: 12,
+          rowHeight: 48,
+          headerHeight: 48,
+          columnWidth: 200,
+          minimumColumnWidth: 48,
+          controlColumnWidth: 48,
+          horizontalPadding: 4,
+          verticalPadding: 2,
+          iconSize: 20,
+          borderWidth: 1,
+          radius: 20,
+        ),
         treeView: const HyperTreeViewSize(
           rowHeight: 48,
           indent: 12,
@@ -1893,6 +1951,7 @@ final class HyperSizeScheme {
   final HyperAvatarSize avatar;
   final HyperSkeletonSize skeleton;
   final HyperPageIndicatorSize pageIndicator;
+  final HyperTableSize table;
   final HyperTreeViewSize treeView;
   final HyperSelectionSize selection;
   final HyperResultSize result;
@@ -1963,6 +2022,7 @@ final class HyperSizeScheme {
     HyperAvatarSize? avatar,
     HyperSkeletonSize? skeleton,
     HyperPageIndicatorSize? pageIndicator,
+    HyperTableSize? table,
     HyperTreeViewSize? treeView,
     HyperSelectionSize? selection,
     HyperResultSize? result,
@@ -2034,6 +2094,7 @@ final class HyperSizeScheme {
     avatar: avatar ?? this.avatar,
     skeleton: skeleton ?? this.skeleton,
     pageIndicator: pageIndicator ?? this.pageIndicator,
+    table: table ?? this.table,
     treeView: treeView ?? this.treeView,
     selection: selection ?? this.selection,
     result: result ?? this.result,
@@ -2170,6 +2231,7 @@ final class HyperSizeScheme {
         b.pageIndicator,
         t,
       ),
+      table: HyperTableSize.lerp(a.table, b.table, t),
       treeView: HyperTreeViewSize.lerp(a.treeView, b.treeView, t),
       selection: HyperSelectionSize.lerp(a.selection, b.selection, t),
       result: HyperResultSize.lerp(a.result, b.result, t),
@@ -2232,6 +2294,7 @@ final class HyperSizeScheme {
           other.avatar == avatar &&
           other.skeleton == skeleton &&
           other.pageIndicator == pageIndicator &&
+          other.table == table &&
           other.treeView == treeView &&
           other.selection == selection &&
           other.result == result &&
@@ -2303,6 +2366,7 @@ final class HyperSizeScheme {
     avatar,
     skeleton,
     pageIndicator,
+    table,
     treeView,
     selection,
     result,

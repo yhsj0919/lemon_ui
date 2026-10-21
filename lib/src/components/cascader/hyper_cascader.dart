@@ -265,6 +265,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
                 HyperMenuItem(
                   id: '$id/retry',
                   label: selection.retryText ?? '重试',
+                  dismissOnPressed: false,
                   onPressed: () => unawaited(_controller.loadBranch(path)),
                 ),
               ]

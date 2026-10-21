@@ -1,3 +1,5 @@
+import '../select/hyper_select_focus.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -93,7 +95,6 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
         builder: (context) => StatefulBuilder(
           builder: (context, update) => SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 HyperColorPicker(
                   recommendedColors: widget.recommendedColors,
@@ -162,33 +163,66 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
         label: '选择颜色',
         value: hex,
         expanded: _open,
-        child: HyperButton.outlined(
-          onPressed: _enabled ? _toggle : null,
-          focusHighlight: _open ? true : null,
-          style: HyperButtonStyle(width: select?.width ?? sizes.select.width)
-              .merge(widget.buttonStyle),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.square, color: widget.value),
-              if (widget.display ==
-                  HyperColorPickerFieldDisplay.colorAndValue) ...[
-                SizedBox(width: gap),
-                Flexible(
-                  child: HyperScrollingText(
-                    hex,
-                    trigger: HyperTextScrollTrigger.hover,
+        child: HyperSelectFocus(
+          open: _open,
+          enabled: _enabled,
+          builder: (focusStyle) => HyperButton.outlined(
+            onPressed: _enabled ? _toggle : null,
+            focusHighlight: _open ? true : null,
+            style:
+                HyperButtonStyle(
+                      width:
+                          widget.display == HyperColorPickerFieldDisplay.swatch
+                          ? null
+                          : select?.width ?? sizes.select.width,
+                      minimumSize: Size(
+                        0,
+                        sizes.select.minimumHeight ??
+                            sizes.textField.minimumHeight,
+                      ),
+                      borderRadius: sizes.select.radius == null
+                          ? null
+                          : BorderRadius.circular(sizes.select.radius!),
+                      foregroundColor: select?.foregroundColor,
+                    )
+                    .merge(focusStyle)
+                    .merge(select?.buttonStyle)
+                    .merge(widget.buttonStyle),
+            child: Row(
+              mainAxisSize:
+                  widget.display == HyperColorPickerFieldDisplay.swatch
+                  ? MainAxisSize.min
+                  : MainAxisSize.max,
+              mainAxisAlignment:
+                  widget.display == HyperColorPickerFieldDisplay.swatch
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
+              children: [
+                Icon(Icons.square, color: widget.value),
+                if (widget.display ==
+                    HyperColorPickerFieldDisplay.colorAndValue) ...[
+                  SizedBox(width: gap),
+                  Expanded(
+                    child: HyperScrollingText(
+                      hex,
+                      trigger: HyperTextScrollTrigger.hover,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: select?.arrowSpacing ?? sizes.select.arrowSpacing,
-                ),
-                Icon(
-                  _open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  size: select?.arrowSize ?? sizes.select.arrowSize,
-                ),
+                  SizedBox(
+                    width: select?.arrowSpacing ?? sizes.select.arrowSpacing,
+                  ),
+                  Icon(
+                    _open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    size: select?.arrowSize ?? sizes.select.arrowSize,
+                    color: _enabled
+                        ? select?.arrowColor ??
+                              HyperTheme.of(context).colors.textSecondary
+                        : select?.disabledArrowColor ??
+                              HyperTheme.of(context).colors.disabled,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

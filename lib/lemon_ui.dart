@@ -305,3 +305,10 @@ export 'src/components/file_picker/hyper_file_picker.dart';
 export 'src/components/form/hyper_file_form_field.dart';
 export 'src/components/form/hyper_cascader_form_field.dart';
 export 'src/components/form/hyper_tree_select_form_field.dart';
+
+export 'src/components/table/hyper_table.dart';
+export 'src/components/table/hyper_table_style.dart';
+export 'src/components/table/hyper_table_theme.dart';
+export 'src/theme/size/components/hyper_table_size.dart';
+
+export 'src/components/form/hyper_color_picker_form_field.dart';

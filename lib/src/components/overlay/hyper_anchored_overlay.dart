@@ -258,88 +258,92 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
             _setOpen(false);
           }
         },
-        child: OverlayPortal.overlayChildLayoutBuilder(
-          controller: _portal,
-          overlayChildBuilder: (overlayContext, info) {
-            var anchorRect = MatrixUtils.transformRect(
-              info.childPaintTransform,
-              Offset.zero & info.childSize,
-            );
-            if (widget.anchorPosition case final position?) {
-              final point = MatrixUtils.transformPoint(
+        child: Align(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: OverlayPortal.overlayChildLayoutBuilder(
+            controller: _portal,
+            overlayChildBuilder: (overlayContext, info) {
+              var anchorRect = MatrixUtils.transformRect(
                 info.childPaintTransform,
-                position,
+                Offset.zero & info.childSize,
               );
-              anchorRect = Rect.fromLTWH(point.dx, point.dy, 0, 0);
-            }
-            final media = MediaQuery.maybeOf(overlayContext);
-            final padding = media?.viewPadding ?? EdgeInsets.zero;
-            final insets = media?.viewInsets ?? EdgeInsets.zero;
-            final safeBounds = Rect.fromLTRB(
-              padding.left,
-              padding.top,
-              math.max(padding.left, info.overlaySize.width - padding.right),
-              math.max(
+              if (widget.anchorPosition case final position?) {
+                final point = MatrixUtils.transformPoint(
+                  info.childPaintTransform,
+                  position,
+                );
+                anchorRect = Rect.fromLTWH(point.dx, point.dy, 0, 0);
+              }
+              final media = MediaQuery.maybeOf(overlayContext);
+              final padding = media?.viewPadding ?? EdgeInsets.zero;
+              final insets = media?.viewInsets ?? EdgeInsets.zero;
+              final safeBounds = Rect.fromLTRB(
+                padding.left,
                 padding.top,
-                info.overlaySize.height -
-                    math.max(padding.bottom, insets.bottom),
-              ),
-            );
-            final content = _HyperOverlayTapGroup(
-              groupId: tapGroup,
-              child: Builder(
-                builder: (context) =>
-                    widget.overlayBuilder(context, () => _setOpen(false)),
-              ),
-            );
-            final transition = widget.transitionBuilder;
-            final animatedContent = transition != null
-                ? transition(overlayContext, _animation, content)
-                : HyperBackdropSafeFade(
-                    opacity: opacity,
-                    child: widget.transition == HyperOverlayTransition.fade
-                        ? content
-                        : ScaleTransition(
-                            scale: Tween<double>(
-                              begin: .96,
-                              end: 1,
-                            ).animate(opacity),
-                            alignment: Alignment.topCenter,
-                            child: content,
-                          ),
-                  );
-            return CustomSingleChildLayout(
-              delegate: _HyperOverlayLayout(
-                anchor: anchorRect,
-                bounds: safeBounds,
-                placement: widget.placement,
-                spacing:
-                    widget.spacing ??
-                    HyperTheme.sizesOf(context).overlaySpacing,
-                direction: Directionality.of(overlayContext),
-              ),
-              child: TapRegion(
+                math.max(padding.left, info.overlaySize.width - padding.right),
+                math.max(
+                  padding.top,
+                  info.overlaySize.height -
+                      math.max(padding.bottom, insets.bottom),
+                ),
+              );
+              final content = _HyperOverlayTapGroup(
                 groupId: tapGroup,
-                child: IgnorePointer(
-                  ignoring: !_open,
-                  child: ExcludeSemantics(
-                    excluding: !_open,
-                    child: MouseRegion(
-                      onEnter: (_) => _hoverCloseTimer?.cancel(),
-                      onExit: (_) => _scheduleHoverClose(),
-                      child: animatedContent,
+                child: Builder(
+                  builder: (context) =>
+                      widget.overlayBuilder(context, () => _setOpen(false)),
+                ),
+              );
+              final transition = widget.transitionBuilder;
+              final animatedContent = transition != null
+                  ? transition(overlayContext, _animation, content)
+                  : HyperBackdropSafeFade(
+                      opacity: opacity,
+                      child: widget.transition == HyperOverlayTransition.fade
+                          ? content
+                          : ScaleTransition(
+                              scale: Tween<double>(
+                                begin: .96,
+                                end: 1,
+                              ).animate(opacity),
+                              alignment: Alignment.topCenter,
+                              child: content,
+                            ),
+                    );
+              return CustomSingleChildLayout(
+                delegate: _HyperOverlayLayout(
+                  anchor: anchorRect,
+                  bounds: safeBounds,
+                  placement: widget.placement,
+                  spacing:
+                      widget.spacing ??
+                      HyperTheme.sizesOf(context).overlaySpacing,
+                  direction: Directionality.of(overlayContext),
+                ),
+                child: TapRegion(
+                  groupId: tapGroup,
+                  child: IgnorePointer(
+                    ignoring: !_open,
+                    child: ExcludeSemantics(
+                      excluding: !_open,
+                      child: MouseRegion(
+                        onEnter: (_) => _hoverCloseTimer?.cancel(),
+                        onExit: (_) => _scheduleHoverClose(),
+                        child: animatedContent,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
-          child: TapRegion(
-            groupId: tapGroup,
-            onTapOutside: (_) {
-              if (_open) _setOpen(false);
+              );
             },
-            child: anchor,
+            child: TapRegion(
+              groupId: tapGroup,
+              onTapOutside: (_) {
+                if (_open) _setOpen(false);
+              },
+              child: anchor,
+            ),
           ),
         ),
       ),

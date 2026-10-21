@@ -68,5 +68,5 @@ HyperTreeSelectFormField<String>(
 选择器、树和按钮语义规格的组合；尚未取得同代 HyperOS/HIUI 树形选择器的直接尺寸，
 默认外观仍待用户确认。
 
-详细 Demo 位于 Gallery 的“未确认”分类，包含单选、仅叶节点、异步失败重试、Form、
+详细 Demo 位于 Gallery 的“选择控件”分类，包含单选、仅叶节点、异步失败重试、Form、
 禁用项、局部主题和实例表面覆盖。

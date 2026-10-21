@@ -217,7 +217,16 @@ class _HyperTextFieldState extends State<HyperTextField> {
           padding: EdgeInsets.all(metrics.horizontalPadding),
         ),
       ),
-      hovered: HyperTextFieldStyle(borderColor: theme.colors.textSecondary),
+      hovered: HyperTextFieldStyle(
+        background: HyperFill.color(
+          Color.alphaBlend(
+            theme.colors.stateLayer.withValues(
+              alpha: HyperTheme.sizesOf(context).button.hoverOverlayOpacity,
+            ),
+            theme.colors.surfaceMuted,
+          ),
+        ),
+      ),
       focused: HyperTextFieldStyle(borderColor: theme.colors.primary),
       error: HyperTextFieldStyle(
         borderColor: theme.colors.error,

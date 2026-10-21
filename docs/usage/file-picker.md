@@ -23,5 +23,5 @@ trailingBuilder 可展示调用方控制的进度、成功、失败和重试操�
 
 HyperFileFormField 使用不可变 List 值，支持必填/异步校验、禁用和重置。
 界面复用 Card、Button、IconButton、文字与 Form 间距的现有四端主题（来源 D，待确认），
-表面可用 style / pickerStyle 覆盖。新增入口位于“未确认 → 文件选择 Upload”。
+表面可用 style / pickerStyle 覆盖。新增入口位于“选择控件 → 文件选择 Upload”。
 原生文件选择及系统拖入需在各目标平台实际运行验证；widget 测试使用注入的 pick。

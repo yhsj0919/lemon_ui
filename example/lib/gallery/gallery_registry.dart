@@ -1,3 +1,4 @@
+import '../pages/content/hyper_table_page.dart';
 import '../pages/form/hyper_form_page.dart';
 import '../pages/form/hyper_form_actions_page.dart';
 import '../pages/selection/hyper_cascader_page.dart';
@@ -362,6 +363,13 @@ final List<GallerySection> gallerySections = [
     title: '输入控件',
     items: [
       GalleryItem(
+        id: 'hyper-number-input',
+        title: '数字输入 NumberInput',
+        description: '范围、步长、精度及 Form 校验。',
+        icon: Icons.pin_outlined,
+        builder: (_) => const HyperNumberInputPage(),
+      ),
+      GalleryItem(
         id: 'hyper-text-field',
         title: 'HyperTextField',
         description: '单行、多行、密码和尾部错误提示。',
@@ -374,6 +382,50 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '选择控件',
     items: [
+      GalleryItem(
+        id: 'hyper-tree-select',
+        title: '树形选择 TreeSelect',
+        description: '树形单选、仅叶节点、异步分支与 Form 校验。',
+        icon: Icons.account_tree_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperTreeSelectPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-cascader',
+        title: '级联选择 Cascader',
+        description: '完整路径单选、异步分支、失败重试及 Form 校验与提交。',
+        icon: Icons.account_tree_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperCascaderPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-file-picker',
+        title: '文件选择 Upload',
+        description: '第三方系统选择与拖放适配，简洁界面和 Form。',
+        icon: Icons.attach_file,
+        builder: (_) => const HyperFilePickerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-calendar',
+        title: '日历',
+        description: '普通日历和日期区间。',
+        icon: Icons.calendar_month,
+        builder: (_) => const HyperCalendarPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-wheel-picker',
+        title: '滚轮选择器',
+        description: '单列吸附、循环与受控更新。',
+        icon: Icons.swap_vert,
+        builder: (_) => const HyperWheelPickerPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-date-time-picker',
+        title: '日期与时间选择器',
+        description: '日期、时间与日期时间；确认提交与四端呈现。',
+        icon: Icons.date_range_outlined,
+        builder: (_) => const HyperDateTimePickerPage(),
+      ),
       GalleryItem(
         id: 'hyper-switch',
         title: 'HyperSwitch',
@@ -689,55 +741,12 @@ final List<GallerySection> gallerySections = [
     title: '未确认',
     items: [
       GalleryItem(
-        id: 'hyper-tree-select',
-        title: '树形选择 TreeSelect',
-        description: '树形单选、仅叶节点、异步分支与 Form 校验。',
-        icon: Icons.account_tree_outlined,
+        id: 'hyper-table',
+        title: 'HyperTable',
+        description: '固定列、拖动、多选、排序、列显隐、分页、无限加载与就地编辑。',
+        icon: Icons.table_chart_outlined,
         hasStyleOverrides: true,
-        builder: (_) => const HyperTreeSelectPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-cascader',
-        title: '级联选择 Cascader',
-        description: '完整路径单选、异步分支、失败重试及 Form 校验与提交。',
-        icon: Icons.account_tree_outlined,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperCascaderPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-file-picker',
-        title: '文件选择 Upload',
-        description: '第三方系统选择与拖放适配，简洁界面和 Form。',
-        icon: Icons.attach_file,
-        builder: (_) => const HyperFilePickerPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-number-input',
-        title: '数字输入 NumberInput',
-        description: '范围、步长、精度及 Form 校验。',
-        icon: Icons.pin_outlined,
-        builder: (_) => const HyperNumberInputPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-calendar',
-        title: '日历',
-        description: '普通日历和日期区间。',
-        icon: Icons.calendar_month,
-        builder: (_) => const HyperCalendarPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-wheel-picker',
-        title: '滚轮选择器',
-        description: '单列吸附、循环与受控更新。',
-        icon: Icons.swap_vert,
-        builder: (_) => const HyperWheelPickerPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-date-time-picker',
-        title: '日期与时间选择器',
-        description: '日期、时间与日期时间；确认提交与四端呈现。',
-        icon: Icons.date_range_outlined,
-        builder: (_) => const HyperDateTimePickerPage(),
+        builder: (_) => const HyperTableDemoPage(),
       ),
     ],
   ),

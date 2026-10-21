@@ -87,7 +87,7 @@ Tab 访问。加载、错误和空态提供 live region。文字跟随系统 Tex
 `resolveHyperMenuSurface`，底部弹窗使用统一 BottomSheet 表面，不叠加 Card；
 材质质量、默认配方、降级和开合安全动画均继承公共基础设施。
 
-Gallery 和主题编辑器入口为“未确认 → 级联选择 Cascader”，id 为 `hyper-cascader`。
+Gallery 和主题编辑器入口为“选择控件 → 级联选择 Cascader”，id 为 `hyper-cascader`。
 编辑器提供默认 Demo 预览以及 Select、Menu、Button 现有设置入口，不建立另一份尺寸或
 表面配置存储；这些设置继续使用原有四端/亮暗存储、继承恢复和保存导入机制。
 
@@ -135,4 +135,4 @@ HyperCascaderFormField<String>(
 `surfaceStyle` 最后覆盖浮层表面。`loadChildren`、`labelBuilder`、`allowClear`、
 呈现方式和路径文字选项均透传给底层控件，不建立第二套主题或设备常量。
 禁用字段沿用公共表单的跳过校验行为，旧异步校验在值变更或重置后失效。
-当前“未确认 → 级联选择 Cascader”页面包含必填、提交和重置演示，未迁移分类。
+当前“选择控件 → 级联选择 Cascader”页面包含必填、提交和重置演示，已于 2026-10-21 经用户确认迁移至正式分类。

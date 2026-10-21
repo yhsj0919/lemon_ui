@@ -172,7 +172,7 @@
 
 ### A5：高级数据、图表和专业内容
 
-- 数据：`HyperDataTable`、`HyperPaginatedDataTable`、`HyperDataGrid`、`HyperTreeTable<T>`、`HyperChartContainer`、`HyperSparkline`、`HyperGauge`。
+- 数据：`HyperTable<T>` 统一提供排序、多选、分页、就地编辑及树形/异步子级；扩展项包括 `HyperChartContainer`、`HyperSparkline`、`HyperGauge`。
 - 图表基础：`HyperChartThemeData`、`HyperChartAxis`、`HyperChartReferenceLine`、`HyperChartSelection`、`HyperChartLegend`、`HyperChartCard`、`HyperAsyncChart<T>`。
 - 图表类型：`HyperBarChart`、`HyperLineChart`、`HyperPieChart`、`HyperScatterChart`、`HyperRadarChart`、`HyperCandlestickChart`、`HyperRankBarChart`、`HyperHeatmap`、`HyperTreemap`。
 - 图表导出：`HyperChartExportBoundary`、`HyperChartExportController`。

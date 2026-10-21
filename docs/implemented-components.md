@@ -18,7 +18,7 @@
 
 ## 导航、浮层与反馈
 
-`HyperTabBar`、`HyperTabBarView`、`HyperBreadcrumb`、`HyperPagination`、`HyperPageIndicator`、`HyperStepIndicator`、`HyperMenu`、`HyperMenuButton`、`HyperContextMenu`、`HyperAnchoredOverlay`、`HyperTooltip`、`HyperDialog`、`HyperBottomSheet`、`HyperToast`、`HyperSnackbar`、`HyperSnackbarHost`、`HyperAlert`、`HyperLoadingOverlay`、`HyperNotification`、`HyperCollapsible`、`HyperAccordion`、`HyperTimeline`、`HyperDescriptionList`、`HyperTreeView<T>`、`HyperResult`。
+`HyperTable<T>`、`HyperTabBar`、`HyperTabBarView`、`HyperBreadcrumb`、`HyperPagination`、`HyperPageIndicator`、`HyperStepIndicator`、`HyperMenu`、`HyperMenuButton`、`HyperContextMenu`、`HyperAnchoredOverlay`、`HyperTooltip`、`HyperDialog`、`HyperBottomSheet`、`HyperToast`、`HyperSnackbar`、`HyperSnackbarHost`、`HyperAlert`、`HyperLoadingOverlay`、`HyperNotification`、`HyperCollapsible`、`HyperAccordion`、`HyperTimeline`、`HyperDescriptionList`、`HyperTreeView<T>`、`HyperResult`。
 
 ## 表单 API
 

@@ -92,15 +92,18 @@ class _HyperContextMenuState extends State<HyperContextMenu> {
             : null,
         child: widget.child,
       ),
-      overlayBuilder: (context, close) => HyperMenu(
-        items: widget.items,
-        groups: widget.groups,
-        selectedId: widget.selectedId,
-        style: widget.menuStyle,
-        onSelected: (id) {
-          close();
-          widget.onSelected?.call(id);
-        },
+      overlayBuilder: (context, close) => IgnorePointer(
+        ignoring: !_open,
+        child: HyperMenu(
+          items: widget.items,
+          groups: widget.groups,
+          selectedId: widget.selectedId,
+          style: widget.menuStyle,
+          onSelected: (id) {
+            close();
+            widget.onSelected?.call(id);
+          },
+        ),
       ),
     ),
   );

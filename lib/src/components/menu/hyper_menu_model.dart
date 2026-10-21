@@ -13,6 +13,7 @@ final class HyperMenuItem {
     this.enabled = true,
     this.onSubmenuOpened,
     this.onPressed,
+    this.dismissOnPressed = true,
     this.submenuIcon,
     this.wrapLabel = false,
   });
@@ -32,10 +33,13 @@ final class HyperMenuItem {
   /// Called when this branch opens, including pointer and keyboard activation.
   final VoidCallback? onSubmenuOpened;
 
-  /// A leaf action handled locally without dismissing ancestor menus.
-  ///
-  /// Useful for retry actions embedded in asynchronous submenus.
+  /// The action invoked after notifying ancestor menus of selection.
   final VoidCallback? onPressed;
+
+  /// Whether a local leaf action notifies and dismisses ancestor menus.
+  ///
+  /// Set to false for retry actions that keep an asynchronous submenu open.
+  final bool dismissOnPressed;
 
   /// The branch indicator override; otherwise uses the directional chevron.
   final IconData? submenuIcon;

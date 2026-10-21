@@ -863,3 +863,14 @@ Form 保留原生 FormField 的 save/reset/validate，Controller 维护具名值
 
 Gallery 预留“表单”正式分类；Form Demo 与编辑入口暂位于“未确认”，id hyper-form 保持稳定。编辑器采用独立 EditorFormMetrics/EditorFormVisual 保存四端尺寸与亮暗外观，恢复继承和历史配置导入兼容；像素滑块写入整数，公共操作上限位于 editor_dimension_limits.dart。
 阶段一采用通用 builder 完整接入现有 Select/DatePicker/Checkbox，提供专门 HyperTextFormField 文本适配。其余专用命名 FormField 包装属于第二阶段，不阻塞表单组合使用。
+
+
+## HyperTable（2026-10-21，未确认）
+
+对外使用 HyperTable<T>、HyperTableColumn<T>、HyperTableController、HyperTableQuery/Page 与强类型事件；TrinaGrid 状态管理器不公开。全局 tableTheme、局部 HyperTableTheme 和实例 HyperTableStyle 逐字段合并，文本深合并；四端默认规格由 sizes.table 集中管理。公开样式及尺寸支持 copyWith、插值和值相等。
+
+编辑器 tableMetrics 属于四端设备规格，tableVisual 属于亮暗外观；保留统一保存、导入、恢复继承和撤销机制。Gallery 与编辑器登记在未确认，id hyper-table。列布局、行状态和表面分别组织，不将交替行配色混作交互状态。
+
+行底色由同一表面路径绘制，固定列与主体共享悬停身份；Motion 与减少动画设置统一处理状态过渡。表格表面继承统一材质质量及降级，行右键/长按菜单使用 HyperContextMenu，表头菜单与编辑控件使用公共 Hyper 组件。未搬运旧版悬停缩放、覆盖滚动条或补丁。
+
+本地/分页/无限加载分别处理数据，远程排序和刷新使旧请求失效。树形按稳定 key 展开，子级缓存与请求代次防止刷新前结果覆盖新数据；分页以根节点计数，排序保留父子关系。行拖动只用于本地未分页且未排序的平面数据，避免把展示位置误当业务全量顺序。

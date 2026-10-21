@@ -1660,6 +1660,23 @@ HyperThemeData applyEditorReviews(
         spacing: d.loadingOverlay.spacing,
       ),
       alert: s.alert.copyWith(
+        banner: s.alert.banner.copyWith(
+          radius: d.banner.radius,
+          padding: _reviewInsets(
+            d.banner.paddingLeft,
+            d.banner.paddingTop,
+            d.banner.paddingRight,
+            d.banner.paddingBottom,
+            s.alert.banner.padding,
+          ),
+          iconSize: d.banner.iconSize,
+          closeIconSize: d.banner.closeIconSize,
+          closeButtonSize: d.banner.closeButtonSize,
+          spacing: d.banner.spacing,
+          titleSpacing: d.banner.titleSpacing,
+          actionSpacing: d.banner.actionSpacing,
+          actionRunSpacing: d.banner.actionRunSpacing,
+        ),
         radius: d.alert.radius,
         padding: _reviewInsets(
           d.alert.paddingLeft,
@@ -1676,23 +1693,7 @@ HyperThemeData applyEditorReviews(
         actionSpacing: d.alert.actionSpacing,
         actionRunSpacing: d.alert.actionRunSpacing,
       ),
-      banner: s.banner.copyWith(
-        radius: d.banner.radius,
-        padding: _reviewInsets(
-          d.banner.paddingLeft,
-          d.banner.paddingTop,
-          d.banner.paddingRight,
-          d.banner.paddingBottom,
-          s.banner.padding,
-        ),
-        iconSize: d.banner.iconSize,
-        closeIconSize: d.banner.closeIconSize,
-        closeButtonSize: d.banner.closeButtonSize,
-        spacing: d.banner.spacing,
-        titleSpacing: d.banner.titleSpacing,
-        actionSpacing: d.banner.actionSpacing,
-        actionRunSpacing: d.banner.actionRunSpacing,
-      ),
+
       bottomSheet: s.bottomSheet.copyWith(
         maxWidth: d.bottomSheet.maxWidth,
         landscapeMaxWidth: d.bottomSheet.landscapeMaxWidth,
@@ -1765,20 +1766,22 @@ HyperThemeData applyEditorReviews(
           s.dialog.insetPadding,
         ),
       ),
-      emptyState: s.emptyState.copyWith(
-        iconSize: d.emptyState.iconSize,
-        illustrationSize: d.emptyState.illustrationSize,
-        maxWidth: d.emptyState.maxWidth,
-        contentSpacing: d.emptyState.contentSpacing,
-        titleSpacing: d.emptyState.titleSpacing,
-        actionSpacing: d.emptyState.actionSpacing,
-        actionRunSpacing: d.emptyState.actionRunSpacing,
-        padding: _reviewInsets(
-          d.emptyState.paddingLeft,
-          d.emptyState.paddingTop,
-          d.emptyState.paddingRight,
-          d.emptyState.paddingBottom,
-          s.emptyState.padding,
+      result: s.result.copyWith(
+        empty: s.result.empty.copyWith(
+          iconSize: d.emptyState.iconSize,
+          illustrationSize: d.emptyState.illustrationSize,
+          maxWidth: d.emptyState.maxWidth,
+          contentSpacing: d.emptyState.contentSpacing,
+          titleSpacing: d.emptyState.titleSpacing,
+          actionSpacing: d.emptyState.actionSpacing,
+          actionRunSpacing: d.emptyState.actionRunSpacing,
+          padding: _reviewInsets(
+            d.emptyState.paddingLeft,
+            d.emptyState.paddingTop,
+            d.emptyState.paddingRight,
+            d.emptyState.paddingBottom,
+            s.result.empty.padding,
+          ),
         ),
       ),
       skeleton: s.skeleton.copyWith(
@@ -1820,6 +1823,15 @@ HyperThemeData applyEditorReviews(
         underlineThickness: d.tabBar.underlineThickness,
       ),
       stepIndicator: s.stepIndicator.copyWith(
+        navigation: s.stepIndicator.navigation.copyWith(
+          nodeSize: d.stepperNavigation.nodeSize,
+          iconSize: d.stepperNavigation.iconSize,
+          connectorThickness: d.stepperNavigation.connectorThickness,
+          spacing: d.stepperNavigation.spacing,
+          titleSpacing: d.stepperNavigation.titleSpacing,
+          itemSpacing: d.stepperNavigation.itemSpacing,
+          interactionRadius: d.stepperNavigation.interactionRadius,
+        ),
         nodeSize: d.stepIndicator.nodeSize,
         iconSize: d.stepIndicator.iconSize,
         connectorThickness: d.stepIndicator.connectorThickness,
@@ -1828,15 +1840,7 @@ HyperThemeData applyEditorReviews(
         itemSpacing: d.stepIndicator.itemSpacing,
         interactionRadius: d.stepIndicator.interactionRadius,
       ),
-      stepperNavigation: s.stepperNavigation.copyWith(
-        nodeSize: d.stepperNavigation.nodeSize,
-        iconSize: d.stepperNavigation.iconSize,
-        connectorThickness: d.stepperNavigation.connectorThickness,
-        spacing: d.stepperNavigation.spacing,
-        titleSpacing: d.stepperNavigation.titleSpacing,
-        itemSpacing: d.stepperNavigation.itemSpacing,
-        interactionRadius: d.stepperNavigation.interactionRadius,
-      ),
+
       pagination: s.pagination.copyWith(
         height: d.pagination.height,
         minWidth: d.pagination.minWidth,
@@ -2277,10 +2281,11 @@ HyperThemeData applyEditorReviews(
     );
   }
 
-  HyperEmptyStateStyle emptyState(EditorReviewFields v) {
+  HyperResultStyle emptyState(EditorReviewFields v) {
     final m = d.emptyState;
-    return HyperEmptyStateStyle(
-      surfaceStyle: surface(v, d.emptyState, fallback: colors.surface),
+    final panel = surface(v, m, fallback: colors.surface);
+    return HyperResultStyle(
+      material: panel?.material,
       actionAlignment: v.actionsAlignment == null
           ? null
           : WrapAlignment.values.byName(v.actionsAlignment!),
@@ -2300,19 +2305,10 @@ HyperThemeData applyEditorReviews(
         colors,
       ),
       iconColor: v.iconColor?.resolve(colors),
-      background: v.background == null
-          ? null
-          : HyperFill.color(v.background!.resolve(colors)),
-      border: v.borderWidth == null && v.borderColor == null
-          ? null
-          : Border.all(
-              width: v.borderWidth ?? 1,
-              color: v.borderColor?.resolve(colors) ?? colors.outline,
-            ),
-      borderRadius: m.surfaceRadius == null
-          ? null
-          : BorderRadius.circular(m.surfaceRadius!),
-      boxShadow: v.shadow.shadows?.map((s) => s.resolve(colors)).toList(),
+      background: panel?.background,
+      border: panel?.border,
+      borderRadius: panel?.borderRadius,
+      boxShadow: panel?.boxShadow,
       duration: v.duration == null
           ? null
           : Duration(milliseconds: v.duration!.round()),
@@ -2804,15 +2800,11 @@ HyperThemeData applyEditorReviews(
         success: alert(mode.reviews.alertSuccess),
         warning: alert(mode.reviews.alertWarning),
         error: alert(mode.reviews.alertError),
-      ),
-    ),
-    bannerTheme: theme.bannerTheme.merge(
-      HyperBannerThemeData(
-        style: banner(mode.reviews.banner),
-        info: banner(mode.reviews.bannerInfo),
-        success: banner(mode.reviews.bannerSuccess),
-        warning: banner(mode.reviews.bannerWarning),
-        error: banner(mode.reviews.bannerError),
+        bannerStyle: banner(mode.reviews.banner),
+        bannerInfo: banner(mode.reviews.bannerInfo),
+        bannerSuccess: banner(mode.reviews.bannerSuccess),
+        bannerWarning: banner(mode.reviews.bannerWarning),
+        bannerError: banner(mode.reviews.bannerError),
       ),
     ),
     bottomSheetTheme: theme.bottomSheetTheme.merge(
@@ -2827,8 +2819,8 @@ HyperThemeData applyEditorReviews(
     dialogTheme: theme.dialogTheme.merge(
       HyperDialogThemeData(style: dialog(mode.reviews.dialog)),
     ),
-    emptyStateTheme: theme.emptyStateTheme.merge(
-      HyperEmptyStateThemeData(style: emptyState(mode.reviews.emptyState)),
+    resultTheme: theme.resultTheme.copyWith(
+      empty: theme.resultTheme.empty.merge(emptyState(mode.reviews.emptyState)),
     ),
     skeletonTheme: theme.skeletonTheme.merge(
       HyperSkeletonThemeData(style: skeleton(mode.reviews.skeleton)),
@@ -2844,16 +2836,20 @@ HyperThemeData applyEditorReviews(
         completed: stepIndicator(mode.reviews.stepIndicatorCompleted),
         error: stepIndicator(mode.reviews.stepIndicatorError),
         disabled: stepIndicator(mode.reviews.stepIndicatorDisabled),
-      ),
-    ),
-    stepperNavigationTheme: theme.stepperNavigationTheme.merge(
-      HyperStepperNavigationThemeData(
-        style: stepperNavigation(mode.reviews.stepperNavigation),
-        pending: stepperNavigation(mode.reviews.stepperNavigationPending),
-        current: stepperNavigation(mode.reviews.stepperNavigationCurrent),
-        completed: stepperNavigation(mode.reviews.stepperNavigationCompleted),
-        error: stepperNavigation(mode.reviews.stepperNavigationError),
-        disabled: stepperNavigation(mode.reviews.stepperNavigationDisabled),
+        navigationStyle: stepperNavigation(mode.reviews.stepperNavigation),
+        navigationPending: stepperNavigation(
+          mode.reviews.stepperNavigationPending,
+        ),
+        navigationCurrent: stepperNavigation(
+          mode.reviews.stepperNavigationCurrent,
+        ),
+        navigationCompleted: stepperNavigation(
+          mode.reviews.stepperNavigationCompleted,
+        ),
+        navigationError: stepperNavigation(mode.reviews.stepperNavigationError),
+        navigationDisabled: stepperNavigation(
+          mode.reviews.stepperNavigationDisabled,
+        ),
       ),
     ),
     paginationTheme: theme.paginationTheme.merge(
@@ -2894,12 +2890,12 @@ void constrainEditorReviewDimensions(
           ? s.notification.closeButtonSize
           : object == 'alert'
           ? s.alert.closeButtonSize
-          : s.banner.closeButtonSize;
+          : s.alert.banner.closeButtonSize;
       final icon = object == 'notification'
           ? s.notification.closeIconSize
           : object == 'alert'
           ? s.alert.closeIconSize
-          : s.banner.closeIconSize;
+          : s.alert.banner.closeIconSize;
       final limit = m.closeButtonSize ?? button;
       m.closeIconSize = cap(
         m.closeIconSize ?? (icon > limit ? icon : null),
@@ -2926,7 +2922,7 @@ void constrainEditorReviewDimensions(
     case 'stepperNavigation':
       final base = object == 'stepIndicator'
           ? s.stepIndicator
-          : s.stepperNavigation;
+          : s.stepIndicator.navigation;
       final node = m.nodeSize ?? base.nodeSize;
       m.iconSize = cap(
         m.iconSize ?? (base.iconSize > node ? base.iconSize : null),

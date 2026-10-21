@@ -15,7 +15,6 @@ import '../../components/page_indicator/hyper_page_indicator_theme.dart';
 import '../../components/result/hyper_result_theme.dart';
 import '../../components/description_list/hyper_description_list_theme.dart';
 import '../../components/timeline/hyper_timeline_theme.dart';
-import '../../components/steps/hyper_stepper_navigation_theme.dart';
 import '../../components/steps/hyper_step_indicator_theme.dart';
 import '../../components/pagination/hyper_pagination_theme.dart';
 import '../../components/collapsible/hyper_accordion_theme.dart';
@@ -23,7 +22,6 @@ import '../../components/collapsible/hyper_collapsible_theme.dart';
 import '../../components/notification/hyper_notification_theme.dart';
 import '../../components/loading_overlay/hyper_loading_overlay_theme.dart';
 import '../../components/notice/hyper_alert_theme.dart';
-import '../../components/notice/hyper_banner_theme.dart';
 import '../../components/message/hyper_toast_theme.dart';
 import '../../components/message/hyper_snackbar_theme.dart';
 import '../../components/text_field/hyper_text_field_theme.dart';
@@ -31,7 +29,6 @@ import '../../components/dialog/hyper_dialog_theme.dart';
 import '../../components/bottom_sheet/hyper_bottom_sheet_theme.dart';
 import '../../components/segmented_button/hyper_segmented_button_theme.dart';
 import '../../components/chip/hyper_chip_theme.dart';
-import '../../components/empty_state/hyper_empty_state_theme.dart';
 import '../../components/skeleton/hyper_skeleton_theme.dart';
 import '../../components/avatar/hyper_avatar_theme.dart';
 
@@ -133,7 +130,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.formTheme = const HyperFormThemeData(),
     this.fieldTheme = const HyperFieldThemeData(),
     this.resultTheme = const HyperResultThemeData(),
-    this.emptyStateTheme = const HyperEmptyStateThemeData(),
     this.segmentedButtonTheme = const HyperSegmentedButtonThemeData(),
     this.textFieldTheme = const HyperTextFieldThemeData(),
     this.dialogTheme = const HyperDialogThemeData(),
@@ -144,12 +140,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.accordionTheme = const HyperAccordionThemeData(),
     this.paginationTheme = const HyperPaginationThemeData(),
     this.stepIndicatorTheme = const HyperStepIndicatorThemeData(),
-    this.stepperNavigationTheme = const HyperStepperNavigationThemeData(),
     this.timelineTheme = const HyperTimelineThemeData(),
     this.descriptionListTheme = const HyperDescriptionListThemeData(),
     this.notificationTheme = const HyperNotificationThemeData(),
     this.alertTheme = const HyperAlertThemeData(),
-    this.bannerTheme = const HyperBannerThemeData(),
     this.bottomSheetTheme = const HyperBottomSheetThemeData(),
     this.chipTheme = const HyperChipThemeData(),
     this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
@@ -405,7 +399,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperFormThemeData formTheme;
   final HyperFieldThemeData fieldTheme;
   final HyperResultThemeData resultTheme;
-  final HyperEmptyStateThemeData emptyStateTheme;
   final HyperSegmentedButtonThemeData segmentedButtonTheme;
   final HyperTextFieldThemeData textFieldTheme;
   final HyperDialogThemeData dialogTheme;
@@ -416,12 +409,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperAccordionThemeData accordionTheme;
   final HyperPaginationThemeData paginationTheme;
   final HyperStepIndicatorThemeData stepIndicatorTheme;
-  final HyperStepperNavigationThemeData stepperNavigationTheme;
   final HyperTimelineThemeData timelineTheme;
   final HyperDescriptionListThemeData descriptionListTheme;
   final HyperNotificationThemeData notificationTheme;
   final HyperAlertThemeData alertTheme;
-  final HyperBannerThemeData bannerTheme;
   final HyperBottomSheetThemeData bottomSheetTheme;
   final HyperChipThemeData chipTheme;
   final HyperWidgetGroupThemeData widgetGroupTheme;
@@ -550,7 +541,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperFormThemeData? formTheme,
     HyperFieldThemeData? fieldTheme,
     HyperResultThemeData? resultTheme,
-    HyperEmptyStateThemeData? emptyStateTheme,
     HyperSegmentedButtonThemeData? segmentedButtonTheme,
     HyperTextFieldThemeData? textFieldTheme,
     HyperDialogThemeData? dialogTheme,
@@ -561,12 +551,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperAccordionThemeData? accordionTheme,
     HyperPaginationThemeData? paginationTheme,
     HyperStepIndicatorThemeData? stepIndicatorTheme,
-    HyperStepperNavigationThemeData? stepperNavigationTheme,
     HyperTimelineThemeData? timelineTheme,
     HyperDescriptionListThemeData? descriptionListTheme,
     HyperNotificationThemeData? notificationTheme,
     HyperAlertThemeData? alertTheme,
-    HyperBannerThemeData? bannerTheme,
     HyperBottomSheetThemeData? bottomSheetTheme,
     HyperChipThemeData? chipTheme,
     HyperWidgetGroupThemeData? widgetGroupTheme,
@@ -632,7 +620,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       formTheme: formTheme ?? this.formTheme,
       fieldTheme: fieldTheme ?? this.fieldTheme,
       resultTheme: resultTheme ?? this.resultTheme,
-      emptyStateTheme: emptyStateTheme ?? this.emptyStateTheme,
       segmentedButtonTheme: segmentedButtonTheme ?? this.segmentedButtonTheme,
       textFieldTheme: textFieldTheme ?? this.textFieldTheme,
       dialogTheme: dialogTheme ?? this.dialogTheme,
@@ -643,13 +630,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       accordionTheme: accordionTheme ?? this.accordionTheme,
       paginationTheme: paginationTheme ?? this.paginationTheme,
       stepIndicatorTheme: stepIndicatorTheme ?? this.stepIndicatorTheme,
-      stepperNavigationTheme:
-          stepperNavigationTheme ?? this.stepperNavigationTheme,
       timelineTheme: timelineTheme ?? this.timelineTheme,
       descriptionListTheme: descriptionListTheme ?? this.descriptionListTheme,
       notificationTheme: notificationTheme ?? this.notificationTheme,
       alertTheme: alertTheme ?? this.alertTheme,
-      bannerTheme: bannerTheme ?? this.bannerTheme,
       bottomSheetTheme: bottomSheetTheme ?? this.bottomSheetTheme,
       chipTheme: chipTheme ?? this.chipTheme,
       widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
@@ -729,11 +713,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.stepIndicatorTheme,
         t,
       ),
-      stepperNavigationTheme: HyperStepperNavigationThemeData.lerp(
-        stepperNavigationTheme,
-        other.stepperNavigationTheme,
-        t,
-      ),
       timelineTheme: HyperTimelineThemeData.lerp(
         timelineTheme,
         other.timelineTheme,
@@ -750,7 +729,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       alertTheme: HyperAlertThemeData.lerp(alertTheme, other.alertTheme, t),
-      bannerTheme: HyperBannerThemeData.lerp(bannerTheme, other.bannerTheme, t),
       bottomSheetTheme: HyperBottomSheetThemeData.lerp(
         bottomSheetTheme,
         other.bottomSheetTheme,
@@ -843,11 +821,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       resultTheme: HyperResultThemeData.lerp(resultTheme, other.resultTheme, t),
-      emptyStateTheme: HyperEmptyStateThemeData.lerp(
-        emptyStateTheme,
-        other.emptyStateTheme,
-        t,
-      ),
       skeletonTheme: HyperSkeletonThemeData.lerp(
         skeletonTheme,
         other.skeletonTheme,
@@ -947,7 +920,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.formTheme == formTheme &&
           other.fieldTheme == fieldTheme &&
           other.resultTheme == resultTheme &&
-          other.emptyStateTheme == emptyStateTheme &&
           other.segmentedButtonTheme == segmentedButtonTheme &&
           other.textFieldTheme == textFieldTheme &&
           other.dialogTheme == dialogTheme &&
@@ -958,12 +930,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.accordionTheme == accordionTheme &&
           other.paginationTheme == paginationTheme &&
           other.stepIndicatorTheme == stepIndicatorTheme &&
-          other.stepperNavigationTheme == stepperNavigationTheme &&
           other.timelineTheme == timelineTheme &&
           other.descriptionListTheme == descriptionListTheme &&
           other.notificationTheme == notificationTheme &&
           other.alertTheme == alertTheme &&
-          other.bannerTheme == bannerTheme &&
           other.bottomSheetTheme == bottomSheetTheme &&
           other.chipTheme == chipTheme &&
           other.avatarTheme == avatarTheme &&
@@ -1017,7 +987,6 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     calendarTheme,
     wheelPickerTheme,
     resultTheme,
-    emptyStateTheme,
     segmentedButtonTheme,
     textFieldTheme,
     dialogTheme,
@@ -1028,12 +997,10 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     accordionTheme,
     paginationTheme,
     stepIndicatorTheme,
-    stepperNavigationTheme,
     timelineTheme,
     descriptionListTheme,
     notificationTheme,
     alertTheme,
-    bannerTheme,
     bottomSheetTheme,
     chipTheme,
     avatarTheme,

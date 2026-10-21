@@ -175,10 +175,10 @@ class _PageState extends State<HyperNotificationCenterPage> {
             SizedBox(height: sizes.compactSectionSpacing),
             Expanded(
               child: rows.isEmpty
-                  ? const HyperEmptyState(
+                  ? const HyperResult.empty(
                       title: '暂无通知',
                       description: '新通知会显示在这里',
-                      icon: Icons.notifications_none,
+                      style: HyperResultStyle(icon: Icons.notifications_none),
                     )
                   : ListView.builder(
                       key: const ValueKey('notifications'),

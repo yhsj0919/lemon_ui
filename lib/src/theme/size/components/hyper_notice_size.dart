@@ -13,7 +13,15 @@ final class HyperNoticeSize {
     required this.titleSpacing,
     required this.actionSpacing,
     required this.actionRunSpacing,
-  });
+    // Named variant arguments stay public while storage remains optional.
+    HyperNoticeSize? banner,
+    // ignore: prefer_initializing_formals
+  }) : _banner = banner;
+  final HyperNoticeSize? _banner;
+
+  /// 此形态的尺寸；未覆盖时继承当前规格。
+  HyperNoticeSize get banner => _banner ?? this;
+
   final double radius;
   final EdgeInsetsGeometry padding;
   final double iconSize;
@@ -33,7 +41,9 @@ final class HyperNoticeSize {
     double? titleSpacing,
     double? actionSpacing,
     double? actionRunSpacing,
+    HyperNoticeSize? banner,
   }) => HyperNoticeSize(
+    banner: banner ?? _banner,
     radius: radius ?? this.radius,
     padding: padding ?? this.padding,
     iconSize: iconSize ?? this.iconSize,
@@ -44,26 +54,34 @@ final class HyperNoticeSize {
     actionSpacing: actionSpacing ?? this.actionSpacing,
     actionRunSpacing: actionRunSpacing ?? this.actionRunSpacing,
   );
-  static HyperNoticeSize lerp(
-    HyperNoticeSize a,
-    HyperNoticeSize b,
-    double t,
-  ) => HyperNoticeSize(
-    radius: a.radius + (b.radius - a.radius) * t,
-    padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t)!,
-    iconSize: a.iconSize + (b.iconSize - a.iconSize) * t,
-    closeIconSize: a.closeIconSize + (b.closeIconSize - a.closeIconSize) * t,
-    closeButtonSize:
-        a.closeButtonSize + (b.closeButtonSize - a.closeButtonSize) * t,
-    spacing: a.spacing + (b.spacing - a.spacing) * t,
-    titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
-    actionSpacing: a.actionSpacing + (b.actionSpacing - a.actionSpacing) * t,
-    actionRunSpacing:
-        a.actionRunSpacing + (b.actionRunSpacing - a.actionRunSpacing) * t,
-  );
+  static HyperNoticeSize lerp(HyperNoticeSize a, HyperNoticeSize b, double t) =>
+      t == 0
+      ? a
+      : t == 1
+      ? b
+      : HyperNoticeSize(
+          banner: a._banner == null && b._banner == null
+              ? null
+              : HyperNoticeSize.lerp(a.banner, b.banner, t),
+          radius: a.radius + (b.radius - a.radius) * t,
+          padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t)!,
+          iconSize: a.iconSize + (b.iconSize - a.iconSize) * t,
+          closeIconSize:
+              a.closeIconSize + (b.closeIconSize - a.closeIconSize) * t,
+          closeButtonSize:
+              a.closeButtonSize + (b.closeButtonSize - a.closeButtonSize) * t,
+          spacing: a.spacing + (b.spacing - a.spacing) * t,
+          titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
+          actionSpacing:
+              a.actionSpacing + (b.actionSpacing - a.actionSpacing) * t,
+          actionRunSpacing:
+              a.actionRunSpacing +
+              (b.actionRunSpacing - a.actionRunSpacing) * t,
+        );
   @override
   bool operator ==(Object other) =>
       other is HyperNoticeSize &&
+      other._banner == _banner &&
       radius == other.radius &&
       padding == other.padding &&
       iconSize == other.iconSize &&
@@ -75,6 +93,7 @@ final class HyperNoticeSize {
       actionRunSpacing == other.actionRunSpacing;
   @override
   int get hashCode => Object.hashAll([
+    _banner,
     radius,
     padding,
     iconSize,

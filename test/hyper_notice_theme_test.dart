@@ -89,9 +89,9 @@ void main() {
       mid,
     );
     expect(
-      HyperBannerThemeData.lerp(
-        const HyperBannerThemeData(style: base),
-        HyperBannerThemeData(style: other),
+      HyperAlertThemeData.lerp(
+        const HyperAlertThemeData(style: base),
+        HyperAlertThemeData(style: other),
         .5,
       ).style,
       mid,
@@ -111,17 +111,17 @@ void main() {
     );
     expect(
       [
-        sizes.phone.banner.radius,
-        sizes.tablet.banner.radius,
-        sizes.desktop.banner.radius,
-        sizes.watch.banner.radius,
+        sizes.phone.alert.banner.radius,
+        sizes.tablet.alert.banner.radius,
+        sizes.desktop.alert.banner.radius,
+        sizes.watch.alert.banner.radius,
       ],
       [0, 0, 0, 0],
     );
     final changedSize = sizes.desktop.copyWith(
       alert: sizes.desktop.alert.copyWith(iconSize: 24),
     );
-    expect(changedSize.banner, sizes.desktop.banner);
+    expect(changedSize.alert.banner, sizes.desktop.alert.banner);
     expect(
       HyperSizeScheme.lerp(sizes.desktop, changedSize, .5).alert.iconSize,
       20,
@@ -131,16 +131,13 @@ void main() {
     final changed = theme.copyWith(
       alertTheme: const HyperAlertThemeData(
         error: HyperNoticeStyle(iconColor: Colors.pink),
-      ),
-      bannerTheme: const HyperBannerThemeData(
-        style: HyperNoticeStyle(spacing: 12),
+        bannerStyle: HyperNoticeStyle(spacing: 12),
       ),
     );
     expect(changed, isNot(theme));
     expect(changed.copyWith(), changed);
     expect(changed.copyWith().hashCode, changed.hashCode);
     expect(theme.lerp(changed, 1).alertTheme, changed.alertTheme);
-    expect(theme.lerp(changed, 1).bannerTheme, changed.bannerTheme);
-    expect(theme.bannerTheme.copyWith().hashCode, theme.bannerTheme.hashCode);
+    expect(theme.alertTheme.copyWith().hashCode, theme.alertTheme.hashCode);
   });
 }

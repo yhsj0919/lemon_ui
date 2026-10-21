@@ -118,9 +118,9 @@ void main() {
       mid,
     );
     expect(
-      HyperStepperNavigationThemeData.lerp(
-        const HyperStepperNavigationThemeData(style: a),
-        HyperStepperNavigationThemeData(style: b),
+      HyperStepIndicatorThemeData.lerp(
+        const HyperStepIndicatorThemeData(style: a),
+        HyperStepIndicatorThemeData(style: b),
         .5,
       ).style,
       mid,
@@ -141,16 +141,20 @@ void main() {
       final changed = base.copyWith(nodeSize: base.nodeSize + 4);
       expect(HyperStepSize.lerp(base, changed, .5).nodeSize, base.nodeSize + 2);
       expect(
-        sizes.copyWith(stepIndicator: changed).stepperNavigation,
-        sizes.stepperNavigation,
+        sizes
+            .copyWith(stepIndicator: changed)
+            .stepIndicator
+            .navigation
+            .nodeSize,
+        changed.nodeSize,
       );
     }
-    const navigation = HyperStepperNavigationThemeData(
+    const navigation = HyperStepIndicatorThemeData(
       style: HyperStepStyle(nodeSize: 40),
     );
-    final updated = theme.copyWith(stepperNavigationTheme: navigation);
-    expect(updated.stepperNavigationTheme, navigation);
-    expect(updated.stepIndicatorTheme, theme.stepIndicatorTheme);
+    final updated = theme.copyWith(stepIndicatorTheme: navigation);
+    expect(updated.stepIndicatorTheme, navigation);
+
     expect(theme.lerp(updated, 1), updated);
   });
 }

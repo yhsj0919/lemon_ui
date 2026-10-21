@@ -66,7 +66,7 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
                 HyperAlert(severity: pair.key, content: Text(pair.value)),
             ]),
             section('Banner · 标题、正文与操作', [
-              HyperBanner(
+              HyperAlert.banner(
                 severity: HyperNoticeSeverity.warning,
                 title: const Text('当前处于离线状态'),
                 content: const Text('本地修改仍会保留，连接恢复后可同步。Banner 留在页面内，不创建浮层。'),
@@ -77,7 +77,7 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
                   ),
                 ],
               ),
-              HyperBanner(
+              HyperAlert.banner(
                 severity: HyperNoticeSeverity.success,
                 content: const Text('所有修改已同步。'),
                 showIcon: false,
@@ -91,7 +91,7 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
                 visible: _alertVisible,
                 onClose: () => setState(() => _alertVisible = false),
               ),
-              HyperBanner(
+              HyperAlert.banner(
                 title: const Text('页面横幅'),
                 content: const Text('隐藏时收起自身高度，同时移除交互和语义。'),
                 visible: _bannerVisible,
@@ -150,7 +150,7 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
                   content: Text('只修改 Alert，Banner 保留自身主题。'),
                 ),
               ),
-              HyperBanner(
+              HyperAlert.banner(
                 content: const Text('Banner 也可显式使用圆角和边框'),
                 icon: const Icon(Icons.lightbulb_outline),
                 style: HyperNoticeStyle(
@@ -174,7 +174,7 @@ class _HyperNoticePageState extends State<HyperNoticePage> {
                 content: const Text('质量和降级由统一主题控制。'),
                 style: HyperNoticeStyle(material: material),
               ),
-              HyperBanner(
+              HyperAlert.banner(
                 title: const Text('玻璃 Banner'),
                 content: const Text('正文区域可使用相同的材质配方。'),
                 style: HyperNoticeStyle(material: material),

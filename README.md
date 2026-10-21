@@ -5,6 +5,7 @@ A Flutter UI package under active redesign.
 ## Documentation
 
 - [组件使用手册](docs/usage/README.md)
+- [当前已实现控件索引](docs/implemented-components.md)
 - [Demo 设备预览与 UI 审核状态](docs/device-preview-and-review.md)
 - [Demo 主题编辑器（第一版）](docs/theme-editor.md)
 - [快速开始与主题配置](docs/usage/getting-started.md)

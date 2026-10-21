@@ -79,7 +79,7 @@ class _PageState extends State<HyperStepsPage> {
         ]),
         section('受控步骤导航', [
           Wrap(
-            spacing: sizes.stepperNavigation.spacing,
+            spacing: sizes.stepIndicator.navigation.spacing,
             children: [
               HyperButton.text(
                 label: Text(_vertical ? '横向导航' : '纵向导航'),
@@ -91,7 +91,7 @@ class _PageState extends State<HyperStepsPage> {
               ),
             ],
           ),
-          HyperStepperNavigation(
+          HyperStepIndicator.navigation(
             items: _items,
             currentStep: _step,
             enabled: _enabled,
@@ -101,7 +101,7 @@ class _PageState extends State<HyperStepsPage> {
           Text('当前索引：$_step。点击只更新页面状态，不触发提交或校验。'),
         ]),
         section('自定义图标、禁用与长文字', [
-          const HyperStepperNavigation(
+          const HyperStepIndicator.navigation(
             currentStep: 0,
             direction: Axis.vertical,
             items: [

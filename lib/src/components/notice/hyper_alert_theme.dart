@@ -11,28 +11,64 @@ final class HyperAlertThemeData {
     this.success,
     this.warning,
     this.error,
+    this.bannerStyle = const HyperNoticeStyle(),
+    this.bannerInfo,
+    this.bannerSuccess,
+    this.bannerWarning,
+    this.bannerError,
   });
   final HyperNoticeStyle style;
-  final HyperNoticeStyle? info, success, warning, error;
-  HyperNoticeStyle styleFor(HyperNoticeSeverity severity) =>
-      style.merge(switch (severity) {
+  final HyperNoticeStyle? info;
+  final HyperNoticeStyle? success;
+  final HyperNoticeStyle? warning;
+  final HyperNoticeStyle? error;
+  final HyperNoticeStyle bannerStyle;
+  final HyperNoticeStyle? bannerInfo;
+  final HyperNoticeStyle? bannerSuccess;
+  final HyperNoticeStyle? bannerWarning;
+  final HyperNoticeStyle? bannerError;
+  HyperNoticeStyle styleFor(
+    HyperNoticeSeverity status, {
+    bool banner = false,
+  }) => style
+      .merge(switch (status) {
         HyperNoticeSeverity.info => info,
         HyperNoticeSeverity.success => success,
         HyperNoticeSeverity.warning => warning,
         HyperNoticeSeverity.error => error,
-      });
+      })
+      .merge(
+        banner
+            ? bannerStyle.merge(switch (status) {
+                HyperNoticeSeverity.info => bannerInfo,
+                HyperNoticeSeverity.success => bannerSuccess,
+                HyperNoticeSeverity.warning => bannerWarning,
+                HyperNoticeSeverity.error => bannerError,
+              })
+            : null,
+      );
   HyperAlertThemeData copyWith({
     HyperNoticeStyle? style,
     HyperNoticeStyle? info,
     HyperNoticeStyle? success,
     HyperNoticeStyle? warning,
     HyperNoticeStyle? error,
+    HyperNoticeStyle? bannerStyle,
+    HyperNoticeStyle? bannerInfo,
+    HyperNoticeStyle? bannerSuccess,
+    HyperNoticeStyle? bannerWarning,
+    HyperNoticeStyle? bannerError,
   }) => HyperAlertThemeData(
     style: style ?? this.style,
     info: info ?? this.info,
     success: success ?? this.success,
     warning: warning ?? this.warning,
     error: error ?? this.error,
+    bannerStyle: bannerStyle ?? this.bannerStyle,
+    bannerInfo: bannerInfo ?? this.bannerInfo,
+    bannerSuccess: bannerSuccess ?? this.bannerSuccess,
+    bannerWarning: bannerWarning ?? this.bannerWarning,
+    bannerError: bannerError ?? this.bannerError,
   );
   HyperAlertThemeData merge(HyperAlertThemeData? other) => other == null
       ? this
@@ -42,6 +78,14 @@ final class HyperAlertThemeData {
           success: success?.merge(other.success) ?? other.success,
           warning: warning?.merge(other.warning) ?? other.warning,
           error: error?.merge(other.error) ?? other.error,
+          bannerStyle: bannerStyle.merge(other.bannerStyle),
+          bannerInfo: bannerInfo?.merge(other.bannerInfo) ?? other.bannerInfo,
+          bannerSuccess:
+              bannerSuccess?.merge(other.bannerSuccess) ?? other.bannerSuccess,
+          bannerWarning:
+              bannerWarning?.merge(other.bannerWarning) ?? other.bannerWarning,
+          bannerError:
+              bannerError?.merge(other.bannerError) ?? other.bannerError,
         );
   static HyperAlertThemeData lerp(
     HyperAlertThemeData a,
@@ -58,6 +102,11 @@ final class HyperAlertThemeData {
       success: blend(a.success, b.success),
       warning: blend(a.warning, b.warning),
       error: blend(a.error, b.error),
+      bannerStyle: HyperNoticeStyle.lerp(a.bannerStyle, b.bannerStyle, t),
+      bannerInfo: blend(a.bannerInfo, b.bannerInfo),
+      bannerSuccess: blend(a.bannerSuccess, b.bannerSuccess),
+      bannerWarning: blend(a.bannerWarning, b.bannerWarning),
+      bannerError: blend(a.bannerError, b.bannerError),
     );
   }
 
@@ -68,9 +117,25 @@ final class HyperAlertThemeData {
       info == other.info &&
       success == other.success &&
       warning == other.warning &&
-      error == other.error;
+      error == other.error &&
+      bannerStyle == other.bannerStyle &&
+      bannerInfo == other.bannerInfo &&
+      bannerSuccess == other.bannerSuccess &&
+      bannerWarning == other.bannerWarning &&
+      bannerError == other.bannerError;
   @override
-  int get hashCode => Object.hash(style, info, success, warning, error);
+  int get hashCode => Object.hashAll([
+    style,
+    info,
+    success,
+    warning,
+    error,
+    bannerStyle,
+    bannerInfo,
+    bannerSuccess,
+    bannerWarning,
+    bannerError,
+  ]);
 }
 
 class HyperAlertTheme extends StatelessWidget {

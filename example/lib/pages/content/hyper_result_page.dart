@@ -13,6 +13,7 @@ class _PageState extends State<HyperResultPage> {
   HyperResultStatus _status = HyperResultStatus.success;
   bool _reduced = false;
   String get _title => switch (_status) {
+    HyperResultStatus.empty => '暂无内容',
     HyperResultStatus.neutral => '处理完成',
     HyperResultStatus.success => '保存成功',
     HyperResultStatus.error => '保存失败',
@@ -26,6 +27,11 @@ class _PageState extends State<HyperResultPage> {
     return ListView(
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
+        const DemoSection(
+          title: '空状态（默认主题）',
+          child: HyperResult.empty(description: '暂无内容时也使用统一结果组件。'),
+        ),
+        SizedBox(height: sizes.sectionSpacing),
         DemoSection(
           title: '受控状态与过渡',
           child: Column(

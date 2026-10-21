@@ -175,13 +175,15 @@ transitionBuilder 替换加载完成过渡。循环遵守减少动画和 TickerM
 全局 skeletonTheme、局部 HyperSkeletonTheme、实例 HyperSkeletonStyle。
 [源码](../../lib/src/components/skeleton/hyper_skeleton.dart)。
 
-## HyperEmptyState 空状态
+## HyperResult.empty 空状态
+
+空内容使用 `HyperResult.empty`，主题通过 `resultTheme.empty` 配置；详见[结果页](result.md)。
 
 ~~~dart
-HyperEmptyState(
+HyperResult.empty(
   title: '暂无文档',
   description: '创建第一个文档后会显示在这里',
-  icon: Icons.description_outlined,
+  style: const HyperResultStyle(icon: Icons.description_outlined),
   actions: [
     HyperButton.filled(label: const Text('新建文档'), onPressed: () {}),
   ],
@@ -192,9 +194,9 @@ title/description 是默认文字；titleWidget/descriptionWidget 替换文字�
 illustration 优先于 icon，showIllustration: false 隐藏插图；
 content 添加任意内容，actions 自动换行。父级决定可用范围。
 空状态不管理网络、加载、重试与路由。
-全局 emptyStateTheme、局部 HyperEmptyStateTheme、实例 HyperEmptyStateStyle。
-[源码](../../lib/src/components/empty_state/hyper_empty_state.dart) ·
-[Demo](../../example/lib/pages/feedback/hyper_empty_state_page.dart)。
+全局 resultTheme.empty、局部 HyperResultTheme、实例 HyperResultStyle。
+[源码](../../lib/src/components/result/hyper_result.dart) ·
+[Demo](../../example/lib/pages/feedback/hyper_result_empty_page.dart)。
 
 ## 通知卡片
 

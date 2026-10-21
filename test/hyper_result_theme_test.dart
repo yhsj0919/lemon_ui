@@ -10,7 +10,8 @@ void main() {
     expect(HyperResultStatus.warning.color(colors), colors.warning);
     expect(HyperResultStatus.info.color(colors), colors.primary);
     expect(HyperResultStatus.neutral.color(colors), colors.textSecondary);
-    expect(HyperResultStatus.values.map((s) => s.icon).toSet().length, 5);
+    expect(HyperResultStatus.empty.color(colors), colors.textTertiary);
+    expect(HyperResultStatus.values.map((s) => s.icon).toSet().length, 6);
   });
   test('通用、状态、局部与实例样式逐字段覆盖', () {
     const global = HyperResultThemeData(
@@ -64,7 +65,7 @@ void main() {
       360,
     );
   });
-  test('四端尺寸独立存储，结果主题不读取空状态主题', () {
+  test('四端尺寸按设备存储，结果状态覆盖互不影响', () {
     const schemes = [
       HyperSizeScheme.phone(),
       HyperSizeScheme.tablet(),
@@ -75,7 +76,7 @@ void main() {
     final sizes = schemes[2].copyWith(
       result: schemes[2].result.copyWith(iconSize: 60),
     );
-    expect(sizes.emptyState, schemes[2].emptyState);
+    expect(sizes.result.empty.iconSize, 60);
     expect(sizes.deviceType, HyperDeviceType.desktop);
     expect(HyperSizeScheme.lerp(schemes[2], sizes, .5).result.iconSize, 50);
     final base = HyperThemeData.light();
@@ -84,7 +85,7 @@ void main() {
         success: HyperResultStyle(iconColor: Colors.green),
       ),
     );
-    expect(changed.emptyStateTheme, base.emptyStateTheme);
+    expect(changed.resultTheme.empty, base.resultTheme.empty);
     expect(changed.copyWith(), changed);
     expect(changed.copyWith().hashCode, changed.hashCode);
     expect(base.lerp(changed, 1).resultTheme, changed.resultTheme);

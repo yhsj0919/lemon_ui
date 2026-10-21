@@ -10,7 +10,15 @@ final class HyperStepSize {
     required this.titleSpacing,
     required this.itemSpacing,
     required this.interactionRadius,
-  });
+    // Named variant arguments stay public while storage remains optional.
+    HyperStepSize? navigation,
+    // ignore: prefer_initializing_formals
+  }) : _navigation = navigation;
+  final HyperStepSize? _navigation;
+
+  /// 此形态的尺寸；未覆盖时继承当前规格。
+  HyperStepSize get navigation => _navigation ?? this;
+
   final double nodeSize;
   final double iconSize;
   final double connectorThickness;
@@ -26,7 +34,9 @@ final class HyperStepSize {
     double? titleSpacing,
     double? itemSpacing,
     double? interactionRadius,
+    HyperStepSize? navigation,
   }) => HyperStepSize(
+    navigation: navigation ?? _navigation,
     nodeSize: nodeSize ?? this.nodeSize,
     iconSize: iconSize ?? this.iconSize,
     connectorThickness: connectorThickness ?? this.connectorThickness,
@@ -36,22 +46,30 @@ final class HyperStepSize {
     interactionRadius: interactionRadius ?? this.interactionRadius,
   );
   static HyperStepSize lerp(HyperStepSize a, HyperStepSize b, double t) =>
-      HyperStepSize(
-        nodeSize: a.nodeSize + (b.nodeSize - a.nodeSize) * t,
-        iconSize: a.iconSize + (b.iconSize - a.iconSize) * t,
-        connectorThickness:
-            a.connectorThickness +
-            (b.connectorThickness - a.connectorThickness) * t,
-        spacing: a.spacing + (b.spacing - a.spacing) * t,
-        titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
-        itemSpacing: a.itemSpacing + (b.itemSpacing - a.itemSpacing) * t,
-        interactionRadius:
-            a.interactionRadius +
-            (b.interactionRadius - a.interactionRadius) * t,
-      );
+      t == 0
+      ? a
+      : t == 1
+      ? b
+      : HyperStepSize(
+          navigation: a._navigation == null && b._navigation == null
+              ? null
+              : HyperStepSize.lerp(a.navigation, b.navigation, t),
+          nodeSize: a.nodeSize + (b.nodeSize - a.nodeSize) * t,
+          iconSize: a.iconSize + (b.iconSize - a.iconSize) * t,
+          connectorThickness:
+              a.connectorThickness +
+              (b.connectorThickness - a.connectorThickness) * t,
+          spacing: a.spacing + (b.spacing - a.spacing) * t,
+          titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
+          itemSpacing: a.itemSpacing + (b.itemSpacing - a.itemSpacing) * t,
+          interactionRadius:
+              a.interactionRadius +
+              (b.interactionRadius - a.interactionRadius) * t,
+        );
   @override
   bool operator ==(Object other) =>
       other is HyperStepSize &&
+      other._navigation == _navigation &&
       nodeSize == other.nodeSize &&
       iconSize == other.iconSize &&
       connectorThickness == other.connectorThickness &&
@@ -61,6 +79,7 @@ final class HyperStepSize {
       interactionRadius == other.interactionRadius;
   @override
   int get hashCode => Object.hashAll([
+    _navigation,
     nodeSize,
     iconSize,
     connectorThickness,

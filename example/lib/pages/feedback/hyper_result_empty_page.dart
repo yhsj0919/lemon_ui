@@ -3,13 +3,13 @@ import 'package:lemon_ui/lemon_ui.dart';
 
 import '../../gallery/demo_section.dart';
 
-class HyperEmptyStatePage extends StatefulWidget {
-  const HyperEmptyStatePage({super.key});
+class HyperResultEmptyPage extends StatefulWidget {
+  const HyperResultEmptyPage({super.key});
   @override
-  State<HyperEmptyStatePage> createState() => _HyperEmptyStatePageState();
+  State<HyperResultEmptyPage> createState() => _HyperResultEmptyPageState();
 }
 
-class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
+class _HyperResultEmptyPageState extends State<HyperResultEmptyPage> {
   int _created = 0;
   int _retries = 0;
   bool _cleared = false;
@@ -31,13 +31,13 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const HyperText(
-                  'Empty State',
+                  'Result · empty',
                   variant: HyperTextVariant.pageTitle,
                 ),
                 SizedBox(height: sizes.sectionSpacing),
                 section(
                   '暂无数据',
-                  HyperEmptyState(
+                  HyperResult.empty(
                     title: _created == 0 ? '暂无项目' : '已创建 $_created 个项目',
                     description: '创建第一个项目，开始整理你的内容。',
                     actions: [
@@ -50,8 +50,10 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                 ),
                 section(
                   '搜索无结果',
-                  HyperEmptyState(
-                    icon: Icons.search_off_outlined,
+                  HyperResult.empty(
+                    style: const HyperResultStyle(
+                      icon: Icons.search_off_outlined,
+                    ),
                     title: _cleared ? '搜索条件已清除' : '未找到相关内容',
                     description: '试试其他关键词，或清除当前筛选条件。',
                     actions: [
@@ -64,8 +66,10 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                 ),
                 section(
                   '加载失败',
-                  HyperEmptyState(
-                    icon: Icons.cloud_off_outlined,
+                  HyperResult.empty(
+                    style: const HyperResultStyle(
+                      icon: Icons.cloud_off_outlined,
+                    ),
                     title: '暂时无法加载',
                     description: _retries == 0
                         ? '请检查网络连接后重试。'
@@ -84,7 +88,7 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                 ),
                 section(
                   '自定义插图',
-                  HyperEmptyState(
+                  HyperResult.empty(
                     title: '这里还没有文件',
                     description: '插图可替换成图片、矢量资源或自定义 Widget。',
                     illustration: SizedBox(
@@ -136,7 +140,7 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                 ),
                 section(
                   '纯文字与自定义内容',
-                  const HyperEmptyState(
+                  const HyperResult.empty(
                     showIllustration: false,
                     titleWidget: HyperText(
                       '先从一个小目标开始',
@@ -148,9 +152,9 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                 ),
                 section(
                   '局部主题与实例覆盖',
-                  HyperEmptyStateTheme(
-                    data: HyperEmptyStateThemeData(
-                      style: HyperEmptyStateStyle(
+                  HyperResultTheme(
+                    data: HyperResultThemeData(
+                      empty: HyperResultStyle(
                         iconColor: theme.colors.primary,
                         background: HyperFill.color(
                           theme.colors.primary.withValues(alpha: .04),
@@ -163,10 +167,10 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                         ),
                       ),
                     ),
-                    child: HyperEmptyState(
+                    child: HyperResult.empty(
                       title: '主题可以替换默认外观',
                       description: '当前实例单独覆盖说明文字的颜色。',
-                      style: HyperEmptyStateStyle(
+                      style: HyperResultStyle(
                         descriptionStyle: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colors.textPrimary,
                         ),
@@ -203,7 +207,7 @@ class _HyperEmptyStatePageState extends State<HyperEmptyStatePage> {
                                   const HyperSkeleton.text(),
                                 ],
                               )
-                            : const HyperEmptyState(
+                            : const HyperResult.empty(
                                 key: ValueKey('empty'),
                                 title: '暂无记录',
                                 description: '新的记录会显示在这里。',

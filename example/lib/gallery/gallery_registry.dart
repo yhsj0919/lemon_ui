@@ -44,7 +44,7 @@ import '../pages/foundation/hyper_theme_page.dart';
 import '../pages/foundation/hyper_typography_scheme_page.dart';
 import '../pages/feedback/hyper_progress_page.dart';
 import '../pages/feedback/hyper_skeleton_page.dart';
-import '../pages/feedback/hyper_empty_state_page.dart';
+import '../pages/feedback/hyper_result_empty_page.dart';
 import '../pages/framework/hyper_app_bar_page.dart';
 import '../pages/framework/hyper_drawer_page.dart';
 import '../pages/framework/hyper_sidebar_page.dart';
@@ -475,7 +475,7 @@ final List<GallerySection> gallerySections = [
       ),
       GalleryItem(
         id: 'hyper-notice',
-        title: 'HyperAlert / HyperBanner',
+        title: 'HyperAlert / HyperAlert.banner',
         description: '四种状态、内联提示、页面横幅、操作与关闭。',
         icon: Icons.info_outline,
         hasStyleOverrides: true,
@@ -507,11 +507,11 @@ final List<GallerySection> gallerySections = [
       ),
       GalleryItem(
         id: 'hyper-empty-state',
-        title: 'HyperEmptyState',
+        title: 'HyperResult.empty',
         description: '暂无数据、搜索无结果、加载失败及自定义内容。',
         icon: Icons.inbox_outlined,
         hasStyleOverrides: true,
-        builder: (_) => const HyperEmptyStatePage(),
+        builder: (_) => const HyperResultEmptyPage(),
       ),
       GalleryItem(
         id: 'hyper-skeleton',
@@ -578,7 +578,7 @@ final List<GallerySection> gallerySections = [
       ),
       GalleryItem(
         id: 'hyper-steps',
-        title: 'HyperStepIndicator / StepperNavigation',
+        title: 'HyperStepIndicator / HyperStepIndicator.navigation',
         description: '步骤状态、横纵布局和受控导航。',
         icon: Icons.format_list_numbered,
         hasStyleOverrides: true,

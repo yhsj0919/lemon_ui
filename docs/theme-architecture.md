@@ -23,6 +23,12 @@ HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴
 
 # Lemon UI 主题与尺寸架构
 
+## Result 与空状态合并（2026-10-21）
+
+`HyperResult.empty` 与其他结果状态共用布局、动画和 `HyperMaterialSurface`。空状态主题统一为 `resultTheme.empty`，尺寸统一为 `sizes.result.empty`；未指定变体尺寸时继承 `sizes.result`。全局、局部和实例均使用 Result 的强类型接口。
+
+编辑器保留页面和文档字段 id，输出到合并后的主题与尺寸变体。显式边框和空阴影列表由统一材质表面解析。
+
 ## Cascader（2026-10-20，未确认）
 
 HyperCascader 的锚定呈现直接复用 HyperMenu 多级浮层，悬停或点击在右侧展开子级，
@@ -91,8 +97,7 @@ iconButtonTheme 和 sizes.textField 的四端规格，不增加独立重复的�
 
 ## Alert / Banner（2026-10-03）
 
-alertTheme / bannerTheme 及 sizes.alert / sizes.banner 独立存储，
-局部通过 HyperAlertTheme / HyperBannerTheme 覆盖，不读取对方主题。
+Alert 与横幅统一使用 alertTheme / HyperAlertTheme；横幅叠加 bannerStyle 及 bannerInfo 等 severity 覆盖，四端尺寸为 sizes.alert.banner。
 HyperNoticeStyle 仅共用字段结构，支持通用与四种状态覆盖，实例 Style 最后应用。
 共用内部 HyperNoticeBody 的内容、图标、操作与显隐布局；状态和关闭由父级控制。
 材质默认继承 HyperMaterialTheme，渲染与降级复用 HyperMaterialSurface。
@@ -172,14 +177,14 @@ Checkbox 与 Chip 的对勾路径及两阶段描画动画采用 Flutter Checkbox
 默认视觉为 D 级项目推导（基于同端按钮、Tag 与图标密度），暂无同场景官方
 Chip 逻辑尺寸或目标截图的直接验证。
 
-`HyperEmptyState` 只展示空内容，不管理网络、加载、重试或业务状态。默认中性图标
+`HyperResult.empty` 只展示空内容，不管理网络、加载、重试或业务状态。默认中性图标
 与“暂无内容”标题；`illustration` 优先于图标，`showIllustration: false` 可隐藏装饰；
 `titleWidget`、`descriptionWidget` 可替换默认文本，`content` 放置额外内容，
 `actions` 接受现有按钮等 Widget 并自动换行。外层最大内容宽度只约束当前组件，
 父布局仍决定可用区域。装饰插图不创建重复朗读条目，文字与操作保持原有语义。
-全局 `emptyStateTheme`、局部 `HyperEmptyStateTheme`、实例 `HyperEmptyStateStyle`
+全局 `resultTheme.empty`、局部 `HyperResultTheme`、实例 `HyperResultStyle`
 管理图标、颜色、排版、对齐、间距、背景填充、边框、圆角、阴影和过渡。
-四端尺寸集中在 `HyperSizeScheme.emptyState`；文字复用当前端 titleMedium 与
+四端尺寸集中在 `HyperSizeScheme.result.empty`；文字复用当前端 titleMedium 与
 bodySmall，背景默认无填充，容器可由使用方组合。内容变化使用 Motion 标准
 过渡，系统减少动画时关闭；`transitionBuilder` 可替换插图和文字的切换效果。
 无同场景可核实的官方尺寸参数，默认视觉按 D 级项目语义规格推导，待设备对照。
@@ -646,9 +651,9 @@ paginationTheme 与 sizes.pagination 独立强类型存储，支持复制、合�
 
 HyperPaginationModel 负责输入合法性、页码窗口与省略号；组件仅发出 onPageChanged，调用方负责数据加载和页数变化后的当前页修正。Wrap 适应可用宽度，不改变设备分类。数据为空使用 currentPage 0，非空页码从 1 起始。
 
-## StepIndicator / StepperNavigation（2026-10-05）
+## StepIndicator 与 navigation 模式（2026-10-05）
 
-stepIndicatorTheme / stepperNavigationTheme 与 sizes.stepIndicator / sizes.stepperNavigation 各自独立存储。HyperStepStyle、HyperStepSize 共用字段结构，公共 Body 只接收已选主题解析函数与当前尺寸，不自行判断设备类别或读取另一组件主题。
+步骤展示与导航统一使用 stepIndicatorTheme / HyperStepIndicatorTheme。导航叠加 navigationStyle 与对应状态字段；四端尺寸为 sizes.stepIndicator.navigation。公共 Body 接收已解析主题与尺寸，不判断设备类别。
 
 纯 HyperStepModel 校验索引与 id，推导 pending/current/completed，并支持显式 error 和 disabled 状态。页面负责实际导航、流程校验与提交；Indicator 仅呈现，Navigation 仅发出请求。主题通用字段、状态字段、实例字段、单项字段依次合并。
 
@@ -677,7 +682,7 @@ HyperDescriptionList 的全局视觉使用 descriptionListTheme，四端尺寸�
 
 ## Result（2026-10-09）
 
-HyperResult 展示调用方控制的 neutral/success/error/warning/info 状态，不管理加载、请求、重试、导航与自动关闭。全局 resultTheme、局部 HyperResultTheme 和实例 Style 逐字段合并，状态 Style 叠加通用 Style；文字字段深合并。四端 sizes.result 独立存储，不读取 emptyStateTheme 或 sizes.emptyState。材质、质量与降级继承统一 HyperMaterialTheme，表面复用 HyperMaterialSurface；前景边框与外部阴影不会被材质遮盖。默认过渡沿用 Motion 与减少动画策略，transitionBuilder 可替换内容过渡。父级负责页面滚动与安全区。
+HyperResult 展示调用方控制的 neutral/success/error/warning/info 状态，不管理加载、请求、重试、导航与自动关闭。全局 resultTheme、局部 HyperResultTheme 和实例 Style 逐字段合并，状态 Style 叠加通用 Style；文字字段深合并。四端 sizes.result 管理基础尺寸，空内容使用其 empty 变体。材质、质量与降级继承统一 HyperMaterialTheme，表面复用 HyperMaterialSurface；前景边框与外部阴影不会被材质遮盖。默认过渡沿用 Motion 与减少动画策略，transitionBuilder 可替换内容过渡。父级负责页面滚动与安全区。
 
 ## PageIndicator（2026-10-09）
 

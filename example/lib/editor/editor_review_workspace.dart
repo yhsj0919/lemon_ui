@@ -14,7 +14,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
       'bottomSheetReview' => const {'bottomSheet': '底部弹窗'},
       'toastReview' => const {'toast': '轻提示', 'snackbar': '操作提示'},
       'dialogReview' => const {'dialog': '对话框'},
-      'emptyStateReview' => const {'emptyState': '空状态'},
+      'emptyStateReview' => const {'emptyState': '结果 · 空状态'},
       'skeletonReview' => const {'skeleton': '骨架屏'},
       'sidebarReview' => const {'sidebar': '侧边导航'},
       'tabBarReview' => const {'tabBar': '标签导航'},
@@ -1940,11 +1940,11 @@ extension _ReviewWorkspace on _ThemeEditorState {
           );
           final native = noticeDefaults(
             theme: theme,
-            metrics: s.banner,
+            metrics: s.alert.banner,
             materialTheme: theme.materialTheme,
             severity: severity,
             banner: true,
-          ).merge(theme.bannerTheme.styleFor(severity));
+          ).merge(theme.alertTheme.styleFor(severity, banner: true));
           return [
             _heading('标题'),
             if (state == 'common')
@@ -2024,7 +2024,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '图标尺寸',
                 m.iconSize,
-                s.banner.iconSize,
+                s.alert.banner.iconSize,
                 0,
                 editorContentIconLimit,
                 (x) => m.iconSize = x,
@@ -2040,7 +2040,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '关闭按钮尺寸',
                 m.closeButtonSize,
-                s.banner.closeButtonSize,
+                s.alert.banner.closeButtonSize,
                 0,
                 editorContentIconLimit,
                 (x) => m.closeButtonSize = x,
@@ -2068,7 +2068,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '关闭图标尺寸',
                 m.closeIconSize,
-                s.banner.closeIconSize,
+                s.alert.banner.closeIconSize,
                 0,
                 editorContentIconLimit,
                 (x) => m.closeIconSize = x,
@@ -2077,7 +2077,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '图标与内容间距',
                 m.spacing,
-                s.banner.spacing,
+                s.alert.banner.spacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.spacing = x,
@@ -2086,7 +2086,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '标题与正文间距',
                 m.titleSpacing,
-                s.banner.titleSpacing,
+                s.alert.banner.titleSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.titleSpacing = x,
@@ -2095,7 +2095,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '操作间距',
                 m.actionSpacing,
-                s.banner.actionSpacing,
+                s.alert.banner.actionSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.actionSpacing = x,
@@ -2104,7 +2104,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '操作换行间距',
                 m.actionRunSpacing,
-                s.banner.actionRunSpacing,
+                s.alert.banner.actionRunSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.actionRunSpacing = x,
@@ -2134,7 +2134,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 左',
                 m.paddingLeft,
-                s.banner.padding.resolve(TextDirection.ltr).left,
+                s.alert.banner.padding.resolve(TextDirection.ltr).left,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingLeft = x,
@@ -2144,7 +2144,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 上',
                 m.paddingTop,
-                s.banner.padding.resolve(TextDirection.ltr).top,
+                s.alert.banner.padding.resolve(TextDirection.ltr).top,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingTop = x,
@@ -2154,7 +2154,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 右',
                 m.paddingRight,
-                s.banner.padding.resolve(TextDirection.ltr).right,
+                s.alert.banner.padding.resolve(TextDirection.ltr).right,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingRight = x,
@@ -2164,7 +2164,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 下',
                 m.paddingBottom,
-                s.banner.padding.resolve(TextDirection.ltr).bottom,
+                s.alert.banner.padding.resolve(TextDirection.ltr).bottom,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingBottom = x,
@@ -2174,7 +2174,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '表面圆角',
                 m.radius,
-                s.banner.radius,
+                s.alert.banner.radius,
                 0,
                 editorSurfaceRadiusLimit,
                 (x) => m.radius = x,
@@ -3110,7 +3110,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
             ),
           ];
         case 'emptyState':
-          final native = theme.emptyStateTheme.style;
+          final native = theme.resultTheme.resolve(HyperResultStatus.empty);
           return [
             _heading('标题'),
             if (state == 'common')
@@ -3190,7 +3190,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '图标尺寸',
                 m.iconSize,
-                s.emptyState.iconSize,
+                s.result.empty.iconSize,
                 0,
                 editorContentIconLimit,
                 (x) => m.iconSize = x,
@@ -3233,7 +3233,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '插图尺寸',
                 m.illustrationSize,
-                s.emptyState.illustrationSize,
+                s.result.empty.illustrationSize,
                 0,
                 editorContentIllustrationLimit,
                 (x) => m.illustrationSize = x,
@@ -3242,7 +3242,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '最大宽度',
                 m.maxWidth,
-                s.emptyState.maxWidth,
+                s.result.empty.maxWidth,
                 0,
                 editorContentWidthLimit,
                 (x) => m.maxWidth = x,
@@ -3251,7 +3251,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容块间距',
                 m.contentSpacing,
-                s.emptyState.contentSpacing,
+                s.result.empty.contentSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.contentSpacing = x,
@@ -3260,7 +3260,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '标题与正文间距',
                 m.titleSpacing,
-                s.emptyState.titleSpacing,
+                s.result.empty.titleSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.titleSpacing = x,
@@ -3269,7 +3269,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '操作间距',
                 m.actionSpacing,
-                s.emptyState.actionSpacing,
+                s.result.empty.actionSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.actionSpacing = x,
@@ -3278,7 +3278,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '操作换行间距',
                 m.actionRunSpacing,
-                s.emptyState.actionRunSpacing,
+                s.result.empty.actionRunSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.actionRunSpacing = x,
@@ -3307,7 +3307,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 左',
                 m.paddingLeft,
-                s.emptyState.padding.resolve(TextDirection.ltr).left,
+                s.result.empty.padding.resolve(TextDirection.ltr).left,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingLeft = x,
@@ -3317,7 +3317,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 上',
                 m.paddingTop,
-                s.emptyState.padding.resolve(TextDirection.ltr).top,
+                s.result.empty.padding.resolve(TextDirection.ltr).top,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingTop = x,
@@ -3327,7 +3327,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 右',
                 m.paddingRight,
-                s.emptyState.padding.resolve(TextDirection.ltr).right,
+                s.result.empty.padding.resolve(TextDirection.ltr).right,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingRight = x,
@@ -3337,7 +3337,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '内容内边距 · 下',
                 m.paddingBottom,
-                s.emptyState.padding.resolve(TextDirection.ltr).bottom,
+                s.result.empty.padding.resolve(TextDirection.ltr).bottom,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.paddingBottom = x,
@@ -4231,7 +4231,9 @@ extension _ReviewWorkspace on _ThemeEditorState {
             ),
           ];
         case 'stepperNavigation':
-          final native = theme.stepperNavigationTheme.style;
+          final native = theme.stepIndicatorTheme.style.merge(
+            theme.stepIndicatorTheme.navigationStyle,
+          );
           return [
             _heading('标题'),
             if (state == 'common')
@@ -4348,9 +4350,9 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '图标尺寸',
                 m.iconSize,
-                s.stepperNavigation.iconSize,
+                s.stepIndicator.navigation.iconSize,
                 0,
-                s.stepperNavigation.nodeSize,
+                s.stepIndicator.navigation.nodeSize,
                 (x) => m.iconSize = x,
                 decimal: false,
               ),
@@ -4359,7 +4361,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '节点尺寸',
                 m.nodeSize,
-                s.stepperNavigation.nodeSize,
+                s.stepIndicator.navigation.nodeSize,
                 0,
                 editorContentIconLimit,
                 (x) => m.nodeSize = x,
@@ -4368,16 +4370,16 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '连接线粗细',
                 m.connectorThickness,
-                s.stepperNavigation.connectorThickness,
+                s.stepIndicator.navigation.connectorThickness,
                 0,
-                s.stepperNavigation.nodeSize / 2,
+                s.stepIndicator.navigation.nodeSize / 2,
                 (x) => m.connectorThickness = x,
                 decimal: false,
               ),
               n(
                 '图标与内容间距',
                 m.spacing,
-                s.stepperNavigation.spacing,
+                s.stepIndicator.navigation.spacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.spacing = x,
@@ -4386,7 +4388,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '标题与正文间距',
                 m.titleSpacing,
-                s.stepperNavigation.titleSpacing,
+                s.stepIndicator.navigation.titleSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.titleSpacing = x,
@@ -4395,7 +4397,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '条目间距',
                 m.itemSpacing,
-                s.stepperNavigation.itemSpacing,
+                s.stepIndicator.navigation.itemSpacing,
                 0,
                 editorContentSpacingLimit,
                 (x) => m.itemSpacing = x,
@@ -4475,9 +4477,9 @@ extension _ReviewWorkspace on _ThemeEditorState {
               n(
                 '交互区域圆角',
                 m.interactionRadius,
-                s.stepperNavigation.interactionRadius,
+                s.stepIndicator.navigation.interactionRadius,
                 0,
-                (s.stepperNavigation.nodeSize / 2),
+                (s.stepIndicator.navigation.nodeSize / 2),
                 (x) => m.interactionRadius = x,
                 decimal: false,
               ),
@@ -4491,9 +4493,9 @@ extension _ReviewWorkspace on _ThemeEditorState {
             n(
               '节点圆角',
               m.surfaceRadius,
-              (s.stepperNavigation.nodeSize / 2),
+              (s.stepIndicator.navigation.nodeSize / 2),
               0,
-              s.stepperNavigation.nodeSize / 2,
+              s.stepIndicator.navigation.nodeSize / 2,
               (x) => m.surfaceRadius = x,
             ),
             n(
@@ -4501,7 +4503,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               v.borderWidth,
               0,
               0,
-              s.stepperNavigation.nodeSize / 2,
+              s.stepIndicator.navigation.nodeSize / 2,
               (x) => v.borderWidth = x,
             ),
             _color(

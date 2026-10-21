@@ -1,11 +1,10 @@
-import '../../painting/hyper_box_decoration.dart';
-
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
 import '../surface/hyper_material_surface.dart';
+
 import 'hyper_result_model.dart';
 import 'hyper_result_style.dart';
 import 'hyper_result_theme.dart';
@@ -25,6 +24,20 @@ class HyperResult extends StatelessWidget {
     this.actions = const [],
     this.style,
   });
+
+  /// 空内容结果；与其他结果状态共享布局、主题和表面解析。
+  const HyperResult.empty({
+    super.key,
+    this.title = '暂无内容',
+    this.description,
+    this.titleWidget,
+    this.descriptionWidget,
+    this.illustration,
+    this.showIllustration = true,
+    this.content,
+    this.actions = const [],
+    this.style,
+  }) : status = HyperResultStatus.empty;
   final HyperResultStatus status;
   final String? title, description;
   final Widget? titleWidget, descriptionWidget, illustration, content;
@@ -35,8 +48,14 @@ class HyperResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final size = HyperTheme.sizesOf(context).result;
+    final sizes = HyperTheme.sizesOf(context);
+    final size = status == HyperResultStatus.empty
+        ? sizes.result.empty
+        : sizes.result;
     final material = HyperMaterialTheme.of(context);
+    final configured = HyperResultTheme.of(context)
+        .resolve(status)
+        .merge(style);
     final s = HyperResultStyle(
       icon: status.icon,
       iconColor: status.color(theme.colors),
@@ -64,7 +83,7 @@ class HyperResult extends StatelessWidget {
       alignment: Alignment.center,
       duration: theme.motion.standardDuration,
       curve: theme.motion.standardCurve,
-    ).merge(HyperResultTheme.of(context).resolve(status)).merge(style);
+    ).merge(configured);
     final duration = (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
         ? Duration.zero
         : s.duration!;
@@ -135,14 +154,27 @@ class HyperResult extends StatelessWidget {
           children: actions,
         ),
     ];
-    Widget body = AnimatedContainer(
+    final body = TweenAnimationBuilder<HyperResultStyle>(
+      tween: _ResultStyleTween(end: s),
       duration: duration,
       curve: s.curve!,
-      padding: s.padding,
-      decoration: HyperBoxDecoration(
-        color: s.background?.color,
-        gradient: s.background?.gradient,
-        borderRadius: s.borderRadius,
+      builder: (context, visual, child) => HyperMaterialSurface(
+        material: configured.background == null || visual.material == null
+            ? visual.material
+            : visual.material!.copyWith(
+                background: visual.background,
+                fallback: visual.material!.fallback?.copyWith(
+                  background: visual.background,
+                ),
+              ),
+        semanticBackground: visual.background,
+        quality: visual.materialQuality,
+        reduceTransparency: visual.reduceTransparency,
+        borderRadius: visual.borderRadius,
+        border: visual.border,
+        boxShadow: visual.boxShadow,
+        padding: visual.padding,
+        child: child,
       ),
       child: AnimatedSize(
         duration: duration,
@@ -160,30 +192,6 @@ class HyperResult extends StatelessWidget {
         ),
       ),
     );
-    if (s.material != null) {
-      body = HyperMaterialSurface(
-        material: s.material,
-        semanticBackground: s.background,
-        quality: s.materialQuality,
-        reduceTransparency: s.reduceTransparency,
-        borderRadius: s.borderRadius,
-        child: body,
-      );
-    }
-    // 边框在内容前景、阴影在材质外绘制，避免被材质填充遮挡。
-    body = AnimatedContainer(
-      duration: duration,
-      curve: s.curve!,
-      decoration: HyperBoxDecoration(
-        borderRadius: s.borderRadius,
-        boxShadow: s.boxShadow,
-      ),
-      foregroundDecoration: HyperBoxDecoration(
-        border: s.border,
-        borderRadius: s.borderRadius,
-      ),
-      child: body,
-    );
     return Align(
       alignment: s.alignment!,
       widthFactor: 1,
@@ -194,4 +202,11 @@ class HyperResult extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ResultStyleTween extends Tween<HyperResultStyle> {
+  _ResultStyleTween({required HyperResultStyle end}) : super(end: end);
+
+  @override
+  HyperResultStyle lerp(double t) => HyperResultStyle.lerp(begin!, end!, t);
 }

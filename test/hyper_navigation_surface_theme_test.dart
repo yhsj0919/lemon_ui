@@ -64,9 +64,15 @@ void main() {
     expect(appBar.copyWith(), appBar);
     final drawer = HyperDrawerStyle(surfaceStyle: surface);
     expect(const HyperDrawerStyle().merge(drawer), drawer);
-    final empty = HyperEmptyStateStyle(surfaceStyle: surface);
+    final empty = HyperResultStyle(
+      material: surface.material,
+      background: surface.background,
+      border: surface.border,
+      borderRadius: surface.borderRadius,
+      boxShadow: surface.boxShadow,
+    );
     expect(empty.copyWith(), empty);
-    expect(empty, isNot(const HyperEmptyStateStyle()));
+    expect(empty, isNot(const HyperResultStyle()));
     const step = HyperStepStyle(boxShadow: []);
     expect(step.copyWith(), step);
     expect(HyperStepStyle.lerp(step, step, .5), step);

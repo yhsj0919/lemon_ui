@@ -3,7 +3,7 @@
 [返回目录](README.md)
 
 HyperAlert 用于正文内的说明、成功结果、警告或错误提示，默认圆角和浅状态底色。
-HyperBanner 用于页面或区域顶部的提示，默认直角和中性背景。两者都属于父布局，
+HyperAlert.banner 用于页面或区域顶部的提示，默认直角和中性背景。两者都属于父布局，
 不创建 Overlay、不计时、不管理请求或表单校验，也不强制吸顶。
 
 ## 四种状态与内容
@@ -17,7 +17,7 @@ Column(
       content: Text('保存成功'),
     ),
     const SizedBox(height: 16),
-    HyperBanner(
+    HyperAlert.banner(
       severity: HyperNoticeSeverity.warning,
       title: const Text('当前处于离线状态'),
       content: const Text('本地修改会保留，连接恢复后可同步。'),
@@ -75,12 +75,8 @@ HyperAlertTheme(
 )
 ~~~
 
-全局配置分别为 HyperThemeData.alertTheme / bannerTheme；
-局部使用 HyperAlertTheme / HyperBannerTheme，互不继承对方主题。
-两者共用 HyperNoticeStyle 字段结构，但各自存储主题和四端 sizes.alert / sizes.banner。
-ThemeData.style 为通用覆盖；info / success / warning / error 为相应状态覆盖。
-优先级：当前端默认 → 全局与局部组件主题的通用字段 → 对应状态字段 → 实例 Style。
-局部通用字段不会移除已有状态覆盖，需要覆盖状态字段时使用对应 severity 配置。
+全局与局部统一使用 `alertTheme` / `HyperAlertTheme`。`style` 和 severity 字段提供通用覆盖，横幅再合并 `bannerStyle` 和 `bannerInfo` / `bannerSuccess` / `bannerWarning` / `bannerError`，最后合并实例 Style。四端尺寸使用 `sizes.alert` 与 `sizes.alert.banner`。
+
 文字和按钮主题 merge 保留未修改字段；copyWith 表示替换指定字段。
 
 Style 可配置背景、边框、阴影、圆角、内边距、标题和正文字体、状态图标、
@@ -99,7 +95,7 @@ HyperMaterialTheme(
       fallback: HyperSurfaceMaterial.solid(background: HyperFill.color(Colors.white)),
     ),
   ),
-  child: const HyperBanner(
+  child: const HyperAlert.banner(
     title: Text('统一玻璃材质'),
     content: Text('材质配方、质量和透明度策略都从统一主题继承。'),
   ),
@@ -114,9 +110,8 @@ HyperMaterialTheme(
 Style.duration / curve 可覆盖；transitionBuilder 可替换整个显隐效果，value 为 0 至 1 的显示进度。
 自定义过渡仍使用减少动画处理后的进度，需自行处理越界曲线和额外动画。
 
-Demo：反馈与状态 → HyperAlert / HyperBanner。
+Demo：反馈与状态 → HyperAlert / HyperAlert.banner。
 源码：[Alert](../../lib/src/components/notice/hyper_alert.dart)、
-[Banner](../../lib/src/components/notice/hyper_banner.dart)、
 [样式](../../lib/src/components/notice/hyper_notice_style.dart)、
 [Demo](../../example/lib/pages/feedback/hyper_notice_page.dart)。
 验证范围为静态分析、纯主题与尺寸数据测试，尚未做设备或 Widget 运行验证。

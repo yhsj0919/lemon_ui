@@ -13,8 +13,9 @@ final class HyperResultThemeData {
     this.error = const HyperResultStyle(),
     this.warning = const HyperResultStyle(),
     this.info = const HyperResultStyle(),
+    this.empty = const HyperResultStyle(),
   });
-  final HyperResultStyle style, neutral, success, error, warning, info;
+  final HyperResultStyle style, neutral, success, error, warning, info, empty;
   HyperResultStyle resolve(HyperResultStatus status) =>
       style.merge(switch (status) {
         HyperResultStatus.neutral => neutral,
@@ -22,6 +23,7 @@ final class HyperResultThemeData {
         HyperResultStatus.error => error,
         HyperResultStatus.warning => warning,
         HyperResultStatus.info => info,
+        HyperResultStatus.empty => empty,
       });
   HyperResultThemeData copyWith({
     HyperResultStyle? style,
@@ -30,6 +32,7 @@ final class HyperResultThemeData {
     HyperResultStyle? error,
     HyperResultStyle? warning,
     HyperResultStyle? info,
+    HyperResultStyle? empty,
   }) => HyperResultThemeData(
     style: style ?? this.style,
     neutral: neutral ?? this.neutral,
@@ -37,6 +40,7 @@ final class HyperResultThemeData {
     error: error ?? this.error,
     warning: warning ?? this.warning,
     info: info ?? this.info,
+    empty: empty ?? this.empty,
   );
   HyperResultThemeData merge(HyperResultThemeData? other) => other == null
       ? this
@@ -47,6 +51,7 @@ final class HyperResultThemeData {
           error: error.merge(other.error),
           warning: warning.merge(other.warning),
           info: info.merge(other.info),
+          empty: empty.merge(other.empty),
         );
   static HyperResultThemeData lerp(
     HyperResultThemeData a,
@@ -59,6 +64,7 @@ final class HyperResultThemeData {
     error: HyperResultStyle.lerp(a.error, b.error, t),
     warning: HyperResultStyle.lerp(a.warning, b.warning, t),
     info: HyperResultStyle.lerp(a.info, b.info, t),
+    empty: HyperResultStyle.lerp(a.empty, b.empty, t),
   );
   @override
   bool operator ==(Object other) =>
@@ -68,10 +74,11 @@ final class HyperResultThemeData {
       success == other.success &&
       error == other.error &&
       warning == other.warning &&
-      info == other.info;
+      info == other.info &&
+      empty == other.empty;
   @override
   int get hashCode =>
-      Object.hash(style, neutral, success, error, warning, info);
+      Object.hash(style, neutral, success, error, warning, info, empty);
 }
 
 class HyperResultTheme extends StatelessWidget {

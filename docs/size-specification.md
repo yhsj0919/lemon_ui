@@ -121,7 +121,7 @@ Toast 默认停留 3 秒、Snackbar 4 秒为项目暂定行为值；均可覆盖
 | desktop | 40 | 72 | 360 | 16 | 6 | 8 / 8 | 16 |
 | watch | 32 | 48 | 180 | 12 | 4 | 6 / 6 | 8 |
 
-`HyperSizeScheme.emptyState` 统一管理默认值；局部主题和 Style 只覆盖当前设备解析结果。
+`HyperSizeScheme.result.empty` 统一管理默认值；局部主题和 Style 只覆盖当前设备解析结果。
 
 ## Skeleton 暂定四端规格
 
@@ -616,7 +616,7 @@ widgetGroup 的圆角、分隔线规格。实例 group.itemHeight 可统一覆�
 
 按钮触达下限来自 minimumInteractiveDimension，与可见高度区分。数字与省略号使用 bodyMedium，普通文字 textPrimary、不可用导航 textTertiary、省略号 textSecondary；当前页 primary/onPrimary。普通背景为空，当前页保留选中填充，即使没有重复切页动作。状态色层、统一材质与 Motion 复用 HyperButton；默认没有分页单独的阴影或动画开关。
 
-## StepIndicator / StepperNavigation（2026-10-05）
+## StepIndicator 与 navigation 模式（2026-10-05）
 
 来源 D：本次官方 HIUI Steps 文档不可访问，无直接 HyperOS 手机规格或目标截图。节点可见尺寸引用同端 controlHeightXs，图标引用相邻 Notification；间距、文字和状态色引用同端语义主题。两组件分别保存相同初始规格，可独立覆盖，待设备与视觉验证。
 

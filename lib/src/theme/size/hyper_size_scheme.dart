@@ -21,7 +21,6 @@ import 'components/hyper_text_field_size.dart';
 import 'components/hyper_dialog_size.dart';
 import 'components/hyper_bottom_sheet_size.dart';
 import 'components/hyper_chip_size.dart';
-import 'components/hyper_empty_state_size.dart';
 import 'components/hyper_skeleton_size.dart';
 import 'components/hyper_avatar_size.dart';
 
@@ -123,7 +122,6 @@ final class HyperSizeScheme {
     required this.treeView,
     required this.selection,
     required this.result,
-    required this.emptyState,
     required this.textField,
     required this.dialog,
     required this.toast,
@@ -133,12 +131,10 @@ final class HyperSizeScheme {
     required this.accordion,
     required this.pagination,
     required this.stepIndicator,
-    required this.stepperNavigation,
     required this.timeline,
     required this.descriptionList,
     required this.notification,
     required this.alert,
-    required this.banner,
     required this.bottomSheet,
     required this.chip,
     required this.widgetGroup,
@@ -241,15 +237,6 @@ final class HyperSizeScheme {
           itemSpacing: 16,
           interactionRadius: 16,
         ),
-        stepperNavigation: const HyperStepSize(
-          nodeSize: 32,
-          iconSize: 20,
-          connectorThickness: 1,
-          spacing: 8,
-          titleSpacing: 4,
-          itemSpacing: 16,
-          interactionRadius: 16,
-        ),
         timeline: const HyperTimelineSize(
           nodeSize: 16,
           iconSize: 20,
@@ -290,17 +277,17 @@ final class HyperSizeScheme {
           titleSpacing: 4,
           actionSpacing: 8,
           actionRunSpacing: 8,
-        ),
-        banner: const HyperNoticeSize(
-          radius: 0,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          iconSize: 20,
-          closeIconSize: 20,
-          closeButtonSize: 40,
-          spacing: 8,
-          titleSpacing: 4,
-          actionSpacing: 8,
-          actionRunSpacing: 8,
+          banner: HyperNoticeSize(
+            radius: 0,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            iconSize: 20,
+            closeIconSize: 20,
+            closeButtonSize: 40,
+            spacing: 8,
+            titleSpacing: 4,
+            actionSpacing: 8,
+            actionRunSpacing: 8,
+          ),
         ),
         bottomSheet: const HyperBottomSheetSize(
           maxWidth: double.infinity,
@@ -505,16 +492,6 @@ final class HyperSizeScheme {
           actionRunSpacing: 8,
           padding: EdgeInsets.all(16),
         ),
-        emptyState: const HyperEmptyStateSize(
-          iconSize: 48,
-          illustrationSize: 80,
-          maxWidth: 320,
-          contentSpacing: 16,
-          titleSpacing: 8,
-          actionSpacing: 12,
-          actionRunSpacing: 8,
-          padding: EdgeInsets.all(16),
-        ),
         skeleton: const HyperSkeletonSize(
           lineHeight: 14,
           lineWidth: 160,
@@ -686,15 +663,6 @@ final class HyperSizeScheme {
           itemSpacing: 20,
           interactionRadius: 16,
         ),
-        stepperNavigation: const HyperStepSize(
-          nodeSize: 36,
-          iconSize: 22,
-          connectorThickness: 1,
-          spacing: 12,
-          titleSpacing: 4,
-          itemSpacing: 20,
-          interactionRadius: 16,
-        ),
         timeline: const HyperTimelineSize(
           nodeSize: 16,
           iconSize: 22,
@@ -735,17 +703,17 @@ final class HyperSizeScheme {
           titleSpacing: 4,
           actionSpacing: 12,
           actionRunSpacing: 12,
-        ),
-        banner: const HyperNoticeSize(
-          radius: 0,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          iconSize: 22,
-          closeIconSize: 22,
-          closeButtonSize: 44,
-          spacing: 12,
-          titleSpacing: 4,
-          actionSpacing: 12,
-          actionRunSpacing: 12,
+          banner: HyperNoticeSize(
+            radius: 0,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            iconSize: 22,
+            closeIconSize: 22,
+            closeButtonSize: 44,
+            spacing: 12,
+            titleSpacing: 4,
+            actionSpacing: 12,
+            actionRunSpacing: 12,
+          ),
         ),
         bottomSheet: const HyperBottomSheetSize(
           maxWidth: 640,
@@ -949,16 +917,6 @@ final class HyperSizeScheme {
           actionRunSpacing: 8,
           padding: EdgeInsets.all(20),
         ),
-        emptyState: const HyperEmptyStateSize(
-          iconSize: 56,
-          illustrationSize: 96,
-          maxWidth: 400,
-          contentSpacing: 20,
-          titleSpacing: 8,
-          actionSpacing: 12,
-          actionRunSpacing: 8,
-          padding: EdgeInsets.all(20),
-        ),
         skeleton: const HyperSkeletonSize(
           lineHeight: 16,
           lineWidth: 180,
@@ -1130,15 +1088,6 @@ final class HyperSizeScheme {
           itemSpacing: 12,
           interactionRadius: 10,
         ),
-        stepperNavigation: const HyperStepSize(
-          nodeSize: 28,
-          iconSize: 16,
-          connectorThickness: 1,
-          spacing: 8,
-          titleSpacing: 4,
-          itemSpacing: 12,
-          interactionRadius: 10,
-        ),
         timeline: const HyperTimelineSize(
           nodeSize: 12,
           iconSize: 16,
@@ -1179,17 +1128,17 @@ final class HyperSizeScheme {
           titleSpacing: 4,
           actionSpacing: 8,
           actionRunSpacing: 8,
-        ),
-        banner: const HyperNoticeSize(
-          radius: 0,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          iconSize: 16,
-          closeIconSize: 16,
-          closeButtonSize: 32,
-          spacing: 8,
-          titleSpacing: 4,
-          actionSpacing: 8,
-          actionRunSpacing: 8,
+          banner: HyperNoticeSize(
+            radius: 0,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            iconSize: 16,
+            closeIconSize: 16,
+            closeButtonSize: 32,
+            spacing: 8,
+            titleSpacing: 4,
+            actionSpacing: 8,
+            actionRunSpacing: 8,
+          ),
         ),
         bottomSheet: const HyperBottomSheetSize(
           maxWidth: 640,
@@ -1393,16 +1342,6 @@ final class HyperSizeScheme {
           actionRunSpacing: 8,
           padding: EdgeInsets.all(16),
         ),
-        emptyState: const HyperEmptyStateSize(
-          iconSize: 40,
-          illustrationSize: 72,
-          maxWidth: 360,
-          contentSpacing: 16,
-          titleSpacing: 6,
-          actionSpacing: 8,
-          actionRunSpacing: 8,
-          padding: EdgeInsets.all(16),
-        ),
         skeleton: const HyperSkeletonSize(
           lineHeight: 12,
           lineWidth: 160,
@@ -1574,15 +1513,6 @@ final class HyperSizeScheme {
           itemSpacing: 12,
           interactionRadius: 20,
         ),
-        stepperNavigation: const HyperStepSize(
-          nodeSize: 32,
-          iconSize: 18,
-          connectorThickness: 1,
-          spacing: 6,
-          titleSpacing: 4,
-          itemSpacing: 12,
-          interactionRadius: 20,
-        ),
         timeline: const HyperTimelineSize(
           nodeSize: 16,
           iconSize: 18,
@@ -1623,17 +1553,17 @@ final class HyperSizeScheme {
           titleSpacing: 4,
           actionSpacing: 6,
           actionRunSpacing: 6,
-        ),
-        banner: const HyperNoticeSize(
-          radius: 0,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          iconSize: 18,
-          closeIconSize: 18,
-          closeButtonSize: 36,
-          spacing: 6,
-          titleSpacing: 4,
-          actionSpacing: 6,
-          actionRunSpacing: 6,
+          banner: HyperNoticeSize(
+            radius: 0,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            iconSize: 18,
+            closeIconSize: 18,
+            closeButtonSize: 36,
+            spacing: 6,
+            titleSpacing: 4,
+            actionSpacing: 6,
+            actionRunSpacing: 6,
+          ),
         ),
         bottomSheet: const HyperBottomSheetSize(
           maxWidth: 180,
@@ -1837,16 +1767,6 @@ final class HyperSizeScheme {
           actionRunSpacing: 6,
           padding: EdgeInsets.all(8),
         ),
-        emptyState: const HyperEmptyStateSize(
-          iconSize: 32,
-          illustrationSize: 48,
-          maxWidth: 180,
-          contentSpacing: 12,
-          titleSpacing: 4,
-          actionSpacing: 6,
-          actionRunSpacing: 6,
-          padding: EdgeInsets.all(8),
-        ),
         skeleton: const HyperSkeletonSize(
           lineHeight: 12,
           lineWidth: 120,
@@ -1976,7 +1896,6 @@ final class HyperSizeScheme {
   final HyperTreeViewSize treeView;
   final HyperSelectionSize selection;
   final HyperResultSize result;
-  final HyperEmptyStateSize emptyState;
   final HyperTextFieldSize textField;
   final HyperDialogSize dialog;
   final HyperMessageSize toast;
@@ -1986,12 +1905,10 @@ final class HyperSizeScheme {
   final HyperAccordionSize accordion;
   final HyperPaginationSize pagination;
   final HyperStepSize stepIndicator;
-  final HyperStepSize stepperNavigation;
   final HyperTimelineSize timeline;
   final HyperDescriptionListSize descriptionList;
   final HyperNotificationSize notification;
   final HyperNoticeSize alert;
-  final HyperNoticeSize banner;
   final HyperBottomSheetSize bottomSheet;
   final HyperChipSize chip;
   final HyperWidgetGroupSize widgetGroup;
@@ -2049,7 +1966,6 @@ final class HyperSizeScheme {
     HyperTreeViewSize? treeView,
     HyperSelectionSize? selection,
     HyperResultSize? result,
-    HyperEmptyStateSize? emptyState,
     HyperTextFieldSize? textField,
     HyperDialogSize? dialog,
     HyperMessageSize? toast,
@@ -2059,12 +1975,10 @@ final class HyperSizeScheme {
     HyperAccordionSize? accordion,
     HyperPaginationSize? pagination,
     HyperStepSize? stepIndicator,
-    HyperStepSize? stepperNavigation,
     HyperTimelineSize? timeline,
     HyperDescriptionListSize? descriptionList,
     HyperNotificationSize? notification,
     HyperNoticeSize? alert,
-    HyperNoticeSize? banner,
     HyperBottomSheetSize? bottomSheet,
     HyperChipSize? chip,
     HyperWidgetGroupSize? widgetGroup,
@@ -2123,7 +2037,6 @@ final class HyperSizeScheme {
     treeView: treeView ?? this.treeView,
     selection: selection ?? this.selection,
     result: result ?? this.result,
-    emptyState: emptyState ?? this.emptyState,
     textField: textField ?? this.textField,
     dialog: dialog ?? this.dialog,
     toast: toast ?? this.toast,
@@ -2134,12 +2047,10 @@ final class HyperSizeScheme {
     accordion: accordion ?? this.accordion,
     pagination: pagination ?? this.pagination,
     stepIndicator: stepIndicator ?? this.stepIndicator,
-    stepperNavigation: stepperNavigation ?? this.stepperNavigation,
     timeline: timeline ?? this.timeline,
     descriptionList: descriptionList ?? this.descriptionList,
     notification: notification ?? this.notification,
     alert: alert ?? this.alert,
-    banner: banner ?? this.banner,
     bottomSheet: bottomSheet ?? this.bottomSheet,
     chip: chip ?? this.chip,
     widgetGroup: widgetGroup ?? this.widgetGroup,
@@ -2206,11 +2117,6 @@ final class HyperSizeScheme {
       accordion: HyperAccordionSize.lerp(a.accordion, b.accordion, t),
       pagination: HyperPaginationSize.lerp(a.pagination, b.pagination, t),
       stepIndicator: HyperStepSize.lerp(a.stepIndicator, b.stepIndicator, t),
-      stepperNavigation: HyperStepSize.lerp(
-        a.stepperNavigation,
-        b.stepperNavigation,
-        t,
-      ),
       timeline: HyperTimelineSize.lerp(a.timeline, b.timeline, t),
       descriptionList: HyperDescriptionListSize.lerp(
         a.descriptionList,
@@ -2223,7 +2129,6 @@ final class HyperSizeScheme {
         t,
       ),
       alert: HyperNoticeSize.lerp(a.alert, b.alert, t),
-      banner: HyperNoticeSize.lerp(a.banner, b.banner, t),
       bottomSheet: HyperBottomSheetSize.lerp(a.bottomSheet, b.bottomSheet, t),
       sidebar: HyperSidebarSize.lerp(a.sidebar, b.sidebar, t),
       menu: HyperMenuSize.lerp(a.menu, b.menu, t),
@@ -2268,7 +2173,6 @@ final class HyperSizeScheme {
       treeView: HyperTreeViewSize.lerp(a.treeView, b.treeView, t),
       selection: HyperSelectionSize.lerp(a.selection, b.selection, t),
       result: HyperResultSize.lerp(a.result, b.result, t),
-      emptyState: HyperEmptyStateSize.lerp(a.emptyState, b.emptyState, t),
       textField: HyperTextFieldSize.lerp(a.textField, b.textField, t),
       chip: HyperChipSize.lerp(a.chip, b.chip, t),
       widgetGroup: HyperWidgetGroupSize.lerp(a.widgetGroup, b.widgetGroup, t),
@@ -2331,7 +2235,6 @@ final class HyperSizeScheme {
           other.treeView == treeView &&
           other.selection == selection &&
           other.result == result &&
-          other.emptyState == emptyState &&
           other.textField == textField &&
           other.dialog == dialog &&
           other.toast == toast &&
@@ -2341,12 +2244,10 @@ final class HyperSizeScheme {
           other.accordion == accordion &&
           other.pagination == pagination &&
           other.stepIndicator == stepIndicator &&
-          other.stepperNavigation == stepperNavigation &&
           other.timeline == timeline &&
           other.descriptionList == descriptionList &&
           other.notification == notification &&
           other.alert == alert &&
-          other.banner == banner &&
           other.bottomSheet == bottomSheet &&
           other.chip == chip &&
           other.widgetGroup == widgetGroup &&
@@ -2405,7 +2306,6 @@ final class HyperSizeScheme {
     treeView,
     selection,
     result,
-    emptyState,
     textField,
     dialog,
     toast,
@@ -2415,12 +2315,10 @@ final class HyperSizeScheme {
     accordion,
     pagination,
     stepIndicator,
-    stepperNavigation,
     timeline,
     descriptionList,
     notification,
     alert,
-    banner,
     bottomSheet,
     chip,
     widgetGroup,

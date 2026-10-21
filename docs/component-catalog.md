@@ -13,9 +13,9 @@ Example 的菜单按「主要使用场景 → 功能分类 → 组件」组织�
 
 ## 近期实施顺序
 
-进度同步（2026-10-01）：Tag、WidgetGroup、Avatar / AvatarGroup、Progress、Skeleton、EmptyState、Chip、SegmentedButton、Divider 和独立 TextField 已完成当前实现与使用文档。
+进度同步（2026-10-21）：本目录此前的状态有较多滞后。本次以 `lib/lemon_ui.dart` 的公开导出和 `lib/src/components` 实现为准更新；当前公开控件索引见 [已实现控件索引](implemented-components.md)。
 
-Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、主题、Demo 与使用文档，Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；通知中心已下沉为业务组合示例，组件库仅保留单条通知；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。表单、字段校验、提交状态和表单弹窗留到最后，见“当前推进顺序”。
+此前“下一项建议评审 DescriptionList”及“表单留到最后”等推进建议已过期：DescriptionList、表单适配、日期时间、文件选择器等均已有实现。当前进度以控件索引和各组件使用文档为准；实现状态不代表 UI 已审核。
 
 ## UI 审核状态
 
@@ -26,6 +26,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - `[ ]`：尚未实现。
 - `[~]`：实现中或仅完成基础版本。
 - `[x]`：API、主题、示例、测试和文档均已完成。
+- 当前公开控件清单按主库导出核对；只有公开导出并有组件实现的控件才列为已实现。构造器、外观变体、表单适配器及内部辅助类型不重复计为独立展示控件。
 - 通用：手机、平板、桌面和手表均可使用。
 - 大屏：主要用于平板和桌面。
 - 桌面：针对鼠标、键盘、窗口和高信息密度场景。
@@ -84,7 +85,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperMaterialSurface`：按材质质量绘制普通、半透明或可降级玻璃表面。
 - [ ] `HyperSurface`：具有语义层级的基础表面。
 - [x] `HyperCard`：独立主题的基础内容卡片，支持自由内容、整卡交互和统一表面材质。
-- [x] `HyperTitledCard`：带标题与右侧自由 action 的卡片组合，支持标题在内、在外两种布局和任意内容。
+- [x] `HyperTitledCard`：`HyperCard` 的标题/action 布局预设，支持标题在内、在外；现有公开 API 保留，目录按 Card 变体归类。
 - [ ] `HyperPanel`：页面或工具区域面板。
 - [ ] `HyperGroupBox`：带边界和标题的内容分组。
 - [x] `HyperDivider`：支持横向、纵向、文字/图标内容、起点/居中/终点对齐、纯色、渐变、实线、虚线、点线、明确尺寸和独立主题。
@@ -108,11 +109,8 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 ## 三、布局与响应式
 
 - [x] `HyperScaffold`：页面基本结构，承载顶栏、主体、抽屉与底部区域，并通过主题解析页面背景。
-- [ ] `HyperAdaptiveScaffold`：按窗口选择手机、平板、桌面和手表布局。
-- [ ] `HyperResponsiveBuilder`：按可用空间构建布局。
-- [ ] `HyperBreakpointBuilder`：按断点构建布局。
-- [ ] `HyperOrientationBuilder`：按方向构建布局。
-- [ ] `HyperDeviceBuilder`：按设备策略构建布局。
+- `HyperAdaptiveScaffold`：通用 Scaffold 按稳定设备类别布局；mobile/tablet/watch scaffold 作为设备预设规划，不另建同职责页面框架。
+- `HyperResponsiveBuilder`：统一通过策略选择可用空间、断点、方向或稳定设备类别；不拆为四个 Builder。
 - [ ] `HyperRow`：带统一间距的水平布局。
 - [ ] `HyperColumn`：带统一间距的垂直布局。
 - [ ] `HyperWrap`：自动换行布局。
@@ -128,7 +126,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperResizablePane`：可拖拽分隔的窗格。
 - [ ] `HyperCollapsiblePane`：可折叠窗格。
 - [ ] `HyperPageView`：页面切换容器。
-- [ ] `HyperCarouselView`：卡片式分页布局。
+- `HyperCarouselView`：作为 `HyperCarousel` 的卡片分页形态，不单独建立分页组件。
 - [ ] `HyperScrollable`：统一滚动行为容器。
 - [ ] `HyperScrollbar`：平台适配滚动条。
 - [ ] `HyperScaledBox`：显式外部整体缩放工具，不参与控件内部尺寸解析。
@@ -136,16 +134,16 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 ## 四、文字、图标与基础内容
 
 - [x] `HyperText`：系统字体主题文本，支持十二级语义样式、控件主题、局部主题和实例覆盖。
-- [ ] `HyperSelectableText`：可选择文本。
+- `HyperSelectableText` 规划为 `HyperText.selectable` 模式，不建立平行文字主题；当前 HyperText 尚无 selectable 构造器。
 - [ ] `HyperRichText`：富文本。
 - [ ] `HyperMarkdown`：可选扩展包中的 Markdown 展示。
 - [ ] `HyperCodeBlock`：代码展示与复制。
 - [x] `HyperIcon`：设备明确尺寸、状态样式、可变图标轴及全局/局部/实例主题覆盖。
 - [ ] `HyperIconLabel`：图标文字组合。
 - [~] `HyperAvatar`：图片、文字、图标与自定义内容，失败回退、四端尺寸与主题覆盖；待视觉核对。
-- [~] `HyperAvatarGroup`：横向/纵向堆叠、无重叠排列、圆形五角、中心环绕、四/九宫格、圆形/方形紧凑拼图、自定义布局、整体尺寸自适应与自定义数量溢出；待视觉核对。
-- [x] `HyperInitialsAvatar`：由 HyperAvatar 的 text 参数提供文字内容，不重复建组件。
-- [ ] `HyperNetworkImage`：网络图片状态封装。
+- [~] `HyperAvatarGroup`：横向/纵向堆叠、无重叠排列、圆形五角、中心环绕、四/九宫格、圆形/方形紧凑拼图、blended 布局、自定义布局、整体尺寸自适应与自定义数量溢出；blended 绘制由 `HyperBlendedAvatar` 支撑，不作为独立头像控件。
+- `HyperInitialsAvatar`：由 `HyperAvatar.text` 提供文字头像模式。
+- `HyperNetworkImage`：网络来源、占位和错误状态属于 `HyperImage` 的来源配置，不另建控件。
 - [ ] `HyperPlaceholder`：内容占位。
 - [ ] `HyperLabel`：字段或内容标签。
 - [ ] `HyperCaption`：辅助说明文字。
@@ -159,18 +157,14 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 按钮统一使用 `FutureOr<void> Function()? onPressed`，同步和异步共用同一个 API。
 
 - [~] `HyperButton`：标准按钮，已实现 `.filled`、`.tonal`、`.outlined`、`.ghost`、`.text`、`.gradient`、自动异步和环形进度；线性与背景填充进度待补充。
-- [x] `HyperIconButton`：纯图标按钮，已实现 `.filled`、`.tonal`、`.outlined`、`.ghost`、独立主题、Tooltip、自动异步进度和材质；图标加文字由各 `HyperButton.xx` 构造器直接支持。
-- [ ] `HyperFloatingActionButton`：浮动操作按钮。
-- [ ] `HyperExtendedFloatingActionButton`：扩展浮动按钮。
-- [ ] `HyperCloseButton`：关闭按钮。
-- [ ] `HyperBackButton`：返回按钮。
+- [x] `HyperIconButton`：纯图标按钮，已实现 `.filled`、`.tonal`、`.outlined`、`.ghost`、独立主题、Tooltip、自动异步进度和材质；作为 Button 家族的紧凑图标入口，图标加文字由各 `HyperButton.xx` 构造器直接支持。
+- 按钮款式规划为 `HyperButton` 的 floating、extended、back、close 预设，不另建对应控件。
 - [~] `HyperMenuButton`：打开操作菜单的 Hyper 按钮组合；运行验证待补齐。
-- [ ] `HyperDropdownButton`：下拉操作按钮。
+- 下拉操作按钮作为 `HyperMenuButton` 的菜单触发款式，不另建 `HyperDropdownButton`。
 - [ ] `HyperSplitButton`：主操作和菜单组合按钮。
-- [ ] `HyperToggleButton`：可切换按钮。
+- `HyperToggleButton` 规划为 `HyperButton` 的 selected 状态预设；当前 Button 尚无 selected 参数，不新增平行控件主题。
 - [ ] `HyperButtonBar`：按钮排列。
-- [ ] `HyperButtonGroup`：关联按钮组。
-- [ ] `HyperSegmentedButton`：分段按钮。
+- 关联按钮布局复用 `HyperWidgetGroup`；互斥/多选分段使用已实现的 `HyperSegmentedButton`。
 - [x] 操作 Chip：由 `HyperChip.action` 提供轻量点击标签。
 - [ ] `HyperFloatingToolbar`：浮动工具按钮组。
 - [ ] `HyperCopyButton`：复制内容按钮。
@@ -179,35 +173,30 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 ## 六、选择、开关与选项
 
 - [x] `HyperCheckbox`：复选框，支持未选中、选中和半选中三态，并提供 `.circle`、`.rounded` 外形变体。
-- [ ] `HyperCheckboxListTile`：带说明的复选项。
 - [x] `HyperRadio<T>`：默认 MIUIX 勾线样式，并提供 `.checkmark`、`.circle`、`.filled` 变体；支持分组值、取消选择及独立背景、边框、圆角、阴影配置。
 - [ ] `HyperRadioGroup<T>`：单选组。
-- [ ] `HyperRadioListTile<T>`：带说明的单选项。
 - [x] `HyperSwitch`：开关，已实现点击、键盘、实时拖动、禁用、减少动画、MIUIX 比例与滑块交互放大，并支持全局/局部/实例配置轨道和滑块的颜色、圆角、尺寸、偏移及动画。
-- [ ] `HyperSwitchListTile`：带说明的开关项。
 - [x] `HyperChip`：受控交互标签，支持图标、头像、独立删除、禁用和三级主题。
 - [x] 单选 Chip：由 `HyperChip.choice` 提供，父级管理互斥关系。
 - [x] 筛选 Chip：由 `HyperChip.filter` 提供，父级管理多选集合。
 - [x] 输入 Chip：由 `HyperChip.input` 提供可删除标签，删除与选择独立。
 - [ ] `HyperToggleGroup<T>`：多项切换组。
-- [ ] `HyperSelectionTile<T>`：通用选择项。
-- [ ] `HyperColorPicker`：颜色选择器。
-- [ ] `HyperColorSwatchPicker`：色板选择器。
+- 选择行复用 `HyperListTile` 的 trailing/selected 状态和 Checkbox、Radio 组合，不另建 `HyperSelectionTile<T>`。
+- [x] `HyperColorPicker`：颜色选择器；字段和对话框入口由 `HyperColorPickerField`、`HyperColorPickerDialog` 提供。
+- `HyperColorSwatchPicker`：色板已属于 `HyperColorPicker` 的内置 palette，不再单独建立选择器。
 - [ ] `HyperRating`：星级或图标评分。
 - [ ] `HyperFavoriteButton`：收藏切换。
 - [ ] `HyperLikeButton`：点赞切换。
 
 ## 七、数值、范围与调节
 
-- [x] `HyperSlider`：单值滑块。
-- [x] `HyperRangeSlider`：范围滑块。
-- [ ] `HyperProgressSlider`：可拖动进度条。
-- [x] `HyperVerticalSlider`：垂直滑块。
+- [x] `HyperNumberInput`：数值输入，支持步进、边界和键盘编辑；Form 适配由 `HyperNumberFormField` 提供。
+- [x] `HyperSlider` 家族：单值/范围、横向/纵向和缓冲值为数据或方向变体；`HyperRangeSlider`、`HyperVerticalSlider` 是兼容便捷入口，共用 Slider 主题。
+- 进度拖动使用 `HyperSlider` 的 bufferValue 及进度样式，不另建 `HyperProgressSlider`。
 - [x] `HyperCapsuleSlider`：整块填充的竖向胶囊滑块，支持上下图标操作。
-- [ ] `HyperStepper`：步进调节。
-- [ ] `HyperCounter`：加减计数器。
-- [ ] `HyperNumberPicker`：数字选择器。
-- [ ] `HyperWheelPicker<T>`：滚轮选择器。
+- 步进器和加减计数器由 `HyperNumberInput` 的 step 与 stepper 样式覆盖。
+- 数字滚轮使用 `HyperWheelPicker<int>`，不另建 `HyperNumberPicker`。
+- [~] `HyperWheelPicker<T>`：通用滚轮选择器已实现；数字滚轮作为 `int` 类型特化，分类使用说明待补齐。
 - [ ] `HyperDial`：旋钮盘。
 - [ ] `HyperKnob`：旋钮控件。
 - [ ] `HyperCircularSlider`：环形滑块。
@@ -217,19 +206,17 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 
 ## 八、文本输入与编辑
 
-- [x] `HyperTextField`：单行、多行、密码、清空、字数限制及尾部错误提示；支持独立主题与四端规格。
+- [x] `HyperTextField` 家族：单行/多行、密码、数字等通过模式和输入配置表达；`HyperTextArea` 是多行内容增长预设，兼容入口共用字段主题。
 - [x] `HyperTextFormField`：单行文本表单适配；字段样式由 HyperTextField 主题管理。
-- [x] `HyperTextArea`：内容增长、行数约束、长度提示与 Form 适配；默认样式与交互已由用户确认，Demo 位于“表单”。
-- [ ] `HyperSearchField`：搜索输入。
-- [ ] `HyperPasswordField`：密码输入。
-- [ ] `HyperNumberField`：数值输入。
-- [ ] `HyperEmailField`：邮件输入便捷配置。
-- [ ] `HyperPhoneField`：电话号码输入便捷配置。
-- [ ] `HyperUrlField`：URL 输入便捷配置。
+- 搜索输入框复用 `HyperTextField`；搜索建议/锚点由 `HyperAutocomplete` / `HyperSearchAnchor` 负责。
+- [x] `HyperScrollingText`：可配置触发条件与方向的溢出滚动文字；不另设 `HyperOverflowMarquee`。
+- 密码输入通过 `obscureText`，数字、邮件、电话和 URL 通过 `keyboardType`/formatter 配置，不另建字段控件。
+- 数值输入使用已实现的 `HyperNumberInput`，Form 适配使用 `HyperNumberFormField`；不另设 `HyperNumberField`。
 - [ ] `HyperPinInput`：PIN 输入。
 - [ ] `HyperOtpInput`：验证码输入。
 - [x] `HyperAutocomplete<T>`：主输入搜索、单多选、异步分页与可选自由值；默认样式与交互已由用户确认。
 - [x] `HyperSelect<T>`：受控单多选、搜索、异步分页与多种呈现；单选与多选 Form 适配已提供，默认样式与交互已由用户确认。
+- [x] `HyperDropdown`：自定义锚定面板容器；选项选择使用 `HyperSelect<T>`，不重复实现选择数据模型。
 - [ ] `HyperComboBox<T>`：输入与选择组合。
 - [ ] `HyperEditableText`：低层级可编辑文本封装。
 - [ ] `HyperSearchBar`：搜索栏。
@@ -249,6 +236,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperSelectFormField<T>`：单值 Select 表单适配，支持选项/异步数据源、同步/异步校验、禁用与重置。
 - [x] `HyperMultiSelectFormField<T>`：不可变 `Set<T>` 多选表单适配，支持选项/异步数据源、数量校验、禁用与重置。
 - [x] `HyperFormSection`：表单字段分区与响应式列布局。
+- [x] `HyperDateTimeRangeFormField`：日期时间范围 Form 适配器，复用范围选择器。
 - [ ] `HyperFormGroup`：关联字段组。
 - [ ] `HyperFieldLabel`：标签、必填标记和帮助入口。
 - [ ] `HyperFieldMessage`：helper、validating、success、warning 和 error 共用区域。
@@ -260,20 +248,18 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 
 ## 十、日期、时间与日程
 
-- [ ] `HyperDatePicker`：日期选择器。
-- [ ] `HyperDateRangePicker`：日期范围选择器。
-- [ ] `HyperTimePicker`：时间选择器。
-- [ ] `HyperDateTimePicker`：日期时间选择器。
+- [x] `HyperDatePicker` / `HyperTimePicker` / `HyperDateTimePicker`：共用 `HyperDateTimePicker` 实现，分别提供日期、时间和日期时间模式。
+- [x] `HyperDateTimeRangePicker`：日期时间范围选择器；独立范围 API，不与单值 picker 重复计数。
 - [ ] `HyperDurationPicker`：时长选择器。
-- [ ] `HyperTimerPicker`：计时器设置。
-- [ ] `HyperCalendar`：月历。
+- `HyperTimerPicker`：作为 `HyperDurationPicker` 的 timer 模式。
 - [ ] `HyperCalendarView`：日、周、月视图。
 - [ ] `HyperCalendarGrid`：日期网格。
 - [ ] `HyperAgenda`：日程列表。
 - [ ] `HyperSchedule`：时间段排程。
 - [ ] `HyperTimeRangePicker`：时间范围选择。
 - [ ] `HyperTimezonePicker`：时区选择。
-- [ ] `HyperCountdownPicker`：倒计时设置。
+- `HyperCountdownPicker`：作为 `HyperDurationPicker` 的 countdown 模式。
+- [x] `HyperCalendar`：主题化月历，提供日期网格和选择状态。
 
 ## 十一、列表、集合与内容单元
 
@@ -295,7 +281,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperInfiniteList`：无限滚动列表。
 - [ ] `HyperRefreshIndicator`：下拉刷新。
 - [ ] `HyperPullToRefresh`：完整刷新容器。
-- [x] `HyperSliverAppBar`：可直接用于 CustomScrollView 的滚动标题栏。
+- `HyperSliverAppBar`：`HyperAppBar` 的 Sliver 布局适配入口，共享 AppBar 视觉配置。
 - [ ] `HyperSliverList`：主题化 Sliver 列表。
 - [ ] `HyperSliverGrid`：主题化 Sliver 网格。
 - [ ] `HyperStickyHeader`：吸顶分组标题。
@@ -311,7 +297,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperKeyValueTable`：键值信息表。
 - [x] `HyperDescriptionList`：描述列表，支持响应式多列、跨列、键值和表格式布局。
 - [x] `HyperTimeline`：时间线。
-- [x] `HyperStepIndicator`：步骤状态展示。
+- [x] `HyperStepIndicator`：步骤状态展示，`.navigation` 提供受控导航。
 - [ ] `HyperMetric`：指标卡。
 - [ ] `HyperStatCard`：统计卡片。
 - [ ] `HyperChartContainer`：图表承载和状态框架。
@@ -319,15 +305,14 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperSparkline`：迷你趋势线。
 - [ ] `HyperGauge`：仪表盘。
 - [ ] `HyperAsyncView<T>`：异步数据状态切换。
-- [x] `HyperEmptyState`：默认图标、自定义插图、标题、说明、附加内容和可换行操作区；四端尺寸、三级主题覆盖及内容过渡，Demo 包含无数据、搜索无结果和失败场景。
 - [ ] `HyperErrorView`：错误状态。
-- [x] `HyperResult`：成功、错误、警告、信息与中性结果展示，支持插图、详情和操作区。
+- [x] `HyperResult`：成功、错误、警告、信息、中性与 empty 结果展示，统一布局、材质表面、插图、详情与操作区。
 
 ## 十三、导航
 
 - [x] `HyperAppBar`：普通、`.medium` 和 `.large` 顶栏；展开变体在 HyperScaffold 中可直接配普通列表收起。
 - [ ] `HyperNavigationBar`：底部导航栏，提供普通与 `.floating` 形态。
-- [ ] `HyperNavigationDestination`：普通与浮动底部导航共用的目标项。
+- 底部导航目标项由 `HyperNavigationBar` 的同一 destination 类型覆盖普通与 floating 样式。
 - [ ] `HyperNavigationRail`：侧边导航轨道，支持折叠与展开布局。
 - [ ] `HyperNavigationRailDestination`：侧边导航轨道目标项。
 - [ ] `HyperNavigationDrawer`：导航抽屉。
@@ -335,11 +320,11 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperSidebar`：分组与树形侧栏，支持折叠悬停子菜单、角标、头尾、自定义项和受控展开。
 - [x] `HyperTabBar`：默认共享底槽的 `.segmented`，另有独立圆角标签的 `.separated` 和普通下划线的 `.underline` 形态。
 - [x] `HyperTabBarView`：与标签栏共享控制器的标签内容。
-- [ ] `HyperSegmentedNavigation`：分段导航。
+- 分段导航使用 `HyperTabBar.segmented` 或 `HyperSegmentedButton`；不另建 `HyperSegmentedNavigation`。
 - [x] `HyperBreadcrumb`：胶囊路径导航，节点点击、独立高亮与横向滚动。
 - [x] `HyperPagination`：页码导航。
 - [x] `HyperPageIndicator`：圆点、数字、有限窗口、横纵布局与受控点击切换。
-- [x] `HyperStepperNavigation`：步骤导航。
+- `HyperStepIndicator.navigation`：`HyperStepIndicator` 的可交互导航形态；共享步骤模型与主题，不另建步骤状态体系。
 - [ ] `HyperBottomAppBar`：底部应用栏。
 - [ ] `HyperNavigationSplitView`：侧栏与内容区域。
 - [ ] `HyperRouteTransition`：统一路由转场。
@@ -365,18 +350,14 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperBottomSheet`：独立主题的底部面板，支持明确高度、上限、表面、拖动条、正文滚动和固定操作区；未做设备或 Widget 运行验证。
 - [x] 模态底部面板入口：统一使用 `showHyperBottomSheet`，复用原生拖动关闭与路由；不重复创建 `HyperModalBottomSheet`。
 - [ ] `HyperSideSheet`：侧边面板。
-- [ ] `HyperDatePickerDialog`：日期选择浮层。
-- [ ] `HyperTimePickerDialog`：时间选择浮层。
-- [ ] `HyperColorPickerDialog`：颜色选择浮层。
+- 日期/时间编辑浮层由 `HyperDatePicker` / `HyperTimePicker` 的呈现参数控制；不另建 `HyperDatePickerDialog` 或 `HyperTimePickerDialog`。
+- `HyperColorPickerDialog`：已实现的 `HyperColorPicker` 浮层适配，不单独计作另一种颜色选择器。
 
 ## 十五、对话框与模态界面
 
 - [x] `HyperDialog`、`showHyperDialog`：自由内容对话框，支持位置、边框、圆角、按钮排列和主题、正文滚动、返回结果及可替换路由过渡；未做设备或 Widget 运行验证。
-- [ ] `HyperAlertDialog`：警告对话框。
-- [ ] `HyperConfirmDialog`：确认对话框。
-- [ ] `HyperInputDialog`：输入对话框。
-- [ ] `HyperSelectionDialog<T>`：选项对话框。
-- [ ] `HyperFullScreenDialog`：全屏对话框。
+- `HyperAlertDialog`、`HyperConfirmDialog`、`HyperInputDialog`、`HyperSelectionDialog<T>`：作为 `HyperDialog` 的内容/操作区组合示例，不单独建立对话框控件。
+- `HyperFullScreenDialog`：作为 `HyperDialog` 的布局配置，不单独建立对话框控件。
 - [ ] `HyperAboutDialog`：关于对话框。
 - [ ] `HyperLicensePage`：许可证页面。
 - [ ] `HyperProgressDialog`：阻塞进度对话框。
@@ -388,15 +369,14 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [x] `HyperToast`：短暂轻提示。
 - [x] `HyperSnackbar`：带操作的底部提示。
 - [x] `HyperSnackbarHost`：管理 Snackbar 队列、呈现位置和生命周期。
-- [x] `HyperBanner`：页面内横幅提示。
+- [x] `HyperAlert.banner`：页面内横幅提示。
 - [x] `HyperNotification`：通知卡片。
 - 通知中心：业务层组合示例，不作为公共组件导出。
 - [x] `HyperAlert`：内联提示块。
 - [x] `HyperLoadingOverlay`：区域或页面加载遮罩。
 - [x] `HyperProgress`：统一进度入口，通过 `.linear` 和 `.circular` 转发到对应轻量实现。
-- [x] `HyperLinearProgress`：支持确定/不确定进度、明确尺寸、圆角、语义、减少动画和三级主题覆盖。
+- `HyperLinearProgress`、`HyperCircularProgress`、`HyperInfiniteProgress`：`HyperProgress` 的线形、环形和不确定模式；复用统一主题与配置，不单独维护进度主题。
 - [ ] `HyperWormProgressIndicator`：类似蚯蚓伸缩、移动的线性进度，支持确定和不确定进度。
-- [~] `HyperCircularProgress`：确定/不确定进度、设备尺寸、端点、语义、减少动画和三级主题覆盖已完成；`.infinite` 轨道点形态待补充。
 - [ ] `HyperLoadingSpinner`：加载旋转器。
 - [ ] `HyperActivityIndicator`：活动指示器。
 - [ ] `HyperActivityRing`：活动圆环。
@@ -424,7 +404,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperWaveform`：音频波形。
 - [ ] `HyperThumbnail`：文件或媒体缩略图。
 - [ ] `HyperFileTile`：文件列表项。
-- [ ] `HyperFilePickerField`：文件选择字段。
+- [x] `HyperFilePicker`：受控文件列表、选择回调、拖放适配、校验及上传状态展示；平台文件选择由调用方适配器提供。Form 适配器见 `HyperFileFormField`。
 - [ ] `HyperDropZone`：桌面拖放区域。
 - [ ] `HyperUpload`：上传状态和操作。
 - [ ] `HyperDownload`：下载状态和操作。
@@ -456,7 +436,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperCheckboxPreference`：复选设置项。
 - [ ] `HyperRadioPreference<T>`：单选设置项。
 - [ ] `HyperSliderPreference`：滑块设置项。
-- [ ] `HyperDropdownPreference<T>`：下拉设置项。
+- `HyperDropdownPreference<T>`：未实现独立偏好设置项；需要选择时复用 `HyperDropdown` / `HyperSelect`。
 - [ ] `HyperNavigationPreference`：进入下级页面的设置项。
 - [ ] `HyperTextFieldPreference`：文本设置项。
 - [ ] `HyperColorPreference`：颜色设置项。
@@ -466,7 +446,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 
 - [ ] `HyperWindowFrame`：自定义窗口框架。
 - [ ] `HyperTitleBar`：桌面标题栏。
-- [ ] `HyperWindowButton`：最小化、最大化和关闭按钮。
+- `HyperWindowButton`：窗口最小化、最大化和关闭作为 `HyperButton` 的系统操作款式。
 - [ ] `HyperWindowCaption`：窗口标题区域。
 - [ ] `HyperDragRegion`：窗口拖动区域语义封装。
 - [ ] `HyperToolbar`：桌面工具栏。
@@ -531,23 +511,23 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - 不支持真实多窗口的平台应提供明确能力检测和单窗口降级，不伪装已经创建独立窗口。
 +## 二十一、手机专项
 
-- [ ] `HyperMobileScaffold`：手机页面结构。
-- [ ] `HyperBottomNavigation`：手机底部导航。
+- `HyperMobileScaffold`：手机设备策略由 AdaptiveScaffold 覆盖。
+- `HyperBottomNavigation`：`HyperNavigationBar` 的底部呈现预设。
 - [ ] `HyperBottomActionBar`：底部操作区。
 - [ ] `HyperSwipeBackRegion`：侧滑返回交互区域。
 - [ ] `HyperPullDownPanel`：下拉面板。
-- [ ] `HyperMobileAppBar`：大标题和滚动联动标题栏。
+- `HyperMobileAppBar`：`HyperAppBar` 的大标题/滚动折叠形态。
 - [ ] `HyperKeyboardAvoider`：软键盘避让布局。
 - [ ] `HyperSafeBottomBar`：底部安全区操作栏。
 - [ ] `HyperMobileContextMenu`：长按菜单。
 - [ ] `HyperMobileSelectionToolbar`：移动端文本选择工具栏外观。
-- [ ] `HyperPageDots`：页面圆点指示。
+- `HyperPageDots`：`HyperPageIndicator` 的圆点展示预设。
 - [ ] `HyperSwipeActions`：侧滑操作。
 - [ ] `HyperEdgePanel`：屏幕边缘面板。
 
 ## 二十二、平板与折叠屏专项
 
-- [ ] `HyperTabletScaffold`：平板页面结构。
+- `HyperTabletScaffold`：平板设备策略由 AdaptiveScaffold 覆盖。
 - [ ] `HyperNavigationSplitView`：侧栏、列表和详情布局。
 - [ ] `HyperMasterDetail`：主从视图。
 - [ ] `HyperThreePaneScaffold`：三栏布局。
@@ -564,22 +544,11 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 ## 二十三、手表通用专项
 
 - [ ] `HyperWatchApp`：手表应用基础宿主。
-- [ ] `HyperWatchScaffold`：手表页面结构。
-- [ ] `HyperWatchTheme`：手表默认视觉和低功耗策略。
+- `HyperWatchScaffold`、`HyperWatchTheme`：手表设备策略由通用 Scaffold 与 HyperTheme 的 watch 规格承载，不另建主题/框架体系。
 - [ ] `HyperWatchSafeArea`：方形和圆形表盘安全区域。
 - [ ] `HyperWatchLayout`：手表内容布局。
-- [ ] `HyperWatchListView`：小屏列表。
-- [ ] `HyperWatchListTile`：手表列表项。
-- [ ] `HyperWatchCard`：手表卡片。
-- [ ] `HyperWatchButton`：大触控目标按钮。
-- [ ] `HyperWatchIconButton`：手表图标按钮。
-- [ ] `HyperWatchNavigation`：手表导航。
-- [ ] `HyperWatchPageIndicator`：手表页面指示。
-- [ ] `HyperWatchDialog`：手表确认和提示。
-- [ ] `HyperWatchToast`：手表轻提示。
-- [ ] `HyperWatchProgressIndicator`：手表低成本进度。
-- [ ] `HyperWatchTimePicker`：手表时间选择。
-- [ ] `HyperWatchNumberPicker`：手表数字滚轮。
+- WatchListView/ListTile/Card/Button/IconButton/Navigation/PageIndicator/Dialog/Toast/ProgressIndicator：复用对应通用组件的设备尺寸与布局变体，不另建同职责控件。
+- WatchTimePicker 使用 `HyperDateTimePicker` 的 time 模式；WatchNumberPicker 使用 `HyperWheelPicker<int>`。
 - [ ] `HyperWatchComplication`：表盘复杂功能展示单元。
 - [ ] `HyperWatchComplicationSlot`：复杂功能槽位。
 - [ ] `HyperWatchFace`：应用内表盘布局基础，不替代原生表盘平台能力。
@@ -614,7 +583,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperArcRangeSlider`：圆弧范围滑块。
 - [ ] `HyperCircularSlider`：完整圆环滑块。
 - [ ] `HyperArcProgressIndicator`：圆弧进度。
-- [ ] `HyperCircularProgress`：完整圆环进度。
+- `HyperCircularProgress`：复用通用进度组件，手表仅按设备尺寸与交互策略适配，不重复规划一份实现。
 - [ ] `HyperSegmentedRing`：分段圆环状态。
 - [ ] `HyperActivityRings`：多层活动圆环。
 - [ ] `HyperArcGauge`：圆弧仪表。
@@ -740,7 +709,7 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - [ ] `HyperChatBubble`：聊天气泡，支持方向、尾部和圆角策略。
 - [ ] `HyperPinnedSheet`：可停靠在多个阶段的拖动面板。
 - [ ] `HyperRefreshTrigger`：把刷新意图与具体刷新指示器分离的触发器。
-- [ ] `HyperSwiper`：手势驱动的卡片或内容切换器；与 Carousel 共用底层分页能力。
+- `HyperSwiper`：作为 `HyperCarousel` 的手势切换形态，不另建平行分页组件。
 
 ### 锚定浮层与桌面交互
 
@@ -792,13 +761,9 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - 不复制其组件源码；只参考组件范围、交互场景和测试经验。
 ## 建议实现顺序
 
-### 当前推进顺序（2026-10-01）
+### 当前推进顺序
 
-- Dialog、BottomSheet、Toast / Snackbar 及队列宿主当前实现、主题、Demo 和使用文档已完成；Alert / Banner 已完成当前实现、主题、Demo 与使用文档；LoadingOverlay 已完成当前实现、主题、Demo 与使用文档；Notification 通知卡片已完成当前实现、主题、Demo 与使用文档；通知中心已下沉为业务组合示例，组件库仅保留单条通知；Collapsible / Accordion 已完成当前实现、主题、Demo 与使用文档；Pagination 已完成当前实现、主题、Demo 与使用文档；StepIndicator / StepperNavigation 已完成当前实现、主题、Demo 与使用文档；Timeline 已完成当前实现、主题、Demo 与使用文档；下一项建议评审 DescriptionList。
-- 表单体系统一放到最后：`HyperForm`、`HyperTextFormField`、字段校验、异步校验与提交状态。
-- 表单弹窗后期基于 `HyperDialog` 的自由正文和操作区组合，复用位置、边框、圆角与按钮主题；不在 Dialog 内实现校验或提交状态。
-- 已有 `HyperTextField` 保持独立输入能力；暂不扩展表单封装。
-- 下方阶段为原始分类参考；当前开发顺序以本节为准，每次只推进确认的一项。
+此处原先记录的 2026-10-01 推进计划已完成或过期，不再作为当前开发队列。具体实现状态查看本目录和[当前已实现控件索引](implemented-components.md)；新增控件优先级需结合依赖和用户确认逐项更新。
 
 ### 阶段 0：基础协议
 
@@ -864,6 +829,30 @@ Dialog、BottomSheet、Toast / Snackbar 及队列宿主已完成当前实现、�
 - Example 中包含可运行、可直观看到效果的 Demo，以及全部关键状态和主题覆盖对照。
 - Widget 测试、主题测试和必要的 Golden 测试通过。
 - API 文档和迁移说明完整。
+
+## 变体归并口径
+
+规划项只有在数据模型、交互流程或布局职责确实不同的情况下才新增独立控件。下列名称统一作为家族变体规划；已有的公开包装类保留兼容，不额外增加同义主题和重复实现。
+
+| 主家族 | 归并的名称或形态 |
+| --- | --- |
+| `HyperButton` | Floating/Extended/Back/Close/Toggle、DropdownButton 触发款及图标/文字布局 |
+| `HyperCard` | `HyperTitledCard` 标题与 action 布局 |
+| `HyperAppBar` | `HyperSliverAppBar`、`HyperMobileAppBar` 的滚动/设备布局 |
+| `HyperListTile` | Navigation/Checkbox/Radio/Switch 行、通用选择行 |
+| `HyperSlider` | Range/Vertical/Progress/Seek/Brightness 形态；CapsuleSlider 保留独立拖动和图标操作 |
+| `HyperNumberInput` / `HyperWheelPicker<int>` | Counter/Stepper 预设、数字滚轮特化 |
+| `HyperTextField` | Search/Password/Number/Email/Phone/URL 类型；PIN/OTP 多格布局保留独立控件 |
+| `HyperProgress` | Linear/Circular/Infinite、圆弧和活动环形态 |
+| `HyperImage` | Network/Asset/File/Memory 来源、Thumbnail 预设 |
+| `HyperDateTimePicker` / `HyperDateTimeRangePicker` | 日期/时间单值与范围模式 |
+| `HyperCalendar` / `HyperDurationPicker` | CalendarView/Grid 与 Timer/Countdown 模式 |
+| `HyperPageIndicator` / `HyperStepIndicator` | PageDots、StepIndicator.navigation 交互模式 |
+| `HyperAdaptiveScaffold` | Mobile/Tablet/Watch Scaffold 设备策略 |
+| `HyperCarousel` | CarouselView/Swiper 分页与手势模式 |
+| `HyperBottomSheet` | ActionSheet 动作内容模式 |
+| `HyperMenu` / `HyperMenuButton` | ContextMenu 触发方式 / DropdownButton 菜单触发方式 |
+| 提示与消息 | Alert/Banner 为正文/区域布局变体；Toast/Snackbar 为时长/操作模式变体，共用消息呈现基础 |
 
 ### HyperSegmentedButton
 

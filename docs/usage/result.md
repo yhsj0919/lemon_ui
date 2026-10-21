@@ -1,6 +1,6 @@
 # 结果页
 
-`HyperResult` 展示操作结果，`HyperEmptyState` 展示没有内容的区域。结果页不发起请求、不自动重试或导航，也不管理加载状态。
+`HyperResult` 统一展示操作结果与空内容。空状态使用 `HyperResult.empty` 或 `HyperResultStatus.empty`。结果页不发起请求、不自动重试或导航，也不管理加载状态。
 
 ## 状态与操作
 
@@ -55,7 +55,9 @@ HyperResultTheme(
 )
 ~~~
 
-全局主题为 `HyperThemeData.resultTheme`，尺寸为 `HyperSizeScheme.result`；局部主题为 `HyperResultTheme`。通用 style 与 neutral/success/error/warning/info 状态 style 逐字段合并，实例 Style 最后覆盖。TextStyle 按显式字段深合并。结果页不读取空状态主题。
+全局主题为 `HyperThemeData.resultTheme`；局部主题为 `HyperResultTheme`。通用 style 与 neutral/success/error/warning/info/empty 状态 style 逐字段合并，实例 Style 最后覆盖。TextStyle 按显式字段深合并。
+
+空状态配置顺序为当前端 `sizes.result.empty` → `resultTheme.style` → `resultTheme.empty` → 实例 `HyperResultStyle`。局部覆盖使用 `HyperResultThemeData(empty: HyperResultStyle(...))`。表面字段直接使用 `HyperResultStyle` 的背景、材质、边框、圆角、阴影和内边距。
 
 Style 支持图标、颜色和尺寸、插图尺寸、最大宽度、内边距、各区间距、背景、边框、圆角、阴影、字体、对齐、材质与过渡配置。null 表示继承，HyperFill.none、Border.fromBorderSide(BorderSide.none)、空阴影列表等用于显式移除对应视觉。
 

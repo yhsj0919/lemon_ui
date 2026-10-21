@@ -23,7 +23,26 @@ class HyperAlert extends StatelessWidget {
     this.semanticLabel,
     this.liveRegion = true,
     this.style,
-  });
+  }) : isBanner = false;
+
+  /// 页面或区域内的横幅布局，复用提示的内容与状态模型。
+  const HyperAlert.banner({
+    super.key,
+    required this.content,
+    this.title,
+    this.severity = HyperNoticeSeverity.info,
+    this.icon,
+    this.showIcon = true,
+    this.actions = const [],
+    this.onClose,
+    this.closeButton,
+    this.visible = true,
+    this.semanticLabel,
+    this.liveRegion = true,
+    this.style,
+  }) : isBanner = true;
+
+  final bool isBanner;
   final Widget content;
   final Widget? title, icon, closeButton;
   final HyperNoticeSeverity severity;
@@ -34,13 +53,19 @@ class HyperAlert extends StatelessWidget {
   final HyperNoticeStyle? style;
   @override
   Widget build(BuildContext context) {
-    final resolved = noticeDefaults(
-      theme: HyperTheme.of(context),
-      metrics: HyperTheme.sizesOf(context).alert,
-      materialTheme: HyperMaterialTheme.of(context),
-      severity: severity,
-      banner: false,
-    ).merge(HyperAlertTheme.of(context).styleFor(severity)).merge(style);
+    final sizes = HyperTheme.sizesOf(context);
+    final resolved =
+        noticeDefaults(
+              theme: HyperTheme.of(context),
+              metrics: isBanner ? sizes.alert.banner : sizes.alert,
+              materialTheme: HyperMaterialTheme.of(context),
+              severity: severity,
+              banner: isBanner,
+            )
+            .merge(
+              HyperAlertTheme.of(context).styleFor(severity, banner: isBanner),
+            )
+            .merge(style);
     return HyperNoticeBody(
       content: content,
       title: title,

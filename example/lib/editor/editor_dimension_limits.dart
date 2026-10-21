@@ -109,12 +109,14 @@ Size editorPreviewSize(HyperDeviceType type, {required bool landscape}) {
       limit = switch (object) {
         'notification' => s.notification.closeButtonSize,
         'alert' => s.alert.closeButtonSize,
-        'banner' => s.banner.closeButtonSize,
+        'banner' => s.alert.banner.closeButtonSize,
         _ => s.controlHeightSm,
       };
     }
     if (object == 'stepIndicator') limit = s.stepIndicator.nodeSize;
-    if (object == 'stepperNavigation') limit = s.stepperNavigation.nodeSize;
+    if (object == 'stepperNavigation') {
+      limit = s.stepIndicator.navigation.nodeSize;
+    }
     max = smaller(max, limit);
   } else if (label == '未读标记尺寸') {
     max = smaller(max, s.notification.iconSize);

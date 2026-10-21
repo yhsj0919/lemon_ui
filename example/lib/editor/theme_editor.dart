@@ -173,7 +173,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'bottomSheetReview': '底部弹窗',
     'toastReview': '轻提示 / 操作提示',
     'dialogReview': '对话框',
-    'emptyStateReview': '空状态',
+    'emptyStateReview': '结果 · 空状态',
     'skeletonReview': '骨架屏',
     'sidebarReview': '侧边导航',
     'tabBarReview': '标签导航',

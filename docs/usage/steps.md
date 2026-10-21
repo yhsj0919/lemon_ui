@@ -1,6 +1,6 @@
 # 步骤指示与导航
 
-`HyperStepIndicator` 只展示状态。`HyperStepperNavigation` 额外提供受控点击导航。两者共享步骤模型与绘制布局，但各自使用独立全局、局部主题和四端尺寸。
+`HyperStepIndicator` 只展示状态。`HyperStepIndicator.navigation` 额外提供受控点击导航。两种模式共享步骤模型、布局与 `HyperStepIndicatorTheme`。
 
 ~~~dart
 const HyperStepIndicator(
@@ -36,7 +36,7 @@ const HyperStepIndicator(
 ## 受控导航
 
 ~~~dart
-HyperStepperNavigation(
+HyperStepIndicator.navigation(
   currentStep: 0,
   onStepChanged: (index) {},
   items: const [
@@ -53,19 +53,19 @@ HyperStepperNavigation(
 
 ## 主题与布局
 
-全局 stepIndicatorTheme / stepperNavigationTheme、对应局部 Theme、组件 Style 和单项 Style 依次覆盖。主题通用样式后合并对应状态字段。共享 HyperStepStyle 字段结构，不互相读取另一组件的主题。
+统一使用全局 `stepIndicatorTheme` 和局部 `HyperStepIndicatorTheme`。通用样式与状态字段后叠加 `navigationStyle`、`navigationPending` / `navigationCurrent` / `navigationCompleted` / `navigationError` / `navigationDisabled`，再合并实例和单项 Style。
 
 ~~~dart
-HyperStepperNavigationTheme(
-  data: const HyperStepperNavigationThemeData(
-    current: HyperStepStyle(
+HyperStepIndicatorTheme(
+  data: const HyperStepIndicatorThemeData(
+    navigationCurrent: HyperStepStyle(
       nodeFill: HyperFill.color(Colors.blue),
       foregroundColor: Colors.white,
       nodeBorderRadius: BorderRadius.all(Radius.circular(8)),
     ),
-    error: HyperStepStyle(statusLabel: '提交失败'),
+    navigationError: HyperStepStyle(statusLabel: '提交失败'),
   ),
-  child: HyperStepperNavigation(
+  child: HyperStepIndicator.navigation(
     currentStep: 0,
     items: const [
       HyperStepItem(id: 1, title: Text('设置')),
@@ -84,7 +84,7 @@ HyperStepperNavigationTheme(
 
 短内容也为连接线预留 itemSpacing 长度，两端留白不会吞掉线段。没有描述的标题在当前节点高度内垂直居中；有描述时文字块顶部对齐，长文字自然增加行高。
 
-尺寸集中在 sizes.stepIndicator / sizes.stepperNavigation。节点可见尺寸与导航触达下限区分。颜色、文字和符号切换有 Motion fast 过渡；transitionBuilder 可替换节点符号切换动画。遵守减少动画设置。
+尺寸集中在 sizes.stepIndicator / sizes.stepIndicator.navigation。节点可见尺寸与导航触达下限区分。颜色、文字和符号切换有 Motion fast 过渡；transitionBuilder 可替换节点符号切换动画。遵守减少动画设置。
 
 节点材质继承统一 HyperMaterialTheme，显式 Style 可覆盖配方、质量与减少透明度设置；复用 HyperMaterialSurface 渲染与降级。默认没有鼠标悬浮背景或阴影（hoverOpacity 为 0）；按下与键盘焦点反馈分别由 pressedOpacity、focusOpacity 配置。
 

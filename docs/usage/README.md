@@ -4,6 +4,7 @@
 
 ## 从这里开始
 
+- [当前已实现控件索引](../implemented-components.md)
 - [快速开始、受控状态与主题配置](getting-started.md)
 - [Demo 四端模拟与 UI 审核台账](../device-preview-and-review.md)
 - [基础内容：文字、图标、头像、徽标、Tag、分隔线](content.md)
@@ -12,6 +13,9 @@
 - [文本输入：单行、多行、密码和尾部错误提示](input.md)
 - [表单：字段布局、校验、提交与重置](form.md)
 - [颜色选择器：HSV、透明度与 HEX 输入](color-picker.md)
+- [日期、时间与日历选择](date-time.md)
+- [数值输入](number-input.md)
+- [文件选择与拖放适配](file-picker.md)
 - [下拉与自动填充：单多选、搜索、异步分页和多种呈现](select-fields.md)
 - [对话框：位置、表面、按钮、关闭规则和自由内容](dialog.md)
 - [底部面板：高度、拖动关闭、滚动正文与固定操作区](bottom-sheet.md)

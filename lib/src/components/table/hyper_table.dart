@@ -6,6 +6,8 @@ import 'package:flutter/rendering.dart';
 
 import 'package:flutter/material.dart';
 import 'package:trina_grid/trina_grid.dart' as trina;
+// ignore: implementation_imports
+import 'package:trina_grid/src/ui/trina_base_row.dart' as trina_ui;
 
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
@@ -46,6 +48,7 @@ class HyperTable<T> extends StatefulWidget {
     this.pageSize = 20,
     this.paginateLocalRows = false,
     this.showPagination = true,
+    this.showColumnResizeHandles = false,
     this.controller,
     this.selectionMode = HyperTableSelectionMode.none,
     this.selectedKeys = const {},
@@ -69,6 +72,7 @@ class HyperTable<T> extends StatefulWidget {
     this.hoverLift = false,
     this.style,
     this.empty,
+    this.noMore,
   }) : assert(pageSize > 0),
        assert(dataMode == HyperTableDataMode.local || loader != null);
   final List<HyperTableColumn<T>> columns;
@@ -88,6 +92,10 @@ class HyperTable<T> extends StatefulWidget {
   /// Whether to show the built-in pager; pagination and controller commands
   /// remain available when an external pager is used.
   final bool showPagination;
+
+  /// Keeps column resize lines visible; otherwise they appear on hover.
+  /// The resize hit region remains stable while the handle fades.
+  final bool showColumnResizeHandles;
 
   /// Gives hovered rows the same lifted surface treatment as drag feedback.
   final bool hoverLift;
@@ -115,6 +123,10 @@ class HyperTable<T> extends StatefulWidget {
   final ValueChanged<Set<Object>>? onExpandedChanged;
   final HyperTableStyle? style;
   final Widget? empty;
+
+  /// Footer shown when infinite loading completes with nonempty data.
+  /// Defaults to "没有更多数据了"; an empty widget explicitly hides it.
+  final Widget? noMore;
   @override
   State<HyperTable<T>> createState() => _HyperTableState<T>();
 }
@@ -134,6 +146,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   List<trina.TrinaRow> _gridRows = [];
   List<T> _remote = [];
   final ValueNotifier<Object?> _hoveredRow = ValueNotifier(null);
+  final _hoveredHeader = ValueNotifier<String?>(null);
   final Map<String, double> _knownWidths = {};
   final Set<String> _userSized = {};
   bool _applyingMetrics = false, _metricsScheduled = false;
@@ -145,6 +158,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   bool _loading = false, _hasMore = false;
   Object? _error;
   bool _failedReset = false;
+  bool _loadingReset = false;
+  bool get _appending =>
+      _loading &&
+      !_loadingReset &&
+      widget.dataMode == HyperTableDataMode.infinite &&
+      _data.isNotEmpty;
   HyperTableStyle? _resolved;
   final _captureKey = GlobalKey();
   final _rowsStackKey = GlobalKey();
@@ -291,7 +310,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       _rowLeadingInset(stack.size.width),
       origin.dy,
       width,
-      rowBox.size.height,
+      math.min(rowBox.size.height, _manager!.rowTotalHeight),
     );
     _hoverLiftRect.value = _lastHoverLiftRect;
   }
@@ -299,6 +318,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   final _dragSnapshot = ValueNotifier<ui.Image?>(null);
   int _captureEpoch = 0;
   bool _draggingRow = false;
+  Rect? _columnDragRect;
+  final _columnDropRect = ValueNotifier<Rect?>(null);
 
   void _clearDragSnapshot() {
     _captureEpoch++;
@@ -325,6 +346,35 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       _visibleRowWidth(boundary.size.width),
       height,
     );
+    await _captureDragRegion(source, epoch);
+  }
+
+  Future<void> _captureDragColumn(BuildContext handleContext) async {
+    _clearDragSnapshot();
+    final epoch = _captureEpoch;
+    final boundary =
+        _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    final handle = handleContext.findRenderObject() as RenderBox;
+    final stack = _rowsStackKey.currentContext!.findRenderObject() as RenderBox;
+    final headerOrigin = boundary.globalToLocal(
+      handle.localToGlobal(Offset.zero),
+    );
+    final stackOrigin = boundary.globalToLocal(
+      stack.localToGlobal(Offset.zero),
+    );
+    final source = Rect.fromLTWH(
+      headerOrigin.dx,
+      stackOrigin.dy,
+      handle.size.width,
+      stack.size.height,
+    ).intersect(Offset.zero & boundary.size);
+    _columnDragRect = source;
+    await _captureDragRegion(source, epoch);
+  }
+
+  Future<void> _captureDragRegion(Rect source, int epoch) async {
+    final boundary =
+        _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     final ratio = MediaQuery.devicePixelRatioOf(context);
     final full = await boundary.toImage(pixelRatio: ratio);
     final recorder = ui.PictureRecorder();
@@ -856,12 +906,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
           hide: c.hidden,
           readOnly: !c.editable || widget.onCellChanged == null,
           enableSorting: c.sortable,
-          enableColumnDrag: c.reorderable,
+          enableColumnDrag: false,
           enableContextMenu: false,
           enableDropToResize: c.resizable,
           textAlign: _align(c.textAlign),
           titleTextAlign: _align(c.headerTextAlign),
-          titleRenderer: (r) => _header(r.column),
+          titleRenderer: (r) => _columnDragHeader(r.column),
           renderer: (r) {
             final row = r.row.data as T;
             final content =
@@ -937,12 +987,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     );
   }
 
-  Widget _rowDragFeedback(trina.TrinaRow row) {
+  Widget _rowDragFeedback(trina.TrinaRow? row, {Size? previewSize}) {
     final s = _resolved!;
-    final height = _manager!.rowTotalHeight;
-    final width = _visibleRowWidth(
-      (context.findRenderObject() as RenderBox).size.width,
-    );
+    final height = previewSize?.height ?? _manager!.rowTotalHeight;
+    final width =
+        previewSize?.width ??
+        _visibleRowWidth((context.findRenderObject() as RenderBox).size.width);
     return IgnorePointer(
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
@@ -1101,106 +1151,207 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     m.notifyListeners();
   }
 
-  Widget _header(trina.TrinaColumn c) => HyperContextMenu(
-    items: [
-      if (c.enableSorting) const HyperMenuItem(id: 'asc', label: '升序'),
-      if (c.enableSorting) const HyperMenuItem(id: 'desc', label: '降序'),
-      const HyperMenuItem(id: 'clear', label: '清除排序'),
-      const HyperMenuItem(id: 'start', label: '固定到起始侧'),
-      const HyperMenuItem(id: 'end', label: '固定到末尾侧'),
-      const HyperMenuItem(id: 'unpin', label: '取消固定'),
-      HyperMenuItem(
-        id: 'hide',
-        label: '隐藏此列',
-        enabled:
-            _columns
-                .where((c) => !c.hide && !c.field.startsWith('__hyper_'))
-                .length >
-            1,
-      ),
-      HyperMenuItem(
-        id: 'show',
-        label: '显示隐藏列',
-        children: [
-          for (final x in _columns.where((c) => c.hide))
-            HyperMenuItem(id: 'show:${x.field}', label: x.title),
-        ],
-      ),
-    ],
-    onSelected: (id) {
-      switch (id) {
-        case 'asc':
-          sort(HyperTableSort(c.field, HyperTableSortDirection.ascending));
-        case 'desc':
-          sort(HyperTableSort(c.field, HyperTableSortDirection.descending));
-        case 'clear':
-          sort(null);
-        case 'start':
-          pinColumn(c.field, HyperTableColumnPin.start);
-        case 'end':
-          pinColumn(c.field, HyperTableColumnPin.end);
-        case 'unpin':
-          pinColumn(c.field, HyperTableColumnPin.none);
-        case 'hide':
-          setColumnVisible(c.field, false);
-        default:
-          if (id.startsWith('show:')) setColumnVisible(id.substring(5), true);
-      }
-    },
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: _resolved!.horizontalPadding!),
-      child: Row(
-        children: [
-          Expanded(
-            child: Align(
-              alignment: switch (c.titleTextAlign) {
-                trina.TrinaColumnTextAlign.left => Alignment.centerLeft,
-                trina.TrinaColumnTextAlign.right => Alignment.centerRight,
-                trina.TrinaColumnTextAlign.center => Alignment.center,
-                trina.TrinaColumnTextAlign.end =>
-                  AlignmentDirectional.centerEnd,
-                trina.TrinaColumnTextAlign.start =>
-                  AlignmentDirectional.centerStart,
-              },
-              child: Text(
-                c.title,
-                style: _resolved!.headerTextStyle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+  Widget _columnDragHeader(trina.TrinaColumn column) {
+    final definition = widget.columns.firstWhere((c) => c.id == column.field);
+    if (!definition.reorderable) return _header(column);
+    return Builder(
+      builder: (headerContext) => DragTarget<trina.TrinaColumn>(
+        onWillAcceptWithDetails: (details) =>
+            details.data != column && details.data.frozen == column.frozen,
+        onMove: (details) {
+          if (details.data == column || details.data.frozen != column.frozen) {
+            _columnDropRect.value = null;
+            return;
+          }
+          final stack =
+              _rowsStackKey.currentContext!.findRenderObject() as RenderBox;
+          final header = headerContext.findRenderObject() as RenderBox;
+          final origin = stack.globalToLocal(header.localToGlobal(Offset.zero));
+          final movingForward =
+              _manager!.columns.indexOf(details.data) <
+              _manager!.columns.indexOf(column);
+          final rightEdge =
+              movingForward !=
+              (Directionality.of(context) == TextDirection.rtl);
+          final x = origin.dx + (rightEdge ? header.size.width : 0);
+          _columnDropRect.value = Rect.fromLTWH(
+            x,
+            0,
+            _resolved!.borderWidth!,
+            stack.size.height,
+          );
+        },
+        onLeave: (_) => _columnDropRect.value = null,
+        onAcceptWithDetails: (details) {
+          _columnDropRect.value = null;
+          _manager!.moveColumn(column: details.data, targetColumn: column);
+        },
+        builder: (context, candidates, rejected) => Listener(
+          onPointerDown: (_) => unawaited(_captureDragColumn(headerContext)),
+          child: Draggable<trina.TrinaColumn>(
+            data: column,
+            axis: Axis.horizontal,
+            maxSimultaneousDrags: 1,
+            dragAnchorStrategy: (_, context, position) {
+              final boundary =
+                  _captureKey.currentContext!.findRenderObject() as RenderBox;
+              final origin = boundary.localToGlobal(
+                _columnDragRect?.topLeft ?? Offset.zero,
+              );
+              return position - origin;
+            },
+            onDragStarted: () {
+              _draggingRow = true;
+              _hoveredRow.value = null;
+              _hoverLiftRect.value = null;
+            },
+            onDragEnd: (_) {
+              _draggingRow = false;
+              _columnDropRect.value = null;
+              _clearDragSnapshot();
+            },
+            feedback: Builder(
+              builder: (_) => _rowDragFeedback(
+                null,
+                previewSize:
+                    _columnDragRect?.size ??
+                    Size(column.width, _resolved!.headerHeight!),
               ),
             ),
-          ),
-          if (c.sort != trina.TrinaColumnSort.none)
-            Icon(
-              c.sort == trina.TrinaColumnSort.ascending
-                  ? Icons.arrow_upward
-                  : Icons.arrow_downward,
-              size: _resolved!.iconSize,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.grab,
+              child: _header(column),
             ),
-          if (c.enableDropToResize)
-            MouseRegion(
-              cursor: SystemMouseCursors.resizeColumn,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onHorizontalDragUpdate: (details) => _manager?.resizeColumn(
-                  c,
-                  details.delta.dx *
-                      (Directionality.of(context) == TextDirection.rtl
-                          ? -1
-                          : 1),
-                ),
-                child: SizedBox(
-                  width: _resolved!.iconSize,
-                  height: double.infinity,
-                  child: Icon(
-                    Icons.drag_indicator,
-                    size: _resolved!.iconSize,
-                    color: _resolved!.borderColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _header(trina.TrinaColumn c) => MouseRegion(
+    onEnter: (_) => _hoveredHeader.value = c.field,
+    onExit: (_) {
+      if (_hoveredHeader.value == c.field) _hoveredHeader.value = null;
+    },
+    child: ValueListenableBuilder<String?>(
+      valueListenable: _hoveredHeader,
+      builder: (context, hovered, _) => HyperContextMenu(
+        items: [
+          if (c.enableSorting) const HyperMenuItem(id: 'asc', label: '升序'),
+          if (c.enableSorting) const HyperMenuItem(id: 'desc', label: '降序'),
+          const HyperMenuItem(id: 'clear', label: '清除排序'),
+          const HyperMenuItem(id: 'start', label: '固定到起始侧'),
+          const HyperMenuItem(id: 'end', label: '固定到末尾侧'),
+          const HyperMenuItem(id: 'unpin', label: '取消固定'),
+          HyperMenuItem(
+            id: 'hide',
+            label: '隐藏此列',
+            enabled:
+                _columns
+                    .where((c) => !c.hide && !c.field.startsWith('__hyper_'))
+                    .length >
+                1,
+          ),
+          HyperMenuItem(
+            id: 'show',
+            label: '显示隐藏列',
+            children: [
+              for (final x in _columns.where((c) => c.hide))
+                HyperMenuItem(id: 'show:${x.field}', label: x.title),
+            ],
+          ),
+        ],
+        onSelected: (id) {
+          switch (id) {
+            case 'asc':
+              sort(HyperTableSort(c.field, HyperTableSortDirection.ascending));
+            case 'desc':
+              sort(HyperTableSort(c.field, HyperTableSortDirection.descending));
+            case 'clear':
+              sort(null);
+            case 'start':
+              pinColumn(c.field, HyperTableColumnPin.start);
+            case 'end':
+              pinColumn(c.field, HyperTableColumnPin.end);
+            case 'unpin':
+              pinColumn(c.field, HyperTableColumnPin.none);
+            case 'hide':
+              setColumnVisible(c.field, false);
+            default:
+              if (id.startsWith('show:'))
+                setColumnVisible(id.substring(5), true);
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: _resolved!.horizontalPadding!,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: switch (c.titleTextAlign) {
+                    trina.TrinaColumnTextAlign.left => Alignment.centerLeft,
+                    trina.TrinaColumnTextAlign.right => Alignment.centerRight,
+                    trina.TrinaColumnTextAlign.center => Alignment.center,
+                    trina.TrinaColumnTextAlign.end =>
+                      AlignmentDirectional.centerEnd,
+                    trina.TrinaColumnTextAlign.start =>
+                      AlignmentDirectional.centerStart,
+                  },
+                  child: Text(
+                    c.title,
+                    style: _resolved!.headerTextStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-            ),
-        ],
+              if (c.sort != trina.TrinaColumnSort.none)
+                Icon(
+                  c.sort == trina.TrinaColumnSort.ascending
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward,
+                  size: _resolved!.iconSize,
+                ),
+              if (c.enableDropToResize)
+                MouseRegion(
+                  cursor: SystemMouseCursors.resizeColumn,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragUpdate: (details) => _manager?.resizeColumn(
+                      c,
+                      details.delta.dx *
+                          (Directionality.of(context) == TextDirection.rtl
+                              ? -1
+                              : 1),
+                    ),
+                    child: SizedBox(
+                      width: _resolved!.iconSize,
+                      height: double.infinity,
+                      child: AnimatedOpacity(
+                        opacity:
+                            widget.showColumnResizeHandles || hovered == c.field
+                            ? 1
+                            : 0,
+                        duration: MediaQuery.of(context).disableAnimations
+                            ? Duration.zero
+                            : _resolved!.duration!,
+                        curve: _resolved!.curve!,
+                        child: Center(
+                          child: SizedBox(
+                            width: _resolved!.borderWidth,
+                            height: _resolved!.iconSize,
+                            child: ColoredBox(color: _resolved!.borderColor!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     ),
   );
@@ -1341,13 +1492,75 @@ class _HyperTableState<T> extends State<HyperTable<T>>
             ),
           )
         : surface;
-    return widget.rowContextMenuBuilder == null
+    final rowContent = widget.rowContextMenuBuilder == null
         ? content
         : HyperContextMenu(
             key: ValueKey(key),
             items: widget.rowContextMenuBuilder!(context, data),
             child: content,
           );
+    if (widget.dataMode != HyperTableDataMode.infinite ||
+        manager.rows.isEmpty ||
+        row.key != manager.rows.last.key) {
+      return rowContent;
+    }
+    final s = _resolved!;
+    final padding = s.footerPadding!.resolve(Directionality.of(context));
+    final textHeight =
+        MediaQuery.textScalerOf(context).scale(s.textStyle!.fontSize!) *
+        (s.textStyle!.height ?? 1.5);
+    final tailHeight =
+        math.max(manager.rowTotalHeight, textHeight) + padding.vertical;
+    final isBody = child is trina_ui.TrinaBaseRow && child.visibilityLayout;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(height: manager.rowTotalHeight, child: rowContent),
+        SizedBox(
+          height: tailHeight,
+          child: isBody
+              ? Padding(
+                  padding: padding,
+                  child: Center(child: _infiniteTail()),
+                )
+              : const SizedBox.expand(),
+        ),
+      ],
+    );
+  }
+
+  Widget _infiniteTail() {
+    final s = _resolved!;
+    if (_appending) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const HyperProgress.infinite(semanticsLabel: '加载更多'),
+          SizedBox(width: s.horizontalPadding!),
+          Text('正在加载更多…', style: s.textStyle),
+        ],
+      );
+    }
+    if (_error != null) {
+      return HyperButton.text(
+        onPressed: () => _load(reset: _failedReset),
+        child: const Text('加载失败，点击重试'),
+      );
+    }
+    if (_loading) return const SizedBox.shrink();
+    if (_hasMore) {
+      return HyperButton.text(
+        onPressed: _requestMore,
+        child: const Text('加载更多'),
+      );
+    }
+    return widget.noMore ??
+        Text(
+          '没有更多数据了',
+          style: s.textStyle?.copyWith(
+            color: HyperTheme.of(context).colors.textSecondary,
+          ),
+        );
   }
 
   void _releaseManager() {
@@ -1416,6 +1629,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     }
     setState(() {
       _loading = true;
+      _loadingReset = reset;
       _error = null;
     });
     try {
@@ -1623,7 +1837,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     _captureEpoch++;
     _dragSnapshot.value?.dispose();
     _dragSnapshot.dispose();
+    _columnDropRect.dispose();
     _hoverLiftRect.dispose();
+    _hoveredHeader.dispose();
     _hoveredRow.dispose();
     widget.controller?._detach(this);
     _releaseManager();
@@ -1686,7 +1902,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                 columns: _columns,
                                 rows: _gridRows,
                                 configuration: trina.TrinaGridConfiguration(
-                                  rowWrapperIsConstantHeight: true,
+                                  rowWrapperIsConstantHeight:
+                                      widget.dataMode !=
+                                      HyperTableDataMode.infinite,
                                   enableAutoSelectFirstRow: false,
                                   selectingMode:
                                       trina.TrinaGridSelectingMode.row,
@@ -2027,7 +2245,23 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                               ),
                             ),
                           ),
-                          if (_loading)
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: ValueListenableBuilder<Rect?>(
+                                valueListenable: _columnDropRect,
+                                builder: (context, rect, _) => Stack(
+                                  children: [
+                                    if (rect != null)
+                                      Positioned.fromRect(
+                                        rect: rect,
+                                        child: ColoredBox(color: s.focusColor!),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_loading && !_appending)
                             Positioned(
                               top: headerHeight,
                               left: 0,
@@ -2099,7 +2333,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                       ),
                     ),
                   ),
-                  if (_error != null && _data.isNotEmpty)
+                  if (_error != null &&
+                      _data.isNotEmpty &&
+                      widget.dataMode != HyperTableDataMode.infinite)
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: s.horizontalPadding!,
@@ -2152,16 +2388,6 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                           ),
                         ),
                       ),
-                    ),
-                  if (widget.dataMode == HyperTableDataMode.infinite &&
-                      _hasMore &&
-                      !_loading &&
-                      _error == null)
-                    HyperButton.text(
-                      onPressed: () {
-                        _requestMore();
-                      },
-                      child: const Text('加载更多'),
                     ),
                 ],
               ),

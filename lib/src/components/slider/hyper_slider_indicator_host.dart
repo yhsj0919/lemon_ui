@@ -67,7 +67,12 @@ class _IndicatorHostState extends State<HyperSliderIndicatorHost> {
             vertical: metrics.menu.padding / 2,
           ),
           style: HyperCardStyle(
-            material: HyperMaterialTheme.of(context).material,
+            material: HyperMaterialTheme.of(context).material?.copyWith(
+              background: HyperFill.color(
+                style.valueIndicatorColor ??
+                    HyperTheme.of(context).colors.primary,
+              ),
+            ),
             background: HyperFill.color(
               style.valueIndicatorColor ??
                   HyperTheme.of(context).colors.primary,

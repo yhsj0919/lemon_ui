@@ -128,8 +128,11 @@ class _HyperColorPickerState extends State<HyperColorPicker> {
     HyperSliderStyle gradientStyle(
       List<Color> colors, {
       bool checker = false,
+      bool showIndicator = false,
     }) => HyperSliderStyle(
-      showValueIndicator: ShowValueIndicator.never,
+      showValueIndicator: showIndicator
+          ? ShowValueIndicator.onDrag
+          : ShowValueIndicator.never,
       trackShape: _ColorTrackShape(
         colors,
         checker: checker,
@@ -273,11 +276,15 @@ class _HyperColorPickerState extends State<HyperColorPicker> {
           if (widget.showAlpha)
             HyperSlider(
               value: widget.value.a,
-              label: '不透明度',
-              style: gradientStyle([
-                widget.value.withValues(alpha: 0),
-                widget.value.withValues(alpha: 1),
-              ], checker: true),
+              label: '${(widget.value.a * 100).round()}%',
+              style: gradientStyle(
+                [
+                  widget.value.withValues(alpha: 0),
+                  widget.value.withValues(alpha: 1),
+                ],
+                checker: true,
+                showIndicator: true,
+              ),
               semanticFormatterCallback: (value) =>
                   '不透明度 ${(value * 100).round()}%',
               onChanged: enabled

@@ -199,15 +199,24 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
             child: Row(
               children: [
                 for (final item in items)
-                  HyperButton.ghost(
-                    onPressed: () => widget.onSelected(item.id),
-                    style: HyperButtonStyle(
-                      foregroundColor: widget.page == item.id
-                          ? HyperTheme.of(context).colors.primary
-                          : HyperTheme.of(context).colors.textPrimary,
+                  Semantics(
+                    selected: widget.page == item.id,
+                    child: HyperButton.ghost(
+                      onPressed: () => widget.onSelected(item.id),
+                      style: HyperButtonStyle(
+                        background: widget.page == item.id
+                            ? HyperFill.color(
+                                HyperTheme.of(context).colors.primaryContainer,
+                              )
+                            : const HyperFill.none(),
+                        foregroundColor: widget.page == item.id
+                            ? HyperTheme.of(context).colors.primary
+                            : HyperTheme.of(context).colors.textPrimary,
+                        contrastMode: HyperContrastMode.standard,
+                      ),
+                      icon: Icon(item.icon),
+                      label: Text(_label(item.id)),
                     ),
-                    icon: Icon(item.icon),
-                    label: Text(_label(item.id)),
                   ),
               ],
             ),

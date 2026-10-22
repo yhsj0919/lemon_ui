@@ -93,7 +93,7 @@ final class HyperColorScheme {
       outline: isDark ? const Color(0xFF3A3A3E) : const Color(0xFFE2E2E5),
       disabled: isDark ? const Color(0xFF707075) : const Color(0xFFB8B8BD),
       stateLayer: isDark ? Colors.white : Colors.black,
-      scrim: isDark ? const Color(0xA6000000) : const Color(0x52000000),
+      scrim: const Color(0x33000000),
       error: material.error,
       onError: material.onError,
       success: isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),

@@ -215,6 +215,6 @@ void main() {
     final resolved = const HyperMaterialThemeData(
       material: HyperSurfaceMaterial.solid(),
     ).resolveMaterial(semanticBackground: const HyperFill.color(Colors.purple));
-    expect(resolved!.background!.color, Colors.purple);
+    expect(resolved!.background!.color!.toARGB32(), Colors.purple.toARGB32());
   });
 }

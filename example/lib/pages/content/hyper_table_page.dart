@@ -248,7 +248,7 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
       padding: EdgeInsets.all(s.pageHorizontalPadding),
       children: [
         const HyperText(
-          'HyperTable · 未确认',
+          '数据表格',
           variant: HyperTextVariant.pageTitle,
         ),
         const HyperText('默认主题审核：本页不覆盖实例样式。旧版只作功能对照，新版没有复制旧封装或补丁。'),

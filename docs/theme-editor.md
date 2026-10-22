@@ -1,5 +1,11 @@
 # Demo 主题编辑器（第一版）
 
+2026-10-22：抽屉圆角调节范围进一步收紧为 min(实际表面短边/2, 公共表面圆角编辑上限60)，默认主题和历史导入规格不改。抽屉及弹窗默认遮罩统一使用 colors.scrim，默认黑色20%；弹窗显式 barrierColor 和原生 DrawerTheme.scrimColor 仍优先。
+
+2026-10-22：抽屉工作区新增左/上/右/下外边距及左上/右上/右下/左下圆角，尺寸覆盖保存于 devices.<端>.reviews.drawer；margin 使用 insetPaddingLeft/Top/Right/Bottom，四角使用 radiusTopLeft/TopRight/BottomRight/BottomLeft。旧 radius 和 surfaceRadius 导入继续兼容，清除四角覆盖恢复方向性默认。边距滑动范围使用紧凑间距的统一编辑边界（一个最小交互尺寸，桌面默认0–36），不按屏幕宽高设置；这是编辑器操作边界，不改默认主题或历史导入配置。圆角上限仍来自实际表面短边的一半，均使用整数逻辑像素；改变宽度或边距会收紧已覆盖圆角。背景/材质、圆角、边框和阴影集中在底部表面组。示例页的实例覆盖开关默认关闭。
+
+2026-10-22：用户明确确认 HyperTable，Gallery 从“未确认”移入“文字与内容”，编辑器通过共用注册表同步归入“内容”；页面 id hyper-table 保持稳定，控件默认样式与行为不变。
+
 运行 `example` 时手机和手表默认进入完整 Demo，桌面和平板进入主题工作室；入口沿用稳定设备解析，不随窗口缩放改变。编辑器外壳优先使用 Hyper 控件，预览拥有独立 MaterialApp、Navigator、设备解析与主题作用域。
 
 ## 工作区

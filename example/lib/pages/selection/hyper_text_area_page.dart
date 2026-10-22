@@ -28,7 +28,7 @@ class HyperTextAreaPage extends StatelessWidget {
           showCounter: true,
         ),
       ),
-      DemoSection(title: 'Form 校验', child: const _TextAreaFormDemo()),
+      DemoSection(title: '表单校验', child: const _TextAreaFormDemo()),
     ],
   );
 }

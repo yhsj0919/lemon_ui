@@ -8,7 +8,7 @@ void main() {
       const MaterialApp(home: Scaffold(body: HyperIconButtonPage())),
     );
 
-    expect(find.text('HyperIconButton'), findsOneWidget);
+    expect(find.text('图标按钮'), findsOneWidget);
     expect(find.byTooltip('收藏'), findsOneWidget);
     expect(find.byTooltip('通知'), findsOneWidget);
     expect(find.byTooltip('分享'), findsOneWidget);

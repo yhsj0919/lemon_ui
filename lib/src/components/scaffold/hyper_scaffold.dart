@@ -89,6 +89,8 @@ class HyperScaffold extends StatelessWidget {
           : body,
       drawer: drawer,
       endDrawer: endDrawer,
+      drawerScrimColor:
+          DrawerTheme.of(context).scrimColor ?? theme.colors.scrim,
       bottomNavigationBar: bottomBar,
       floatingActionButton: floatingActionButton,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,

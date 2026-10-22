@@ -15,7 +15,7 @@ void main() {
       ),
     );
 
-    expect(find.text('HyperIcon'), findsOneWidget);
+    expect(find.text('图标'), findsOneWidget);
     final favorite = find.byIcon(Icons.favorite);
     final before = tester.widget<Icon>(favorite).color;
     await tester.tap(find.byType(HyperSwitch));

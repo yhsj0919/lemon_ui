@@ -32,7 +32,7 @@ class _HyperIconButtonPageState extends State<HyperIconButtonPage> {
         ),
         children: [
           Text(
-            'HyperIconButton',
+            '图标按钮',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),

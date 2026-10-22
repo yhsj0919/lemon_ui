@@ -47,7 +47,7 @@ class _HyperTextPageState extends State<HyperTextPage> {
               vertical: 24,
             ),
             children: [
-              const HyperText('HyperText', variant: HyperTextVariant.pageTitle),
+              const HyperText('文字', variant: HyperTextVariant.pageTitle),
               const SizedBox(height: 8),
               const HyperText('直接使用系统字体和明确语义字号，不执行倍率缩放。'),
               const SizedBox(height: 16),

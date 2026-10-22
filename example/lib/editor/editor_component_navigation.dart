@@ -235,6 +235,8 @@ class _EditorComponentNavigationState extends State<EditorComponentNavigation>
 }
 
 String _label(String id) => switch (id) {
+  'hyper-table' => '数据表格',
+  'hyper-scrolling-text' => '滚动文字',
   'hyper-color-picker' => '颜色选择器',
   'hyper-fill' => '填充',
   'hyper-container-theme' => '容器主题',
@@ -299,5 +301,5 @@ String _label(String id) => switch (id) {
   'hyper-top-navigation' => '顶部导航',
   'hyper-menu' => '菜单',
   'hyper-tooltip' => '悬停提示',
-  _ => id,
+  _ => galleryItems.where((item) => item.id == id).firstOrNull?.title ?? id,
 };

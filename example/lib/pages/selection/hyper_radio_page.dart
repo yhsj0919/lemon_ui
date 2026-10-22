@@ -27,7 +27,7 @@ class _HyperRadioPageState extends State<HyperRadioPage> {
           vertical: 24,
         ),
         children: [
-          Text('HyperRadio', style: Theme.of(context).textTheme.headlineSmall),
+          Text('单选框', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
           const Text('默认使用 MIUIX 勾线样式，也提供 .circle 和 .filled 变体。'),
           const SizedBox(height: 20),

@@ -25,7 +25,7 @@ class _HyperSwitchPageState extends State<HyperSwitchPage> {
           vertical: 24,
         ),
         children: [
-          Text('HyperSwitch', style: Theme.of(context).textTheme.headlineSmall),
+          Text('开关', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
             '点击、键盘与拖动共用一套状态。当前 ${HyperTheme.sizesOf(context).deviceType.name} '

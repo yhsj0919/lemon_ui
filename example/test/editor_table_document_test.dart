@@ -40,11 +40,11 @@ void main() {
       );
     },
   );
-  test('table gallery entry remains unconfirmed', () {
+  test('confirmed table gallery entry belongs to content', () {
     final section = gallerySections.singleWhere(
       (s) => s.items.any((i) => i.id == 'hyper-table'),
     );
-    expect(section.title, '未确认');
+    expect(section.title, '文字与内容');
   });
   testWidgets('table workspace builds and pixel edits write integers', (
     tester,
@@ -60,7 +60,7 @@ void main() {
         )
         .onSelected('hyper-table');
     await tester.pumpAndSettle();
-    final panel = find.byKey(const ValueKey('editor-panel-数据表格 · 未确认'));
+    final panel = find.byKey(const ValueKey('editor-panel-数据表格'));
     expect(panel, findsOneWidget);
     final field = find.byKey(const ValueKey('editor-number-单元格最小高度'));
     final scroll = find

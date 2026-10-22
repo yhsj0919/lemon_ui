@@ -1,6 +1,6 @@
 # 数据表格
 
-`HyperTable<T>` 基于 TrinaGrid 2.3.0，公开接口只使用 Hyper 与 Flutter 类型。旧版 AppDataGrid 仅用于核对功能；新实现没有复制旧悬停缩放、滚动条覆盖及历史补丁。Gallery 与主题编辑器入口位于「未确认 → HyperTable」，页面 id 为 `hyper-table`。
+`HyperTable<T>` 基于 TrinaGrid 2.3.0，公开接口只使用 Hyper 与 Flutter 类型。旧版 AppDataGrid 仅用于核对功能；新实现没有复制旧悬停缩放、滚动条覆盖及历史补丁。2026-10-22 用户明确确认表格，Gallery 入口移至「文字与内容 → HyperTable」，主题编辑器同步归入「内容」，页面 id 保持 `hyper-table`。此确认不替代四端实机逐项视觉验收。
 
 ## 基本用法
 

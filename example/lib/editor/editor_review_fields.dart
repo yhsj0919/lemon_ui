@@ -8,6 +8,7 @@ import 'editor_dimension_limits.dart';
 /// Explicit editor overrides shared by feedback and navigation workspaces.
 /// Dimensions are stored per device, visual values per appearance.
 class EditorReviewFields {
+  double? radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft;
   double? dotRadius, dotBorderWidth;
   double? expandIconSize;
   double? collapsedIconSize;
@@ -171,6 +172,10 @@ class EditorReviewFields {
   String? textAlign;
   final shadow = EditorComponentShadow();
   Map<String, Object?> toJson() => {
+    if (radiusTopLeft != null) 'radiusTopLeft': radiusTopLeft,
+    if (radiusTopRight != null) 'radiusTopRight': radiusTopRight,
+    if (radiusBottomRight != null) 'radiusBottomRight': radiusBottomRight,
+    if (radiusBottomLeft != null) 'radiusBottomLeft': radiusBottomLeft,
     if (expandIconSize != null) 'expandIconSize': expandIconSize,
     if (collapsedIconSize != null) 'collapsedIconSize': collapsedIconSize,
     if (collapsedRowGap != null) 'collapsedRowGap': collapsedRowGap,
@@ -374,6 +379,10 @@ class EditorReviewFields {
   };
   static EditorReviewFields fromJson(Map<String, dynamic> j) {
     const keys = {
+      'radiusTopLeft',
+      'radiusTopRight',
+      'radiusBottomRight',
+      'radiusBottomLeft',
       'dotRadius',
       'expandIconSize',
       'collapsedIconSize',
@@ -558,6 +567,10 @@ class EditorReviewFields {
     }
     final result = EditorReviewFields()
       ..expandIconSize = number(j['expandIconSize'], min: 0)
+      ..radiusTopLeft = number(j['radiusTopLeft'], min: 0)
+      ..radiusTopRight = number(j['radiusTopRight'], min: 0)
+      ..radiusBottomRight = number(j['radiusBottomRight'], min: 0)
+      ..radiusBottomLeft = number(j['radiusBottomLeft'], min: 0)
       ..collapsedIconSize = number(j['collapsedIconSize'], min: 0)
       ..collapsedRowGap = number(j['collapsedRowGap'], min: 0)
       ..expandIconColor = j['expandIconColor'] == null
@@ -1631,7 +1644,18 @@ HyperThemeData applyEditorReviews(
         expandedHeight: d.appBar.expandedHeight,
         titleHorizontalPadding: d.appBar.titleHorizontalPadding,
       ),
-      drawer: s.drawer.copyWith(width: d.drawer.width, radius: d.drawer.radius),
+      drawer: s.drawer.copyWith(
+        width: d.drawer.width,
+        radius: d.drawer.radius,
+        margin: _reviewInsets(
+          d.drawer.insetPaddingLeft,
+          d.drawer.insetPaddingTop,
+          d.drawer.insetPaddingRight,
+          d.drawer.insetPaddingBottom,
+          s.drawer.margin,
+        ),
+        borderRadius: resolveEditorDrawerCorners(d.drawer, s.drawer),
+      ),
 
       notification: s.notification.copyWith(
         radius: d.notification.radius,
@@ -2875,15 +2899,71 @@ HyperThemeData applyEditorReviews(
   );
 }
 
+/// 四角未显式编辑时保留方向性默认值；显式编辑后两侧共用物理四角。
+BorderRadiusGeometry? resolveEditorDrawerCorners(
+  EditorReviewFields m,
+  HyperDrawerSize base,
+) {
+  if (m.radiusTopLeft == null &&
+      m.radiusTopRight == null &&
+      m.radiusBottomLeft == null &&
+      m.radiusBottomRight == null) {
+    return base.borderRadius;
+  }
+  final fallback =
+      (base.borderRadius ??
+              BorderRadiusDirectional.horizontal(
+                end: Radius.circular(m.radius ?? base.radius ?? 0),
+              ))
+          .resolve(TextDirection.ltr);
+  return BorderRadius.only(
+    topLeft: m.radiusTopLeft == null
+        ? fallback.topLeft
+        : Radius.circular(m.radiusTopLeft!),
+    topRight: m.radiusTopRight == null
+        ? fallback.topRight
+        : Radius.circular(m.radiusTopRight!),
+    bottomRight: m.radiusBottomRight == null
+        ? fallback.bottomRight
+        : Radius.circular(m.radiusBottomRight!),
+    bottomLeft: m.radiusBottomLeft == null
+        ? fallback.bottomLeft
+        : Radius.circular(m.radiusBottomLeft!),
+  );
+}
+
 /// Keep linked dimensions legal when their containing geometry is reduced.
 void constrainEditorReviewDimensions(
   String object,
   EditorReviewFields m,
-  HyperSizeScheme s,
-) {
+  HyperSizeScheme s, {
+  Size? viewport,
+}) {
   double? cap(double? value, double limit) =>
       value?.clamp(0, limit.floorToDouble()).toDouble();
   switch (object) {
+    case 'drawer':
+      if (viewport == null) break;
+      final margin =
+          (_reviewInsets(
+                    m.insetPaddingLeft,
+                    m.insetPaddingTop,
+                    m.insetPaddingRight,
+                    m.insetPaddingBottom,
+                    s.drawer.margin,
+                  ) ??
+                  s.drawer.margin)
+              .resolve(TextDirection.ltr);
+      final limit = editorDrawerRadiusLimit(
+        m.width ?? s.drawer.width,
+        viewport,
+        margin,
+      );
+      m.radiusTopLeft = cap(m.radiusTopLeft, limit);
+      m.radiusTopRight = cap(m.radiusTopRight, limit);
+      m.radiusBottomRight = cap(m.radiusBottomRight, limit);
+      m.radiusBottomLeft = cap(m.radiusBottomLeft, limit);
+      break;
     case 'topNavigationMenu':
       m.itemRadius = cap(m.itemRadius, (m.itemHeight ?? s.menu.itemHeight) / 2);
       break;

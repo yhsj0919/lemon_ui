@@ -727,7 +727,7 @@ Tree 视觉为 D 级同端 Sidebar 语义推导；已尝试官方 HIUI Tree 入�
 Radio、Checkbox、Switch、Progress 和 Divider 的尺寸模板补充可选几何字段，详见 [主题编辑器字段清单](theme-editor.md)。所有四端模板分别持有字段；默认 null 继续采用原有同端推导，不新增物理像素规格或跨端倍率。Radio 命中区域、内部圆点/对勾/线宽/圆角，Checkbox 命中区域/圆形圆角，Switch 命中/轨道与滑块圆角/两端偏移，Progress 线性长度/轨道和填充圆角/无限线宽，Divider 长度/缩进/圆角均可通过强类型 copyWith 覆盖。可选数值的插值在两端有值时连续，两端有 null 时按既有离散策略切换；值相等与哈希均包括新增字段。
 
 
-## HyperTable（2026-10-21，未确认）
+## HyperTable（2026-10-21；2026-10-22 用户确认）
 
 已核对 HiUI 官方仓库的表格功能与设计入口（https://github.com/XiaoMi/hiui/tree/master/packages/ui/table），本次未取得可验证的对应 SCSS 尺寸源，不能把候选数字称为 HiUI 官方规格。手机端未取得同代 HyperOS 数据网格截图和逻辑尺寸。首版全部为 D 级同端既有规格组合，单位为 Flutter 逻辑像素，待用户与设备对照。
 

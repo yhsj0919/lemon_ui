@@ -66,7 +66,7 @@ class _HyperButtonPageState extends State<HyperButtonPage> {
           vertical: 24,
         ),
         children: [
-          Text('HyperButton', style: Theme.of(context).textTheme.headlineSmall),
+          Text('按钮', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
           const Text('六种命名变体共用一套交互、主题和异步状态。异步按钮切换进度时保持原尺寸。'),
           const SizedBox(height: 8),

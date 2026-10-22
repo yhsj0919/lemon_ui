@@ -33,7 +33,7 @@ extension _TableWorkspace on _ThemeEditorState {
       () => set(null),
       value != null,
     );
-    return _panel('数据表格 · 未确认', [
+    return _panel('数据表格', [
       const HyperText('尺寸按真实设备保存，外观按亮暗保存。默认继承；各审核示例不使用实例样式覆盖。'),
       _heading('表头'),
       n(

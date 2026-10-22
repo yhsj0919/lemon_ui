@@ -12,7 +12,7 @@ class HyperLinePage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
-        const HyperText('HyperLine：共用线条样式'),
+        const HyperText('共用线条样式'),
         const HyperText('以下实例把同一个样式用于分割线和卡片轮廓；默认颜色和尺寸来自当前主题。'),
         for (final pattern in HyperLinePattern.values)
           ..._preview(

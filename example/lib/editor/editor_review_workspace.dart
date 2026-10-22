@@ -152,7 +152,12 @@ extension _ReviewWorkspace on _ThemeEditorState {
         decimal ? max : upper,
         (x) {
           set(x);
-          constrainEditorReviewDimensions(object, m, s);
+          constrainEditorReviewDimensions(
+            object,
+            m,
+            s,
+            viewport: editorPreviewSize(_device, landscape: _landscape),
+          );
         },
         () => set(null),
         value != null,
@@ -1053,27 +1058,71 @@ extension _ReviewWorkspace on _ThemeEditorState {
           ];
         case 'drawer':
           final native = theme.drawerTheme.style ?? const HyperDrawerStyle();
+          final viewport = editorPreviewSize(_device, landscape: _landscape);
+          final margin = (native.margin ?? s.drawer.margin).resolve(
+            Directionality.of(context),
+          );
+          final corners =
+              (native.surfaceStyle?.borderRadius ??
+                      s.drawer.borderRadius ??
+                      BorderRadiusDirectional.horizontal(
+                        end: Radius.circular(s.drawer.radius ?? 0),
+                      ))
+                  .resolve(Directionality.of(context));
+          final radiusLimit = editorDrawerRadiusLimit(
+            s.drawer.width,
+            viewport,
+            margin,
+          );
           return [
-            n(
-              '表面圆角',
-              m.radius,
-              s.drawer.radius ?? 0,
-              0,
-              editorRadiusLimit(s.drawer.width),
-              (x) => m.radius = x,
-            ),
             if (state == 'common') ...[
               _heading('布局'),
               n(
                 '展开宽度',
                 m.width,
                 s.drawer.width,
-                0,
-                editorContentWidthLimit,
+                1,
+                (viewport.width - margin.horizontal)
+                    .clamp(1, double.infinity)
+                    .floorToDouble(),
                 (x) => m.width = x,
                 decimal: false,
               ),
+              _heading('四边外边距'),
+              n(
+                '左外边距',
+                m.insetPaddingLeft,
+                margin.left,
+                0,
+                editorDrawerMarginLimit(s),
+                (x) => m.insetPaddingLeft = x,
+              ),
+              n(
+                '上外边距',
+                m.insetPaddingTop,
+                margin.top,
+                0,
+                editorDrawerMarginLimit(s),
+                (x) => m.insetPaddingTop = x,
+              ),
+              n(
+                '右外边距',
+                m.insetPaddingRight,
+                margin.right,
+                0,
+                editorDrawerMarginLimit(s),
+                (x) => m.insetPaddingRight = x,
+              ),
+              n(
+                '下外边距',
+                m.insetPaddingBottom,
+                margin.bottom,
+                0,
+                editorDrawerMarginLimit(s),
+                (x) => m.insetPaddingBottom = x,
+              ),
             ],
+            _heading('抽屉表面'),
             _color(
               '背景',
               v.backgroundColor,
@@ -1081,6 +1130,48 @@ extension _ReviewWorkspace on _ThemeEditorState {
               inheritedColor: native.backgroundColor ?? theme.colors.surface,
             ),
             ...material(v),
+            _heading('四角圆角'),
+            const HyperText('未覆盖时保留贴边圆角；分别设置后，两侧抽屉共用这组四角。'),
+            n(
+              '贴边默认圆角',
+              m.radius,
+              s.drawer.radius ?? 0,
+              0,
+              radiusLimit,
+              (x) => m.radius = x,
+            ),
+            n(
+              '左上圆角',
+              m.radiusTopLeft,
+              corners.topLeft.x,
+              0,
+              radiusLimit,
+              (x) => m.radiusTopLeft = x,
+            ),
+            n(
+              '右上圆角',
+              m.radiusTopRight,
+              corners.topRight.x,
+              0,
+              radiusLimit,
+              (x) => m.radiusTopRight = x,
+            ),
+            n(
+              '右下圆角',
+              m.radiusBottomRight,
+              corners.bottomRight.x,
+              0,
+              radiusLimit,
+              (x) => m.radiusBottomRight = x,
+            ),
+            n(
+              '左下圆角',
+              m.radiusBottomLeft,
+              corners.bottomLeft.x,
+              0,
+              radiusLimit,
+              (x) => m.radiusBottomLeft = x,
+            ),
             n(
               '边框宽度',
               v.borderWidth,

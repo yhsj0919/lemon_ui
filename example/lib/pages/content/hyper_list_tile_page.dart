@@ -28,7 +28,7 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
           vertical: 24,
         ),
         children: [
-          const HyperText('HyperListTile', variant: HyperTextVariant.pageTitle),
+          const HyperText('列表项', variant: HyperTextVariant.pageTitle),
           const SizedBox(height: 8),
           const HyperText('基础排布不附加语义；进入下一级由导航列表项统一处理。'),
           const SizedBox(height: 28),

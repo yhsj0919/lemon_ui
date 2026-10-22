@@ -426,7 +426,7 @@ extension _SurfaceWorkspace on _ThemeEditorState {
         ),
       ],
       if (_component == 'collapsible') ...[
-        _heading('Accordion 分隔线'),
+        _heading('手风琴分隔线'),
         _select(
           '显示分隔线',
           v.showDividers?.toString() ?? 'inherit',

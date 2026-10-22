@@ -33,7 +33,7 @@ class _HyperProgressPageState extends State<HyperProgressPage> {
           ),
           children: [
             const HyperText(
-              'HyperProgress',
+              '进度',
               variant: HyperTextVariant.pageTitle,
             ),
             const SizedBox(height: 8),

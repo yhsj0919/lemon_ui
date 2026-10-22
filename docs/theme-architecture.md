@@ -1,5 +1,7 @@
 ## 通知业务边界与导航表面（2026-10-16）
 
+2026-10-22：抽屉新增四边 margin，由当前端 sizes.drawer.margin 提供默认值，HyperDrawerStyle.margin 支持全局、局部和实例覆盖；默认零边距不变。此留白属于 Scaffold 抽屉表面的滑动几何，表面宽度不包含边距，四边留白参与父约束收缩和关闭手势范围。四角复用 surfaceStyle.borderRadius，不新增重复 Style 字段；四端可用 sizes.drawer.borderRadius 配置，null 保留旧 radius 按抽屉起止方向解析的贴边圆角。普通与高级表面继续共用 HyperNavigationSurface，未新增材质或降级路径。边距过渡跟随 Motion 并遵守减少动画；Demo 使用显式开关展示示例几何，默认仍继承主题。
+
 顶部导航的下拉菜单复用 HyperMenu，编辑器将面板与菜单项分开：面板宽度、最大高度、外层内边距和表面配置保存在 topNavigationPanel，菜单项布局、文字与状态配色保存在 topNavigationMenu；顶部按钮覆盖保持独立。
 菜单新增 itemVerticalPadding，进入 HyperMenuSize 四端规格以及 HyperMenuStyle 的主题、局部和实例覆盖。默认值暂由同端既有 menu.padding 的一半推导（phone/tablet 6、desktop 4、watch 2 逻辑像素），用于在描述内容增高后保留上下留白；这是既有语义尺寸的推导值，待视觉确认，不是新增官方规格。itemHeight 继续表示最小高度，内容随文字缩放增高，不裁切。
 
@@ -865,7 +867,7 @@ Gallery 预留“表单”正式分类；Form Demo 与编辑入口暂位于“�
 阶段一采用通用 builder 完整接入现有 Select/DatePicker/Checkbox，提供专门 HyperTextFormField 文本适配。其余专用命名 FormField 包装属于第二阶段，不阻塞表单组合使用。
 
 
-## HyperTable（2026-10-21，未确认）
+## HyperTable（2026-10-21；2026-10-22 用户确认）
 
 对外使用 HyperTable<T>、HyperTableColumn<T>、HyperTableController、HyperTableQuery/Page 与强类型事件；TrinaGrid 状态管理器不公开。全局 tableTheme、局部 HyperTableTheme 和实例 HyperTableStyle 逐字段合并，文本深合并；四端默认规格由 sizes.table 集中管理。公开样式及尺寸支持 copyWith、插值和值相等。
 

@@ -27,7 +27,7 @@ class _HyperCheckboxPageState extends State<HyperCheckboxPage> {
         ),
         children: [
           Text(
-            'HyperCheckbox',
+            '复选框',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),

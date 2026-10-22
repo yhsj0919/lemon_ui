@@ -141,7 +141,10 @@ Size editorPreviewSize(HyperDeviceType type, {required bool landscape}) {
   if (object == 'sidebar' && label == '收起宽度') {
     max = smaller(max, s.sidebar.width);
   }
-  if (label.contains('宽度') && !label.contains('边框') && !label.contains('微光')) {
+  if (object != 'drawer' &&
+      label.contains('宽度') &&
+      !label.contains('边框') &&
+      !label.contains('微光')) {
     max = smaller(max, viewport.width - 2 * s.pageHorizontalPadding);
   }
   if (object == 'appBar') {
@@ -156,6 +159,28 @@ Size editorPreviewSize(HyperDeviceType type, {required bool landscape}) {
     }
   }
   return (min: min.ceilToDouble(), max: max.floorToDouble());
+}
+
+/// 抽屉边距复用紧凑间距的编辑边界：一个最小交互尺寸。
+/// 这是便于微调的编辑器操作上限，待交互验证；不是屏幕约束、
+/// 组件 API 上限或官方默认规格，不修改主题默认值及历史导入值。
+double editorDrawerMarginLimit(HyperSizeScheme sizes) =>
+    sizes.minimumInteractiveDimension.floorToDouble();
+
+/// 四角不超过实际短边的一半，并使用统一表面圆角操作上限。
+double editorDrawerRadiusLimit(double width, Size viewport, EdgeInsets margin) {
+  final availableWidth = (viewport.width - margin.horizontal).clamp(
+    0,
+    double.infinity,
+  );
+  final availableHeight = (viewport.height - margin.vertical).clamp(
+    0,
+    double.infinity,
+  );
+  final panelWidth = width.clamp(0, availableWidth);
+  return editorRadiusLimit(
+    (panelWidth < availableHeight ? panelWidth : availableHeight).toDouble(),
+  ).clamp(0, editorSurfaceRadiusLimit).toDouble();
 }
 
 // Wheel editor operation boundaries, pending device review. Width allows a

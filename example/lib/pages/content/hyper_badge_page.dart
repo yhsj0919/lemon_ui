@@ -35,7 +35,7 @@ class _HyperBadgePageState extends State<HyperBadgePage> {
       child: ListView(
         padding: EdgeInsets.all(sizes.pageHorizontalPadding),
         children: [
-          const HyperText('HyperBadge', variant: HyperTextVariant.pageTitle),
+          const HyperText('徽标', variant: HyperTextVariant.pageTitle),
           SizedBox(height: sizes.compactSectionSpacing),
           const HyperText('点、数字、短文本与自定义内容；角标定位由独立组件负责。'),
           SizedBox(height: sizes.sectionSpacing),

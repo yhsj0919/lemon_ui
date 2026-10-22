@@ -18,7 +18,7 @@ class HyperDividerPage extends StatelessWidget {
           vertical: 24,
         ),
         children: [
-          const HyperText('HyperDivider', variant: HyperTextVariant.pageTitle),
+          const HyperText('分隔线', variant: HyperTextVariant.pageTitle),
           const SizedBox(height: 8),
           const HyperText('轻量分隔线，支持横向、纵向、渐变、虚线和点线。'),
           const SizedBox(height: 28),

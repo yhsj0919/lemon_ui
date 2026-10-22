@@ -48,7 +48,7 @@ class _HyperWidgetGroupPageState extends State<HyperWidgetGroupPage> {
         padding: EdgeInsets.all(sizes.pageHorizontalPadding),
         children: [
           const HyperText(
-            'HyperWidgetGroup',
+            '控件组',
             variant: HyperTextVariant.pageTitle,
           ),
           SizedBox(height: sizes.compactSectionSpacing),

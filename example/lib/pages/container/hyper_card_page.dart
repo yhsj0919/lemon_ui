@@ -22,7 +22,7 @@ class _HyperCardPageState extends State<HyperCardPage> {
           vertical: 24,
         ),
         children: [
-          const HyperText('HyperCard', variant: HyperTextVariant.pageTitle),
+          const HyperText('卡片', variant: HyperTextVariant.pageTitle),
           const SizedBox(height: 8),
           const HyperText('卡片默认提供内容内边距；标题区独立配置，媒体可显式关闭内边距。'),
           const SizedBox(height: 24),

@@ -189,7 +189,7 @@ class _HyperFilePickerPageState extends State<HyperFilePickerPage> {
         ),
       ),
       DemoSection(
-        title: 'Form · 必填与重置',
+        title: '表单 · 必填与重置',
         child: HyperForm(
           controller: form,
           child: HyperFormSection(

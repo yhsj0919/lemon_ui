@@ -23,7 +23,7 @@ class _HyperTagPageState extends State<HyperTagPage> {
       child: ListView(
         padding: EdgeInsets.all(sizes.pageHorizontalPadding),
         children: [
-          const HyperText('HyperTag', variant: HyperTextVariant.pageTitle),
+          const HyperText('标签', variant: HyperTextVariant.pageTitle),
           SizedBox(height: sizes.compactSectionSpacing),
           const HyperText('轻量分类与状态展示；点击和选择行为由 Chip 提供。'),
           SizedBox(height: sizes.sectionSpacing),

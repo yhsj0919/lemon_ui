@@ -112,7 +112,7 @@
 | `HyperTreeView<T>` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperDescriptionList` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperTimeline` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
-| `HyperTable<T>` | 已创建（未确认） | 未审核 | 未审核 | 未审核 | 未审核 |
+| `HyperTable<T>` | 已确认（2026-10-22） | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperStepIndicator` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperResult.empty` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |
 | `HyperResult` | 已创建 | 未审核 | 未审核 | 未审核 | 未审核 |

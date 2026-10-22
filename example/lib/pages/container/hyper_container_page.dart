@@ -41,7 +41,7 @@ class _HyperContainerPageState extends State<HyperContainerPage> {
         ),
         children: [
           Text(
-            'HyperContainer',
+            '容器',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),

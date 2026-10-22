@@ -39,6 +39,7 @@ class HyperDrawer extends StatelessWidget {
     final theme = HyperTheme.of(context);
     final resolved = HyperDrawerStyle(
       width: HyperTheme.sizesOf(context).drawer.width,
+      margin: HyperTheme.sizesOf(context).drawer.margin,
       backgroundColor: theme.colors.surfaceElevated,
     ).merge(HyperDrawerTheme.of(context).style).merge(style);
     final sizes = HyperTheme.sizesOf(context);
@@ -50,7 +51,9 @@ class HyperDrawer extends StatelessWidget {
         ? BorderRadiusDirectional.horizontal(start: Radius.circular(radius))
         : BorderRadiusDirectional.horizontal(end: Radius.circular(radius));
     final effectiveRadius =
-        resolved.surfaceStyle?.borderRadius ?? defaultRadius;
+        resolved.surfaceStyle?.borderRadius ??
+        sizes.drawer.borderRadius ??
+        defaultRadius;
     final useSurface =
         resolved.surfaceStyle != null ||
         HyperMaterialTheme.of(context).material != null;
@@ -82,7 +85,7 @@ class HyperDrawer extends StatelessWidget {
               ],
             ),
     );
-    final drawer = !useSurface
+    final surface = !useSurface
         ? content
         : HyperNavigationSurface(
             inheritMaterial: true,
@@ -93,6 +96,16 @@ class HyperDrawer extends StatelessWidget {
             ).merge(resolved.surfaceStyle),
             child: content,
           );
+    final margin = resolved.margin!.resolve(Directionality.of(context));
+    assert(margin.isNonNegative, '抽屉外边距不能为负');
+    final drawer = AnimatedPadding(
+      padding: margin,
+      duration: (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
+          ? Duration.zero
+          : theme.motion.fastDuration,
+      curve: theme.motion.fastCurve,
+      child: surface,
+    );
     // Flutter 的 DrawerController 在桌面端不安装拖动识别器。
     final desktop = switch (Theme.of(context).platform) {
       TargetPlatform.windows ||
@@ -101,7 +114,10 @@ class HyperDrawer extends StatelessWidget {
       _ => false,
     };
     return desktop
-        ? _DesktopDrawerCloseGesture(width: resolved.width!, child: drawer)
+        ? _DesktopDrawerCloseGesture(
+            width: resolved.width! + margin.horizontal,
+            child: drawer,
+          )
         : drawer;
   }
 }

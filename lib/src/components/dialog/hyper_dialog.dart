@@ -192,7 +192,8 @@ Future<T?> showHyperDialog<T>({
       barrierLabel:
           barrierLabel ??
           MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: resolved.barrierColor ?? Colors.black.withValues(alpha: .2),
+      barrierColor:
+          resolved.barrierColor ?? HyperTheme.of(context).colors.scrim,
       transitionDuration: reduced
           ? Duration.zero
           : (resolved.duration ?? motion.fastDuration),

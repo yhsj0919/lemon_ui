@@ -113,7 +113,7 @@ class _HyperCascaderPageState extends State<HyperCascaderPage> {
           ),
         ),
         DemoSection(
-          title: 'Form · 必填校验、提交和重置（本地演示）',
+          title: '表单 · 必填校验、提交和重置（本地演示）',
           child: HyperForm(
             controller: _form,
             child: HyperFormSection(

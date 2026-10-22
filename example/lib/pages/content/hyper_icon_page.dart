@@ -15,7 +15,7 @@ class HyperIconPage extends StatelessWidget {
         HyperTheme.sizesOf(context).pageHorizontalPadding,
       ),
       children: [
-        const HyperText('HyperIcon', variant: HyperTextVariant.pageTitle),
+        const HyperText('图标', variant: HyperTextVariant.pageTitle),
         const HyperText('默认示例直接继承图标主题，局部和实例覆盖单独展示。'),
         const DemoSection(
           title: '默认主题预览',

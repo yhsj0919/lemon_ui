@@ -1,4 +1,5 @@
 import '../pages/content/hyper_table_page.dart';
+import '../pages/content/hyper_charts_page.dart';
 import '../pages/form/hyper_form_page.dart';
 import '../pages/form/hyper_form_actions_page.dart';
 import '../pages/selection/hyper_cascader_page.dart';
@@ -82,6 +83,19 @@ import 'gallery_item.dart';
 ///
 /// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-charts',
+        title: '图表',
+        description: '折线、柱状、饼图、散点、雷达、排名与 K 线；跟随提示与图例布局。',
+        icon: Icons.bar_chart,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperChartsPage(),
+      ),
+    ],
+  ),
   GallerySection(
     title: '基础能力',
     items: [

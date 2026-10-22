@@ -25,6 +25,12 @@ HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴
 
 # Lemon UI 主题与尺寸架构
 
+## 图表（2026-10-22，未确认）
+
+新增 `sizes.chart` 四端规格与 `chartTheme` 强类型主题；局部 `HyperChartTheme`、实例
+`HyperChartStyle` 只合并显式字段。绘图参考用户指定的 lemon_shadcn，提示表面统一走
+菜单表面解析，未更改已有控件默认值。候选尺寸来源与功能边界见 [图表](usage/charts.md)。
+
 ## Result 与空状态合并（2026-10-21）
 
 `HyperResult.empty` 与其他结果状态共用布局、动画和 `HyperMaterialSurface`。空状态主题统一为 `resultTheme.empty`，尺寸统一为 `sizes.result.empty`；未指定变体尺寸时继承 `sizes.result`。全局、局部和实例均使用 Result 的强类型接口。

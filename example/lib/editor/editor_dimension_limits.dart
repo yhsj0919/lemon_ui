@@ -1,8 +1,40 @@
 import 'package:flutter/widgets.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
+import 'editor_chart_fields.dart';
+
 /// Editor bounds for surfaces whose dimensions are supplied by a parent layout.
 const editorSurfaceRadiusLimit = 60.0;
+
+void constrainEditorChartDimensions(
+  EditorChartMetrics metrics,
+  HyperChartSize inherited,
+  Size viewport,
+) {
+  final current = metrics.resolve(inherited);
+  if (metrics.radius != null) {
+    metrics.radius = metrics.radius!.roundToDouble().clamp(
+      0,
+      editorRadiusLimit(current.barWidth),
+    );
+  }
+  if (metrics.donutHoleRadius != null) {
+    metrics.donutHoleRadius = metrics.donutHoleRadius!.roundToDouble().clamp(
+      0,
+      editorChartRadiusLimit(viewport, current.height, current.pieRadius),
+    );
+  }
+}
+
+/// 图表几何操作边界来自当前预览绘图区；不作为组件默认规格。
+/// 环形外半径由环宽与内半径共同占用，图例的实际占位由布局进一步收缩。
+double editorChartRadiusLimit(
+  Size viewport,
+  double height,
+  double otherRadius,
+) => ((viewport.width < height ? viewport.width : height) / 2 - otherRadius)
+    .clamp(0, double.infinity)
+    .floorToDouble();
 
 // Clear-glass experiment operation bounds, pending visual review. Blur explores
 // legibility across background rows; spread stays within the scene's 32px inset,

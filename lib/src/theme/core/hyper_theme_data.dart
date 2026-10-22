@@ -1,3 +1,4 @@
+import '../../components/charts/hyper_chart_theme.dart';
 import '../../components/table/hyper_table_theme.dart';
 import '../../components/form/hyper_form_theme.dart';
 import '../../components/cascader/hyper_cascader_theme.dart';
@@ -106,6 +107,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.scaffoldTheme = const HyperScaffoldThemeData(),
     this.appBarTheme = const HyperAppBarThemeData(),
     this.drawerTheme = const HyperDrawerThemeData(),
+    this.chartTheme = const HyperChartThemeData(),
     this.sidebarTheme = const HyperSidebarThemeData(),
     this.menuTheme = const HyperMenuThemeData(),
     this.topNavigationTheme = const HyperTopNavigationThemeData(),
@@ -358,6 +360,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   /// 全局通用抽屉主题。
   final HyperDrawerThemeData drawerTheme;
+  final HyperChartThemeData chartTheme;
 
   /// 全局树形侧栏主题。
   final HyperSidebarThemeData sidebarTheme;
@@ -519,6 +522,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperScaffoldThemeData? scaffoldTheme,
     HyperAppBarThemeData? appBarTheme,
     HyperDrawerThemeData? drawerTheme,
+    HyperChartThemeData? chartTheme,
     HyperSidebarThemeData? sidebarTheme,
     HyperMenuThemeData? menuTheme,
     HyperTopNavigationThemeData? topNavigationTheme,
@@ -599,6 +603,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       scaffoldTheme: scaffoldTheme ?? this.scaffoldTheme,
       appBarTheme: appBarTheme ?? this.appBarTheme,
       drawerTheme: drawerTheme ?? this.drawerTheme,
+      chartTheme: chartTheme ?? this.chartTheme,
       sidebarTheme: sidebarTheme ?? this.sidebarTheme,
       menuTheme: menuTheme ?? this.menuTheme,
       topNavigationTheme: topNavigationTheme ?? this.topNavigationTheme,
@@ -685,6 +690,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       ),
       appBarTheme: HyperAppBarThemeData.lerp(appBarTheme, other.appBarTheme, t),
       drawerTheme: HyperDrawerThemeData.lerp(drawerTheme, other.drawerTheme, t),
+      chartTheme: HyperChartThemeData.lerp(chartTheme, other.chartTheme, t),
       dialogTheme: HyperDialogThemeData.lerp(dialogTheme, other.dialogTheme, t),
       toastTheme: HyperToastThemeData.lerp(toastTheme, other.toastTheme, t),
       snackbarTheme: HyperSnackbarThemeData.lerp(
@@ -903,6 +909,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.scaffoldTheme == scaffoldTheme &&
           other.appBarTheme == appBarTheme &&
           other.drawerTheme == drawerTheme &&
+          other.chartTheme == chartTheme &&
           other.sidebarTheme == sidebarTheme &&
           other.menuTheme == menuTheme &&
           other.topNavigationTheme == topNavigationTheme &&
@@ -972,6 +979,7 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     scaffoldTheme,
     appBarTheme,
     drawerTheme,
+    chartTheme,
     sidebarTheme,
     menuTheme,
     topNavigationTheme,

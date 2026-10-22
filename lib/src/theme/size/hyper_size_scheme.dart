@@ -1,3 +1,4 @@
+import 'components/hyper_chart_size.dart';
 import 'components/hyper_table_size.dart';
 import 'components/hyper_form_size.dart';
 import 'components/hyper_calendar_size.dart';
@@ -98,6 +99,7 @@ final class HyperSizeScheme {
     required this.card,
     required this.appBar,
     required this.drawer,
+    this.chart = const HyperChartSize(),
     required this.sidebar,
     required this.menu,
     required this.topNavigation,
@@ -190,6 +192,7 @@ final class HyperSizeScheme {
           expandedHeight: 96,
           titleHorizontalPadding: 26,
         ),
+        chart: const HyperChartSize(),
         drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 320,
@@ -630,6 +633,7 @@ final class HyperSizeScheme {
           expandedHeight: 160,
           titleHorizontalPadding: 26,
         ),
+        chart: const HyperChartSize(),
         drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 400,
@@ -1069,6 +1073,7 @@ final class HyperSizeScheme {
           expandedHeight: 120,
           titleHorizontalPadding: 16,
         ),
+        chart: const HyperChartSize(),
         drawer: const HyperDrawerSize(width: 304, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 360,
@@ -1508,6 +1513,7 @@ final class HyperSizeScheme {
           expandedHeight: 96,
           titleHorizontalPadding: 12,
         ),
+        chart: const HyperChartSize(),
         drawer: const HyperDrawerSize(width: 200, radius: 16),
         toast: const HyperMessageSize(
           maxWidth: 180,
@@ -1927,6 +1933,7 @@ final class HyperSizeScheme {
   final HyperCardSize card;
   final HyperAppBarSize appBar;
   final HyperDrawerSize drawer;
+  final HyperChartSize chart;
   final HyperSidebarSize sidebar;
   final HyperMenuSize menu;
 
@@ -2000,6 +2007,7 @@ final class HyperSizeScheme {
     HyperCardSize? card,
     HyperAppBarSize? appBar,
     HyperDrawerSize? drawer,
+    HyperChartSize? chart,
     HyperSidebarSize? sidebar,
     HyperMenuSize? menu,
     HyperTopNavigationSize? topNavigation,
@@ -2071,6 +2079,7 @@ final class HyperSizeScheme {
     card: card ?? this.card,
     appBar: appBar ?? this.appBar,
     drawer: drawer ?? this.drawer,
+    chart: chart ?? this.chart,
     sidebar: sidebar ?? this.sidebar,
     menu: menu ?? this.menu,
     topNavigation: topNavigation ?? this.topNavigation,
@@ -2165,6 +2174,7 @@ final class HyperSizeScheme {
       card: HyperCardSize.lerp(a.card, b.card, t),
       appBar: HyperAppBarSize.lerp(a.appBar, b.appBar, t),
       drawer: HyperDrawerSize.lerp(a.drawer, b.drawer, t),
+      chart: HyperChartSize.lerp(a.chart, b.chart, t),
       dialog: HyperDialogSize.lerp(a.dialog, b.dialog, t),
       toast: HyperMessageSize.lerp(a.toast, b.toast, t),
       snackbar: HyperMessageSize.lerp(a.snackbar, b.snackbar, t),
@@ -2272,6 +2282,7 @@ final class HyperSizeScheme {
           other.card == card &&
           other.appBar == appBar &&
           other.drawer == drawer &&
+          other.chart == chart &&
           other.sidebar == sidebar &&
           other.menu == menu &&
           other.topNavigation == topNavigation &&
@@ -2344,6 +2355,7 @@ final class HyperSizeScheme {
     card,
     appBar,
     drawer,
+    chart,
     sidebar,
     menu,
     topNavigation,

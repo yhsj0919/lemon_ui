@@ -1,3 +1,4 @@
+import 'editor_chart_fields.dart';
 import 'editor_table_fields.dart';
 import 'editor_form_fields.dart';
 import 'editor_wheel_fields.dart';
@@ -349,6 +350,7 @@ class EditorDevice {
   EditorWheelMetrics wheelMetrics = EditorWheelMetrics();
   EditorWheelMetrics calendarMetrics = EditorWheelMetrics();
   EditorTableMetrics tableMetrics = EditorTableMetrics();
+  EditorChartMetrics chartMetrics = EditorChartMetrics();
   EditorFormMetrics formMetrics = EditorFormMetrics();
   EditorTextFieldMetrics textFieldMetrics = EditorTextFieldMetrics();
   EditorButtonMetrics buttonMetrics = EditorButtonMetrics();
@@ -403,6 +405,7 @@ class EditorDevice {
       'switchMetrics': switchMetrics.toJson(),
     if (tagMetrics.toJson().isNotEmpty) 'tagMetrics': tagMetrics.toJson(),
     if (chipMetrics.toJson().isNotEmpty) 'chipMetrics': chipMetrics.toJson(),
+    if (chartMetrics.toJson().isNotEmpty) 'chartMetrics': chartMetrics.toJson(),
     if (tableMetrics.toJson().isNotEmpty) 'tableMetrics': tableMetrics.toJson(),
     if (formMetrics.toJson().isNotEmpty) 'formMetrics': formMetrics.toJson(),
     if (calendarMetrics.toJson().isNotEmpty)
@@ -457,6 +460,7 @@ class EditorDevice {
       'chipMetrics',
       'selectMetrics',
       'tableMetrics',
+      'chartMetrics',
       'formMetrics',
       'calendarMetrics',
       'wheelMetrics',
@@ -548,6 +552,9 @@ class EditorDevice {
       ..chipMetrics = EditorChipMetrics.fromJson(
         (j['chipMetrics'] as Map<String, dynamic>?) ?? {},
       )
+      ..chartMetrics = EditorChartMetrics.fromJson(
+        (j['chartMetrics'] as Map<String, dynamic>?) ?? {},
+      )
       ..tableMetrics = EditorTableMetrics.fromJson(
         (j['tableMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -602,6 +609,7 @@ double? number(dynamic value, {double? min, double? max}) {
 /// 亮暗方案独立编辑，共享一套四端布局规格。
 class EditorMode {
   EditorTableVisual tableVisual = EditorTableVisual();
+  EditorChartVisual chartVisual = EditorChartVisual();
   EditorReviewCollection reviews = EditorReviewCollection();
   String? fontFamily;
   final materialAppearance = EditorComponent();
@@ -666,6 +674,7 @@ class EditorMode {
   EditorWheelVisual calendar = EditorWheelVisual();
   EditorFormVisual formFields = EditorFormVisual();
   Map<String, Object?> toJson() => {
+    if (chartVisual.toJson().isNotEmpty) 'chartVisual': chartVisual.toJson(),
     if (tableVisual.toJson().isNotEmpty) 'tableVisual': tableVisual.toJson(),
     if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (fontFamily != null) 'fontFamily': fontFamily,
@@ -811,6 +820,7 @@ class EditorMode {
       'iconButtonOutlinedInput',
       'iconButtonGhostInput',
       'tableVisual',
+      'chartVisual',
       'treeContent',
       'resultContent',
       'descriptionContent',
@@ -927,6 +937,9 @@ class EditorMode {
     read('iconButtonTonalInput', result.iconButtonTonalInput);
     read('iconButtonOutlinedInput', result.iconButtonOutlinedInput);
     read('iconButtonGhostInput', result.iconButtonGhostInput);
+    result.chartVisual = EditorChartVisual.fromJson(
+      (j['chartVisual'] as Map<String, dynamic>?) ?? {},
+    );
     result.tableVisual = EditorTableVisual.fromJson(
       (j['tableVisual'] as Map<String, dynamic>?) ?? {},
     );
@@ -1077,6 +1090,7 @@ class EditorThemeDocument {
               radius: d.buttonRadius,
             ),
           ),
+          chart: d.chartMetrics.resolve(s.chart),
           table: d.tableMetrics.resolve(s.table),
           form: d.formMetrics.resolve(s.form),
           calendar: s.calendar.copyWith(
@@ -1582,6 +1596,9 @@ class EditorThemeDocument {
                 ),
               ),
         ),
+      ),
+      chartTheme: theme.chartTheme.merge(
+        HyperChartThemeData(style: m.chartVisual.resolve()),
       ),
       tableTheme: theme.tableTheme.merge(
         HyperTableThemeData(

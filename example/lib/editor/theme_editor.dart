@@ -45,6 +45,7 @@ part 'editor_basic_control_workspace.dart';
 part 'editor_surface_workspace.dart';
 part 'editor_content_workspace.dart';
 part 'editor_table_workspace.dart';
+part 'editor_chart_workspace.dart';
 part 'editor_input_workspace.dart';
 part 'editor_review_workspace.dart';
 
@@ -2670,6 +2671,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     }
     if (_isReviewControl) return _reviewPanel();
     if (_isInputControl) return _inputPanel();
+    if (_page == 'hyper-charts') return _chartPanel();
     if (_component == 'table') return _tablePanel();
     if (_isContentControl) return _contentPanel();
     if (_isBasicControl) return _basicControlPanel();

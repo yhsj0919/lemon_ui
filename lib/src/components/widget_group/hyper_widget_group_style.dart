@@ -1,3 +1,4 @@
+import '../../foundation/hyper_surface_material.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,7 @@ final class HyperWidgetGroupStyle {
     this.spacing,
     this.padding,
     this.backgroundColor,
+    this.material,
     this.border,
     this.borderRadius,
     this.itemBorderRadius,
@@ -28,6 +30,7 @@ final class HyperWidgetGroupStyle {
   final double? spacing;
   final EdgeInsetsGeometry? padding;
   final Color? backgroundColor;
+  final HyperSurfaceMaterial? material;
   final BoxBorder? border;
   final BorderRadiusGeometry? borderRadius;
 
@@ -48,6 +51,7 @@ final class HyperWidgetGroupStyle {
           spacing: other.spacing ?? spacing,
           padding: other.padding ?? padding,
           backgroundColor: other.backgroundColor ?? backgroundColor,
+          material: other.material ?? material,
           border: other.border ?? border,
           borderRadius: other.borderRadius ?? borderRadius,
           itemBorderRadius: other.itemBorderRadius ?? itemBorderRadius,
@@ -72,6 +76,9 @@ final class HyperWidgetGroupStyle {
       spacing: number(a.spacing, b.spacing),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      material: a.material == null || b.material == null
+          ? (t < .5 ? a.material : b.material)
+          : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
       border: lerpHyperBoxBorder(a.border, b.border, t),
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
@@ -100,6 +107,7 @@ final class HyperWidgetGroupStyle {
       other.spacing == spacing &&
       other.padding == padding &&
       other.backgroundColor == backgroundColor &&
+      other.material == material &&
       other.border == border &&
       other.borderRadius == borderRadius &&
       other.itemBorderRadius == itemBorderRadius &&
@@ -117,6 +125,7 @@ final class HyperWidgetGroupStyle {
     spacing,
     padding,
     backgroundColor,
+    material,
     border,
     borderRadius,
     itemBorderRadius,

@@ -68,6 +68,7 @@ import '../pages/interaction/hyper_anchored_overlay_page.dart';
 import '../pages/interaction/hyper_menu_page.dart';
 import '../pages/interaction/hyper_tooltip_page.dart';
 import '../pages/surface/hyper_material_surface_page.dart';
+import '../pages/surface/hyper_clear_glass_page.dart';
 import '../pages/selection/hyper_switch_page.dart';
 import '../pages/selection/hyper_slider_page.dart';
 import '../pages/selection/hyper_number_input_page.dart';
@@ -227,6 +228,14 @@ final List<GallerySection> gallerySections = [
         icon: Icons.view_week_outlined,
         hasStyleOverrides: true,
         builder: (_) => const HyperWidgetGroupPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-clear-glass',
+        title: '高透毛玻璃',
+        description: '彩色与纯白背景上的高透毛玻璃内置配方。',
+        icon: Icons.blur_on,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperClearGlassPage(),
       ),
       GalleryItem(
         id: 'hyper-material-surface',

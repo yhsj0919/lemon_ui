@@ -4,6 +4,12 @@ import 'package:lemon_ui/lemon_ui.dart';
 /// Editor bounds for surfaces whose dimensions are supplied by a parent layout.
 const editorSurfaceRadiusLimit = 60.0;
 
+// Clear-glass experiment operation bounds, pending visual review. Blur explores
+// legibility across background rows; spread stays within the scene's 32px inset,
+// leaving room for the existing shadow blur. These are not default design tokens.
+const editorClearGlassBlurLimit = 32.0;
+const editorClearGlassSpreadLimit = 12.0;
+
 /// A rounded surface reaches a capsule/circle at half its shortest dimension.
 double editorRadiusLimit(double extent) =>
     extent <= 0 ? 0 : (extent / 2).floorToDouble();

@@ -44,7 +44,6 @@ abstract final class HyperOverlayMaterial {
       blurSigmaX: 20,
       blurSigmaY: 20,
       tint: colors.surfaceElevated.withValues(alpha: .06),
-      border: BorderSide(color: colors.outline.withValues(alpha: .65)),
       boxShadow: [
         BoxShadow(
           color: colors.scrim.withValues(alpha: .12),

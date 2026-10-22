@@ -7,6 +7,62 @@ extension _SurfaceWorkspace on _ThemeEditorState {
     'collapsible' => _spec.collapsibleMetrics,
     _ => _spec.groupMetrics,
   };
+  List<Widget> _surfaceMaterialProperties(EditorReviewFields target) {
+    final theme = _resolveTheme(_dark);
+    final recipe =
+        resolveEditorReviewMaterial(target, theme) ??
+        theme.materialTheme.material;
+    return [
+      _select(
+        '表面材质',
+        target.materialKind ?? 'inherit',
+        const {
+          'inherit': '继承组件默认',
+          'solid': '实色',
+          'translucent': '半透明',
+          'frostedGlass': '毛玻璃',
+          'softLightGlass': '柔光玻璃',
+          'clearFrostedGlass': '高透毛玻璃',
+        },
+        (value) => _change(
+          () => target.materialKind = value == 'inherit' ? null : value,
+        ),
+      ),
+      if (target.materialKind != null && recipe?.usesBackdrop == true) ...[
+        _select(
+          '高光描边',
+          target.materialEdgeEnabled?.toString() ?? 'inherit',
+          const {'inherit': '按表面用途默认', 'true': '开启', 'false': '关闭'},
+          (value) => _change(
+            () => target.materialEdgeEnabled = value == 'inherit'
+                ? null
+                : value == 'true',
+          ),
+        ),
+
+        _number(
+          '材质水平模糊',
+          target.materialBlurX ?? recipe!.blurSigmaX,
+          0,
+          editorClearGlassBlurLimit,
+          (value) => target.materialBlurX = value,
+          () => target.materialBlurX = null,
+          target.materialBlurX != null,
+        ),
+        _number(
+          '材质垂直模糊',
+          target.materialBlurY ?? recipe!.blurSigmaY,
+          0,
+          editorClearGlassBlurLimit,
+          (value) => target.materialBlurY = value,
+          () => target.materialBlurY = null,
+          target.materialBlurY != null,
+        ),
+      ],
+      const HyperText('配方仅作用于当前组件；质量与减少透明度沿用统一材质策略。'),
+    ];
+  }
+
   Widget _surfacePanel() {
     final a = _appearance, v = a.surface, m = _surfaceMetrics;
     final theme = _resolveTheme(_dark), s = theme.sizes.resolve(_device);
@@ -23,6 +79,7 @@ extension _SurfaceWorkspace on _ThemeEditorState {
       HyperButton.text(
         onPressed: () => _change(() {
           a.surface = EditorSurfaceFields();
+          a.material = EditorReviewFields();
           a.background = null;
           a.foreground = null;
           a.fillKind = null;
@@ -476,6 +533,7 @@ extension _SurfaceWorkspace on _ThemeEditorState {
         ),
       ],
       _heading('表面'),
+      ..._surfaceMaterialProperties(a.material),
       if (_component == 'card')
         _color(
           '前景颜色',

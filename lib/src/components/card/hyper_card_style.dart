@@ -12,6 +12,7 @@ final class HyperCardStyle {
   HyperCardStyle({
     this.background,
     this.material,
+    this.materialEdge,
     this.foregroundColor,
     this.overlayColor,
     this.border,
@@ -28,6 +29,7 @@ final class HyperCardStyle {
 
   final HyperFill? background;
   final HyperSurfaceMaterial? material;
+  final bool? materialEdge;
   final Color? foregroundColor;
   final Color? overlayColor;
   final BoxBorder? border;
@@ -46,6 +48,7 @@ final class HyperCardStyle {
     return HyperCardStyle(
       background: other.background ?? background,
       material: other.material ?? material,
+      materialEdge: other.materialEdge ?? materialEdge,
       foregroundColor: other.foregroundColor ?? foregroundColor,
       overlayColor: other.overlayColor ?? overlayColor,
       border: other.border ?? border,
@@ -69,6 +72,7 @@ final class HyperCardStyle {
       background: a.background == null || b.background == null
           ? discrete(a.background, b.background)
           : HyperFill.lerp(a.background!, b.background!, t),
+      materialEdge: t < .5 ? a.materialEdge : b.materialEdge,
       material: a.material == null || b.material == null
           ? discrete(a.material, b.material)
           : HyperSurfaceMaterial.lerp(a.material!, b.material!, t),
@@ -98,6 +102,7 @@ final class HyperCardStyle {
       other is HyperCardStyle &&
       other.background == background &&
       other.material == material &&
+      other.materialEdge == materialEdge &&
       other.foregroundColor == foregroundColor &&
       other.overlayColor == overlayColor &&
       other.border == border &&
@@ -115,6 +120,7 @@ final class HyperCardStyle {
   int get hashCode => Object.hash(
     background,
     material,
+    materialEdge,
     foregroundColor,
     overlayColor,
     border,

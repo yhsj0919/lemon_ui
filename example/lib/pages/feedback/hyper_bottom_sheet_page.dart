@@ -153,6 +153,7 @@ class _HyperBottomSheetPageState extends State<HyperBottomSheetPage> {
                     HyperSurfaceMaterialKind.translucent => '半透明',
                     HyperSurfaceMaterialKind.frostedGlass => '毛玻璃',
                     HyperSurfaceMaterialKind.softLightGlass => '柔光玻璃',
+                    HyperSurfaceMaterialKind.clearFrostedGlass => '高透毛玻璃',
                   }),
                   onPressed: () => _open(
                     context,
@@ -174,6 +175,8 @@ class _HyperBottomSheetPageState extends State<HyperBottomSheetPage> {
                               colors.surfaceElevated.withValues(alpha: .75),
                             ),
                           ),
+                        HyperSurfaceMaterialKind.clearFrostedGlass =>
+                          const HyperSurfaceMaterial.clearFrostedGlass(),
                         HyperSurfaceMaterialKind.softLightGlass =>
                           HyperSurfaceMaterial.softLightGlass(
                             background: HyperFill.color(

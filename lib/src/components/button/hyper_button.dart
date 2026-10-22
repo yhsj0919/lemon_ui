@@ -1,3 +1,4 @@
+import '../surface/hyper_material_edge.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:async';
@@ -278,7 +279,7 @@ class _HyperButtonState extends State<HyperButton> {
     final materialTheme = HyperMaterialTheme.of(context);
     final material = materialTheme.resolveMaterial(
       material: style.material,
-      semanticBackground: style.material == null ? style.background : null,
+      semanticBackground: style.background,
     );
     final explicitBackground =
         style.material == null && !(material?.usesBackdrop ?? false)
@@ -656,6 +657,12 @@ class _HyperButtonState extends State<HyperButton> {
             result,
           ],
         ),
+      );
+      result = HyperMaterialEdge(
+        material: material,
+        radius: radius,
+        hasBorderOverride: style.border != null || style.boxBorder != null,
+        child: result,
       );
       if (shadows != null && shadows.isNotEmpty) {
         result = DecoratedBox(

@@ -1,3 +1,4 @@
+import '../../foundation/hyper_surface_material.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,7 @@ const _unchanged = Object();
 final class HyperContainerThemeData {
   HyperContainerThemeData({
     this.background,
+    this.material,
     this.border,
     this.borderRadius,
     this.padding,
@@ -28,6 +30,9 @@ final class HyperContainerThemeData {
 
   /// 容器的 background 配置；null 表示未指定。
   final HyperFill? background;
+
+  /// 实例未指定时使用的独立表面材质。
+  final HyperSurfaceMaterial? material;
 
   /// 容器的 border 配置；null 表示未指定。
   final BoxBorder? border;
@@ -62,6 +67,7 @@ final class HyperContainerThemeData {
   /// 不传参数保留原值；显式传 null 恢复该字段的继承行为。
   HyperContainerThemeData copyWith({
     Object? background = _unchanged,
+    Object? material = _unchanged,
     Object? border = _unchanged,
     Object? borderRadius = _unchanged,
     Object? padding = _unchanged,
@@ -73,6 +79,9 @@ final class HyperContainerThemeData {
     Object? clipBehavior = _unchanged,
     Object? boxShadow = _unchanged,
   }) => HyperContainerThemeData(
+    material: identical(material, _unchanged)
+        ? this.material
+        : material as HyperSurfaceMaterial?,
     background: identical(background, _unchanged)
         ? this.background
         : background as HyperFill?,
@@ -111,6 +120,7 @@ final class HyperContainerThemeData {
     if (other == null) return this;
     return HyperContainerThemeData(
       background: other.background ?? background,
+      material: other.material ?? material,
       border: other.border ?? border,
       borderRadius: other.borderRadius ?? borderRadius,
       padding: other.padding ?? padding,
@@ -141,6 +151,7 @@ final class HyperContainerThemeData {
 
     return HyperContainerThemeData(
       background: blend(a.background, b.background, HyperFill.lerp),
+      material: blend(a.material, b.material, HyperSurfaceMaterial.lerp),
       border: blend(
         a.border,
         b.border,
@@ -195,6 +206,7 @@ final class HyperContainerThemeData {
     return identical(this, other) ||
         other is HyperContainerThemeData &&
             other.background == background &&
+            other.material == material &&
             other.border == border &&
             other.borderRadius == borderRadius &&
             other.padding == padding &&
@@ -210,6 +222,7 @@ final class HyperContainerThemeData {
   @override
   int get hashCode => Object.hash(
     background,
+    material,
     border,
     borderRadius,
     padding,

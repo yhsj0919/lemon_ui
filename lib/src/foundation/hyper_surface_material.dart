@@ -14,6 +14,7 @@ enum HyperSurfaceMaterialKind {
   translucent,
   frostedGlass,
   softLightGlass,
+  clearFrostedGlass,
 }
 
 /// 跨控件复用的表面材质配方。
@@ -28,6 +29,9 @@ final class HyperSurfaceMaterial {
     this.border,
     this.boxShadow = const [],
     this.fallback,
+    this.edgeGradient,
+    this.edgeEnabled,
+    this.outsideShadow = false,
   });
 
   const HyperSurfaceMaterial.solid({
@@ -60,6 +64,8 @@ final class HyperSurfaceMaterial {
     double blurSigmaY = 20,
     Color? tint,
     BorderSide? border,
+    Gradient? edgeGradient = clearGlassEdge,
+    bool? edgeEnabled,
     List<BoxShadow> boxShadow = const [],
     HyperSurfaceMaterial? fallback,
   }) : this._(
@@ -69,6 +75,8 @@ final class HyperSurfaceMaterial {
          blurSigmaY: blurSigmaY,
          tint: tint,
          border: border,
+         edgeGradient: edgeGradient,
+         edgeEnabled: edgeEnabled,
          boxShadow: boxShadow,
          fallback: fallback,
        );
@@ -79,6 +87,8 @@ final class HyperSurfaceMaterial {
     double blurSigmaY = 28,
     Color? tint,
     BorderSide? border,
+    Gradient? edgeGradient = clearGlassEdge,
+    bool? edgeEnabled,
     List<BoxShadow> boxShadow = const [],
     HyperSurfaceMaterial? fallback,
   }) : this._(
@@ -88,9 +98,90 @@ final class HyperSurfaceMaterial {
          blurSigmaY: blurSigmaY,
          tint: tint,
          border: border,
+         edgeGradient: edgeGradient,
+         edgeEnabled: edgeEnabled,
          boxShadow: boxShadow,
          fallback: fallback,
        );
+
+  /// 高透毛玻璃：轻染色、方向高光及外侧阴影；默认质量仍由材质主题管理。
+  const HyperSurfaceMaterial.clearFrostedGlass({
+    HyperFill? background = const HyperFill.gradient(
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0x14FFFFFF), Color(0x05607080)],
+      ),
+    ),
+    double blurSigmaX = 15,
+    double blurSigmaY = 15,
+    Color? tint,
+    BorderSide? border,
+    Gradient? edgeGradient = clearGlassEdge,
+    bool? edgeEnabled,
+    List<BoxShadow> boxShadow = const [
+      BoxShadow(color: Color(0x140F2035), blurRadius: 20, spreadRadius: -2),
+      BoxShadow(color: Color(0x080F2035), blurRadius: 4),
+    ],
+    bool outsideShadow = true,
+    HyperSurfaceMaterial? fallback = const HyperSurfaceMaterial.solid(
+      background: HyperFill.color(Color(0xFFF1F2F4)),
+      border: BorderSide(color: Color(0x220F2035)),
+    ),
+  }) : this._(
+         kind: HyperSurfaceMaterialKind.clearFrostedGlass,
+         background: background,
+         blurSigmaX: blurSigmaX,
+         blurSigmaY: blurSigmaY,
+         tint: tint,
+         border: border,
+         edgeGradient: edgeGradient,
+         edgeEnabled: edgeEnabled,
+         boxShadow: boxShadow,
+         outsideShadow: outsideShadow,
+         fallback: fallback,
+       );
+
+  /// 未指定背景的毛玻璃使用组件语义底色时的默认不透明度。
+  static const double semanticGlassOpacity = .75;
+
+  /// 普通半透明填充的默认不透明度，与毛玻璃配方分开管理。
+  static const double semanticTranslucentOpacity = .75;
+
+  /// 已确认实验配方的单线高光；可通过 copyWith 替换或传 null 关闭。
+  static const Gradient clearGlassEdge = SweepGradient(
+    colors: [
+      Color(0x66D8E3ED),
+      Color(0x88EDF3F8),
+      Color(0x66C8D5E1),
+      Color(0x88E5EBF1),
+      Color(0xF5FFFFFF),
+      Color(0x88E5EBF1),
+      Color(0x66D8E3ED),
+    ],
+    stops: [0, .125, .3, .52, .625, .73, 1],
+  );
+
+  /// 可选的单线高光轮廓；实例显式 border 优先。
+  final Gradient? edgeGradient;
+
+  /// 高光边缘开关；null 使用表面用途默认值（普通控件关闭，浮层开启）。
+  final bool? edgeEnabled;
+
+  /// 已解析材质的高光；显式边框（包括关闭边框）阻止额外轮廓。
+  Gradient? resolveEdgeGradient({
+    bool hasBorderOverride = false,
+    bool defaultEnabled = false,
+  }) =>
+      usesBackdrop &&
+          (edgeEnabled ?? defaultEnabled) &&
+          !hasBorderOverride &&
+          border == null
+      ? edgeGradient
+      : null;
+
+  /// 阴影是否裁去表面内部，避免高透明表面透出阴影底色。
+  final bool outsideShadow;
 
   /// 材质类型。
   final HyperSurfaceMaterialKind kind;
@@ -118,7 +209,8 @@ final class HyperSurfaceMaterial {
 
   bool get usesBackdrop =>
       kind == HyperSurfaceMaterialKind.frostedGlass ||
-      kind == HyperSurfaceMaterialKind.softLightGlass;
+      kind == HyperSurfaceMaterialKind.softLightGlass ||
+      kind == HyperSurfaceMaterialKind.clearFrostedGlass;
 
   /// 按显式质量与透明度策略选择实际材质。
   HyperSurfaceMaterial resolve({
@@ -146,8 +238,18 @@ final class HyperSurfaceMaterial {
     Object? border = _unchanged,
     List<BoxShadow>? boxShadow,
     Object? fallback = _unchanged,
+    Object? edgeGradient = _unchanged,
+    Object? edgeEnabled = _unchanged,
+    bool? outsideShadow,
   }) => HyperSurfaceMaterial._(
     kind: kind ?? this.kind,
+    edgeEnabled: identical(edgeEnabled, _unchanged)
+        ? this.edgeEnabled
+        : edgeEnabled as bool?,
+    edgeGradient: identical(edgeGradient, _unchanged)
+        ? this.edgeGradient
+        : edgeGradient as Gradient?,
+    outsideShadow: outsideShadow ?? this.outsideShadow,
     background: identical(background, _unchanged)
         ? this.background
         : background as HyperFill?,
@@ -178,6 +280,9 @@ final class HyperSurfaceMaterial {
     }
     return HyperSurfaceMaterial._(
       kind: a.kind,
+      edgeEnabled: t < .5 ? a.edgeEnabled : b.edgeEnabled,
+      edgeGradient: Gradient.lerp(a.edgeGradient, b.edgeGradient, t),
+      outsideShadow: t < .5 ? a.outsideShadow : b.outsideShadow,
       background: fill,
       blurSigmaX: a.blurSigmaX + (b.blurSigmaX - a.blurSigmaX) * t,
       blurSigmaY: a.blurSigmaY + (b.blurSigmaY - a.blurSigmaY) * t,
@@ -195,6 +300,9 @@ final class HyperSurfaceMaterial {
       identical(this, other) ||
       other is HyperSurfaceMaterial &&
           other.kind == kind &&
+          other.edgeGradient == edgeGradient &&
+          other.edgeEnabled == edgeEnabled &&
+          other.outsideShadow == outsideShadow &&
           other.background == background &&
           other.blurSigmaX == blurSigmaX &&
           other.blurSigmaY == blurSigmaY &&
@@ -206,6 +314,9 @@ final class HyperSurfaceMaterial {
   @override
   int get hashCode => Object.hash(
     kind,
+    edgeGradient,
+    edgeEnabled,
+    outsideShadow,
     background,
     blurSigmaX,
     blurSigmaY,

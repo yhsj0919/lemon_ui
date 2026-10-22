@@ -1,3 +1,5 @@
+import '../../painting/hyper_box_decoration.dart';
+import 'hyper_material_edge.dart';
 import '../../painting/hyper_surface_border.dart';
 
 import 'dart:ui';
@@ -14,6 +16,7 @@ class HyperMaterialSurface extends StatelessWidget {
   const HyperMaterialSurface({
     super.key,
     this.material,
+    this.materialEdge = false,
     this.semanticBackground,
     this.quality,
     this.reduceTransparency,
@@ -31,6 +34,9 @@ class HyperMaterialSurface extends StatelessWidget {
 
   /// 表面材质配方；null 时使用材质主题或普通表面色。
   final HyperSurfaceMaterial? material;
+
+  /// 此表面用途的高光默认值；配方显式开关优先。
+  final bool materialEdge;
 
   /// 继承全局高级配方时使用的组件语义底色；显式材质颜色优先。
   final HyperFill? semanticBackground;
@@ -76,20 +82,10 @@ class HyperMaterialSurface extends StatelessWidget {
     final hyperTheme = HyperTheme.of(context);
     final sizes = HyperTheme.sizesOf(context);
     final materialTheme = HyperMaterialTheme.of(context);
-    final inherited = material == null || material == materialTheme.material;
-    final requested =
-        !inherited && material!.background == null && semanticBackground != null
-        ? material!.copyWith(
-            background: semanticBackground,
-            fallback: material!.fallback?.copyWith(
-              background: material!.fallback!.background ?? semanticBackground,
-            ),
-          )
-        : material;
     final resolved =
         materialTheme.resolveMaterial(
-          material: requested,
-          semanticBackground: inherited ? semanticBackground : null,
+          material: material,
+          semanticBackground: semanticBackground,
           quality: quality,
           reduceTransparency: reduceTransparency,
         ) ??
@@ -116,86 +112,58 @@ class HyperMaterialSurface extends StatelessWidget {
       radius,
     );
 
-    if (resolved.usesBackdrop) {
-      // 背景滤镜与前景内容必须是兄弟层。若把文字作为 BackdropFilter 的
-      // child 一起提交，部分桌面合成器会在文字边缘产生模糊重影。
-      Widget filteredBackground = DecoratedBox(
-        decoration: backgroundDecoration,
-        child: resolved.tint == null ? null : ColoredBox(color: resolved.tint!),
-      );
-      filteredBackground = BackdropFilter(
-        enabled: resolved.blurSigmaX > 0 || resolved.blurSigmaY > 0,
-        // Opacity/FadeTransition uses an offscreen layer before reaching
-        // 1.0. Replace its filtered backdrop instead of blending it twice.
-        blendMode: BlendMode.src,
-        filter: ImageFilter.blur(
-          sigmaX: resolved.blurSigmaX,
-          sigmaY: resolved.blurSigmaY,
-        ),
-        child: filteredBackground,
-      );
-
-      Widget content = ClipRRect(
-        borderRadius: radius,
-        clipBehavior: clipBehavior == Clip.none ? Clip.antiAlias : clipBehavior,
-        child: Stack(
-          children: [
-            Positioned.fill(child: filteredBackground),
-            Container(
-              width: width,
-              height: height,
-              padding: padding,
-              alignment: alignment,
-              foregroundDecoration: borderDecoration,
-              child: child,
-            ),
-          ],
-        ),
-      );
-      if (effectiveShadows.isNotEmpty) {
-        content = DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            boxShadow: effectiveShadows,
-          ),
-          child: content,
-        );
-      }
-      if (margin != null) content = Padding(padding: margin!, child: content);
-      return content;
-    }
-
-    Widget? surfaceChild = child;
-    if (resolved.tint != null) {
-      surfaceChild = Stack(
-        fit: StackFit.passthrough,
+    final glass = resolved.usesBackdrop;
+    final content = ClipRRect(
+      borderRadius: radius,
+      clipBehavior: glass && clipBehavior == Clip.none
+          ? Clip.antiAlias
+          : clipBehavior,
+      child: Stack(
         children: [
           Positioned.fill(
-            child: IgnorePointer(
+            child: BackdropFilter(
+              enabled:
+                  glass && (resolved.blurSigmaX > 0 || resolved.blurSigmaY > 0),
+              blendMode: BlendMode.src,
+              filter: ImageFilter.blur(
+                sigmaX: glass ? resolved.blurSigmaX : 0,
+                sigmaY: glass ? resolved.blurSigmaY : 0,
+              ),
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: resolved.tint,
-                  borderRadius: radius,
+                decoration: backgroundDecoration,
+                child: ColoredBox(
+                  color: resolved.tint ?? const Color(0x00000000),
                 ),
               ),
             ),
           ),
-          ?child,
+          Container(
+            width: width,
+            height: height,
+            padding: padding,
+            alignment: alignment,
+            foregroundDecoration: borderDecoration,
+            child: child,
+          ),
         ],
-      );
-    }
-    Widget surface = Container(
-      width: width,
-      height: height,
-      padding: padding,
-      alignment: alignment,
-      decoration: backgroundDecoration.copyWith(boxShadow: effectiveShadows),
-      foregroundDecoration: borderDecoration,
-      clipBehavior: Clip.none,
-      child: surfaceChild,
+      ),
     );
-    Widget content = surface;
-    if (margin != null) content = Padding(padding: margin!, child: content);
-    return content;
+    return Padding(
+      padding: margin ?? EdgeInsets.zero,
+      child: DecoratedBox(
+        decoration: HyperBoxDecoration(
+          borderRadius: radius,
+          boxShadow: effectiveShadows,
+          outerShadowsOnly: resolved.outsideShadow,
+        ),
+        child: HyperMaterialEdge(
+          material: resolved,
+          defaultEnabled: materialEdge,
+          radius: radius,
+          hasBorderOverride: border != null,
+          child: content,
+        ),
+      ),
+    );
   }
 }

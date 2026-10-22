@@ -41,37 +41,53 @@ final class HyperMaterialThemeData {
     HyperFill? semanticBackground,
   }) {
     var recipe = material ?? this.material;
-    // An unspecified recipe background inherits the component semantic fill.
-    // HyperFill.none remains an explicit transparent override.
-    if (recipe != null &&
-        recipe.background == null && !recipe.usesBackdrop &&
-        semanticBackground != null) {
-      recipe = recipe.copyWith(background: semanticBackground);
+    // An explicit recipe fill is complete. An unspecified fill still needs the
+    // component semantic hue and glass opacity, just like inherited material.
+    if (material?.background != null && material != this.material) {
+      semanticBackground = null;
     }
-    if (recipe?.usesBackdrop == true && semanticBackground != null) {
-      if (semanticBackground.isNone) return null;
+    // Inherited recipes provide composition, opacity and effects. The surface
+    // still owns its semantic hue for every recipe kind, including solid and
+    // translucent fills. Explicit recipe backgrounds remain complete overrides.
+    if (recipe != null && semanticBackground != null) {
+      final semanticFill = semanticBackground;
+      if (semanticFill.isNone) return null;
       final opacity =
-          recipe!.background?.color?.a ??
+          recipe.background?.color?.a ??
           recipe.background?.gradient?.colors.first.a ??
-          1;
-      HyperFill tinted(double alpha) => semanticBackground.color != null
+          (recipe.kind == HyperSurfaceMaterialKind.solid
+              ? 1
+              : recipe.kind == HyperSurfaceMaterialKind.translucent
+              ? HyperSurfaceMaterial.semanticTranslucentOpacity
+              : HyperSurfaceMaterial.semanticGlassOpacity);
+      HyperFill tinted(double alpha) => semanticFill.color != null
           ? HyperFill.color(
-              semanticBackground.color!.withValues(
-                alpha: semanticBackground.color!.a * alpha,
+              semanticFill.color!.withValues(
+                alpha: semanticFill.color!.a * alpha,
               ),
             )
-          : HyperFill.gradient(semanticBackground.gradient!.scale(alpha));
-      final hue =
-          semanticBackground.color ?? semanticBackground.gradient!.colors.first;
+          : HyperFill.gradient(semanticFill.gradient!.scale(alpha));
+      // Retain a recipe's opacity profile without replacing a colored control
+      // with the global material's neutral white/gray color.
+      final profile = recipe.background?.gradient;
+      final coloredProfile = semanticFill.color != null && profile != null
+          ? _withSemanticColors(profile, semanticFill.color!)
+          : null;
+      final background = coloredProfile == null
+          ? tinted(opacity)
+          : HyperFill.gradient(coloredProfile);
+      final hue = semanticFill.color ?? semanticFill.gradient!.colors.first;
       final fallback =
           recipe.fallback ??
           recipe.resolve(quality: HyperMaterialQuality.standard);
       recipe = recipe.copyWith(
-        background: tinted(opacity),
+        background: background,
         tint: recipe.tint == null
             ? null
             : hue.withValues(alpha: recipe.tint!.a * hue.a),
-        fallback: fallback.copyWith(background: tinted(1), tint: null),
+        fallback: recipe.usesBackdrop
+            ? fallback.copyWith(background: tinted(1), tint: null)
+            : recipe.fallback,
       );
     }
     final resolved = recipe?.resolve(
@@ -224,4 +240,42 @@ class _HyperMaterialThemeScope extends InheritedTheme {
   @override
   Widget wrap(BuildContext context, Widget child) =>
       _HyperMaterialThemeScope(data: data, child: child);
+}
+
+// Preserve standard Flutter gradient geometry while transferring only the
+// material opacity profile onto the component's own semantic color.
+Gradient? _withSemanticColors(Gradient profile, Color hue) {
+  final colors = [
+    for (final color in profile.colors) hue.withValues(alpha: hue.a * color.a),
+  ];
+  return switch (profile) {
+    LinearGradient() => LinearGradient(
+      begin: profile.begin,
+      end: profile.end,
+      colors: colors,
+      stops: profile.stops,
+      tileMode: profile.tileMode,
+      transform: profile.transform,
+    ),
+    RadialGradient() => RadialGradient(
+      center: profile.center,
+      radius: profile.radius,
+      focal: profile.focal,
+      focalRadius: profile.focalRadius,
+      colors: colors,
+      stops: profile.stops,
+      tileMode: profile.tileMode,
+      transform: profile.transform,
+    ),
+    SweepGradient() => SweepGradient(
+      center: profile.center,
+      startAngle: profile.startAngle,
+      endAngle: profile.endAngle,
+      colors: colors,
+      stops: profile.stops,
+      tileMode: profile.tileMode,
+      transform: profile.transform,
+    ),
+    _ => null,
+  };
 }

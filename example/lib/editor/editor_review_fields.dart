@@ -15,6 +15,7 @@ class EditorReviewFields {
   EditorColor? expandIconColor;
   EditorColor? dotBorderColor;
   String? materialKind;
+  bool? materialEdgeEnabled;
   double? materialBlurX, materialBlurY;
   double? surfaceRadius;
   double? borderWidth;
@@ -178,6 +179,7 @@ class EditorReviewFields {
     if (dotBorderWidth != null) 'dotBorderWidth': dotBorderWidth,
     if (dotBorderColor != null) 'dotBorderColor': dotBorderColor!.toJson(),
     if (materialKind != null) 'materialKind': materialKind,
+    if (materialEdgeEnabled != null) 'materialEdgeEnabled': materialEdgeEnabled,
     if (materialBlurX != null) 'materialBlurX': materialBlurX,
     if (materialBlurY != null) 'materialBlurY': materialBlurY,
     if (surfaceRadius != null) 'surfaceRadius': surfaceRadius,
@@ -380,6 +382,7 @@ class EditorReviewFields {
       'dotBorderWidth',
       'dotBorderColor',
       'materialKind',
+      'materialEdgeEnabled',
       'materialBlurX',
       'materialBlurY',
       'surfaceRadius',
@@ -566,6 +569,7 @@ class EditorReviewFields {
           ? null
           : EditorColor.fromJson(j['dotBorderColor'] as Map<String, dynamic>)
       ..materialKind = j['materialKind'] as String?
+      ..materialEdgeEnabled = j['materialEdgeEnabled'] as bool?
       ..materialBlurX = number(j['materialBlurX'], min: 0)
       ..materialBlurY = number(j['materialBlurY'], min: 0)
       ..surfaceRadius = number(j['surfaceRadius'], min: 0)
@@ -3009,20 +3013,20 @@ HyperSurfaceMaterial? resolveEditorReviewMaterial(
 ) {
   if (v.materialKind == null) return null;
   final kind = HyperSurfaceMaterialKind.values.byName(v.materialKind!);
-  final inherited = theme.materialTheme.material;
-  final recipe = inherited?.kind == kind
-      ? inherited!
-      : switch (kind) {
-          HyperSurfaceMaterialKind.solid => const HyperSurfaceMaterial.solid(),
-          HyperSurfaceMaterialKind.translucent =>
-            const HyperSurfaceMaterial.translucent(),
-          HyperSurfaceMaterialKind.frostedGlass =>
-            const HyperSurfaceMaterial.frostedGlass(),
-          HyperSurfaceMaterialKind.softLightGlass =>
-            const HyperSurfaceMaterial.softLightGlass(),
-        };
+  final recipe = switch (kind) {
+    HyperSurfaceMaterialKind.solid => const HyperSurfaceMaterial.solid(),
+    HyperSurfaceMaterialKind.translucent =>
+      const HyperSurfaceMaterial.translucent(),
+    HyperSurfaceMaterialKind.frostedGlass =>
+      const HyperSurfaceMaterial.frostedGlass(),
+    HyperSurfaceMaterialKind.clearFrostedGlass =>
+      const HyperSurfaceMaterial.clearFrostedGlass(),
+    HyperSurfaceMaterialKind.softLightGlass =>
+      const HyperSurfaceMaterial.softLightGlass(),
+  };
   final color = v.background ?? v.backgroundColor ?? v.nodeFill;
   return recipe.copyWith(
+    edgeEnabled: v.materialEdgeEnabled,
     background: color == null
         ? recipe.background
         : HyperFill.color(color.resolve(theme.colors)),

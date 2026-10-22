@@ -1,3 +1,5 @@
+import '../surface/hyper_material_edge.dart';
+
 import 'dart:async';
 import 'dart:ui';
 
@@ -150,7 +152,7 @@ class _HyperIconButtonState extends State<HyperIconButton> {
     final materialTheme = HyperMaterialTheme.of(context);
     final material = materialTheme.resolveMaterial(
       material: style.material,
-      semanticBackground: style.material == null ? style.background : null,
+      semanticBackground: style.background,
     );
     final explicitBackground =
         style.material == null && !(material?.usesBackdrop ?? false)
@@ -336,6 +338,12 @@ class _HyperIconButtonState extends State<HyperIconButton> {
             result,
           ],
         ),
+      );
+      result = HyperMaterialEdge(
+        material: material,
+        radius: radius,
+        hasBorderOverride: style.border != null,
+        child: result,
       );
       if (shadows != null && shadows.isNotEmpty) {
         result = DecoratedBox(

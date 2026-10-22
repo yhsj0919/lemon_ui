@@ -41,6 +41,7 @@ class _HyperMaterialSurfacePageState extends State<HyperMaterialSurfacePage> {
       (
         '毛玻璃',
         const HyperSurfaceMaterial.frostedGlass(
+          edgeEnabled: true,
           background: HyperFill.color(Color(0x70FFFFFF)),
           tint: Color(0x12FFFFFF),
           border: BorderSide(color: Color(0x88FFFFFF)),
@@ -50,6 +51,7 @@ class _HyperMaterialSurfacePageState extends State<HyperMaterialSurfacePage> {
       (
         '柔光玻璃',
         const HyperSurfaceMaterial.softLightGlass(
+          edgeEnabled: true,
           background: HyperFill.gradient(
             LinearGradient(
               begin: Alignment.topLeft,
@@ -101,6 +103,96 @@ class _HyperMaterialSurfacePageState extends State<HyperMaterialSurfacePage> {
                 padding: EdgeInsets.all(24),
                 borderRadius: BorderRadius.all(Radius.circular(16)),
                 child: Text('当前配方：材质、透明度、模糊、染色、边框和阴影'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DemoSection(
+            title: '当前全局配方下的控件语义色',
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                HyperButton.filled(onPressed: () {}, label: const Text('主色按钮')),
+                HyperButton.tonal(onPressed: () {}, label: const Text('浅色按钮')),
+                HyperButton.outlined(
+                  onPressed: () {},
+                  label: const Text('描边按钮'),
+                ),
+                HyperButton.gradient(
+                  onPressed: () {},
+                  label: const Text('渐变按钮'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          DemoSection(
+            title: '毛玻璃高光与边框优先级（实例显式配方）',
+            child: ColoredBox(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: HyperMaterialTheme(
+                  data: HyperMaterialThemeData(
+                    quality: _quality,
+                    reduceTransparency: _reduceTransparency,
+                  ),
+                  child: Wrap(
+                    spacing: 24,
+                    runSpacing: 24,
+                    children: [
+                      for (final recipe in const [
+                        HyperSurfaceMaterial.frostedGlass(
+                          edgeEnabled: true,
+                          background: HyperFill.color(Color(0x26FFFFFF)),
+                        ),
+                        HyperSurfaceMaterial.softLightGlass(
+                          edgeEnabled: true,
+                          background: HyperFill.color(Color(0x26FFFFFF)),
+                        ),
+                        HyperSurfaceMaterial.clearFrostedGlass(
+                          edgeEnabled: true,
+                        ),
+                      ])
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            HyperMaterialSurface(
+                              material: recipe,
+                              padding: const EdgeInsets.all(20),
+                              child: const Text(
+                                '无边框：材质高光',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            HyperMaterialSurface(
+                              material: recipe,
+                              border: Border.all(
+                                color: const Color(0xFF3482FF),
+                              ),
+                              padding: const EdgeInsets.all(20),
+                              child: const Text(
+                                '显式边框：只画一层',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            HyperMaterialSurface(
+                              material: recipe,
+                              border: const Border(),
+                              padding: const EdgeInsets.all(20),
+                              child: const Text(
+                                '空边框：关闭轮廓',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

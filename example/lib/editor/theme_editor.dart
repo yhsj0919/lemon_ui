@@ -2340,6 +2340,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ),
       _heading('背景材质'),
       _select(
+        '高光描边',
+        _mode.materialAppearance.material.materialEdgeEnabled?.toString() ??
+            'inherit',
+        const {'inherit': '按表面用途默认', 'true': '全部开启', 'false': '全部关闭'},
+        (value) => _change(
+          () => _mode.materialAppearance.material.materialEdgeEnabled =
+              value == 'inherit' ? null : value == 'true',
+        ),
+      ),
+
+      _select(
         '配方',
         _mode.material?.name ?? 'inherit',
         {
@@ -2350,6 +2361,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
               HyperSurfaceMaterialKind.translucent => '半透明',
               HyperSurfaceMaterialKind.frostedGlass => '毛玻璃',
               HyperSurfaceMaterialKind.softLightGlass => '柔光玻璃',
+              HyperSurfaceMaterialKind.clearFrostedGlass => '高透毛玻璃',
             },
         },
         (value) => _change(() {
@@ -2365,6 +2377,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
             _mode.materialBorderWidth = null;
             _mode.materialAppearance.background = null;
             _mode.materialAppearance.shadows = null;
+            _mode.materialAppearance.material.materialEdgeEnabled = null;
           }
         }),
       ),
@@ -2372,7 +2385,18 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _number(
           '背景不透明度',
           _mode.opacity ??
-              (_mode.material == HyperSurfaceMaterialKind.solid ? 1 : .75),
+              (_mode.material == HyperSurfaceMaterialKind.solid
+                  ? 1
+                  : _mode.material == HyperSurfaceMaterialKind.clearFrostedGlass
+                  ? const HyperSurfaceMaterial.clearFrostedGlass()
+                        .background!
+                        .gradient!
+                        .colors
+                        .first
+                        .a
+                  : _mode.material == HyperSurfaceMaterialKind.translucent
+                  ? HyperSurfaceMaterial.semanticTranslucentOpacity
+                  : HyperSurfaceMaterial.semanticGlassOpacity),
           0,
           1,
           (value) {
@@ -2388,6 +2412,8 @@ class _ThemeEditorState extends State<ThemeEditor> {
           _mode.blur ??
               (_mode.material == HyperSurfaceMaterialKind.softLightGlass
                   ? 28
+                  : _mode.material == HyperSurfaceMaterialKind.clearFrostedGlass
+                  ? const HyperSurfaceMaterial.clearFrostedGlass().blurSigmaX
                   : 20),
           0,
           80,
@@ -2525,6 +2551,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
       'hyper-typography-scheme' => {'文字缩放', '字体', '语义字阶', '文字语义颜色'},
       'hyper-motion-theme' => {'快速动效', '标准动效', '强调动效', '弹簧动效'},
       'hyper-material-surface' => {'材质质量与降级', '背景材质', '材质阴影'},
+      'hyper-clear-glass' => {'材质质量与降级'},
       _ => null,
     };
     if (sections != null) {

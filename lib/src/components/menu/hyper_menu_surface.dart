@@ -69,6 +69,7 @@ HyperCardStyle resolveHyperMenuSurfaceStyle({
         ];
   return HyperCardStyle(
     material: fallbackMaterial,
+    materialEdge: true,
     padding: padding,
     borderRadius: BorderRadius.circular(radius),
     border: hasMaterial

@@ -51,6 +51,7 @@ class EditorColor {
             ![
               'primary',
               'surface',
+              'material',
               'textPrimary',
               'outline',
             ].contains(semantic)) ||
@@ -76,6 +77,7 @@ class EditorComponent {
   EditorInputFields input = EditorInputFields();
   EditorContentFields content = EditorContentFields();
   EditorSurfaceFields surface = EditorSurfaceFields();
+  EditorReviewFields material = EditorReviewFields();
   EditorBadgeVisual badgeStyle = EditorBadgeVisual();
   EditorDividerVisual dividerStyle = EditorDividerVisual();
   EditorProgressVisual progressStyle = EditorProgressVisual();
@@ -90,6 +92,7 @@ class EditorComponent {
   Map<String, Object?> toJson() => {
     if (input.toJson().isNotEmpty) 'input': input.toJson(),
     if (content.toJson().isNotEmpty) 'content': content.toJson(),
+    if (material.toJson().isNotEmpty) 'material': material.toJson(),
     if (surface.toJson().isNotEmpty) 'surface': surface.toJson(),
     if (dividerStyle.toJson().isNotEmpty) 'dividerStyle': dividerStyle.toJson(),
     if (progressStyle.toJson().isNotEmpty)
@@ -163,6 +166,9 @@ class EditorComponent {
               (dynamic s) => EditorShadow.fromJson(s as Map<String, dynamic>),
             )
             .toList(),
+      )
+      ..material = EditorReviewFields.fromJson(
+        (json['material'] as Map<String, dynamic>?) ?? {},
       )
       ..input = EditorInputFields.fromJson(
         (json['input'] as Map<String, dynamic>?) ?? {},
@@ -1315,7 +1321,18 @@ class EditorThemeDocument {
           .withValues(
             alpha:
                 m.opacity ??
-                (m.material == HyperSurfaceMaterialKind.solid ? 1 : .75),
+                (m.material == HyperSurfaceMaterialKind.solid
+                    ? 1
+                    : m.material == HyperSurfaceMaterialKind.translucent
+                    ? HyperSurfaceMaterial.semanticTranslucentOpacity
+                    : m.material == HyperSurfaceMaterialKind.clearFrostedGlass
+                    ? const HyperSurfaceMaterial.clearFrostedGlass()
+                          .background!
+                          .gradient!
+                          .colors
+                          .first
+                          .a
+                    : HyperSurfaceMaterial.semanticGlassOpacity),
           ),
     );
     final material =
@@ -1332,6 +1349,25 @@ class EditorThemeDocument {
               blurSigmaX: m.blur ?? 20,
               blurSigmaY: m.blurY ?? m.blur ?? 20,
             ),
+          HyperSurfaceMaterialKind.clearFrostedGlass =>
+            HyperSurfaceMaterial.clearFrostedGlass(
+              background:
+                  m.opacity == null && m.materialAppearance.background == null
+                  ? const HyperSurfaceMaterial.clearFrostedGlass().background
+                  : bg,
+              blurSigmaX:
+                  m.blur ??
+                  const HyperSurfaceMaterial.clearFrostedGlass().blurSigmaX,
+              blurSigmaY:
+                  m.blurY ??
+                  m.blur ??
+                  const HyperSurfaceMaterial.clearFrostedGlass().blurSigmaX,
+              boxShadow:
+                  m.materialAppearance.shadows
+                      ?.map((s) => s.resolve(colors))
+                      .toList() ??
+                  const HyperSurfaceMaterial.clearFrostedGlass().boxShadow,
+            ),
           HyperSurfaceMaterialKind.softLightGlass =>
             HyperSurfaceMaterial.softLightGlass(
               background: bg,
@@ -1339,6 +1375,7 @@ class EditorThemeDocument {
               blurSigmaY: m.blurY ?? m.blur ?? 28,
             ),
         })?.copyWith(
+          edgeEnabled: m.materialAppearance.material.materialEdgeEnabled,
           tint: m.materialTint?.resolve(colors),
           border: m.materialBorder == null && m.materialBorderWidth == null
               ? null
@@ -1352,7 +1389,9 @@ class EditorThemeDocument {
               m.materialAppearance.shadows
                   ?.map((s) => s.resolve(colors))
                   .toList() ??
-              const [],
+              (m.material == HyperSurfaceMaterialKind.clearFrostedGlass
+                  ? const HyperSurfaceMaterial.clearFrostedGlass().boxShadow
+                  : const []),
         );
     final behavior = m.behavior;
     theme = theme.copyWith(
@@ -2010,6 +2049,7 @@ class EditorThemeDocument {
         ),
       ),
       containerTheme: theme.containerTheme.copyWith(
+        material: resolveEditorReviewMaterial(m.container.material, theme),
         background: background(m.container),
         border: m.container.border.resolve(colors),
         borderRadius: device(deviceType).containerMetrics.borderRadius,
@@ -2022,6 +2062,7 @@ class EditorThemeDocument {
       widgetGroupTheme: theme.widgetGroupTheme.copyWith(
         style: theme.widgetGroupTheme.style.merge(
           HyperWidgetGroupStyle(
+            material: resolveEditorReviewMaterial(m.group.material, theme),
             backgroundColor: m.group.background?.resolve(colors),
             border: m.group.border.resolve(colors),
             padding: device(deviceType).groupMetrics.insets,
@@ -2046,6 +2087,10 @@ class EditorThemeDocument {
       collapsibleTheme: theme.collapsibleTheme.copyWith(
         style: theme.collapsibleTheme.style.merge(
           HyperCollapsibleStyle(
+            material: resolveEditorReviewMaterial(
+              m.collapsible.material,
+              theme,
+            ),
             background: background(m.collapsible),
             border: m.collapsible.border.resolve(colors),
             headerStyle: TextStyle(
@@ -2132,6 +2177,7 @@ class EditorThemeDocument {
       cardTheme: theme.cardTheme.copyWith(
         style: (theme.cardTheme.style ?? HyperCardStyle()).merge(
           HyperCardStyle(
+            material: resolveEditorReviewMaterial(c.material, theme),
             background: background(c),
             border: c.border.resolve(colors),
             foregroundColor: c.foreground?.resolve(colors),

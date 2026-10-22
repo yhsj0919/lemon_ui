@@ -1,3 +1,4 @@
+import '../surface/hyper_material_edge.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:ui';
@@ -62,9 +63,7 @@ class HyperCard extends StatelessWidget {
     // 组件材质优先于统一材质；未指定时继承全局或子树的材质配方。
     final material = materialTheme.resolveMaterial(
       material: resolved.material,
-      semanticBackground: resolved.material == null
-          ? resolved.background
-          : null,
+      semanticBackground: resolved.background,
     );
     Widget buildVisual(Set<HyperControlState> states) {
       final pressed = states.contains(HyperControlState.pressed);
@@ -103,95 +102,63 @@ class HyperCard extends StatelessWidget {
         border: border,
         borderRadius: radius,
       );
-      Widget surface;
-      if (material?.usesBackdrop ?? false) {
-        // 毛玻璃只过滤背景；内容作为兄弟前景层保持清晰，避免文字重影。
-        final background = BackdropFilter(
-          enabled: material!.blurSigmaX > 0 || material.blurSigmaY > 0,
-          // Opacity/FadeTransition uses an offscreen layer before reaching
-          // 1.0. Replace its filtered backdrop instead of blending it twice.
-          blendMode: BlendMode.src,
-          filter: ImageFilter.blur(
-            sigmaX: material.blurSigmaX,
-            sigmaY: material.blurSigmaY,
-          ),
-          child: DecoratedBox(
-            decoration: HyperBoxDecoration(
-              color: fill.color,
-              gradient: fill.gradient,
-              borderRadius: radius,
-            ),
-            child: material.tint == null
-                ? const SizedBox.expand()
-                : ColoredBox(color: material.tint!),
-          ),
-        );
-        final foreground = AnimatedContainer(
-          width: width,
-          height: height,
-          alignment: alignment,
-          constraints: resolved.constraints,
-          padding: resolved.padding,
-          duration: duration,
-          curve: resolved.animationCurve!,
-          foregroundDecoration: foregroundDecoration,
-          child: content,
-        );
-        final effectiveClip = resolved.clipBehavior == Clip.none
-            ? Clip.antiAlias
-            : resolved.clipBehavior!;
-        surface = ClipRRect(
-          borderRadius: radius,
-          clipBehavior: effectiveClip,
-          child: Stack(
-            fit: StackFit.passthrough,
-            children: [
-              Positioned.fill(child: background),
-              foreground,
-            ],
-          ),
-        );
-        if (shadows case final shadows? when shadows.isNotEmpty) {
-          surface = DecoratedBox(
-            decoration: HyperBoxDecoration(
-              borderRadius: radius,
-              boxShadow: shadows,
-            ),
-            child: surface,
-          );
-        }
-      } else {
-        Widget layeredContent = content;
-        if (material?.tint case final tint?) {
-          layeredContent = Stack(
-            fit: StackFit.passthrough,
-            children: [
-              Positioned.fill(
-                child: IgnorePointer(child: ColoredBox(color: tint)),
-              ),
-              content,
-            ],
-          );
-        }
-        surface = AnimatedContainer(
-          width: width,
-          height: height,
-          alignment: alignment,
-          constraints: resolved.constraints,
-          padding: resolved.padding,
+      final glass = material?.usesBackdrop ?? false;
+      // Keep the content ancestry stable across material, edge and shadow
+      // changes. Stateful descendants must not remount when paint changes.
+      final background = BackdropFilter(
+        enabled: glass && (material!.blurSigmaX > 0 || material.blurSigmaY > 0),
+        blendMode: BlendMode.src,
+        filter: ImageFilter.blur(
+          sigmaX: glass ? material!.blurSigmaX : 0,
+          sigmaY: glass ? material!.blurSigmaY : 0,
+        ),
+        child: AnimatedContainer(
           duration: duration,
           curve: resolved.animationCurve!,
           decoration: HyperBoxDecoration(
             color: fill.color,
             gradient: fill.gradient,
             borderRadius: radius,
-            boxShadow: shadows,
           ),
-          foregroundDecoration: foregroundDecoration,
-          clipBehavior: resolved.clipBehavior!,
-          child: layeredContent,
-        );
-      }
+          child: ColoredBox(color: material?.tint ?? const Color(0x00000000)),
+        ),
+      );
+      final surface = DecoratedBox(
+        decoration: HyperBoxDecoration(
+          borderRadius: radius,
+          boxShadow: shadows,
+          outerShadowsOnly: material?.outsideShadow ?? false,
+        ),
+        child: HyperMaterialEdge(
+          material: material,
+          defaultEnabled: resolved.materialEdge ?? false,
+          radius: radius,
+          hasBorderOverride: resolved.border != null,
+          child: ClipRRect(
+            borderRadius: radius,
+            clipBehavior: glass && resolved.clipBehavior == Clip.none
+                ? Clip.antiAlias
+                : resolved.clipBehavior!,
+            child: Stack(
+              fit: StackFit.passthrough,
+              children: [
+                Positioned.fill(child: background),
+                AnimatedContainer(
+                  width: width,
+                  height: height,
+                  alignment: alignment,
+                  constraints: resolved.constraints,
+                  padding: resolved.padding,
+                  duration: duration,
+                  curve: resolved.animationCurve!,
+                  foregroundDecoration: foregroundDecoration,
+                  child: content,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
       return AnimatedScale(
         scale: pressed ? resolved.pressedScale! : 1,

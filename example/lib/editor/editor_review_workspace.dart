@@ -174,10 +174,22 @@ extension _ReviewWorkspace on _ThemeEditorState {
             'translucent': '半透明',
             'frostedGlass': '磨砂玻璃',
             'softLightGlass': '柔光玻璃',
+            'clearFrostedGlass': '高透毛玻璃',
           },
           (x) => _change(() => target.materialKind = x == 'inherit' ? null : x),
         ),
         if (target.materialKind != null && recipe?.usesBackdrop == true) ...[
+          _select(
+            '高光描边',
+            target.materialEdgeEnabled?.toString() ?? 'inherit',
+            const {'inherit': '按表面用途默认', 'true': '开启', 'false': '关闭'},
+            (value) => _change(
+              () => target.materialEdgeEnabled = value == 'inherit'
+                  ? null
+                  : value == 'true',
+            ),
+          ),
+
           n(
             '材质水平模糊',
             target.materialBlurX,

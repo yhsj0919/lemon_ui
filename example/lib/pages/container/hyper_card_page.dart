@@ -75,6 +75,27 @@ class _HyperCardPageState extends State<HyperCardPage> {
             ),
           ),
           const SizedBox(height: 16),
+          const HyperText('独立材质（实例覆盖）', variant: HyperTextVariant.sectionTitle),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFFFCB98),
+                  Color(0xFF8DDBEB),
+                  Color(0xFFBCA5EA),
+                ],
+              ),
+            ),
+            child: HyperCard(
+              style: HyperCardStyle(
+                material: const HyperSurfaceMaterial.clearFrostedGlass(),
+              ),
+              child: const HyperText('此卡片独立使用高透毛玻璃，无需设置全局配方'),
+            ),
+          ),
+          const SizedBox(height: 16),
           const HyperTitledCard(
             title: Text('标题在外'),
             action: Text('查看全部'),

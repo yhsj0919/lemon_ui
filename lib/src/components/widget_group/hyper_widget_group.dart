@@ -1,4 +1,7 @@
 import '../../painting/hyper_box_decoration.dart';
+import '../../foundation/hyper_fill.dart';
+import '../../foundation/hyper_surface_material.dart';
+import '../surface/hyper_material_surface.dart';
 
 import 'package:flutter/material.dart';
 
@@ -95,73 +98,80 @@ class HyperWidgetGroup extends StatelessWidget {
       duration: duration,
       curve: curve,
       width: resolved.width,
-      // 边框绘制在外框内部，不增加连接项的主题高度；显式内容留白独立生效。
-      padding: (resolved.padding ?? EdgeInsets.zero).add(
-        connected ? EdgeInsets.zero : border?.dimensions ?? EdgeInsets.zero,
-      ),
-      clipBehavior: connected ? Clip.antiAlias : clipBehavior,
-      decoration: HyperBoxDecoration(
-        color:
-            resolved.backgroundColor ??
-            (connected ? theme.colors.surface : null),
-        borderRadius: radius,
-        boxShadow: resolved.boxShadow,
-      ),
-      foregroundDecoration: HyperBoxDecoration(
+      child: HyperMaterialSurface(
+        // 边框绘制在外框内部，不增加连接项的主题高度；显式内容留白独立生效。
+        padding: (resolved.padding ?? EdgeInsets.zero).add(
+          connected ? EdgeInsets.zero : border?.dimensions ?? EdgeInsets.zero,
+        ),
+        material:
+            resolved.material ??
+            HyperSurfaceMaterial.solid(
+              background: HyperFill.color(
+                resolved.backgroundColor ??
+                    (connected
+                        ? theme.colors.surface
+                        : const Color(0x00000000)),
+              ),
+            ),
+        semanticBackground: resolved.backgroundColor == null
+            ? null
+            : HyperFill.color(resolved.backgroundColor!),
         border: border,
         borderRadius: radius,
-      ),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(end: spacing),
-        duration: duration,
-        curve: curve,
-        builder: (context, currentSpacing, _) {
-          final arranged = <Widget>[];
-          for (var index = 0; index < children.length; index++) {
-            if (index > 0) {
-              if (showSeparators) {
-                arranged.add(_gap(currentSpacing / 2));
-                arranged.add(
-                  separatorBuilder?.call(context, index - 1) ??
-                      _defaultSeparator(
-                        resolved.separatorColor ?? theme.colors.outline,
-                        resolved.separatorExtent ??
-                            (connected
-                                ? itemHeight ?? metrics.separatorExtent
-                                : metrics.separatorExtent),
-                        resolved.separatorThickness ??
-                            metrics.separatorThickness,
-                        duration,
-                        curve,
-                      ),
-                );
-                arranged.add(_gap(currentSpacing / 2));
-              } else {
-                arranged.add(_gap(currentSpacing));
+        boxShadow: resolved.boxShadow,
+        clipBehavior: connected ? Clip.antiAlias : clipBehavior,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: spacing),
+          duration: duration,
+          curve: curve,
+          builder: (context, currentSpacing, _) {
+            final arranged = <Widget>[];
+            for (var index = 0; index < children.length; index++) {
+              if (index > 0) {
+                if (showSeparators) {
+                  arranged.add(_gap(currentSpacing / 2));
+                  arranged.add(
+                    separatorBuilder?.call(context, index - 1) ??
+                        _defaultSeparator(
+                          resolved.separatorColor ?? theme.colors.outline,
+                          resolved.separatorExtent ??
+                              (connected
+                                  ? itemHeight ?? metrics.separatorExtent
+                                  : metrics.separatorExtent),
+                          resolved.separatorThickness ??
+                              metrics.separatorThickness,
+                          duration,
+                          curve,
+                        ),
+                  );
+                  arranged.add(_gap(currentSpacing / 2));
+                } else {
+                  arranged.add(_gap(currentSpacing));
+                }
               }
+              arranged.add(
+                _buildItem(
+                  children[index],
+                  itemHeight,
+                  resolved.itemBorderRadius ??
+                      (connected
+                          ? null
+                          : BorderRadius.circular(metrics.innerRadius)),
+                  duration,
+                  curve,
+                  connected,
+                ),
+              );
             }
-            arranged.add(
-              _buildItem(
-                children[index],
-                itemHeight,
-                resolved.itemBorderRadius ??
-                    (connected
-                        ? null
-                        : BorderRadius.circular(metrics.innerRadius)),
-                duration,
-                curve,
-                connected,
-              ),
+            return Flex(
+              direction: direction,
+              mainAxisSize: hasFlexibleItem ? MainAxisSize.max : mainAxisSize,
+              mainAxisAlignment: mainAxisAlignment,
+              crossAxisAlignment: crossAxisAlignment,
+              children: arranged,
             );
-          }
-          return Flex(
-            direction: direction,
-            mainAxisSize: hasFlexibleItem ? MainAxisSize.max : mainAxisSize,
-            mainAxisAlignment: mainAxisAlignment,
-            crossAxisAlignment: crossAxisAlignment,
-            children: arranged,
-          );
-        },
+          },
+        ),
       ),
     );
   }

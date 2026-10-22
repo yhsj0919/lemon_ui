@@ -1,4 +1,5 @@
-import '../../painting/hyper_box_decoration.dart';
+import '../../foundation/hyper_surface_material.dart';
+import '../surface/hyper_material_surface.dart';
 
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class HyperContainer extends StatelessWidget {
     super.key,
     this.child,
     this.background,
+    this.material,
     this.border,
     this.borderRadius,
     this.boxShadow,
@@ -33,6 +35,9 @@ class HyperContainer extends StatelessWidget {
 
   /// 容器背景，支持纯色、渐变和显式无背景。
   final HyperFill? background;
+
+  /// 实例表面配方，未指定时使用容器主题。
+  final HyperSurfaceMaterial? material;
 
   /// 容器边框。
   final BoxBorder? border;
@@ -90,13 +95,6 @@ class HyperContainer extends StatelessWidget {
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     final effectiveDuration = reduceMotion ? Duration.zero : resolvedDuration;
-    final decoration = HyperBoxDecoration(
-      color: resolvedBackground.color,
-      gradient: resolvedBackground.gradient,
-      border: border ?? componentTheme.border,
-      borderRadius: resolvedBorderRadius,
-      boxShadow: boxShadow ?? componentTheme.boxShadow,
-    );
     final resolvedMargin = margin ?? componentTheme.margin;
     final resolvedAlignment = alignment ?? componentTheme.alignment;
     final resolvedConstraints = constraints ?? componentTheme.constraints;
@@ -107,32 +105,31 @@ class HyperContainer extends StatelessWidget {
     final resolvedClip =
         clipBehavior ?? componentTheme.clipBehavior ?? Clip.none;
 
-    if (effectiveDuration == Duration.zero) {
-      return Container(
-        width: width,
-        height: height,
-        constraints: resolvedConstraints,
-        margin: resolvedMargin,
-        padding: resolvedPadding,
-        alignment: resolvedAlignment,
-        decoration: decoration,
-        clipBehavior: resolvedClip,
-        child: child,
-      );
-    }
-
     return AnimatedContainer(
       width: width,
       height: height,
       constraints: resolvedConstraints,
       margin: resolvedMargin,
-      padding: resolvedPadding,
-      alignment: resolvedAlignment,
-      decoration: decoration,
-      clipBehavior: resolvedClip,
       duration: effectiveDuration,
       curve: resolvedCurve,
-      child: child,
+      child: HyperMaterialSurface(
+        material:
+            material ??
+            componentTheme.material ??
+            HyperSurfaceMaterial.solid(background: resolvedBackground),
+        semanticBackground: resolvedBackground.isNone
+            ? null
+            : resolvedBackground,
+        borderRadius: resolvedBorderRadius,
+        border: border ?? componentTheme.border,
+        boxShadow: boxShadow ?? componentTheme.boxShadow,
+        padding: resolvedPadding.add(
+          (border ?? componentTheme.border)?.dimensions ?? EdgeInsets.zero,
+        ),
+        alignment: resolvedAlignment,
+        clipBehavior: resolvedClip,
+        child: child,
+      ),
     );
   }
 }

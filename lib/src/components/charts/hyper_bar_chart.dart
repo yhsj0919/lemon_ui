@@ -1,3 +1,6 @@
+import 'hyper_chart_legend_binding.dart';
+import 'hyper_chart_legend_controller.dart';
+import 'hyper_chart_axis_layout.dart';
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
 
@@ -96,6 +99,9 @@ class HyperBarChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = false,
     this.interactive = true,
     this.selectionEnabled = false,
@@ -125,6 +131,9 @@ class HyperBarChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = false,
     this.interactive = true,
     this.selectionEnabled = false,
@@ -156,6 +165,9 @@ class HyperBarChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = false,
     this.interactive = true,
     this.selectionEnabled = false,
@@ -187,6 +199,9 @@ class HyperBarChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = false,
     this.interactive = true,
     this.selectionEnabled = false,
@@ -207,6 +222,10 @@ class HyperBarChart extends StatefulWidget {
     HyperChartAxis xAxis = const HyperChartAxis(),
     HyperChartAxis yAxis = const HyperChartAxis(),
     bool showValues = false,
+    bool showLegend = true,
+    HyperChartLegendController? legendController,
+    List<String>? legendIds,
+    ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged,
     HyperPointerTooltipStyle? tooltipStyle,
     HyperBarChartTooltipBuilder? tooltipWidgetBuilder,
     HyperBarChartTapCallback? onBarTap,
@@ -222,6 +241,10 @@ class HyperBarChart extends StatefulWidget {
       xAxis: xAxis,
       yAxis: yAxis,
       showValues: showValues,
+      showLegend: showLegend,
+      legendController: legendController,
+      legendIds: legendIds,
+      onLegendChanged: onLegendChanged,
       tooltipStyle: tooltipStyle,
       tooltipWidgetBuilder: tooltipWidgetBuilder,
       onBarTap: onBarTap,
@@ -242,6 +265,9 @@ class HyperBarChart extends StatefulWidget {
   final HyperPointerTooltipStyle? tooltipStyle;
   final HyperBarChartTooltipBuilder? tooltipWidgetBuilder;
   final bool showLegend;
+  final HyperChartLegendController? legendController;
+  final List<String>? legendIds;
+  final ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged;
   final bool showValues;
   final bool interactive;
   final bool selectionEnabled;
@@ -261,13 +287,22 @@ class HyperBarChart extends StatefulWidget {
   State<HyperBarChart> createState() => _HyperBarChartState();
 }
 
-class _HyperBarChartState extends State<HyperBarChart> {
+class _HyperBarChartState extends State<HyperBarChart>
+    with HyperChartLegendBinding<HyperBarChart> {
   final GlobalKey _chartAreaKey = GlobalKey();
   HyperChartSelection? _hovered;
   Offset? _tooltipPosition;
   String? _tooltipMessage;
   Set<HyperChartSelection> _internalSelected = <HyperChartSelection>{};
-  final Set<int> _hiddenSeries = <int>{};
+  Set<int> get _hiddenSeries => legendHiddenIndices;
+  @override
+  HyperChartLegendController? get externalLegendController =>
+      widget.legendController;
+  @override
+  List<String>? get explicitLegendIds => widget.legendIds;
+  @override
+  ValueChanged<List<HyperChartLegendEntry>>? get legendChanged =>
+      widget.onLegendChanged;
 
   bool get _selectionIsControlled => widget.onSelectionChanged != null;
   Set<HyperChartSelection> get _selected => widget.selectionEnabled
@@ -296,12 +331,55 @@ class _HyperBarChartState extends State<HyperBarChart> {
     }
   }
 
+  Widget _defaultTooltip(List<Color> palette) {
+    final hit = _hit(_hovered!);
+    final indices = _stacked
+        ? [
+            for (var i = 0; i < hit.group.values.length; i++)
+              if (!_hiddenSeries.contains(i)) i,
+          ]
+        : [hit.selection.seriesIndex];
+    return HyperChartTooltipContent(
+      title: hit.group.label,
+      rows: [
+        for (final index in indices)
+          HyperChartTooltipRow(
+            label: index < widget.series.length
+                ? widget.series[index].name
+                : '数值',
+            value:
+                _valueAxis.formatter?.call(
+                  hit.group.values[index].value ?? 0,
+                ) ??
+                hyperChartNumber(hit.group.values[index].value ?? 0),
+            color: index < widget.series.length
+                ? widget.series[index].color ?? palette[index % palette.length]
+                : palette[index % palette.length],
+          ),
+      ],
+    );
+  }
+
+  @override
+  void legendVisibilityChanged() {
+    _hovered = null;
+    _tooltipPosition = null;
+    _tooltipMessage = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final chartTheme = HyperChartTokens(context, widget.style);
     final theme = HyperTheme.of(context);
     final colors = theme.colors;
     final palette = hyperChartPalette(chartTheme, colors, widget.palette);
+    syncChartLegend([
+      for (var index = 0; index < widget.series.length; index++)
+        (
+          label: widget.series[index].name,
+          color: widget.series[index].color ?? palette[index % palette.length],
+        ),
+    ]);
     return HyperChartTheme(
       data: HyperChartThemeData(style: widget.style ?? const HyperChartStyle()),
       child: HyperChartKeyboardRegion(
@@ -380,12 +458,12 @@ class _HyperBarChartState extends State<HyperBarChart> {
                                   widget.tooltipStyle,
                                 ) ??
                                 widget.tooltipStyle,
-                            builder: widget.tooltipWidgetBuilder == null
-                                ? null
-                                : (context, _) => widget.tooltipWidgetBuilder!(
-                                    context,
-                                    _hit(_hovered!),
-                                  ),
+                            builder: (context, _) =>
+                                widget.tooltipWidgetBuilder?.call(
+                                  context,
+                                  _hit(_hovered!),
+                                ) ??
+                                _defaultTooltip(palette),
                             onExit: _clearPointerHover,
                             child: chart,
                           ),
@@ -409,9 +487,7 @@ class _HyperBarChartState extends State<HyperBarChart> {
     ],
     hidden: _hiddenSeries,
     onToggle: (index) => setState(() {
-      _hiddenSeries.contains(index)
-          ? _hiddenSeries.remove(index)
-          : _hiddenSeries.add(index);
+      toggleLegendIndex(index);
     }),
   );
 
@@ -492,16 +568,10 @@ class _HyperBarChartState extends State<HyperBarChart> {
               .toList();
     final minValue = values.isEmpty ? 0.0 : values.reduce(math.min);
     final maxValue = values.isEmpty ? 1.0 : values.reduce(math.max);
-    final minY = _valueAxis.min ?? math.min(0, minValue * 1.12);
-    final maxY =
-        _valueAxis.max ??
-        hyperChartNiceMaximum(
-          minY,
-          math.max(0.0, maxValue),
-          interval: _valueAxis.interval,
-        );
-    final valueInterval =
-        _valueAxis.interval ?? hyperChartNiceInterval(minY, maxY);
+    final scale = hyperChartNumericScale(minValue, maxValue, _valueAxis);
+    final minY = scale.min;
+    final maxY = scale.max;
+    final valueInterval = scale.interval;
     final axisStyle = (theme.textTheme.labelSmall ?? const TextStyle())
         .copyWith(
           fontSize: chart.labelFontSize,
@@ -602,38 +672,43 @@ class _HyperBarChartState extends State<HyperBarChart> {
     final positiveLabelSpace = maxValue > 0 ? boundaryLabelSpace : 0.0;
     final negativeLabelSpace = minValue < 0 ? boundaryLabelSpace : 0.0;
 
+    final grid = FlGridData(
+      show: widget.showGrid,
+      drawVerticalLine: false,
+      horizontalInterval: valueInterval,
+      getDrawingHorizontalLine: (_) => FlLine(
+        color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
+        strokeWidth: 1,
+      ),
+    );
     return BarChartData(
       barGroups: groups,
       groupsSpace: chart.groupSpacing,
       minY: minY,
       maxY: maxY,
       alignment: BarChartAlignment.spaceAround,
-      borderData: FlBorderData(show: false),
-      gridData: FlGridData(
-        show: widget.showGrid,
-        drawVerticalLine: false,
-        horizontalInterval: valueInterval,
-        getDrawingHorizontalLine: (_) => FlLine(
-          color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
-          strokeWidth: 1,
+      borderData: hyperChartGridBoundary(grid, minY: minY, maxY: maxY),
+      gridData: grid,
+      titlesData: hyperChartBalancedTitles(
+        FlTitlesData(
+          // With a quarter-turn, the logical top side becomes the physical
+          // right edge. Reserve this side for positive labels in both layouts.
+          topTitles: _reservedTitles(positiveLabelSpace),
+          rightTitles: _horizontal
+              ? _leftTitles(axisStyle, chart, minY, maxY, valueInterval, 0)
+              : const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: _bottomTitles(
+            axisStyle,
+            chart,
+            categoryLabelStride,
+            negativeLabelSpace,
+          ),
+          leftTitles: _horizontal
+              ? const AxisTitles(sideTitles: SideTitles(showTitles: false))
+              : _leftTitles(axisStyle, chart, minY, maxY, valueInterval, 0),
         ),
-      ),
-      titlesData: FlTitlesData(
-        // With a quarter-turn, the logical top side becomes the physical
-        // right edge. Reserve this side for positive labels in both layouts.
-        topTitles: _reservedTitles(positiveLabelSpace),
-        rightTitles: _horizontal
-            ? _leftTitles(axisStyle, chart, minY, maxY, valueInterval, 0)
-            : const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        bottomTitles: _bottomTitles(
-          axisStyle,
-          chart,
-          categoryLabelStride,
-          negativeLabelSpace,
-        ),
-        leftTitles: _horizontal
-            ? const AxisTitles(sideTitles: SideTitles(showTitles: false))
-            : _leftTitles(axisStyle, chart, minY, maxY, valueInterval, 0),
+        quarterTurn: _horizontal,
+        verticalLabelHeight: hyperChartAxisLabelHeight(context, axisStyle),
       ),
       extraLinesData: ExtraLinesData(
         horizontalLines: <HorizontalLine>[
@@ -842,13 +917,21 @@ class _HyperBarChartState extends State<HyperBarChart> {
         }
         return SideTitleWidget(
           meta: meta,
-          space: 6,
-          child: Text(
-            widget.groups[index].label,
-            style: style,
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
+          space: hyperChartAxisLabelGap,
+          child: hyperChartCornerLabel(
+            meta,
+            hyperChartAxisLabelWidth(
+              context,
+              widget.groups[index].label,
+              style,
+            ),
+            Text(
+              widget.groups[index].label,
+              style: style,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         );
       },
@@ -890,13 +973,21 @@ class _HyperBarChartState extends State<HyperBarChart> {
       interval: valueInterval,
       getTitlesWidget: (value, meta) => SideTitleWidget(
         meta: meta,
-        space: 6,
-        child: Text(
-          _valueAxis.formatter?.call(value) ?? hyperChartNumber(value),
-          style: style,
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.ellipsis,
+        space: hyperChartAxisLabelGap,
+        child: hyperChartCornerLabel(
+          meta,
+          hyperChartAxisLabelWidth(
+            context,
+            _valueAxis.formatter?.call(value) ?? hyperChartNumber(value),
+            style,
+          ),
+          Text(
+            _valueAxis.formatter?.call(value) ?? hyperChartNumber(value),
+            style: style,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     ),

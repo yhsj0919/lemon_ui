@@ -1,3 +1,6 @@
+import 'hyper_chart_legend_binding.dart';
+import 'hyper_chart_legend_controller.dart';
+import 'hyper_chart_axis_layout.dart';
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
 
@@ -5,9 +8,13 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+
+import 'hyper_chart_viewport.dart';
 
 import 'hyper_chart_pointer_tooltip.dart';
 import 'hyper_chart_common.dart';
+part 'hyper_line_dataset.dart';
 
 enum _HyperLineChartVariant { line, area, step }
 
@@ -88,6 +95,9 @@ class HyperLineChart extends StatefulWidget {
     super.key,
     this.style,
     required this.series,
+    this.preparedData,
+    this.viewportController,
+    this.panEnabled = false,
     this.xAxis = const HyperChartAxis(),
     this.yAxis = const HyperChartAxis(),
     this.referenceLines = const <HyperChartReferenceLine>[],
@@ -99,6 +109,9 @@ class HyperLineChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.interactive = true,
     this.selectionEnabled = false,
     this.keyboardNavigation = true,
@@ -117,6 +130,9 @@ class HyperLineChart extends StatefulWidget {
     super.key,
     this.style,
     required this.series,
+    this.preparedData,
+    this.viewportController,
+    this.panEnabled = false,
     this.xAxis = const HyperChartAxis(),
     this.yAxis = const HyperChartAxis(),
     this.referenceLines = const <HyperChartReferenceLine>[],
@@ -128,6 +144,9 @@ class HyperLineChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.interactive = true,
     this.selectionEnabled = false,
     this.keyboardNavigation = true,
@@ -146,6 +165,9 @@ class HyperLineChart extends StatefulWidget {
     super.key,
     this.style,
     required this.series,
+    this.preparedData,
+    this.viewportController,
+    this.panEnabled = false,
     this.xAxis = const HyperChartAxis(),
     this.yAxis = const HyperChartAxis(),
     this.referenceLines = const <HyperChartReferenceLine>[],
@@ -157,6 +179,9 @@ class HyperLineChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.interactive = true,
     this.selectionEnabled = false,
     this.keyboardNavigation = true,
@@ -172,6 +197,9 @@ class HyperLineChart extends StatefulWidget {
   }) : _variant = _HyperLineChartVariant.step;
 
   final List<HyperLineSeries> series;
+  final HyperLineChartDataset? preparedData;
+  final HyperChartViewportController? viewportController;
+  final bool panEnabled;
   final HyperChartAxis xAxis;
   final HyperChartAxis yAxis;
   final List<HyperChartReferenceLine> referenceLines;
@@ -183,6 +211,9 @@ class HyperLineChart extends StatefulWidget {
   final HyperPointerTooltipStyle? tooltipStyle;
   final HyperLineChartTooltipBuilder? tooltipWidgetBuilder;
   final bool showLegend;
+  final HyperChartLegendController? legendController;
+  final List<String>? legendIds;
+  final ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged;
   final bool interactive;
   final bool selectionEnabled;
   final bool keyboardNavigation;
@@ -202,8 +233,17 @@ class HyperLineChart extends StatefulWidget {
   State<HyperLineChart> createState() => _HyperLineChartState();
 }
 
-class _HyperLineChartState extends State<HyperLineChart> {
-  final Set<int> _hiddenSeries = <int>{};
+class _HyperLineChartState extends State<HyperLineChart>
+    with HyperChartLegendBinding<HyperLineChart> {
+  Set<int> get _hiddenSeries => legendHiddenIndices;
+  @override
+  HyperChartLegendController? get externalLegendController =>
+      widget.legendController;
+  @override
+  List<String>? get explicitLegendIds => widget.legendIds;
+  @override
+  ValueChanged<List<HyperChartLegendEntry>>? get legendChanged =>
+      widget.onLegendChanged;
   Set<HyperChartSelection> _internalSelected = <HyperChartSelection>{};
   HyperChartSelection? _hovered;
   Offset? _tooltipPosition;
@@ -211,7 +251,42 @@ class _HyperLineChartState extends State<HyperLineChart> {
   HyperLineChartTooltipData? _tooltipData;
 
   _HyperLineIndex? _index;
-  _HyperLineIndex get _source => _index ??= _HyperLineIndex(widget.series);
+  _HyperLineIndex get _source =>
+      _index ??= identical(widget.preparedData?.series, widget.series)
+      ? widget.preparedData!._index
+      : _HyperLineIndex(widget.series);
+  HyperChartRange get _range {
+    final min = widget.xAxis.min ?? _source.minX;
+    final rawMax = widget.xAxis.max ?? _source.maxX;
+    final max = rawMax > min ? rawMax : min + 1;
+    final requested = widget.viewportController?.range;
+    if (requested == null) return HyperChartRange(min, max);
+    final span = math.min(requested.span, max - min);
+    final start = requested.min.clamp(min, max - span);
+    return HyperChartRange(start, start + span);
+  }
+
+  void _viewportChanged() {
+    if (!mounted) return;
+    setState(() {
+      _sampleCache.clear();
+      _clearHoverState();
+    });
+  }
+
+  void _clearHoverState() {
+    _hovered = null;
+    _tooltipPosition = null;
+    _tooltipMessage = null;
+    _tooltipData = null;
+  }
+
+  @override
+  void dispose() {
+    widget.viewportController?.removeListener(_viewportChanged);
+    super.dispose();
+  }
+
   final Map<HyperLineSeries, List<HyperLinePoint>> _sampleCache = {};
   bool get _controlled => widget.onSelectionChanged != null;
   Set<HyperChartSelection> get _selected => widget.selectionEnabled
@@ -221,22 +296,40 @@ class _HyperLineChartState extends State<HyperLineChart> {
   @override
   void initState() {
     super.initState();
+    widget.viewportController?.addListener(_viewportChanged);
     _internalSelected = Set<HyperChartSelection>.of(widget.selected);
   }
 
   @override
   void didUpdateWidget(covariant HyperLineChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _index = null;
-    _sampleCache.clear();
-    _hiddenSeries.removeWhere((index) => index >= widget.series.length);
-    _hovered = null;
-    _tooltipPosition = null;
-    _tooltipMessage = null;
-    _tooltipData = null;
+    if (oldWidget.viewportController != widget.viewportController) {
+      oldWidget.viewportController?.removeListener(_viewportChanged);
+      widget.viewportController?.addListener(_viewportChanged);
+    }
+    final changed =
+        !identical(oldWidget.series, widget.series) ||
+        oldWidget.preparedData != widget.preparedData;
+    if (changed) {
+      _index = null;
+    }
+    if (changed ||
+        oldWidget.maxRenderedPoints != widget.maxRenderedPoints ||
+        oldWidget.nullPolicy != widget.nullPolicy ||
+        oldWidget.samplingStrategy != widget.samplingStrategy ||
+        oldWidget.xAxis != widget.xAxis ||
+        oldWidget.viewportController != widget.viewportController) {
+      _sampleCache.clear();
+      _clearHoverState();
+    }
     if (!_controlled && oldWidget.selected != widget.selected) {
       _internalSelected = Set<HyperChartSelection>.of(widget.selected);
     }
+  }
+
+  @override
+  void legendVisibilityChanged() {
+    _clearHoverState();
   }
 
   @override
@@ -244,6 +337,13 @@ class _HyperLineChartState extends State<HyperLineChart> {
     final chart = HyperChartTokens(context, widget.style);
     final theme = HyperTheme.of(context);
     final palette = hyperChartPalette(chart, theme.colors, widget.palette);
+    syncChartLegend([
+      for (var index = 0; index < widget.series.length; index++)
+        (
+          label: widget.series[index].name,
+          color: widget.series[index].color ?? palette[index % palette.length],
+        ),
+    ]);
     final empty = _source.valid.isEmpty;
     return HyperChartTheme(
       data: HyperChartThemeData(style: widget.style ?? const HyperChartStyle()),
@@ -282,9 +382,7 @@ class _HyperLineChartState extends State<HyperLineChart> {
                         ],
                         hidden: _hiddenSeries,
                         onToggle: (index) => setState(() {
-                          _hiddenSeries.contains(index)
-                              ? _hiddenSeries.remove(index)
-                              : _hiddenSeries.add(index);
+                          toggleLegendIndex(index);
                         }),
                       ),
                       SizedBox(height: chart.legendSpacing),
@@ -295,8 +393,8 @@ class _HyperLineChartState extends State<HyperLineChart> {
                           final labelSize = widget.xAxis.show
                               ? _xLabelSize(
                                   widget.xAxis,
-                                  widget.xAxis.min ?? _source.minX,
-                                  widget.xAxis.max ?? _source.maxX,
+                                  _range.min,
+                                  _range.max,
                                   hyperChartAxisStyle(theme, chart),
                                 )
                               : Size.zero;
@@ -316,36 +414,68 @@ class _HyperLineChartState extends State<HyperLineChart> {
                             palette,
                             constraints.maxWidth - inset * 2,
                           );
+                          final leftAxis = data.titlesData.leftTitles;
+                          final plotWidth = math.max(
+                            1.0,
+                            constraints.maxWidth -
+                                inset * 2 -
+                                hyperChartAxisExtent(leftAxis) -
+                                hyperChartAxisExtent(
+                                  data.titlesData.rightTitles,
+                                ),
+                          );
                           return Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: inset.toDouble(),
                             ),
-                            child: HyperPointerTooltipArea(
-                              position: _tooltipPosition,
-                              message: _tooltipMessage,
-                              style:
-                                  widget.style?.tooltipStyle?.merge(
+                            child: GestureDetector(
+                              onHorizontalDragUpdate:
+                                  widget.panEnabled &&
+                                      widget.viewportController != null
+                                  ? (details) => widget.viewportController!.pan(
+                                      -details.delta.dx /
+                                          plotWidth *
+                                          _range.span,
+                                    )
+                                  : null,
+                              child: HyperPointerTooltipArea(
+                                position: _tooltipPosition,
+                                message: _tooltipMessage,
+                                style:
+                                    widget.style?.tooltipStyle?.merge(
+                                      widget.tooltipStyle,
+                                    ) ??
                                     widget.tooltipStyle,
-                                  ) ??
-                                  widget.tooltipStyle,
-                              builder:
-                                  widget.tooltipWidgetBuilder == null ||
-                                      _tooltipData == null
-                                  ? null
-                                  : (context, _) =>
-                                        widget.tooltipWidgetBuilder!(
-                                          context,
-                                          _tooltipData!,
-                                        ),
-                              onExit: _clearPointerHover,
-                              child: LineChart(
-                                widget.dataBuilder?.call(data) ?? data,
-                                duration:
-                                    MediaQuery.maybeOf(context)
-                                            ?.disableAnimations ==
-                                        true
-                                    ? Duration.zero
-                                    : chart.animationDuration,
+                                builder: _tooltipData == null
+                                    ? null
+                                    : (context, _) =>
+                                          widget.tooltipWidgetBuilder?.call(
+                                            context,
+                                            _tooltipData!,
+                                          ) ??
+                                          HyperChartTooltipContent(
+                                            title: _tooltipData!.xLabel,
+                                            rows: [
+                                              for (final item
+                                                  in _tooltipData!.items)
+                                                HyperChartTooltipRow(
+                                                  label: item.hit.series.name,
+                                                  value: item.formattedValue,
+                                                  color: item.color,
+                                                ),
+                                            ],
+                                          ),
+                                onExit: _clearPointerHover,
+                                child: LineChart(
+                                  widget.dataBuilder?.call(data) ?? data,
+                                  duration:
+                                      widget.viewportController != null ||
+                                          MediaQuery.maybeOf(context)
+                                                  ?.disableAnimations ==
+                                              true
+                                      ? Duration.zero
+                                      : chart.animationDuration,
+                                ),
                               ),
                             ),
                           );
@@ -365,19 +495,13 @@ class _HyperLineChartState extends State<HyperLineChart> {
     List<Color> palette,
     double availableWidth,
   ) {
-    final minX = widget.xAxis.min ?? _source.minX;
-    final maxX = widget.xAxis.max ?? _source.maxX;
+    final minX = _range.min;
+    final maxX = _range.max;
     final rawMinY = _source.minY;
     final rawMaxY = _source.maxY;
-    final minY = widget.yAxis.min ?? math.min(0, rawMinY * 1.08);
-    final automaticMinY = math.min(0.0, rawMinY);
-    final maxY =
-        widget.yAxis.max ??
-        hyperChartNiceMaximum(
-          widget.yAxis.min ?? automaticMinY,
-          math.max(0.0, rawMaxY),
-          interval: widget.yAxis.interval,
-        );
+    final scale = hyperChartNumericScale(rawMinY, rawMaxY, widget.yAxis);
+    final minY = scale.min;
+    final maxY = scale.max;
     final axisStyle = hyperChartAxisStyle(theme, chart);
     final xLabelExtent = math.max(
       0.0,
@@ -397,43 +521,52 @@ class _HyperLineChartState extends State<HyperLineChart> {
           16,
     );
 
+    final grid = FlGridData(
+      show: widget.showGrid,
+      drawVerticalLine: false,
+      horizontalInterval: scale.interval,
+      getDrawingHorizontalLine: (_) => FlLine(
+        color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
+        strokeWidth: 1,
+      ),
+    );
     return LineChartData(
       minX: minX,
       maxX: maxX == minX ? minX + 1 : maxX,
       minY: minY,
       maxY: maxY == minY ? minY + 1 : maxY,
-      borderData: FlBorderData(show: false),
-      gridData: FlGridData(
-        show: widget.showGrid,
-        drawVerticalLine: false,
-        horizontalInterval: widget.yAxis.interval,
-        getDrawingHorizontalLine: (_) => FlLine(
-          color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
-          strokeWidth: 1,
+      clipData: widget.viewportController == null
+          ? const FlClipData.none()
+          : const FlClipData.all(),
+      borderData: hyperChartGridBoundary(grid, minY: minY, maxY: maxY),
+      gridData: grid,
+      titlesData: hyperChartBalancedTitles(
+        FlTitlesData(
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: _axisTitles(
+            widget.xAxis,
+            axisStyle,
+            false,
+            chart,
+            minX,
+            maxX,
+            availableExtent: xLabelExtent,
+          ),
+          leftTitles: _axisTitles(
+            widget.yAxis,
+            axisStyle,
+            true,
+            chart,
+            minY,
+            maxY,
+          ),
         ),
-      ),
-      titlesData: FlTitlesData(
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        bottomTitles: _axisTitles(
-          widget.xAxis,
-          axisStyle,
-          false,
-          chart,
-          minX,
-          maxX,
-          availableExtent: xLabelExtent,
-        ),
-        leftTitles: _axisTitles(
-          widget.yAxis,
-          axisStyle,
-          true,
-          chart,
-          minY,
-          maxY,
-        ),
+        verticalLabelHeight: hyperChartAxisLabelHeight(context, axisStyle),
       ),
       extraLinesData: ExtraLinesData(
         horizontalLines: <HorizontalLine>[
@@ -561,7 +694,7 @@ class _HyperLineChartState extends State<HyperLineChart> {
     axisNameSize: !axis.show || axis.title == null ? 0 : 20,
     sideTitles: SideTitles(
       showTitles: axis.show,
-      minIncluded: vertical ? axis.min != null : true,
+      minIncluded: true,
       maxIncluded: vertical || !axis.autoLabelInterval,
       reservedSize:
           axis.reservedSize ??
@@ -575,7 +708,11 @@ class _HyperLineChartState extends State<HyperLineChart> {
       interval:
           axis.interval ??
           (vertical
-              ? null
+              ? hyperChartNumericScale(
+                  _source.minY,
+                  _source.maxY,
+                  axis,
+                ).interval
               : _automaticXInterval(axis, min, max, availableExtent, style)),
       getTitlesWidget: (value, meta) {
         final pointLabel = vertical ? null : _pointLabel(value);
@@ -594,34 +731,37 @@ class _HyperLineChartState extends State<HyperLineChart> {
         final projected = _projectLabel(textSize, angle);
         return SideTitleWidget(
           meta: meta,
-          space: 6,
-          fitInside: vertical
-              ? SideTitleFitInsideData.fromTitleMeta(meta)
-              : SideTitleFitInsideData.disable(),
-          child: SizedBox(
-            width: vertical
+          space: hyperChartAxisLabelGap,
+          child: hyperChartCornerLabel(
+            meta,
+            vertical
                 ? projected.width
                 : _xLabelSize(axis, min, max, style).width,
-            height: vertical
-                ? projected.height
-                : _xLabelSize(axis, min, max, style).height,
-            child: OverflowBox(
-              minWidth: textSize.width,
-              maxWidth: textSize.width,
-              minHeight: textSize.height,
-              maxHeight: textSize.height,
-              child: Transform.rotate(
-                angle: angle,
-                child: RichText(
-                  text: TextSpan(
-                    text: label,
-                    style: DefaultTextStyle.of(context).style.merge(style),
+            SizedBox(
+              width: vertical
+                  ? projected.width
+                  : _xLabelSize(axis, min, max, style).width,
+              height: vertical
+                  ? projected.height
+                  : _xLabelSize(axis, min, max, style).height,
+              child: OverflowBox(
+                minWidth: textSize.width,
+                maxWidth: textSize.width,
+                minHeight: textSize.height,
+                maxHeight: textSize.height,
+                child: Transform.rotate(
+                  angle: angle,
+                  child: RichText(
+                    text: TextSpan(
+                      text: label,
+                      style: DefaultTextStyle.of(context).style.merge(style),
+                    ),
+                    textScaler: MediaQuery.textScalerOf(context),
+                    textDirection: Directionality.of(context),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
                   ),
-                  textScaler: MediaQuery.textScalerOf(context),
-                  textDirection: Directionality.of(context),
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.visible,
                 ),
               ),
             ),
@@ -645,10 +785,12 @@ class _HyperLineChartState extends State<HyperLineChart> {
     final step = _xPointInterval();
     if (step == null || step <= 0) return null;
     final width = _xLabelSize(axis, min, max, style).width;
-    // 端点标签向内收缩时也要留出文字宽度，避免相邻标签再次相撞。
+    // At an endpoint the label can move inward by half its width. Keep a
+    // full label width plus that half-width between neighboring tick centers.
     final slots = math.max(
       1.0,
-      ((extent ?? 1) - width) / math.max(1.0, width + axis.minLabelSpacing),
+      ((extent ?? 1) - width) /
+          math.max(1.0, width * 1.5 + axis.minLabelSpacing),
     );
     return step * math.max(1, ((max - min) / step / slots).ceil());
   }
@@ -701,7 +843,14 @@ class _HyperLineChartState extends State<HyperLineChart> {
   String? _pointLabel(double x) => _source.labels[x];
 
   void _handleTouch(FlTouchEvent event, LineTouchResponse? response) {
-    final spots = response?.lineBarSpots;
+    final spots = response?.lineBarSpots
+        ?.where(
+          (spot) =>
+              spot.barIndex >= 0 &&
+              spot.barIndex < _source.indices.length &&
+              _source.indices[spot.barIndex].containsKey(spot.x),
+        )
+        .toList();
     final spot = spots?.firstOrNull;
     final next = spot == null
         ? null
@@ -762,7 +911,10 @@ class _HyperLineChartState extends State<HyperLineChart> {
     for (var seriesIndex = 0; seriesIndex < widget.series.length; seriesIndex++)
       if (!_hiddenSeries.contains(seriesIndex))
         for (final point in _renderPoints(widget.series[seriesIndex]))
-          if (point.y != null || widget.nullPolicy == HyperChartNullPolicy.zero)
+          if ((point.y != null ||
+                  widget.nullPolicy == HyperChartNullPolicy.zero) &&
+              point.x >= _range.min &&
+              point.x <= _range.max)
             HyperChartSelection(
               _pointIndexForX(seriesIndex, point.x),
               seriesIndex,
@@ -881,42 +1033,40 @@ class _HyperLineChartState extends State<HyperLineChart> {
       _sampleCache.putIfAbsent(series, () => _samplePoints(series));
 
   List<HyperLinePoint> _samplePoints(HyperLineSeries series) {
-    final limit = widget.maxRenderedPoints;
-    if (limit == null ||
-        limit < 3 ||
-        series.points.length <= limit ||
-        widget.samplingStrategy == HyperChartSamplingStrategy.none) {
-      return series.points;
+    final prepared = widget.preparedData;
+    final range = _range;
+    final isFull = range.min <= _source.minX && range.max >= _source.maxX;
+    final compatible =
+        identical(prepared?.series, widget.series) &&
+        prepared!.nullPolicy == widget.nullPolicy &&
+        prepared.samplingStrategy == widget.samplingStrategy;
+    if (isFull &&
+        compatible &&
+        prepared.maxRenderedPoints == widget.maxRenderedPoints) {
+      return prepared._samples[series]!;
     }
-    final valid = <HyperLinePoint>[
-      for (final point in series.points)
-        if (point.y != null || widget.nullPolicy == HyperChartNullPolicy.zero)
-          point,
-    ];
-    if (valid.length <= limit) return series.points;
-    final sampled = hyperChartSampleIndices<HyperLinePoint>(
-      valid,
-      maxPoints: limit,
-      x: (point) => point.x,
-      y: (point) => point.y ?? 0,
-      strategy: widget.samplingStrategy,
+    List<HyperLinePoint> points;
+    if (compatible &&
+        widget.maxRenderedPoints != null &&
+        widget.samplingStrategy != HyperChartSamplingStrategy.none &&
+        _source.sorted[series] == true) {
+      points = const [];
+      for (final tier in prepared._levels[series]!) {
+        points = isFull ? tier : _source.window(series, range, tier);
+        if (points.length >= widget.maxRenderedPoints! * 2 ||
+            identical(tier, series.points)) {
+          break;
+        }
+      }
+    } else {
+      points = isFull ? series.points : _source.window(series, range);
+    }
+    return _sampleHyperLinePoints(
+      points,
+      widget.maxRenderedPoints,
+      widget.nullPolicy,
+      widget.samplingStrategy,
     );
-    final retained = <HyperLinePoint>{
-      for (final index in sampled) valid[index],
-    };
-    if (widget.nullPolicy != HyperChartNullPolicy.gap) {
-      return <HyperLinePoint>[
-        for (final point in series.points)
-          if (retained.contains(point)) point,
-      ];
-    }
-    return <HyperLinePoint>[
-      for (var index = 0; index < series.points.length; index++)
-        if (retained.contains(series.points[index]) ||
-            (series.points[index].y == null &&
-                (index == 0 || series.points[index - 1].y != null)))
-          series.points[index],
-    ];
   }
 }
 
@@ -941,6 +1091,14 @@ class _HyperLineIndex {
         }
       }
       indices.add(lookup);
+      var ordered = true;
+      for (var i = 1; i < item.points.length; i++) {
+        if (item.points[i].x < item.points[i - 1].x) {
+          ordered = false;
+          break;
+        }
+      }
+      sorted[item] = ordered;
     }
     final xs = indices.expand((map) => map.keys).toSet().toList()..sort();
     var minimum = double.infinity;
@@ -949,6 +1107,38 @@ class _HyperLineIndex {
     }
     interval = minimum.isFinite ? minimum : null;
   }
+  final sorted = <HyperLineSeries, bool>{};
+  List<HyperLinePoint> window(
+    HyperLineSeries series,
+    HyperChartRange range, [
+    List<HyperLinePoint>? tier,
+  ]) {
+    final points = tier ?? series.points;
+    if (points.isEmpty) return const [];
+    if (sorted[series] != true) {
+      return [
+        for (final point in points)
+          if (point.x >= range.min && point.x <= range.max) point,
+      ];
+    }
+    int bound(double x, bool upper) {
+      var low = 0, high = points.length;
+      while (low < high) {
+        final mid = (low + high) ~/ 2;
+        if (points[mid].x < x || (upper && points[mid].x == x)) {
+          low = mid + 1;
+        } else {
+          high = mid;
+        }
+      }
+      return low;
+    }
+
+    final first = math.max(0, bound(range.min, false) - 1);
+    final last = math.min(points.length, bound(range.max, true) + 1);
+    return points.sublist(first, last);
+  }
+
   final valid = <HyperLinePoint>[];
   final labels = <double, String>{};
   final indices = <Map<double, int>>[];
@@ -957,4 +1147,44 @@ class _HyperLineIndex {
       maxX = double.negativeInfinity,
       minY = double.infinity,
       maxY = double.negativeInfinity;
+}
+
+List<HyperLinePoint> _sampleHyperLinePoints(
+  List<HyperLinePoint> points,
+  int? limit,
+  HyperChartNullPolicy nullPolicy,
+  HyperChartSamplingStrategy strategy,
+) {
+  if (limit == null ||
+      limit < 3 ||
+      points.length <= limit ||
+      strategy == HyperChartSamplingStrategy.none) {
+    return points;
+  }
+  final valid = <HyperLinePoint>[
+    for (final point in points)
+      if (point.y != null || nullPolicy == HyperChartNullPolicy.zero) point,
+  ];
+  if (valid.length <= limit) return points;
+  final sampled = hyperChartSampleIndices<HyperLinePoint>(
+    valid,
+    maxPoints: limit,
+    x: (point) => point.x,
+    y: (point) => point.y ?? 0,
+    strategy: strategy,
+  );
+  final retained = <HyperLinePoint>{for (final index in sampled) valid[index]};
+  if (nullPolicy != HyperChartNullPolicy.gap) {
+    return <HyperLinePoint>[
+      for (final point in points)
+        if (retained.contains(point)) point,
+    ];
+  }
+  return <HyperLinePoint>[
+    for (var index = 0; index < points.length; index++)
+      if (retained.contains(points[index]) ||
+          (points[index].y == null &&
+              (index == 0 || points[index - 1].y != null)))
+        points[index],
+  ];
 }

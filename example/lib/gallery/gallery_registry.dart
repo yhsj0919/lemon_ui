@@ -83,19 +83,7 @@ import 'gallery_item.dart';
 ///
 /// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
-  GallerySection(
-    title: '未确认',
-    items: [
-      GalleryItem(
-        id: 'hyper-charts',
-        title: '图表',
-        description: '折线、柱状、饼图、散点、雷达、排名与 K 线；跟随提示与图例布局。',
-        icon: Icons.bar_chart,
-        hasStyleOverrides: true,
-        builder: (_) => const HyperChartsPage(),
-      ),
-    ],
-  ),
+  GallerySection(title: '未确认', items: []),
   GallerySection(
     title: '基础能力',
     items: [
@@ -265,6 +253,15 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '文字与内容',
     items: [
+      GalleryItem(
+        id: 'hyper-charts',
+        title: '图表',
+        description: '折线、柱状、饼图、散点、雷达、排名与 K 线；跟随提示与图例布局。',
+        icon: Icons.bar_chart,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperChartsPage(),
+      ),
+
       GalleryItem(
         id: 'hyper-table',
         title: '数据表格',

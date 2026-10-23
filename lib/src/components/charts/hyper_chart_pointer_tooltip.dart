@@ -6,12 +6,104 @@ import '../card/hyper_card_style.dart';
 import '../menu/hyper_menu_surface.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 import 'hyper_chart_theme.dart';
+import 'hyper_chart_capture_scope.dart';
 
 typedef HyperPointerTooltipStyle = HyperCardStyle;
 typedef HyperPointerTooltipBuilder = Widget Function(
   BuildContext context,
   String message,
 );
+
+@immutable
+class HyperChartTooltipRow {
+  const HyperChartTooltipRow({
+    required this.label,
+    required this.value,
+    this.color,
+  });
+  final String label;
+  final String value;
+  final Color? color;
+}
+
+/// Shared default content; the overlay continues to own surface and placement.
+class HyperChartTooltipContent extends StatelessWidget {
+  const HyperChartTooltipContent({
+    super.key,
+    required this.title,
+    required this.rows,
+  });
+  final String title;
+  final List<HyperChartTooltipRow> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    final sizes = HyperTheme.sizesOf(context);
+    final style = DefaultTextStyle.of(context).style;
+    return IntrinsicWidth(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title, style: style.copyWith(fontWeight: FontWeight.w600)),
+          if (rows.isNotEmpty) SizedBox(height: sizes.navigationItemSpacing),
+          Table(
+            columnWidths: {
+              0: const IntrinsicColumnWidth(flex: 1),
+              1: FixedColumnWidth(sizes.compactSectionSpacing),
+              2: const IntrinsicColumnWidth(),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: [
+              for (var index = 0; index < rows.length; index++)
+                TableRow(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: index == 0 ? 0 : sizes.menu.descriptionGap,
+                      ),
+                      child: Row(
+                        children: [
+                          if (rows[index].color != null) ...[
+                            Container(
+                              width: sizes.chart.pointRadius * 2,
+                              height: sizes.chart.pointRadius * 2,
+                              decoration: BoxDecoration(
+                                color: rows[index].color,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: sizes.navigationItemSpacing),
+                          ],
+                          Expanded(
+                            child: Text(rows[index].label, style: style),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox.shrink(),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: index == 0 ? 0 : sizes.menu.descriptionGap,
+                      ),
+                      child: Text(
+                        rows[index].value,
+                        textAlign: TextAlign.right,
+                        style: style.copyWith(
+                          color: rows[index].color,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// 指针位置以绘图区局部坐标传入，进出场复用公共安全材质过渡。
 class HyperPointerTooltipArea extends StatefulWidget {
@@ -90,7 +182,9 @@ class _HyperPointerTooltipAreaState extends State<HyperPointerTooltipArea> {
       child: Stack(
         children: [
           Positioned.fill(child: widget.child),
-          if (_retainedPosition != null && _content != null)
+          if (!HyperChartCaptureScope.hidesTooltip(context) &&
+              _retainedPosition != null &&
+              _content != null)
             Positioned.fill(
               child: IgnorePointer(
                 child: CustomSingleChildLayout(

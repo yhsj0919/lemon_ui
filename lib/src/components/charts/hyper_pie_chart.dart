@@ -1,3 +1,6 @@
+import 'hyper_chart_legend_binding.dart';
+import 'hyper_chart_legend_controller.dart';
+
 import 'dart:math' as math;
 
 import 'hyper_pie_leader_labels.dart';
@@ -43,6 +46,9 @@ class HyperPieChart extends StatefulWidget {
     this.height,
     this.palette,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = true,
     this.showLeaderLabels = false,
     this.leaderLabelFormatter,
@@ -68,6 +74,9 @@ class HyperPieChart extends StatefulWidget {
     this.height,
     this.palette,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showValues = true,
     this.showLeaderLabels = false,
     this.leaderLabelFormatter,
@@ -90,6 +99,9 @@ class HyperPieChart extends StatefulWidget {
   final double? height;
   final List<Color>? palette;
   final bool showLegend;
+  final HyperChartLegendController? legendController;
+  final List<String>? legendIds;
+  final ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged;
   final bool showValues;
   final bool showLeaderLabels;
   final String Function(HyperPieChartHit hit, double percent)?
@@ -115,8 +127,17 @@ class HyperPieChart extends StatefulWidget {
   State<HyperPieChart> createState() => _HyperPieChartState();
 }
 
-class _HyperPieChartState extends State<HyperPieChart> {
-  final Set<int> _hidden = <int>{};
+class _HyperPieChartState extends State<HyperPieChart>
+    with HyperChartLegendBinding<HyperPieChart> {
+  Set<int> get _hidden => legendHiddenIndices;
+  @override
+  HyperChartLegendController? get externalLegendController =>
+      widget.legendController;
+  @override
+  List<String>? get explicitLegendIds => widget.legendIds;
+  @override
+  ValueChanged<List<HyperChartLegendEntry>>? get legendChanged =>
+      widget.onLegendChanged;
   int? _internalSelected;
   int? _hovered;
   Offset? _tooltipPosition;
@@ -141,11 +162,54 @@ class _HyperPieChartState extends State<HyperPieChart> {
     }
   }
 
+  Widget _defaultTooltip(List<Color> palette) {
+    final index = _hovered!;
+    final section = widget.sections[index];
+    final total = widget.sections
+        .asMap()
+        .entries
+        .where((entry) => !_hidden.contains(entry.key))
+        .fold<double>(0, (sum, entry) => sum + entry.value.value);
+    final color = section.color ?? palette[index % palette.length];
+    return HyperChartTooltipContent(
+      title: section.label,
+      rows: [
+        HyperChartTooltipRow(
+          label: '数值',
+          value:
+              widget.valueFormatter?.call(section.value) ??
+              hyperChartNumber(section.value),
+          color: color,
+        ),
+        HyperChartTooltipRow(
+          label: '占比',
+          value: '${(total == 0 ? 0 : section.value / total * 100).round()}%',
+          color: color,
+        ),
+      ],
+    );
+  }
+
+  @override
+  void legendVisibilityChanged() {
+    _hovered = null;
+    _tooltipPosition = null;
+    _tooltipMessage = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final chart = HyperChartTokens(context, widget.style);
     final theme = HyperTheme.of(context);
     final palette = hyperChartPalette(chart, theme.colors, widget.palette);
+    syncChartLegend([
+      for (var index = 0; index < widget.sections.length; index++)
+        (
+          label: widget.sections[index].label,
+          color:
+              widget.sections[index].color ?? palette[index % palette.length],
+        ),
+    ]);
     var total = 0.0;
     for (var index = 0; index < widget.sections.length; index++) {
       if (!_hidden.contains(index)) total += widget.sections[index].value;
@@ -203,15 +267,15 @@ class _HyperPieChartState extends State<HyperPieChart> {
                               widget.tooltipStyle,
                             ) ??
                             widget.tooltipStyle,
-                        builder: widget.tooltipWidgetBuilder == null
-                            ? null
-                            : (context, _) => widget.tooltipWidgetBuilder!(
-                                context,
-                                HyperPieChartHit(
-                                  index: _hovered!,
-                                  section: widget.sections[_hovered!],
-                                ),
+                        builder: (context, _) =>
+                            widget.tooltipWidgetBuilder?.call(
+                              context,
+                              HyperPieChartHit(
+                                index: _hovered!,
+                                section: widget.sections[_hovered!],
                               ),
+                            ) ??
+                            _defaultTooltip(palette),
                         onExit: _clearPointerHover,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
@@ -390,7 +454,7 @@ class _HyperPieChartState extends State<HyperPieChart> {
       return;
     }
     setState(() {
-      _hidden.contains(index) ? _hidden.remove(index) : _hidden.add(index);
+      toggleLegendIndex(index);
     });
   }
 

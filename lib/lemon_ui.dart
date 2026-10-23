@@ -326,3 +326,5 @@ export 'src/components/charts/hyper_rank_bar_chart.dart';
 export 'src/components/charts/hyper_scatter_chart.dart';
 export 'src/theme/size/components/hyper_chart_size.dart';
 export 'src/components/charts/hyper_chart_legend.dart';
+export 'src/components/charts/hyper_chart_legend_controller.dart';
+export 'src/components/charts/hyper_chart_viewport.dart';

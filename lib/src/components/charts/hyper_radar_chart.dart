@@ -1,3 +1,5 @@
+import 'hyper_chart_legend_binding.dart';
+import 'hyper_chart_legend_controller.dart';
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
 
@@ -58,6 +60,9 @@ class HyperRadarChart extends StatefulWidget {
     this.titlePositionPercentageOffset = 0.12,
     this.shape = RadarShape.polygon,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.showTooltip = true,
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
@@ -78,6 +83,9 @@ class HyperRadarChart extends StatefulWidget {
   final double titlePositionPercentageOffset;
   final RadarShape shape;
   final bool showLegend;
+  final HyperChartLegendController? legendController;
+  final List<String>? legendIds;
+  final ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged;
   final bool showTooltip;
   final HyperPointerTooltipStyle? tooltipStyle;
   final HyperRadarChartTooltipBuilder? tooltipWidgetBuilder;
@@ -94,21 +102,60 @@ class HyperRadarChart extends StatefulWidget {
   State<HyperRadarChart> createState() => _HyperRadarChartState();
 }
 
-class _HyperRadarChartState extends State<HyperRadarChart> {
-  final Set<int> _hidden = <int>{};
+class _HyperRadarChartState extends State<HyperRadarChart>
+    with HyperChartLegendBinding<HyperRadarChart> {
+  Set<int> get _hidden => legendHiddenIndices;
+  @override
+  HyperChartLegendController? get externalLegendController =>
+      widget.legendController;
+  @override
+  List<String>? get explicitLegendIds => widget.legendIds;
+  @override
+  ValueChanged<List<HyperChartLegendEntry>>? get legendChanged =>
+      widget.onLegendChanged;
   Offset? _tooltipPosition;
   String? _tooltipMessage;
   HyperChartSelection? _hovered;
+
+  Widget _defaultTooltip(List<Color> palette) {
+    final hit = _hit(_hovered!);
+    return HyperChartTooltipContent(
+      title: hit.indicator,
+      rows: [
+        HyperChartTooltipRow(
+          label: hit.series.name,
+          value: hyperChartNumber(hit.value),
+          color: hit.series.color ?? palette[hit.seriesIndex % palette.length],
+        ),
+      ],
+    );
+  }
+
+  @override
+  void legendVisibilityChanged() {
+    _hovered = null;
+    _tooltipPosition = null;
+    _tooltipMessage = null;
+  }
 
   @override
   Widget build(BuildContext context) {
     final chart = HyperChartTokens(context, widget.style);
     final theme = HyperTheme.of(context);
     final palette = hyperChartPalette(chart, theme.colors, widget.palette);
+    syncChartLegend([
+      for (var index = 0; index < widget.series.length; index++)
+        (
+          label: widget.series[index].name,
+          color: widget.series[index].color ?? palette[index % palette.length],
+        ),
+    ]);
     final valid = widget.series.where(
       (series) => series.values.length == widget.indicators.length,
     );
-    final hasData = widget.indicators.length >= 3 && valid.isNotEmpty;
+    final hasData =
+        widget.indicators.length >= 3 &&
+        valid.any((series) => !_hidden.contains(widget.series.indexOf(series)));
     return HyperChartTheme(
       data: HyperChartThemeData(style: widget.style ?? const HyperChartStyle()),
       child: HyperChartKeyboardRegion(
@@ -161,12 +208,12 @@ class _HyperRadarChartState extends State<HyperRadarChart> {
                               widget.tooltipStyle,
                             ) ??
                             widget.tooltipStyle,
-                        builder: widget.tooltipWidgetBuilder == null
-                            ? null
-                            : (context, _) => widget.tooltipWidgetBuilder!(
-                                context,
-                                _hit(_hovered!),
-                              ),
+                        builder: (context, _) =>
+                            widget.tooltipWidgetBuilder?.call(
+                              context,
+                              _hit(_hovered!),
+                            ) ??
+                            _defaultTooltip(palette),
                         onExit: _clear,
                         child: RadarChart(
                           widget.dataBuilder?.call(
@@ -334,7 +381,7 @@ class _HyperRadarChartState extends State<HyperRadarChart> {
       return;
     }
     setState(() {
-      _hidden.contains(index) ? _hidden.remove(index) : _hidden.add(index);
+      toggleLegendIndex(index);
       _hovered = null;
       _tooltipPosition = null;
       _tooltipMessage = null;

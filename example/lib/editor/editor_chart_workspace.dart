@@ -42,7 +42,7 @@ extension _ChartWorkspace on _ThemeEditorState {
       wholeNumbers: false,
     );
     final radiusLimit = editorChartRadiusLimit(viewport, size.height, 0);
-    return _panel('图表 · 未确认', [
+    return _panel('图表', [
       const HyperText('尺寸按设备保存，外观按亮暗保存。默认继承；图例实例覆盖示例优先于本页设置。'),
       _heading('绘图区'),
       n(

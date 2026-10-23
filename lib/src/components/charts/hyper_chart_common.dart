@@ -10,6 +10,61 @@ enum HyperChartNullPolicy { gap, zero, skip }
 
 enum HyperChartSamplingStrategy { none, largestTriangleThreeBuckets }
 
+@immutable
+class HyperChartNumericScale {
+  const HyperChartNumericScale(this.min, this.max, this.interval);
+
+  final double min, max, interval;
+
+  Iterable<double> get ticks sync* {
+    yield min;
+    final first = (min / interval).floor() + 1;
+    final last = (max / interval).ceil() - 1;
+    for (var index = first; index <= last; index++) {
+      final value = index * interval;
+      if (value > min && value < max) yield value == 0 ? 0.0 : value;
+    }
+    yield max;
+  }
+}
+
+/// Resolves readable numeric bounds while preserving explicit axis limits.
+HyperChartNumericScale hyperChartNumericScale(
+  double dataMin,
+  double dataMax,
+  HyperChartAxis axis, {
+  bool includeZero = true,
+}) {
+  var low = dataMin;
+  var high = dataMax;
+  if (axis.includeZero ?? includeZero) {
+    low = math.min(0, low);
+    high = math.max(0, high);
+  }
+  low = axis.min ?? low;
+  high = axis.max ?? high;
+  if (high <= low) {
+    final extent = low == 0 ? 1.0 : low.abs() * .1;
+    if (axis.min == null) low -= extent;
+    if (axis.max == null) high += extent;
+  }
+  final interval = axis.interval ?? hyperChartNiceInterval(low, high);
+  if (!low.isFinite ||
+      !high.isFinite ||
+      high <= low ||
+      !interval.isFinite ||
+      interval <= 0) {
+    throw ArgumentError(
+      'Numeric axis requires finite increasing bounds and a positive interval.',
+    );
+  }
+  return HyperChartNumericScale(
+    axis.min ?? (low / interval).floorToDouble() * interval,
+    axis.max ?? (high / interval).ceilToDouble() * interval,
+    interval,
+  );
+}
+
 int hyperChartLoopIndex(int current, int delta, int length) {
   assert(length > 0);
   return (current + delta + length) % length;
@@ -126,6 +181,7 @@ class HyperChartAxis {
     this.min,
     this.max,
     this.interval,
+    this.includeZero,
     this.reservedSize,
     this.formatter,
     this.autoLabelInterval = true,
@@ -138,6 +194,10 @@ class HyperChartAxis {
   final double? min;
   final double? max;
   final double? interval;
+
+  /// Whether automatic numeric bounds include zero. Defaults to true for
+  /// line/bar value axes and false for scatter/price axes. Explicit bounds win.
+  final bool? includeZero;
   final double? reservedSize;
   final HyperChartValueFormatter? formatter;
 
@@ -527,17 +587,19 @@ class _HyperChartLegendItemState extends State<_HyperChartLegendItem> {
               SizedBox(
                 width: HyperTheme.sizesOf(context).navigationItemSpacing,
               ),
-              Text(
-                widget.data.label,
-                style: (theme.textTheme.labelSmall ?? const TextStyle())
-                    .copyWith(
-                      color: widget.hidden
-                          ? colors.textSecondary
-                          : colors.textPrimary,
-                      decoration: widget.hidden
-                          ? TextDecoration.lineThrough
-                          : null,
-                    ),
+              Flexible(
+                child: Text(
+                  widget.data.label,
+                  style: (theme.textTheme.labelSmall ?? const TextStyle())
+                      .copyWith(
+                        color: widget.hidden
+                            ? colors.textSecondary
+                            : colors.textPrimary,
+                        decoration: widget.hidden
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                ),
               ),
             ],
           ),

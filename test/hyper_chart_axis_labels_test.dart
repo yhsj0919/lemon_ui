@@ -59,7 +59,13 @@ void main() {
               .toList();
           final rects = [
             for (final label in labels)
-              tester.getRect(find.byWidget(label.child)),
+              tester.getRect(
+                find.byWidget(
+                  label.child is Transform
+                      ? (label.child as Transform).child!
+                      : label.child,
+                ),
+              ),
           ]..sort((a, b) => a.left.compareTo(b.left));
           expect(rects, isNotEmpty);
           final positions =

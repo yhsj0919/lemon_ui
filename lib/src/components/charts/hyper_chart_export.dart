@@ -1,5 +1,6 @@
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
+import 'hyper_chart_capture_scope.dart';
 
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -10,15 +11,26 @@ import 'package:flutter/rendering.dart';
 /// Controls an [HyperChartExportBoundary].
 ///
 /// The controller deliberately returns bytes instead of writing a file so the
-/// package remains platform independent. Hyperlications can download, share, or
+/// package remains platform independent. Applications can download, share, or
 /// upload the PNG using their existing platform service.
 class HyperChartExportController {
   _HyperChartExportBoundaryState? _state;
 
   bool get attached => _state != null;
 
-  Future<ui.Image> captureImage({double pixelRatio = 2}) {
-    assert(pixelRatio > 0);
+  /// Captures the full boundary after a fresh frame, excluding tooltips unless
+  /// [includeTooltip] is true. Concurrent captures are serialized.
+  Future<ui.Image> captureImage({
+    double pixelRatio = 2,
+    bool includeTooltip = false,
+  }) {
+    if (!pixelRatio.isFinite || pixelRatio <= 0) {
+      throw ArgumentError.value(
+        pixelRatio,
+        'pixelRatio',
+        'Must be finite and positive.',
+      );
+    }
     final state = _state;
     if (state == null) {
       throw StateError(
@@ -26,11 +38,20 @@ class HyperChartExportController {
         'HyperChartExportBoundary.',
       );
     }
-    return state.captureImage(pixelRatio: pixelRatio);
+    return state.captureImage(
+      pixelRatio: pixelRatio,
+      includeTooltip: includeTooltip,
+    );
   }
 
-  Future<Uint8List> capturePng({double pixelRatio = 2}) async {
-    final image = await captureImage(pixelRatio: pixelRatio);
+  Future<Uint8List> capturePng({
+    double pixelRatio = 2,
+    bool includeTooltip = false,
+  }) async {
+    final image = await captureImage(
+      pixelRatio: pixelRatio,
+      includeTooltip: includeTooltip,
+    );
     try {
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) {
@@ -56,7 +77,7 @@ class HyperChartExportBoundary extends StatefulWidget {
   final HyperChartExportController controller;
   final Widget child;
 
-  /// Defaults to the active shadcn background color. Set transparent to export
+  /// Defaults to the active theme background color. Set transparent to export
   /// only the chart pixels.
   final Color? backgroundColor;
   final EdgeInsetsGeometry padding;
@@ -68,6 +89,8 @@ class HyperChartExportBoundary extends StatefulWidget {
 
 class _HyperChartExportBoundaryState extends State<HyperChartExportBoundary> {
   final GlobalKey _boundaryKey = GlobalKey();
+  bool _hideTooltip = false;
+  Future<void> _captureTail = Future.value();
 
   @override
   void initState() {
@@ -105,33 +128,57 @@ class _HyperChartExportBoundaryState extends State<HyperChartExportBoundary> {
     if (controller._state == this) controller._state = null;
   }
 
-  Future<ui.Image> captureImage({required double pixelRatio}) async {
-    final context = _boundaryKey.currentContext;
-    var boundary = context?.findRenderObject() as RenderRepaintBoundary?;
-    if (boundary == null) {
-      throw StateError('The chart export boundary is not ready to capture.');
-    }
-    if (boundary.debugNeedsPaint) {
+  Future<ui.Image> captureImage({
+    required double pixelRatio,
+    required bool includeTooltip,
+  }) {
+    final result = _captureTail.then(
+      (_) => _capture(pixelRatio, includeTooltip),
+    );
+    _captureTail = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  Future<ui.Image> _capture(double pixelRatio, bool includeTooltip) async {
+    if (!mounted) throw StateError('The chart export boundary was removed.');
+    setState(() => _hideTooltip = !includeTooltip);
+    final current = _boundaryKey.currentContext?.findRenderObject();
+    if (current is RenderRepaintBoundary) current.markNeedsPaint();
+    try {
+      // Always finish a new frame. A pending descendant rebuild need not mark
+      // this repaint boundary dirty yet; capturing its old layer is stale.
       WidgetsBinding.instance.scheduleFrame();
       await WidgetsBinding.instance.endOfFrame;
-      boundary =
+      final boundary =
           _boundaryKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
+      if (!mounted ||
+          boundary == null ||
+          !boundary.hasSize ||
+          boundary.size.isEmpty ||
+          boundary.debugNeedsPaint) {
+        throw StateError('The chart export boundary is not ready to capture.');
+      }
+      return await boundary.toImage(pixelRatio: pixelRatio);
+    } finally {
+      if (mounted) setState(() => _hideTooltip = false);
     }
-    if (boundary == null || boundary.debugNeedsPaint) {
-      throw StateError('The chart export boundary is not ready to capture.');
-    }
-    return boundary.toImage(pixelRatio: pixelRatio);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    return RepaintBoundary(
-      key: _boundaryKey,
-      child: ColoredBox(
-        color: widget.backgroundColor ?? theme.colors.background,
-        child: Padding(padding: widget.padding, child: widget.child),
+    return HyperChartCaptureScope(
+      hideTooltip: _hideTooltip,
+      child: RepaintBoundary(
+        key: _boundaryKey,
+        child: ColoredBox(
+          color: widget.backgroundColor ?? theme.colors.background,
+          child: Padding(padding: widget.padding, child: widget.child),
+        ),
       ),
     );
   }

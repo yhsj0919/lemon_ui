@@ -1,10 +1,12 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 class HyperChartsPage extends StatefulWidget {
-  const HyperChartsPage({super.key});
+  const HyperChartsPage({super.key, this.datasetLoader});
+  final Future<HyperLineChartDataset> Function(int count)? datasetLoader;
   @override
   State<HyperChartsPage> createState() => _HyperChartsPageState();
 }
@@ -12,10 +14,60 @@ class HyperChartsPage extends StatefulWidget {
 class _HyperChartsPageState extends State<HyperChartsPage> {
   HyperChartLegendPosition _position = HyperChartLegendPosition.top;
   Axis _direction = Axis.horizontal;
-  List<HyperLineSeries>? _large;
+  HyperLineChartDataset? _large;
+  HyperChartViewportController? _viewport;
+  bool _preparing = false;
+  int _request = 0;
+  String? _loadError;
+  int? _prepareMilliseconds;
   int _count = 8760;
   final _export = HyperChartExportController();
   String _exportStatus = '';
+  Uint8List? _exportPreview;
+  final _externalLegendController = HyperChartLegendController();
+  List<HyperChartLegendEntry> _externalLegend = const [];
+  @override
+  void dispose() {
+    _request++;
+    _viewport?.dispose();
+    _externalLegendController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadYear(int count) async {
+    final request = ++_request;
+    setState(() {
+      _count = count;
+      _preparing = true;
+      _loadError = null;
+    });
+    final watch = Stopwatch()..start();
+    try {
+      final data =
+          await (widget.datasetLoader?.call(count) ??
+              HyperLineChartDataset.generate(count, _generateYearSeries));
+      if (!mounted || request != _request) return;
+      final previous = _viewport;
+      setState(() {
+        _large = data;
+        _viewport = HyperChartViewportController(
+          domain: data.domain!,
+          minimumSpan: 1,
+        );
+        _prepareMilliseconds = watch.elapsedMilliseconds;
+        _preparing = false;
+      });
+      previous?.dispose();
+    } catch (error) {
+      if (mounted && request == _request) {
+        setState(() {
+          _preparing = false;
+          _loadError = '准备失败：$error';
+        });
+      }
+    }
+  }
+
   static const _lines = [
     HyperLineSeries(
       name: '访问量',
@@ -83,11 +135,15 @@ class _HyperChartsPageState extends State<HyperChartsPage> {
       child: HyperText(text),
     );
     return SingleChildScrollView(
-      padding: EdgeInsets.all(sizes.pageHorizontalPadding),
+      // The gallery surface owns the outer clearance; chart labels retain
+      // their positions relative to the data and axes.
+      padding: EdgeInsets.all(
+        sizes.pageHorizontalPadding + sizes.compactSectionSpacing,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const HyperText('图表 · 未确认'),
+          const HyperText('图表'),
           const HyperText('默认主题预览。图例可点击隐藏数据，鼠标悬停或键盘方向键查看数据。'),
           title('图例位置与排列（显式实例覆盖）'),
           Wrap(
@@ -113,39 +169,69 @@ class _HyperChartsPageState extends State<HyperChartsPage> {
               ),
             ],
           ),
-          title('折线图 · 自定义鼠标跟随提示'),
+          title('折线图 · 默认鼠标跟随提示'),
           HyperChartExportBoundary(
             controller: _export,
-            child: HyperLineChart(
-              series: _lines,
-              style: style,
-              tooltipWidgetBuilder: (context, data) => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HyperText(data.xLabel),
-                  for (final item in data.items)
-                    HyperText(
-                      '${item.hit.series.name}：${item.formattedValue} 次',
-                    ),
-                ],
-              ),
-            ),
+            child: HyperLineChart(series: _lines, style: style),
           ),
           HyperButton.outlined(
             onPressed: () async {
               final bytes = await _export.capturePng();
               if (mounted) {
-                setState(
-                  () => _exportStatus = '已生成 PNG：${bytes.length} 字节，可交给应用保存或分享',
-                );
+                setState(() {
+                  _exportPreview = bytes;
+                  _exportStatus =
+                      '已生成完整 PNG（不含鼠标提示）：${bytes.length} 字节，下方为实际导出图片';
+                });
               }
             },
             child: const Text('测试导出 PNG'),
           ),
           HyperText(_exportStatus),
+          if (_exportPreview != null)
+            Image.memory(_exportPreview!, fit: BoxFit.contain),
           title('面积图'),
           HyperLineChart.area(series: _lines, style: style),
+          title('外部图例（独立绘制，共享显隐）'),
+          const HyperText('图例由回调提供，可放在任意位置；下方两个图表共用控制器。'),
+          Wrap(
+            spacing: sizes.navigationItemSpacing,
+            children: [
+              for (final item in _externalLegend)
+                HyperButton.outlined(
+                  onPressed: () => _externalLegendController.toggle(item.id),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        item.hidden
+                            ? Icons.visibility_off_outlined
+                            : Icons.circle,
+                        color: item.color,
+                        size: sizes.chart.labelFontSize,
+                      ),
+                      SizedBox(width: sizes.navigationItemSpacing),
+                      Text(item.label),
+                    ],
+                  ),
+                ),
+              HyperButton.outlined(
+                onPressed: _externalLegendController.showAll,
+                child: const Text('显示全部图例'),
+              ),
+            ],
+          ),
+          HyperLineChart(
+            series: _lines,
+            showLegend: false,
+            legendController: _externalLegendController,
+            onLegendChanged: (items) => setState(() => _externalLegend = items),
+          ),
+          HyperLineChart.area(
+            series: _lines,
+            showLegend: false,
+            legendController: _externalLegendController,
+          ),
           title('阶梯图'),
           HyperLineChart.step(series: _lines, style: style),
           title('纵向分组柱状图'),
@@ -224,32 +310,56 @@ class _HyperChartsPageState extends State<HyperChartsPage> {
                 525600: '每分钟',
               }.entries)
                 HyperButton.outlined(
-                  onPressed: () => setState(() {
-                    _count = entry.key;
-                    _large = [
-                      HyperLineSeries(
-                        name: '一年数据',
-                        showPoints: false,
-                        points: List.generate(
-                          _count,
-                          (i) => HyperLinePoint(
-                            x: i.toDouble(),
-                            y:
-                                50 +
-                                math.sin(i * .05) * 20 +
-                                math.cos(i * .001) * 10,
-                          ),
-                        ),
-                      ),
-                    ];
-                  }),
+                  onPressed: () => _loadYear(entry.key),
                   child: Text('${entry.value}（${entry.key} 点）'),
                 ),
             ],
           ),
-          if (_large != null)
+          if (_preparing) ...[
+            const HyperProgress.infinite(),
+            HyperText('正在准备 $_count 个数据点…'),
+          ],
+          if (_loadError != null) HyperText(_loadError!),
+          if (_large != null && _viewport != null) ...[
+            HyperText(
+              '共 ${_large!.pointCount} 点，准备耗时 ${_prepareMilliseconds ?? 0} ms（当前运行模式，仅供对比）',
+            ),
+            Wrap(
+              spacing: sizes.navigationItemSpacing,
+              children: [
+                HyperButton.outlined(
+                  onPressed: () => _viewport!.zoom(2),
+                  child: const Text('放大'),
+                ),
+                HyperButton.outlined(
+                  onPressed: () => _viewport!.zoom(.5),
+                  child: const Text('缩小'),
+                ),
+                HyperButton.outlined(
+                  onPressed: () => _viewport!.pan(-_viewport!.range.span / 4),
+                  child: const Text('向前'),
+                ),
+                HyperButton.outlined(
+                  onPressed: () => _viewport!.pan(_viewport!.range.span / 4),
+                  child: const Text('向后'),
+                ),
+                HyperButton.outlined(
+                  onPressed: () => _viewport!.reset(),
+                  child: const Text('恢复全量'),
+                ),
+              ],
+            ),
+            ListenableBuilder(
+              listenable: _viewport!,
+              builder: (context, _) => HyperText(
+                '可见范围：第 ${_viewport!.range.min.round()} 至 ${_viewport!.range.max.round()} 次；可横向拖动绘图区',
+              ),
+            ),
             HyperLineChart(
-              series: _large!,
+              series: _large!.series,
+              preparedData: _large,
+              viewportController: _viewport,
+              panEnabled: true,
               maxRenderedPoints: 1000,
               xAxis: HyperChartAxis(
                 labelRotation: -45,
@@ -257,8 +367,23 @@ class _HyperChartsPageState extends State<HyperChartsPage> {
               ),
               style: style,
             ),
+          ],
         ],
       ),
     );
   }
 }
+
+List<HyperLineSeries> _generateYearSeries(int count) => [
+  HyperLineSeries(
+    name: '一年数据',
+    showPoints: false,
+    points: List.generate(
+      count,
+      (i) => HyperLinePoint(
+        x: i.toDouble(),
+        y: 50 + math.sin(i * .05) * 20 + math.cos(i * .001) * 10,
+      ),
+    ),
+  ),
+];

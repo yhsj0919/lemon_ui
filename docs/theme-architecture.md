@@ -25,7 +25,11 @@ HyperMaterialSurface 的显式 border / boxShadow 优先于材质配方；空阴
 
 # Lemon UI 主题与尺寸架构
 
-## 图表（2026-10-22，未确认）
+## 图表（2026-10-23，已确认）
+
+2026-10-23：折线族增加数据坐标视口控制器和原生后台数据准备接口。它们属于数据与交互
+职责，不引入设备尺寸常量或视觉主题字段。当前范围采样及多级缓存使用原始快照下标，
+用户于 2026-10-23 明确确认样式与行为，Demo 与主题编辑器同步归入“文字与内容”，页面 ID 保持 `hyper-charts`。
 
 新增 `sizes.chart` 四端规格与 `chartTheme` 强类型主题；局部 `HyperChartTheme`、实例
 `HyperChartStyle` 只合并显式字段。绘图参考用户指定的 lemon_shadcn，提示表面统一走

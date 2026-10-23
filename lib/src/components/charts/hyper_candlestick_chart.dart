@@ -1,5 +1,6 @@
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
+import 'hyper_chart_axis_layout.dart';
 
 import 'dart:math' as math;
 
@@ -213,28 +214,25 @@ class _HyperCandlestickChartState extends State<HyperCandlestickChart> {
     HyperChartTokens chart,
     HyperThemeData theme,
   ) {
-    final low =
-        widget.yAxis.min ?? widget.data.map((e) => e.low).reduce(math.min);
-    final high =
-        widget.yAxis.max ?? widget.data.map((e) => e.high).reduce(math.max);
-    final span = math.max(high - low, 1);
-    final min = widget.yAxis.min ?? low - span * .06;
-    final max = widget.yAxis.max ?? high + span * .06;
+    final scale = hyperChartNumericScale(
+      widget.data.map((e) => e.low).reduce(math.min),
+      widget.data.map((e) => e.high).reduce(math.max),
+      widget.yAxis,
+      includeZero: false,
+    );
+    final min = scale.min, max = scale.max;
     final style = hyperChartAxisStyle(theme, chart);
     final reserved =
         widget.yAxis.reservedSize ??
         hyperChartAxisReservedWidth(
-          hyperChartValueAxisLabels(
-            min,
-            max,
-            widget.yAxis.formatter ?? widget.valueFormatter,
-          ),
+          scale.ticks.map(_formatValue),
           style,
           chart,
         );
     return _CandlestickGeometry(
       size: size,
       count: widget.data.length,
+      ticks: scale.ticks.toList(),
       min: min,
       max: max == min ? min + 1 : max,
       left: widget.yAxis.show ? reserved : 10,
@@ -311,6 +309,7 @@ class _CandlestickGeometry {
   const _CandlestickGeometry({
     required this.size,
     required this.count,
+    required this.ticks,
     required this.min,
     required this.max,
     required this.left,
@@ -319,12 +318,14 @@ class _CandlestickGeometry {
 
   final Size size;
   final int count;
+  final List<double> ticks;
   final double min;
   final double max;
   final double left;
   final double bottom;
 
-  Rect get plot => Rect.fromLTRB(left, 8, size.width - 8, size.height - bottom);
+  Rect get plot =>
+      Rect.fromLTRB(left, 8, size.width - left, size.height - bottom);
   double get slot => plot.width / count;
   double x(int index) => plot.left + slot * (index + .5);
   double y(double value) =>
@@ -375,8 +376,7 @@ class _CandlestickPainter extends CustomPainter {
     final gridPaint = Paint()
       ..color = theme.colors.outline.withValues(alpha: chart.gridOpacity)
       ..strokeWidth = 1;
-    for (var tick = 0; tick <= 4; tick++) {
-      final value = geometry.min + (geometry.max - geometry.min) * tick / 4;
+    for (final value in geometry.ticks) {
       final y = geometry.y(value);
       if (showGrid) {
         canvas.drawLine(
@@ -390,7 +390,7 @@ class _CandlestickPainter extends CustomPainter {
           canvas,
           valueFormatter(value),
           axisStyle,
-          Offset(geometry.plot.left - 6, y),
+          Offset(geometry.plot.left - hyperChartAxisLabelGap, y),
           right: true,
         );
       }
@@ -444,8 +444,9 @@ class _CandlestickPainter extends CustomPainter {
           canvas,
           labelFormatter(index, candle),
           axisStyle,
-          Offset(x, geometry.plot.bottom + 8),
+          Offset(x, geometry.plot.bottom + hyperChartAxisLabelGap),
           center: true,
+          below: true,
         );
       }
       if (showValues && geometry.slot >= chart.dataLabelMinSpacing) {
@@ -469,6 +470,7 @@ class _CandlestickPainter extends CustomPainter {
     bool right = false,
     bool center = false,
     bool above = false,
+    bool below = false,
   }) {
     final painter =
         TextPainter(
@@ -484,7 +486,9 @@ class _CandlestickPainter extends CustomPainter {
         : center
         ? anchor.dx - painter.width / 2
         : anchor.dx;
-    final dy = above
+    final dy = below
+        ? anchor.dy
+        : above
         ? anchor.dy - painter.height
         : anchor.dy - painter.height / 2;
     painter.paint(canvas, Offset(dx, dy));

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui_example/editor/editor_theme_document.dart';
@@ -8,6 +11,87 @@ import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 import 'package:lemon_ui_example/pages/content/hyper_charts_page.dart';
 
 void main() {
+  testWidgets(
+    'year-data demo discards stale loads, zooms and restores its viewport',
+    (tester) async {
+      final small = await tester.runAsync(
+        () => HyperLineChartDataset.prepare([
+          HyperLineSeries(
+            name: '旧数据',
+            points: List.generate(
+              365,
+              (i) => HyperLinePoint(x: i.toDouble(), y: (i % 10).toDouble()),
+            ),
+          ),
+        ]),
+      );
+      final large = await tester.runAsync(
+        () => HyperLineChartDataset.prepare([
+          HyperLineSeries(
+            name: '新数据',
+            points: List.generate(
+              8760,
+              (i) => HyperLinePoint(x: i.toDouble(), y: (i % 10).toDouble()),
+            ),
+          ),
+        ]),
+      );
+      final first = Completer<HyperLineChartDataset>(),
+          second = Completer<HyperLineChartDataset>();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: Scaffold(
+              body: HyperChartsPage(
+                datasetLoader: (count) =>
+                    count == 365 ? first.future : second.future,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('每天（365 点）'));
+      await tester.tap(find.text('每天（365 点）'));
+      await tester.pump();
+      expect(find.text('正在准备 365 个数据点…'), findsOneWidget);
+      await tester.ensureVisible(find.text('每小时（8760 点）'));
+      await tester.tap(find.text('每小时（8760 点）'));
+      await tester.pump();
+      second.complete(large!);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(
+        tester
+            .widget<HyperLineChart>(
+              find.byWidgetPredicate(
+                (widget) =>
+                    widget is HyperLineChart && widget.preparedData != null,
+              ),
+            )
+            .preparedData!
+            .pointCount,
+        8760,
+      );
+      first.complete(small!);
+      await tester.pumpAndSettle();
+      final finder = find.byWidgetPredicate(
+        (widget) => widget is HyperLineChart && widget.preparedData != null,
+      );
+      final chart = tester.widget<HyperLineChart>(finder);
+      expect(chart.preparedData!.pointCount, 8760);
+      expect(chart.viewportController!.isFullRange, isTrue);
+      await tester.ensureVisible(find.text('放大'));
+      await tester.tap(find.text('放大'));
+      await tester.pumpAndSettle();
+      expect(chart.viewportController!.range.span, closeTo(8759 / 2, .001));
+      await tester.tap(find.text('恢复全量'));
+      await tester.pumpAndSettle();
+      expect(chart.viewportController!.isFullRange, isTrue);
+      expect(tester.takeException(), isNull);
+    },
+  );
   test('related chart geometry changes constrain explicit values and save integers', () {
     final metrics = EditorChartMetrics()
       ..barWidth = 10
@@ -34,9 +118,9 @@ void main() {
     metrics.radius = null;
     expect(metrics.resolve(const HyperChartSize()).radius, 5);
   });
-  test('chart registration stays pending, device geometry and appearance round trip', () {
+  test('confirmed chart registration preserves ID, device geometry and appearance round trip', () {
     final section = gallerySections.singleWhere(
-      (section) => section.title == '未确认',
+      (section) => section.title == '文字与内容',
     );
     expect(section.items.any((item) => item.id == 'hyper-charts'), isTrue);
     final doc = EditorThemeDocument();
@@ -79,7 +163,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('图表 · 未确认'), findsOneWidget);
+    expect(find.text('图表'), findsOneWidget);
     await tester.tap(find.text('右侧'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);

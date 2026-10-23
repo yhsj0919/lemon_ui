@@ -1,3 +1,6 @@
+import 'hyper_chart_legend_binding.dart';
+import 'hyper_chart_legend_controller.dart';
+import 'hyper_chart_axis_layout.dart';
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
 
@@ -75,6 +78,9 @@ class HyperScatterChart extends StatefulWidget {
     this.tooltipStyle,
     this.tooltipWidgetBuilder,
     this.showLegend = true,
+    this.legendController,
+    this.legendIds,
+    this.onLegendChanged,
     this.interactive = true,
     this.keyboardNavigation = true,
     this.autofocus = false,
@@ -98,6 +104,9 @@ class HyperScatterChart extends StatefulWidget {
   final HyperPointerTooltipStyle? tooltipStyle;
   final HyperScatterChartTooltipBuilder? tooltipWidgetBuilder;
   final bool showLegend;
+  final HyperChartLegendController? legendController;
+  final List<String>? legendIds;
+  final ValueChanged<List<HyperChartLegendEntry>>? onLegendChanged;
   final bool interactive;
   final bool keyboardNavigation;
   final bool autofocus;
@@ -116,8 +125,17 @@ class HyperScatterChart extends StatefulWidget {
   State<HyperScatterChart> createState() => _HyperScatterChartState();
 }
 
-class _HyperScatterChartState extends State<HyperScatterChart> {
-  final Set<int> _hiddenSeries = <int>{};
+class _HyperScatterChartState extends State<HyperScatterChart>
+    with HyperChartLegendBinding<HyperScatterChart> {
+  Set<int> get _hiddenSeries => legendHiddenIndices;
+  @override
+  HyperChartLegendController? get externalLegendController =>
+      widget.legendController;
+  @override
+  List<String>? get explicitLegendIds => widget.legendIds;
+  @override
+  ValueChanged<List<HyperChartLegendEntry>>? get legendChanged =>
+      widget.onLegendChanged;
   Set<HyperChartSelection> _internalSelected = <HyperChartSelection>{};
   HyperChartSelection? _hovered;
   Offset? _tooltipPosition;
@@ -142,11 +160,50 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
     }
   }
 
+  Widget _defaultTooltip(List<Color> palette) {
+    final hit = _hit(_hovered!);
+    final color =
+        hit.series.color ?? palette[hit.selection.seriesIndex % palette.length];
+    return HyperChartTooltipContent(
+      title: hit.point.label ?? hit.series.name,
+      rows: [
+        HyperChartTooltipRow(
+          label: widget.xAxis.title ?? 'X',
+          value:
+              widget.xAxis.formatter?.call(hit.point.x) ??
+              hyperChartNumber(hit.point.x),
+          color: color,
+        ),
+        HyperChartTooltipRow(
+          label: widget.yAxis.title ?? 'Y',
+          value:
+              widget.yAxis.formatter?.call(hit.point.y) ??
+              hyperChartNumber(hit.point.y),
+          color: color,
+        ),
+      ],
+    );
+  }
+
+  @override
+  void legendVisibilityChanged() {
+    _hovered = null;
+    _tooltipPosition = null;
+    _tooltipMessage = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final chart = HyperChartTokens(context, widget.style);
     final theme = HyperTheme.of(context);
     final palette = hyperChartPalette(chart, theme.colors, widget.palette);
+    syncChartLegend([
+      for (var index = 0; index < widget.series.length; index++)
+        (
+          label: widget.series[index].name,
+          color: widget.series[index].color ?? palette[index % palette.length],
+        ),
+    ]);
     final flattened = _flattened;
     return HyperChartTheme(
       data: HyperChartThemeData(style: widget.style ?? const HyperChartStyle()),
@@ -193,9 +250,7 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
                                   widget.series.length - 1) {
                             return;
                           }
-                          _hiddenSeries.contains(index)
-                              ? _hiddenSeries.remove(index)
-                              : _hiddenSeries.add(index);
+                          toggleLegendIndex(index);
                         }),
                       ),
                       SizedBox(height: chart.legendSpacing),
@@ -209,12 +264,12 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
                               widget.tooltipStyle,
                             ) ??
                             widget.tooltipStyle,
-                        builder: widget.tooltipWidgetBuilder == null
-                            ? null
-                            : (context, _) => widget.tooltipWidgetBuilder!(
-                                context,
-                                _hit(_hovered!),
-                              ),
+                        builder: (context, _) =>
+                            widget.tooltipWidgetBuilder?.call(
+                              context,
+                              _hit(_hovered!),
+                            ) ??
+                            _defaultTooltip(palette),
                         onExit: _clearHover,
                         child: Builder(
                           builder: (context) {
@@ -281,44 +336,68 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
         if (!_hiddenSeries.contains(seriesIndex))
           ...widget.series[seriesIndex].points,
     ];
+    if (points.isEmpty) {
+      points.addAll(widget.series.expand((series) => series.points));
+    }
     final rawMinX = points.map((e) => e.x).reduce(math.min);
     final rawMaxX = points.map((e) => e.x).reduce(math.max);
     final rawMinY = points.map((e) => e.y).reduce(math.min);
     final rawMaxY = points.map((e) => e.y).reduce(math.max);
-    final xPadding = math.max((rawMaxX - rawMinX).abs() * 0.06, 0.5);
-    final yPadding = math.max((rawMaxY - rawMinY).abs() * 0.06, 0.5);
-    final minX = widget.xAxis.min ?? rawMinX - xPadding;
-    final maxX = widget.xAxis.max ?? rawMaxX + xPadding;
-    final minY = widget.yAxis.min ?? rawMinY - yPadding;
-    final maxY = widget.yAxis.max ?? rawMaxY + yPadding;
+    final xScale = hyperChartNumericScale(
+      rawMinX,
+      rawMaxX,
+      widget.xAxis,
+      includeZero: false,
+    );
+    final yScale = hyperChartNumericScale(
+      rawMinY,
+      rawMaxY,
+      widget.yAxis,
+      includeZero: false,
+    );
+    final minX = xScale.min, maxX = xScale.max;
+    final minY = yScale.min, maxY = yScale.max;
     final style = hyperChartAxisStyle(theme, chart);
+    final leftAxis = _axis(widget.yAxis, style, true, chart, minY, maxY);
+    final grid = FlGridData(
+      show: widget.showGrid,
+      drawVerticalLine: true,
+      horizontalInterval: yScale.interval,
+      verticalInterval: xScale.interval,
+      getDrawingHorizontalLine: (_) => FlLine(
+        color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
+        strokeWidth: 1,
+      ),
+      getDrawingVerticalLine: (_) => FlLine(
+        color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
+        strokeWidth: 1,
+      ),
+    );
     return ScatterChartData(
       minX: minX,
       maxX: maxX == minX ? minX + 1 : maxX,
       minY: minY,
       maxY: maxY == minY ? minY + 1 : maxY,
-      borderData: FlBorderData(show: false),
-      gridData: FlGridData(
-        show: widget.showGrid,
-        drawVerticalLine: true,
-        horizontalInterval: widget.yAxis.interval,
-        verticalInterval: widget.xAxis.interval,
-        getDrawingHorizontalLine: (_) => FlLine(
-          color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
-          strokeWidth: 1,
-        ),
-        getDrawingVerticalLine: (_) => FlLine(
-          color: theme.colors.outline.withValues(alpha: chart.gridOpacity),
-          strokeWidth: 1,
-        ),
+      borderData: hyperChartGridBoundary(
+        grid,
+        minY: minY,
+        maxY: maxY,
+        minX: minX,
+        maxX: maxX,
       ),
-      titlesData: FlTitlesData(
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
+      gridData: grid,
+      titlesData: hyperChartBalancedTitles(
+        FlTitlesData(
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: _axis(widget.xAxis, style, false, chart, minX, maxX),
+          leftTitles: leftAxis,
         ),
-        bottomTitles: _axis(widget.xAxis, style, false, chart, minX, maxX),
-        leftTitles: _axis(widget.yAxis, style, true, chart, minY, maxY),
+        verticalLabelHeight: hyperChartAxisLabelHeight(context, style),
       ),
       scatterSpots: <ScatterSpot>[
         for (final entry in flattened) _spot(entry, chart, palette),
@@ -379,8 +458,8 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
     axisNameSize: !axis.show || axis.title == null ? 0 : 20,
     sideTitles: SideTitles(
       showTitles: axis.show,
-      minIncluded: axis.min != null,
-      maxIncluded: axis.max != null,
+      minIncluded: true,
+      maxIncluded: true,
       reservedSize:
           axis.reservedSize ??
           (vertical
@@ -390,16 +469,24 @@ class _HyperScatterChartState extends State<HyperScatterChart> {
                   chart,
                 )
               : 26),
-      interval: axis.interval,
+      interval: axis.interval ?? hyperChartNiceInterval(min, max),
       getTitlesWidget: (value, meta) => SideTitleWidget(
         meta: meta,
-        space: 6,
-        child: Text(
-          axis.formatter?.call(value) ?? hyperChartNumber(value),
-          style: style,
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.ellipsis,
+        space: hyperChartAxisLabelGap,
+        child: hyperChartCornerLabel(
+          meta,
+          hyperChartAxisLabelWidth(
+            context,
+            axis.formatter?.call(value) ?? hyperChartNumber(value),
+            style,
+          ),
+          Text(
+            axis.formatter?.call(value) ?? hyperChartNumber(value),
+            style: style,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     ),

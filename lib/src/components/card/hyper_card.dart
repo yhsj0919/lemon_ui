@@ -1,5 +1,6 @@
 import '../surface/hyper_material_edge.dart';
 import '../../painting/hyper_box_decoration.dart';
+import '../../painting/hyper_surface_shadow.dart';
 
 import 'dart:ui';
 
@@ -103,6 +104,11 @@ class HyperCard extends StatelessWidget {
         borderRadius: radius,
       );
       final glass = material?.usesBackdrop ?? false;
+      final isolateShadow = hyperSurfaceShadowNeedsIsolation(
+        background: fill,
+        usesBackdrop: glass,
+        outsideShadow: material?.outsideShadow ?? false,
+      );
       // Keep the content ancestry stable across material, edge and shadow
       // changes. Stateful descendants must not remount when paint changes.
       final background = BackdropFilter(
@@ -124,10 +130,13 @@ class HyperCard extends StatelessWidget {
         ),
       );
       final surface = DecoratedBox(
+        position: isolateShadow
+            ? DecorationPosition.foreground
+            : DecorationPosition.background,
         decoration: HyperBoxDecoration(
           borderRadius: radius,
           boxShadow: shadows,
-          outerShadowsOnly: material?.outsideShadow ?? false,
+          outerShadowsOnly: isolateShadow,
         ),
         child: HyperMaterialEdge(
           material: material,

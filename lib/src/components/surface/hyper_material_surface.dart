@@ -1,4 +1,5 @@
 import '../../painting/hyper_box_decoration.dart';
+import '../../painting/hyper_surface_shadow.dart';
 import 'hyper_material_edge.dart';
 import '../../painting/hyper_surface_border.dart';
 
@@ -113,6 +114,11 @@ class HyperMaterialSurface extends StatelessWidget {
     );
 
     final glass = resolved.usesBackdrop;
+    final isolateShadow = hyperSurfaceShadowNeedsIsolation(
+      background: fill,
+      usesBackdrop: glass,
+      outsideShadow: resolved.outsideShadow,
+    );
     final content = ClipRRect(
       borderRadius: radius,
       clipBehavior: glass && clipBehavior == Clip.none
@@ -151,10 +157,13 @@ class HyperMaterialSurface extends StatelessWidget {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
       child: DecoratedBox(
+        position: isolateShadow
+            ? DecorationPosition.foreground
+            : DecorationPosition.background,
         decoration: HyperBoxDecoration(
           borderRadius: radius,
           boxShadow: effectiveShadows,
-          outerShadowsOnly: resolved.outsideShadow,
+          outerShadowsOnly: isolateShadow,
         ),
         child: HyperMaterialEdge(
           material: resolved,

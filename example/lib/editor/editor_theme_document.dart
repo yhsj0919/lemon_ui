@@ -1,3 +1,4 @@
+import 'editor_extended_fields.dart';
 import 'editor_chart_fields.dart';
 import 'editor_table_fields.dart';
 import 'editor_form_fields.dart';
@@ -350,6 +351,7 @@ class EditorDevice {
   EditorWheelMetrics wheelMetrics = EditorWheelMetrics();
   EditorWheelMetrics calendarMetrics = EditorWheelMetrics();
   EditorTableMetrics tableMetrics = EditorTableMetrics();
+  EditorExtendedMetrics extendedControls = EditorExtendedMetrics();
   EditorChartMetrics chartMetrics = EditorChartMetrics();
   EditorFormMetrics formMetrics = EditorFormMetrics();
   EditorTextFieldMetrics textFieldMetrics = EditorTextFieldMetrics();
@@ -405,6 +407,8 @@ class EditorDevice {
       'switchMetrics': switchMetrics.toJson(),
     if (tagMetrics.toJson().isNotEmpty) 'tagMetrics': tagMetrics.toJson(),
     if (chipMetrics.toJson().isNotEmpty) 'chipMetrics': chipMetrics.toJson(),
+    if (extendedControls.toJson().isNotEmpty)
+      'extendedControls': extendedControls.toJson(),
     if (chartMetrics.toJson().isNotEmpty) 'chartMetrics': chartMetrics.toJson(),
     if (tableMetrics.toJson().isNotEmpty) 'tableMetrics': tableMetrics.toJson(),
     if (formMetrics.toJson().isNotEmpty) 'formMetrics': formMetrics.toJson(),
@@ -460,6 +464,7 @@ class EditorDevice {
       'chipMetrics',
       'selectMetrics',
       'tableMetrics',
+      'extendedControls',
       'chartMetrics',
       'formMetrics',
       'calendarMetrics',
@@ -552,6 +557,9 @@ class EditorDevice {
       ..chipMetrics = EditorChipMetrics.fromJson(
         (j['chipMetrics'] as Map<String, dynamic>?) ?? {},
       )
+      ..extendedControls = EditorExtendedMetrics.fromJson(
+        (j['extendedControls'] as Map<String, dynamic>?) ?? {},
+      )
       ..chartMetrics = EditorChartMetrics.fromJson(
         (j['chartMetrics'] as Map<String, dynamic>?) ?? {},
       )
@@ -607,8 +615,29 @@ double? number(dynamic value, {double? min, double? max}) {
 }
 
 /// 亮暗方案独立编辑，共享一套四端布局规格。
+/// Inline editor owns only display/error overrides; controls inherit their themes.
+class EditorInlineEditVisual {
+  EditorColor? displayColor, errorColor;
+  Map<String, Object?> toJson() => {
+    if (displayColor != null) 'displayColor': displayColor!.toJson(),
+    if (errorColor != null) 'errorColor': errorColor!.toJson(),
+  };
+  EditorInlineEditVisual();
+  factory EditorInlineEditVisual.fromJson(Map<String, dynamic> json) {
+    _checkFields(json, {'displayColor', 'errorColor'});
+    return EditorInlineEditVisual()
+      ..displayColor = json['displayColor'] == null
+          ? null
+          : EditorColor.fromJson(json['displayColor'] as Map<String, dynamic>)
+      ..errorColor = json['errorColor'] == null
+          ? null
+          : EditorColor.fromJson(json['errorColor'] as Map<String, dynamic>);
+  }
+}
+
 class EditorMode {
   EditorTableVisual tableVisual = EditorTableVisual();
+  EditorExtendedVisual extendedControls = EditorExtendedVisual();
   EditorChartVisual chartVisual = EditorChartVisual();
   EditorReviewCollection reviews = EditorReviewCollection();
   String? fontFamily;
@@ -667,6 +696,7 @@ class EditorMode {
   final collapsible = EditorComponent();
   final group = EditorComponent();
   final card = EditorComponent();
+  EditorInlineEditVisual inlineEdit = EditorInlineEditVisual();
   final field = EditorComponent();
   final menu = EditorComponent();
   final select = EditorComponent(), selectAnchor = EditorComponent();
@@ -674,6 +704,8 @@ class EditorMode {
   EditorWheelVisual calendar = EditorWheelVisual();
   EditorFormVisual formFields = EditorFormVisual();
   Map<String, Object?> toJson() => {
+    if (extendedControls.toJson().isNotEmpty)
+      'extendedControls': extendedControls.toJson(),
     if (chartVisual.toJson().isNotEmpty) 'chartVisual': chartVisual.toJson(),
     if (tableVisual.toJson().isNotEmpty) 'tableVisual': tableVisual.toJson(),
     if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
@@ -760,6 +792,7 @@ class EditorMode {
     if (collapsible.toJson().isNotEmpty) 'collapsible': collapsible.toJson(),
     if (group.toJson().isNotEmpty) 'group': group.toJson(),
     if (card.toJson().isNotEmpty) 'card': card.toJson(),
+    if (inlineEdit.toJson().isNotEmpty) 'inlineEdit': inlineEdit.toJson(),
     if (field.toJson().isNotEmpty) 'field': field.toJson(),
     if (formFields.toJson().isNotEmpty) 'formFields': formFields.toJson(),
     if (calendar.toJson().isNotEmpty) 'calendar': calendar.toJson(),
@@ -820,6 +853,7 @@ class EditorMode {
       'iconButtonOutlinedInput',
       'iconButtonGhostInput',
       'tableVisual',
+      'extendedControls',
       'chartVisual',
       'treeContent',
       'resultContent',
@@ -836,6 +870,7 @@ class EditorMode {
       'field',
       'select',
       'selectAnchor',
+      'inlineEdit',
       'formFields',
       'calendar',
       'wheel',
@@ -902,6 +937,9 @@ class EditorMode {
       target.border = value.border;
     }
 
+    result.inlineEdit = EditorInlineEditVisual.fromJson(
+      (j['inlineEdit'] as Map<String, dynamic>?) ?? {},
+    );
     read('materialAppearance', result.materialAppearance);
     read('button', result.button);
     read('tag', result.tag);
@@ -937,6 +975,9 @@ class EditorMode {
     read('iconButtonTonalInput', result.iconButtonTonalInput);
     read('iconButtonOutlinedInput', result.iconButtonOutlinedInput);
     read('iconButtonGhostInput', result.iconButtonGhostInput);
+    result.extendedControls = EditorExtendedVisual.fromJson(
+      (j['extendedControls'] as Map<String, dynamic>?) ?? {},
+    );
     result.chartVisual = EditorChartVisual.fromJson(
       (j['chartVisual'] as Map<String, dynamic>?) ?? {},
     );
@@ -1187,6 +1228,9 @@ class EditorThemeDocument {
             padding: d.cardMetrics.resolvedPadding(
               s.card.padding.resolve(TextDirection.ltr),
             ),
+            listGroupTitlePadding: d.cardMetrics.titlePadding == null
+                ? null
+                : EdgeInsets.all(d.cardMetrics.titlePadding!),
             titlePadding: d.cardMetrics.titlePadding == null
                 ? null
                 : EdgeInsets.all(d.cardMetrics.titlePadding!),
@@ -2291,6 +2335,113 @@ class EditorThemeDocument {
                   ),
                 ),
           ),
+
+      ratingTheme: theme.ratingTheme.copyWith(
+        style: HyperRatingStyle(
+          iconSize: device(deviceType).extendedControls.ratingIconSize,
+          gap: device(deviceType).extendedControls.ratingGap,
+          hitExtent: device(deviceType).extendedControls.ratingHitExtent,
+          activeColor: m.extendedControls.ratingActive?.resolve(colors),
+          inactiveColor: m.extendedControls.ratingInactive?.resolve(colors),
+          hoverColor: m.extendedControls.ratingHover?.resolve(colors),
+          focusColor: m.extendedControls.ratingFocus?.resolve(colors),
+          disabledColor: m.extendedControls.ratingDisabled?.resolve(colors),
+        ),
+      ),
+      transferTheme: theme.transferTheme.copyWith(
+        style: HyperTransferStyle(
+          panelHeight: device(deviceType).extendedControls.transferHeight,
+          panelWidth: device(deviceType).extendedControls.transferWidth,
+          gap: device(deviceType).extendedControls.transferGap,
+          titleStyle: m.extendedControls.transferTitle == null
+              ? null
+              : TextStyle(
+                  color: m.extendedControls.transferTitle!.resolve(colors),
+                ),
+          emptyStyle: m.extendedControls.transferEmpty == null
+              ? null
+              : TextStyle(
+                  color: m.extendedControls.transferEmpty!.resolve(colors),
+                ),
+          surfaceStyle: HyperCardStyle(
+            background: m.extendedControls.transferBackground == null
+                ? null
+                : HyperFill.color(
+                    m.extendedControls.transferBackground!.resolve(colors),
+                  ),
+            border: m.extendedControls.transferBorder == null
+                ? null
+                : Border.all(
+                    color: m.extendedControls.transferBorder!.resolve(colors),
+                    width: theme.sizes.resolve(deviceType).divider.thickness,
+                  ),
+            borderRadius:
+                device(deviceType).extendedControls.transferRadius == null
+                ? null
+                : BorderRadius.circular(
+                    device(deviceType).extendedControls.transferRadius!,
+                  ),
+          ),
+        ),
+      ),
+      resizableTheme: theme.resizableTheme.copyWith(
+        style: HyperResizableStyle(
+          handleExtent: device(deviceType)
+              .extendedControls
+              .resizableHandleExtent,
+          thickness: device(deviceType).extendedControls.resizableThickness,
+          handleColor: m.extendedControls.resizableColor?.resolve(colors),
+          activeColor: m.extendedControls.resizableActive?.resolve(colors),
+          focusColor: m.extendedControls.resizableFocus?.resolve(colors),
+        ),
+      ),
+      navigationBarTheme: theme.navigationBarTheme.copyWith(
+        style: HyperNavigationBarStyle(
+          gap: device(deviceType).extendedControls.navigationGap,
+          iconSize: device(deviceType).extendedControls.navigationIconSize,
+          itemSpacing: device(deviceType)
+              .extendedControls
+              .navigationItemSpacing,
+          itemStyle: HyperButtonStyle(
+            foregroundColor: m.extendedControls.navigationText?.resolve(colors),
+          ),
+          selectedItemStyle: HyperButtonStyle(
+            foregroundColor: m.extendedControls.navigationSelectedText?.resolve(
+              colors,
+            ),
+          ),
+          surfaceStyle: HyperCardStyle(
+            background: m.extendedControls.navigationBackground == null
+                ? null
+                : HyperFill.color(
+                    m.extendedControls.navigationBackground!.resolve(colors),
+                  ),
+            border: m.extendedControls.navigationBorder == null
+                ? null
+                : Border.all(
+                    color: m.extendedControls.navigationBorder!.resolve(colors),
+                    width: theme.sizes.resolve(deviceType).divider.thickness,
+                  ),
+            borderRadius:
+                device(deviceType).extendedControls.navigationRadius == null
+                ? null
+                : BorderRadius.circular(
+                    device(deviceType).extendedControls.navigationRadius!,
+                  ),
+          ),
+        ),
+      ),
+
+      inlineEditTheme: theme.inlineEditTheme.copyWith(
+        style: HyperInlineEditStyle(
+          displayStyle: m.inlineEdit.displayColor == null
+              ? null
+              : TextStyle(color: m.inlineEdit.displayColor!.resolve(colors)),
+          errorStyle: m.inlineEdit.errorColor == null
+              ? null
+              : TextStyle(color: m.inlineEdit.errorColor!.resolve(colors)),
+        ),
+      ),
       fieldTheme: theme.fieldTheme.copyWith(
         style: m.formFields.resolve(colors),
       ),

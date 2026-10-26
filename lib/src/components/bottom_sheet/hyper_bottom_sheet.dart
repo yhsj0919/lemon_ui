@@ -39,7 +39,10 @@ HyperBottomSheetStyle _resolveStyle(
         ? metrics.landscapeMaxWidth ?? metrics.maxWidth
         : metrics.maxWidth,
     padding: metrics.padding,
-    titleStyle: theme.textTheme.titleMedium ?? const TextStyle(),
+    titleStyle: (theme.textTheme.titleLarge ?? const TextStyle()).copyWith(
+      fontSize: theme.textTheme.bodyLarge?.fontSize,
+      fontWeight: FontWeight.w500,
+    ),
     contentStyle: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
       color: theme.colors.textSecondary,
     ),
@@ -181,7 +184,7 @@ class HyperBottomSheet extends StatelessWidget {
     if (resolved.material != null) {
       surface = HyperMaterialSurface(
         material: resolved.material,
-        materialEdge: true,
+        materialEdge: false,
         boxShadow: resolved.boxShadow,
         border: resolved.border,
         semanticBackground: resolved.background,

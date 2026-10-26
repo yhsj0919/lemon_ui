@@ -22,6 +22,7 @@ class HyperDialog extends StatelessWidget {
   const HyperDialog({
     super.key,
     this.title,
+    this.titleActions = const [],
     required this.content,
     this.actions = const [],
     this.showCloseButton = true,
@@ -29,9 +30,14 @@ class HyperDialog extends StatelessWidget {
     this.scrollable = true,
     this.semanticLabel,
     this.style,
+    this.surfaceBuilder,
+    this.animateInsets = true,
   });
 
   final Widget? title;
+
+  /// Independent title-end controls; their hit regions do not size the title.
+  final List<Widget> titleActions;
   final Widget content;
   final List<Widget> actions;
   final bool showCloseButton;
@@ -41,6 +47,12 @@ class HyperDialog extends StatelessWidget {
   final bool scrollable;
   final String? semanticLabel;
   final HyperDialogStyle? style;
+
+  /// Wraps the resolved dialog surface, preserving the shared material path.
+  final Widget Function(BuildContext context, Widget surface)? surfaceBuilder;
+
+  /// Disable for window geometry changes that must apply in a single layout.
+  final bool animateInsets;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +75,10 @@ class HyperDialog extends StatelessWidget {
       padding: metrics.padding,
       insetPadding: metrics.insetPadding,
       alignment: Alignment.center,
-      titleStyle: theme.textTheme.titleMedium ?? const TextStyle(),
+      titleStyle: (theme.textTheme.titleLarge ?? const TextStyle()).copyWith(
+        fontSize: theme.textTheme.bodyLarge?.fontSize,
+        fontWeight: FontWeight.w500,
+      ),
       contentStyle: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
         color: theme.colors.textSecondary,
       ),
@@ -79,17 +94,25 @@ class HyperDialog extends StatelessWidget {
     ).merge(HyperDialogTheme.of(context).style).merge(style);
     final layout = HyperModalContent(
       title: title,
-      closeButton: showCloseButton
-          ? HyperIconButton.ghost(
-              icon: Icon(resolved.closeIcon!),
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              style: HyperIconButtonStyle(
-                foregroundColor: resolved.closeIconColor,
-                iconSize: resolved.closeIconSize,
-              ),
-              onPressed: onClose ?? () => Navigator.of(context).pop(),
-            )
-          : null,
+      closeButton: titleActions.isEmpty && !showCloseButton
+          ? null
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...titleActions,
+                if (showCloseButton)
+                  HyperIconButton.ghost(
+                    icon: Icon(resolved.closeIcon!),
+                    tooltip: MaterialLocalizations.of(context)
+                        .closeButtonTooltip,
+                    style: HyperIconButtonStyle(
+                      foregroundColor: resolved.closeIconColor,
+                      iconSize: resolved.closeIconSize,
+                    ),
+                    onPressed: onClose ?? () => Navigator.of(context).pop(),
+                  ),
+              ],
+            ),
       content: content,
       actions: actions,
       scrollable: scrollable,
@@ -127,7 +150,7 @@ class HyperDialog extends StatelessWidget {
     if (resolved.material != null) {
       surface = HyperMaterialSurface(
         material: resolved.material,
-        materialEdge: true,
+        materialEdge: false,
         boxShadow: resolved.boxShadow,
         border: resolved.border,
         semanticBackground: resolved.background,
@@ -136,6 +159,15 @@ class HyperDialog extends StatelessWidget {
         child: surface,
       );
     }
+    Widget positionedSurface = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: resolved.maxWidth!),
+      child: SizedBox(
+        width: resolved.width ?? resolved.maxWidth,
+        child: surface,
+      ),
+    );
+    positionedSurface =
+        surfaceBuilder?.call(context, positionedSurface) ?? positionedSurface;
     return Semantics(
       scopesRoute: true,
       namesRoute: true,
@@ -143,20 +175,11 @@ class HyperDialog extends StatelessWidget {
       explicitChildNodes: true,
       child: AnimatedPadding(
         padding: resolved.insetPadding!.add(MediaQuery.viewInsetsOf(context)),
-        duration: MediaQuery.of(context).disableAnimations
+        duration: !animateInsets || MediaQuery.of(context).disableAnimations
             ? Duration.zero
             : (resolved.duration ?? theme.motion.fastDuration),
         curve: resolved.curve ?? theme.motion.fastCurve,
-        child: Align(
-          alignment: resolved.alignment!,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: resolved.maxWidth!),
-            child: SizedBox(
-              width: resolved.width ?? resolved.maxWidth,
-              child: surface,
-            ),
-          ),
-        ),
+        child: Align(alignment: resolved.alignment!, child: positionedSurface),
       ),
     );
   }

@@ -56,6 +56,7 @@ class HyperNavigationSurface extends StatelessWidget {
         boxShadow: style.boxShadow,
         borderRadius: style.borderRadius,
         padding: style.padding,
+        clipBehavior: Clip.antiAlias,
         child: content,
       );
     }
@@ -63,6 +64,7 @@ class HyperNavigationSurface extends StatelessWidget {
       duration: duration,
       curve: theme.motion.fastCurve,
       padding: style.padding,
+      clipBehavior: Clip.antiAlias,
       foregroundDecoration: hyperSurfaceBorderDecoration(
         style.border,
         style.borderRadius,

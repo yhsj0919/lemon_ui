@@ -20,6 +20,7 @@ final class HyperDescriptionListStyle {
     this.cellPadding,
     this.columnSpacing,
     this.rowSpacing,
+    this.minimumRowHeight,
     this.labelValueSpacing,
     this.labelAlign,
     this.valueAlign,
@@ -48,6 +49,7 @@ final class HyperDescriptionListStyle {
   final EdgeInsetsGeometry? cellPadding;
   final double? columnSpacing;
   final double? rowSpacing;
+  final double? minimumRowHeight;
   final double? labelValueSpacing;
   final TextAlign? labelAlign;
   final TextAlign? valueAlign;
@@ -76,6 +78,7 @@ final class HyperDescriptionListStyle {
     EdgeInsetsGeometry? cellPadding,
     double? columnSpacing,
     double? rowSpacing,
+    double? minimumRowHeight,
     double? labelValueSpacing,
     TextAlign? labelAlign,
     TextAlign? valueAlign,
@@ -104,6 +107,7 @@ final class HyperDescriptionListStyle {
     cellPadding: cellPadding ?? this.cellPadding,
     columnSpacing: columnSpacing ?? this.columnSpacing,
     rowSpacing: rowSpacing ?? this.rowSpacing,
+    minimumRowHeight: minimumRowHeight ?? this.minimumRowHeight,
     labelValueSpacing: labelValueSpacing ?? this.labelValueSpacing,
     labelAlign: labelAlign ?? this.labelAlign,
     valueAlign: valueAlign ?? this.valueAlign,
@@ -136,6 +140,7 @@ final class HyperDescriptionListStyle {
           cellPadding: other.cellPadding ?? cellPadding,
           columnSpacing: other.columnSpacing ?? columnSpacing,
           rowSpacing: other.rowSpacing ?? rowSpacing,
+          minimumRowHeight: other.minimumRowHeight ?? minimumRowHeight,
           labelValueSpacing: other.labelValueSpacing ?? labelValueSpacing,
           labelAlign: other.labelAlign ?? labelAlign,
           valueAlign: other.valueAlign ?? valueAlign,
@@ -191,6 +196,10 @@ final class HyperDescriptionListStyle {
       columnSpacing: a.columnSpacing == null || b.columnSpacing == null
           ? (t < .5 ? a.columnSpacing : b.columnSpacing)
           : a.columnSpacing! + (b.columnSpacing! - a.columnSpacing!) * t,
+      minimumRowHeight: a.minimumRowHeight == null || b.minimumRowHeight == null
+          ? (t < .5 ? a.minimumRowHeight : b.minimumRowHeight)
+          : a.minimumRowHeight! +
+                (b.minimumRowHeight! - a.minimumRowHeight!) * t,
       rowSpacing: a.rowSpacing == null || b.rowSpacing == null
           ? (t < .5 ? a.rowSpacing : b.rowSpacing)
           : a.rowSpacing! + (b.rowSpacing! - a.rowSpacing!) * t,
@@ -248,6 +257,7 @@ final class HyperDescriptionListStyle {
       cellPadding == other.cellPadding &&
       columnSpacing == other.columnSpacing &&
       rowSpacing == other.rowSpacing &&
+      minimumRowHeight == other.minimumRowHeight &&
       labelValueSpacing == other.labelValueSpacing &&
       labelAlign == other.labelAlign &&
       valueAlign == other.valueAlign &&
@@ -277,6 +287,7 @@ final class HyperDescriptionListStyle {
     cellPadding,
     columnSpacing,
     rowSpacing,
+    minimumRowHeight,
     labelValueSpacing,
     labelAlign,
     valueAlign,

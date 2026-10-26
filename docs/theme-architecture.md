@@ -886,3 +886,13 @@ Gallery 预留“表单”正式分类；Form Demo 与编辑入口暂位于“�
 行底色由同一表面路径绘制，固定列与主体共享悬停身份；Motion 与减少动画设置统一处理状态过渡。表格表面继承统一材质质量及降级，行右键/长按菜单使用 HyperContextMenu，表头菜单与编辑控件使用公共 Hyper 组件。未搬运旧版悬停缩放、覆盖滚动条或补丁。
 
 本地/分页/无限加载分别处理数据，远程排序和刷新使旧请求失效。树形按稳定 key 展开，子级缓存与请求代次防止刷新前结果覆盖新数据；分页以根节点计数，排序保留父子关系。行拖动只用于本地未分页且未排序的平面数据，避免把展示位置误当业务全量顺序。
+
+## InlineEdit（2026-10-26，用户已确认）
+
+行内编辑全局 inlineEditTheme、局部 HyperInlineEditTheme 与实例 HyperInlineEditStyle 逐字段合并，包含文字、输入、操作按钮和动效覆盖；支持 copyWith、插值及值相等。四端最小高度复用 sizes.textField，间距复用 sizes.form，不保存组件端内常量。默认表面由子控件主题及统一材质系统负责，默认过渡只动画尺寸，减少动画优先。设计来源为 D 级既有语义组合，细节见 usage/inline-edit.md。
+
+## 评分、穿梭框、分栏、可移动对话框与导航栏（2026-10-26，未确认）
+
+新增 ratingTheme、transferTheme、resizableTheme、movableDialogTheme、navigationBarTheme 强类型全局主题，局部 Theme 和实例 Style 只覆盖显式字段；复制、插值、值相等和哈希保持完整。默认四端几何复用当前已解析的 icon/button/form/divider/menu/selection/card/dialog 等语义规格，不在组件内分设备保存常量。编辑器设备尺寸与亮暗颜色分开保存。详见 usage/pending-controls.md。
+
+HyperDialog 新增 surfaceBuilder，只包装已完成材质、边框、阴影与圆角解析的表面；可移动对话框以此复用公共路径，仅施加平移。路由继续使用 showHyperDialog 的调用处主题捕获和安全材质过渡，空阴影与显式边框优先。

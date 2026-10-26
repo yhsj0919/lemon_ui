@@ -1,3 +1,6 @@
+import 'components/hyper_navigation_bar_size.dart';
+import 'components/hyper_transfer_size.dart';
+import 'components/hyper_rating_size.dart';
 import 'components/hyper_chart_size.dart';
 import 'components/hyper_table_size.dart';
 import 'components/hyper_form_size.dart';
@@ -149,6 +152,9 @@ final class HyperSizeScheme {
     required this.slider,
     required this.divider,
     required this.icon,
+    this.navigationBar = const HyperNavigationBarSize(),
+    this.rating = const HyperRatingSize(),
+    this.transfer = const HyperTransferSize(),
     required this.progress,
   });
 
@@ -156,6 +162,7 @@ final class HyperSizeScheme {
   const HyperSizeScheme.phone()
     : this(
         deviceType: HyperDeviceType.phone,
+        navigationBar: const HyperNavigationBarSize.phone(),
         controlHeightXs: 32,
         controlHeightSm: 40,
         controlHeightMd: 48,
@@ -253,7 +260,7 @@ final class HyperSizeScheme {
         ),
         descriptionList: const HyperDescriptionListSize(
           radius: 16,
-          cellPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          cellPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           columnSpacing: 16,
           rowSpacing: 8,
           labelValueSpacing: 8,
@@ -402,11 +409,11 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.all(4),
           height: 42,
           separatedRadius: 12,
           segmentedRadius: 8,
-          itemSpacing: 9,
+          itemSpacing: 4,
           underlineThickness: 2,
         ),
         breadcrumb: const HyperBreadcrumbSize(
@@ -694,7 +701,7 @@ final class HyperSizeScheme {
         ),
         descriptionList: const HyperDescriptionListSize(
           radius: 20,
-          cellPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          cellPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           columnSpacing: 20,
           rowSpacing: 12,
           labelValueSpacing: 12,
@@ -842,11 +849,11 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.all(4),
           height: 44,
           separatedRadius: 16,
           segmentedRadius: 16,
-          itemSpacing: 10,
+          itemSpacing: 4,
           underlineThickness: 2,
         ),
         breadcrumb: const HyperBreadcrumbSize(
@@ -1037,6 +1044,7 @@ final class HyperSizeScheme {
   const HyperSizeScheme.desktop()
     : this(
         deviceType: HyperDeviceType.desktop,
+        navigationBar: const HyperNavigationBarSize.desktop(),
         controlHeightXs: 28,
         controlHeightSm: 36,
         controlHeightMd: 44,
@@ -1134,7 +1142,7 @@ final class HyperSizeScheme {
         ),
         descriptionList: const HyperDescriptionListSize(
           radius: 8,
-          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           columnSpacing: 12,
           rowSpacing: 8,
           labelValueSpacing: 8,
@@ -1282,11 +1290,11 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.all(4),
           height: 36,
           separatedRadius: 10,
           segmentedRadius: 10,
-          itemSpacing: 8,
+          itemSpacing: 4,
           underlineThickness: 2,
         ),
         breadcrumb: const HyperBreadcrumbSize(
@@ -1574,7 +1582,7 @@ final class HyperSizeScheme {
         ),
         descriptionList: const HyperDescriptionListSize(
           radius: 20,
-          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          cellPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           columnSpacing: 12,
           rowSpacing: 6,
           labelValueSpacing: 6,
@@ -1722,11 +1730,11 @@ final class HyperSizeScheme {
           itemHorizontalPadding: 16,
         ),
         tabBar: const HyperTabBarSize(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.all(4),
           height: 40,
           separatedRadius: 20,
           segmentedRadius: 20,
-          itemSpacing: 8,
+          itemSpacing: 4,
           underlineThickness: 2,
         ),
         breadcrumb: const HyperBreadcrumbSize(
@@ -1985,6 +1993,9 @@ final class HyperSizeScheme {
   final HyperSliderSize slider;
   final HyperDividerSize divider;
   final HyperIconSize icon;
+  final HyperNavigationBarSize navigationBar;
+  final HyperRatingSize rating;
+  final HyperTransferSize transfer;
   final HyperProgressSize progress;
 
   HyperSizeScheme copyWith({
@@ -2057,6 +2068,9 @@ final class HyperSizeScheme {
     HyperSliderSize? slider,
     HyperDividerSize? divider,
     HyperIconSize? icon,
+    HyperNavigationBarSize? navigationBar,
+    HyperRatingSize? rating,
+    HyperTransferSize? transfer,
     HyperProgressSize? progress,
   }) => HyperSizeScheme(
     navigationItemSpacing: navigationItemSpacing ?? this.navigationItemSpacing,
@@ -2131,6 +2145,9 @@ final class HyperSizeScheme {
     slider: slider ?? this.slider,
     divider: divider ?? this.divider,
     icon: icon ?? this.icon,
+    navigationBar: navigationBar ?? this.navigationBar,
+    rating: rating ?? this.rating,
+    transfer: transfer ?? this.transfer,
     progress: progress ?? this.progress,
   );
 
@@ -2255,6 +2272,13 @@ final class HyperSizeScheme {
       slider: HyperSliderSize.lerp(a.slider, b.slider, t),
       divider: HyperDividerSize.lerp(a.divider, b.divider, t),
       icon: HyperIconSize.lerp(a.icon, b.icon, t),
+      navigationBar: HyperNavigationBarSize.lerp(
+        a.navigationBar,
+        b.navigationBar,
+        t,
+      ),
+      rating: HyperRatingSize.lerp(a.rating, b.rating, t),
+      transfer: HyperTransferSize.lerp(a.transfer, b.transfer, t),
       progress: HyperProgressSize.lerp(a.progress, b.progress, t),
     );
   }
@@ -2332,6 +2356,9 @@ final class HyperSizeScheme {
           other.slider == slider &&
           other.divider == divider &&
           other.icon == icon &&
+          other.navigationBar == navigationBar &&
+          other.rating == rating &&
+          other.transfer == transfer &&
           other.progress == progress;
 
   @override
@@ -2405,6 +2432,9 @@ final class HyperSizeScheme {
     slider,
     divider,
     icon,
+    navigationBar,
+    rating,
+    transfer,
     progress,
   ]);
 }

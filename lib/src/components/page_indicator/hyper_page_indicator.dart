@@ -82,8 +82,8 @@ class HyperPageIndicator extends StatelessWidget {
       counterStyle: theme.textTheme.bodySmall?.copyWith(
         color: theme.colors.textSecondary,
       ),
-      duration: theme.motion.fastDuration,
-      curve: theme.motion.fastCurve,
+      duration: theme.motion.standardDuration,
+      curve: theme.motion.standardCurve,
     ).merge(HyperPageIndicatorTheme.of(context).style).merge(style);
     final duration = (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
         ? Duration.zero

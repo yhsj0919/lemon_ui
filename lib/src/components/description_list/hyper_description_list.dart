@@ -1,3 +1,4 @@
+import '../overlay/hyper_title_action_layout.dart';
 import '../divider/hyper_divider.dart';
 import '../../painting/hyper_box_decoration.dart';
 
@@ -56,6 +57,7 @@ class HyperDescriptionList extends StatelessWidget {
       cellPadding: size.cellPadding,
       columnSpacing: size.columnSpacing,
       rowSpacing: size.rowSpacing,
+      minimumRowHeight: size.minimumRowHeight,
       labelValueSpacing: size.labelValueSpacing,
       labelAlign: TextAlign.start,
       valueAlign: TextAlign.start,
@@ -148,7 +150,18 @@ class HyperDescriptionList extends StatelessWidget {
           );
           final label = part(item.label, cs.labelStyle!, cs.labelBackground!);
           final value = part(
-            item.value ?? Text(cs.placeholder!),
+            item.action == null
+                ? item.value ?? Text(cs.placeholder!)
+                : HyperTitleActionLayout(
+                    direction: direction,
+                    title: item.value ?? const Text(''),
+                    controls: Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        start: cs.labelValueSpacing!,
+                      ),
+                      child: item.action!,
+                    ),
+                  ),
             cs.valueStyle!,
             cs.valueBackground!,
             value: true,
@@ -196,8 +209,12 @@ class HyperDescriptionList extends StatelessWidget {
               ],
             );
           }
-          return SizedBox(
-            width: placement.width,
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: placement.width,
+              maxWidth: placement.width,
+              minHeight: cs.minimumRowHeight!,
+            ),
             child: DecoratedBox(
               position: DecorationPosition.foreground,
               decoration: HyperBoxDecoration(
@@ -292,10 +309,18 @@ class HyperDescriptionList extends StatelessWidget {
             child: body,
           );
         }
-        body = ClipRRect(
-          borderRadius: s.borderRadius!.resolve(direction),
-          child: body,
-        );
+        // A transparent layout has no rounded surface to clip. Clipping here
+        // otherwise cuts the corners of interactive values in its outer cells.
+        if (bordered ||
+            s.material != null ||
+            !s.background!.isNone ||
+            !s.labelBackground!.isNone ||
+            !s.valueBackground!.isNone) {
+          body = ClipRRect(
+            borderRadius: s.borderRadius!.resolve(direction),
+            child: body,
+          );
+        }
         if (bordered) {
           // 前景边框不占布局宽度，跨列与普通列使用同一套宽度。
           body = DecoratedBox(

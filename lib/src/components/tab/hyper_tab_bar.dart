@@ -77,6 +77,31 @@ class HyperTabBar extends StatelessWidget {
     final radius = BorderRadius.circular(
       segmented ? sizes.tabBar.segmentedRadius : sizes.tabBar.separatedRadius,
     );
+    final insets = (padding ?? sizes.tabBar.padding).resolve(
+      Directionality.of(context),
+    );
+    final outerRadius = (visual.trackStyle?.borderRadius ?? radius).resolve(
+      Directionality.of(context),
+    );
+    Radius innerCorner(Radius outer, double horizontal, double vertical) =>
+        Radius.elliptical(
+          (outer.x - horizontal).clamp(0, double.infinity),
+          (outer.y - vertical).clamp(0, double.infinity),
+        );
+    final innerRadius = BorderRadius.only(
+      topLeft: innerCorner(outerRadius.topLeft, insets.left, insets.top),
+      topRight: innerCorner(outerRadius.topRight, insets.right, insets.top),
+      bottomLeft: innerCorner(
+        outerRadius.bottomLeft,
+        insets.left,
+        insets.bottom,
+      ),
+      bottomRight: innerCorner(
+        outerRadius.bottomRight,
+        insets.right,
+        insets.bottom,
+      ),
+    );
     final textStyle = theme.textTheme.labelLarge
         ?.copyWith(fontSize: theme.typography.control)
         .merge(visual.textStyle);
@@ -124,7 +149,7 @@ class HyperTabBar extends StatelessWidget {
                   : double.infinity,
               child: _IndependentTabSurface(
                 inset: segmented
-                    ? EdgeInsets.all(sizes.overlaySpacing)
+                    ? EdgeInsets.zero
                     : separated
                     ? EdgeInsets.symmetric(
                         horizontal: sizes.tabBar.itemSpacing / 2,
@@ -188,7 +213,7 @@ class HyperTabBar extends StatelessWidget {
       indicatorSize: variant == HyperTabBarVariant.underline
           ? TabBarIndicatorSize.label
           : TabBarIndicatorSize.tab,
-      indicatorPadding: EdgeInsets.all(segmented ? sizes.overlaySpacing : 0),
+      indicatorPadding: EdgeInsets.zero,
       indicator: variant == HyperTabBarVariant.underline
           ? UnderlineTabIndicator(
               borderSide: BorderSide(
@@ -214,10 +239,10 @@ class HyperTabBar extends StatelessWidget {
             ? HyperTabSelectionTrack(
                 controller: effectiveController,
                 count: tabs.length,
-                inset: EdgeInsets.all(sizes.overlaySpacing),
+                inset: EdgeInsets.zero,
                 style: HyperCardStyle(
                   background: HyperFill.color(theme.colors.surface),
-                  borderRadius: radius,
+                  borderRadius: innerRadius,
                   padding: EdgeInsets.zero,
                 ).merge(visual.itemStyle).merge(visual.selectedItemStyle),
                 builder: buildTabs,

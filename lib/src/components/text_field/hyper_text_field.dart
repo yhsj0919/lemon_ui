@@ -42,6 +42,7 @@ class HyperTextField extends StatefulWidget {
     this.maxLengthEnforcement,
     this.maxLines = 1,
     this.minLines,
+    this.expands = false,
     this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
@@ -59,7 +60,8 @@ class HyperTextField extends StatefulWidget {
     this.semanticLabel,
     this.style,
     this.errorBuilder,
-  }) : assert(controller == null || initialValue == null),
+  }) : assert(!expands || (maxLines == null && minLines == null)),
+       assert(controller == null || initialValue == null),
        assert(maxLines == null || maxLines > 0),
        assert(minLines == null || minLines > 0),
        assert(maxLines == null || minLines == null || minLines <= maxLines),
@@ -85,6 +87,9 @@ class HyperTextField extends StatefulWidget {
       autocorrect,
       enableSuggestions;
   final int? maxLength, maxLines, minLines;
+
+  /// Fill a bounded parent height and scroll multiline text within the surface.
+  final bool expands;
   final MaxLengthEnforcement? maxLengthEnforcement;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -361,6 +366,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
           obscureText: widget.obscureText && !_showPassword,
           maxLines: widget.maxLines,
           minLines: widget.minLines,
+          expands: widget.expands,
           maxLength: widget.maxLength,
           maxLengthEnforcement: widget.maxLengthEnforcement,
           keyboardType: widget.keyboardType,
@@ -419,6 +425,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
               minWidth: resolved.actionWidth!,
               minHeight: resolveHyperTextFieldActionHeight(
                 minimumHeight: resolved.minimumHeight!,
+                borderVertical: _contentBorderVertical(context, resolved),
                 iconSize: resolved.iconSize!,
                 padding: resolved.padding!.resolve(Directionality.of(context)),
               ),
@@ -431,12 +438,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
           constraints: BoxConstraints(
             minHeight:
                 (resolved.minimumHeight! -
-                        (resolved.material == null
-                            ? (resolved.border?.dimensions
-                                      .resolve(Directionality.of(context))
-                                      .vertical ??
-                                  resolved.borderWidth! * 2)
-                            : 0))
+                        _contentBorderVertical(context, resolved))
                     .clamp(0.0, double.infinity),
           ),
           child: Align(
@@ -492,6 +494,15 @@ class _HyperTextFieldState extends State<HyperTextField> {
             child: surface,
           );
         }
+        final semanticSurface = Semantics(
+          label: widget.semanticLabel ?? widget.label,
+          hint: _hasError ? widget.errorText : null,
+          liveRegion: _hasError,
+          validationResult: _hasError
+              ? SemanticsValidationResult.invalid
+              : SemanticsValidationResult.none,
+          child: surface,
+        );
         return MouseRegion(
           onEnter: (_) => setState(() => _hovered = true),
           onExit: (_) => setState(() => _hovered = false),
@@ -503,15 +514,10 @@ class _HyperTextFieldState extends State<HyperTextField> {
                 Text(widget.label!, style: resolved.labelStyle),
                 SizedBox(height: resolved.labelGap),
               ],
-              Semantics(
-                label: widget.semanticLabel ?? widget.label,
-                hint: _hasError ? widget.errorText : null,
-                liveRegion: _hasError,
-                validationResult: _hasError
-                    ? SemanticsValidationResult.invalid
-                    : SemanticsValidationResult.none,
-                child: surface,
-              ),
+              if (widget.expands)
+                Expanded(child: semanticSurface)
+              else
+                semanticSurface,
             ],
           ),
         );
@@ -532,6 +538,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
     width: style.actionWidth,
     height: resolveHyperTextFieldActionHeight(
       minimumHeight: style.minimumHeight!,
+      borderVertical: _contentBorderVertical(context, style),
       iconSize: style.iconSize!,
       padding: style.padding!.resolve(Directionality.of(context)),
     ),
@@ -634,6 +641,7 @@ class _ErrorHintState extends State<_ErrorHint> {
       width: style.actionWidth,
       height: resolveHyperTextFieldActionHeight(
         minimumHeight: style.minimumHeight!,
+        borderVertical: _contentBorderVertical(context, style),
         iconSize: style.iconSize!,
         padding: style.padding!.resolve(Directionality.of(context)),
       ),
@@ -721,3 +729,12 @@ class _ErrorHintState extends State<_ErrorHint> {
         ),
       );
 }
+
+// Solid decoration borders consume layout space; material borders paint on top.
+double _contentBorderVertical(
+  BuildContext context,
+  HyperTextFieldStyle style,
+) => style.material != null
+    ? 0
+    : style.border?.dimensions.resolve(Directionality.of(context)).vertical ??
+          style.borderWidth! * 2;

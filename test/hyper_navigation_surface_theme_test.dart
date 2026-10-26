@@ -18,7 +18,10 @@ void main() {
                 ),
                 child: HyperNavigationSurface(
                   key: const ValueKey('surface'),
-                  style: HyperCardStyle(material: material),
+                  style: HyperCardStyle(
+                    material: material,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: const SizedBox(width: 40, height: 24),
                 ),
               ),
@@ -27,6 +30,20 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      if (material == null) {
+        expect(
+          tester
+              .widget<AnimatedContainer>(find.byType(AnimatedContainer).first)
+              .clipBehavior,
+          Clip.antiAlias,
+        );
+      } else {
+        final surface = tester.widget<HyperMaterialSurface>(
+          find.byType(HyperMaterialSurface).first,
+        );
+        expect(surface.borderRadius, BorderRadius.circular(16));
+        expect(surface.clipBehavior, Clip.antiAlias);
+      }
       expect(
         tester.getSize(find.byKey(const ValueKey('surface'))),
         const Size(40, 24),
@@ -123,6 +140,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
       expect(tester.takeException(), isNull);
     }
   });
@@ -163,6 +181,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
       final tabBar = tester.widget<TabBar>(find.byType(TabBar));
       expect(tabBar.labelColor, Colors.red);
       expect(tabBar.unselectedLabelColor, Colors.green);
@@ -197,6 +216,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
       for (final decoration in tester.widgetList<DecoratedBox>(
         find.descendant(
           of: find.byType(HyperNotification),

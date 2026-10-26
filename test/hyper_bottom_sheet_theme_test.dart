@@ -3,6 +3,52 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  for (final scale in [1.0, 1.3, 2.0]) {
+    testWidgets('关闭按钮不撑高底部面板标题 $scale', (tester) async {
+      var closed = false;
+      Future<void> render(bool showClose) => tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            duration: Duration.zero,
+            child: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: Scaffold(
+                body: Center(
+                  child: SizedBox(
+                    width: 280,
+                    child: HyperBottomSheet(
+                      title: const Text('标题', key: Key('sheet-title')),
+                      content: const SizedBox(
+                        key: Key('sheet-body'),
+                        height: 120,
+                      ),
+                      showCloseButton: showClose,
+                      onClose: () => closed = true,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await render(false);
+      double contentOffset() =>
+          tester.getTopLeft(find.byKey(const Key('sheet-body'))).dy -
+          tester.getTopLeft(find.byKey(const Key('sheet-title'))).dy;
+      final before = contentOffset();
+      await render(true);
+      await tester.pumpAndSettle();
+      expect(contentOffset(), closeTo(before, .01));
+      final button = find.byType(HyperIconButton);
+      final rect = tester.getRect(button);
+      await tester.tapAt(Offset(rect.center.dx, rect.bottom - 1));
+      await tester.pump();
+      expect(closed, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('未指定配方时默认高级浮层材质，普通质量保留降级配方', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

@@ -258,3 +258,18 @@ const editorTableRowExtentLimit = 320.0;
 /// Icons must fit the row, header and control slot without scaling with text.
 double editorTableIconLimit(double row, double header, double control) =>
     [row, header, control].reduce((a, b) => a < b ? a : b).floorToDouble();
+
+/// Compact control spacing operation boundary, inherited from one interaction target.
+/// Editor policy only; not a platform specification or component default.
+double editorExtendedSpacingLimit(HyperSizeScheme sizes) =>
+    sizes.minimumInteractiveDimension.floorToDouble();
+
+/// A resize hit area may use at most half the smaller preview extent.
+/// Shared with the rating hit-target editor; this is an operation boundary.
+double editorExtendedHandleLimit(Size viewport) =>
+    ((viewport.width < viewport.height ? viewport.width : viewport.height) / 2)
+        .floorToDouble();
+
+/// Transfer panel corner editor: at most half the configured shorter side.
+double editorTransferRadiusLimit(double width, double height) =>
+    editorRadiusLimit(width < height ? width : height);

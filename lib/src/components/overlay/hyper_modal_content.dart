@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'hyper_title_action_layout.dart';
+
 import '../button/hyper_button_theme.dart';
 
 /// 内部布局复用：不读取 Dialog/Sheet 主题，不管理路由或业务状态。
@@ -47,21 +49,16 @@ class HyperModalContent extends StatelessWidget {
     if (scrollable) body = SingleChildScrollView(child: body);
     return Padding(
       padding: padding,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: HyperOverflowColumn(
         children: [
           if (title != null || closeButton != null) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: DefaultTextStyle.merge(
-                    style: titleStyle,
-                    child: title ?? const SizedBox.shrink(),
-                  ),
-                ),
-                ?closeButton,
-              ],
+            HyperTitleActionLayout(
+              direction: Directionality.of(context),
+              title: DefaultTextStyle.merge(
+                style: titleStyle,
+                child: title ?? const Text(''),
+              ),
+              controls: closeButton ?? const SizedBox.shrink(),
             ),
             SizedBox(height: titleSpacing),
           ],

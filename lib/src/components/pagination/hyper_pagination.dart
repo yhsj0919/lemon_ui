@@ -18,7 +18,7 @@ typedef HyperPaginationCounterBuilder = Widget Function(
 );
 
 /// 受控分页导航；不管理数据加载、每页数量或页数变化后的业务修正。
-class HyperPagination extends StatelessWidget {
+class HyperPagination extends StatefulWidget {
   const HyperPagination({
     super.key,
     required this.pageCount,
@@ -40,6 +40,31 @@ class HyperPagination extends StatelessWidget {
   final HyperPaginationCounterBuilder? counterBuilder;
   final HyperPaginationStyle? style;
   @override
+  State<HyperPagination> createState() => _HyperPaginationState();
+}
+
+class _HyperPaginationState extends State<HyperPagination> {
+  bool forward = true;
+  int get pageCount => widget.pageCount;
+  int get currentPage => widget.currentPage;
+  int get siblingCount => widget.siblingCount;
+  int get boundaryCount => widget.boundaryCount;
+  bool get enabled => widget.enabled;
+  bool get showPageNumbers => widget.showPageNumbers;
+  bool get showBoundaryButtons => widget.showBoundaryButtons;
+  ValueChanged<int>? get onPageChanged => widget.onPageChanged;
+  HyperPageLabelBuilder? get pageLabelBuilder => widget.pageLabelBuilder;
+  HyperPaginationCounterBuilder? get counterBuilder => widget.counterBuilder;
+  HyperPaginationStyle? get style => widget.style;
+
+  @override
+  void didUpdateWidget(HyperPagination oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (currentPage != oldWidget.currentPage)
+      forward = currentPage > oldWidget.currentPage;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final model = HyperPaginationModel(
       pageCount: pageCount,
@@ -51,11 +76,14 @@ class HyperPagination extends StatelessWidget {
     final sizes = HyperTheme.sizesOf(context);
     final metrics = sizes.pagination;
     final defaults = HyperButtonStyle(
-      background: const HyperFill.none(),
-      disabledBackground: const HyperFill.none(),
+      background: const HyperFill.color(Colors.transparent),
+      disabledBackground: const HyperFill.color(Colors.transparent),
       foregroundColor: theme.colors.textPrimary,
       disabledForegroundColor: theme.colors.textTertiary,
       border: BorderSide.none,
+      hoverOverlayOpacity: 0,
+      pressOverlayOpacity: 0,
+      focusOverlayOpacity: 0,
       borderRadius: BorderRadius.circular(metrics.radius),
       boxShadow: const [],
       padding: metrics.padding,
@@ -63,8 +91,8 @@ class HyperPagination extends StatelessWidget {
       minimumTapTargetSize: Size.square(sizes.minimumInteractiveDimension),
       iconSize: metrics.iconSize,
       textStyle: theme.textTheme.bodyMedium,
-      animationDuration: theme.motion.fastDuration,
-      animationCurve: theme.motion.fastCurve,
+      animationDuration: theme.motion.standardDuration,
+      animationCurve: theme.motion.standardCurve,
     );
     final resolved = HyperPaginationStyle(
       buttonStyle: defaults,
@@ -90,6 +118,46 @@ class HyperPagination extends StatelessWidget {
       lastIcon: Icons.last_page,
     ).merge(HyperPaginationTheme.of(context).style).merge(style);
     final active = enabled && onPageChanged != null;
+    final duration = (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
+        ? Duration.zero
+        : resolved.buttonStyle?.animationDuration ??
+              theme.motion.standardDuration;
+    final curve =
+        resolved.buttonStyle?.animationCurve ?? theme.motion.standardCurve;
+    final direction =
+        (forward ? 1.0 : -1.0) *
+        (Directionality.of(context) == TextDirection.rtl ? -1 : 1);
+    Widget transition(Widget content) => duration == Duration.zero
+        ? content
+        : AnimatedSwitcher(
+            duration: duration,
+            switchInCurve: curve,
+            switchOutCurve: curve,
+            layoutBuilder: (current, previous) => Stack(
+              alignment: Alignment.center,
+              children: [
+                for (final old in previous)
+                  IgnorePointer(child: ExcludeSemantics(child: old)),
+                if (current != null) current,
+              ],
+            ),
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: animation.drive(
+                  Tween(
+                    begin: Offset(
+                      (child.key == content.key ? direction : -direction) * .12,
+                      0,
+                    ),
+                    end: Offset.zero,
+                  ),
+                ),
+                child: child,
+              ),
+            ),
+            child: content,
+          );
     Widget button(
       Widget child,
       int target, {
@@ -98,8 +166,10 @@ class HyperPagination extends StatelessWidget {
       bool selected = false,
       Object? key,
     }) {
-      final callback = active && available
-          ? () => onPageChanged!(target)
+      final callback = active && (available || selected)
+          ? () {
+              if (available) onPageChanged!(target);
+            }
           : null;
       final visual = resolved.buttonStyle!
           .merge(selected ? resolved.selectedStyle : null)
@@ -107,9 +177,15 @@ class HyperPagination extends StatelessWidget {
       Widget result = Semantics(
         key: key == null ? null : ValueKey(key),
         selected: selected,
-        child: HyperButton.ghost(
-          onPressed: callback,
-          style: visual,
+        child: TweenAnimationBuilder<HyperButtonStyle>(
+          tween: _PaginationStyleTween(end: visual),
+          duration: duration,
+          curve: curve,
+          builder: (context, animatedStyle, child) => HyperButton.ghost(
+            onPressed: callback,
+            style: animatedStyle,
+            child: child!,
+          ),
           child: child,
         ),
       );
@@ -155,31 +231,41 @@ class HyperPagination extends StatelessWidget {
           resolved.previousLabel!,
         ),
         if (showPageNumbers)
-          for (final page in model.pages)
-            if (page == null)
-              SizedBox(
-                width: resolved.buttonStyle!.minimumSize!.width,
-                child: Center(
-                  child: DefaultTextStyle(
-                    style: resolved.ellipsisStyle!,
-                    child: Text(resolved.ellipsis!),
-                  ),
-                ),
-              )
-            else
-              button(
-                Text(pageLabelBuilder?.call(page) ?? '$page'),
-                page,
-                available: page != currentPage,
-                selected: page == currentPage,
-                key: page,
-              )
-        else
-          counterBuilder?.call(context, currentPage, pageCount) ??
-              DefaultTextStyle(
-                style: resolved.ellipsisStyle!,
-                child: Text('$currentPage / $pageCount'),
+          for (final (index, page) in model.pages.indexed)
+            transition(
+              KeyedSubtree(
+                key: ValueKey(page == null ? 'ellipsis-$index' : 'page-$page'),
+                child: page == null
+                    ? SizedBox(
+                        width: resolved.buttonStyle!.minimumSize!.width,
+                        child: Center(
+                          child: DefaultTextStyle(
+                            style: resolved.ellipsisStyle!,
+                            child: Text(resolved.ellipsis!),
+                          ),
+                        ),
+                      )
+                    : button(
+                        Text(pageLabelBuilder?.call(page) ?? '$page'),
+                        page,
+                        available: page != currentPage,
+                        selected: page == currentPage,
+                        key: page,
+                      ),
               ),
+            )
+        else
+          transition(
+            KeyedSubtree(
+              key: ValueKey('counter-$currentPage-$pageCount'),
+              child:
+                  counterBuilder?.call(context, currentPage, pageCount) ??
+                  DefaultTextStyle(
+                    style: resolved.ellipsisStyle!,
+                    child: Text('$currentPage / $pageCount'),
+                  ),
+            ),
+          ),
         navigation(
           resolved.nextIcon!,
           currentPage + 1,
@@ -196,4 +282,11 @@ class HyperPagination extends StatelessWidget {
       ],
     );
   }
+}
+
+class _PaginationStyleTween extends Tween<HyperButtonStyle> {
+  _PaginationStyleTween({required HyperButtonStyle end}) : super(end: end);
+
+  @override
+  HyperButtonStyle lerp(double t) => HyperButtonStyle.lerp(begin!, end!, t);
 }

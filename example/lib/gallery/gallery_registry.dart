@@ -1,3 +1,6 @@
+import '../pages/pending/hyper_list_group_page.dart';
+import '../pages/pending/hyper_pending_controls_pages.dart';
+import '../pages/selection/hyper_inline_edit_page.dart';
 import '../pages/content/hyper_table_page.dart';
 import '../pages/content/hyper_charts_page.dart';
 import '../pages/form/hyper_form_page.dart';
@@ -83,7 +86,53 @@ import 'gallery_item.dart';
 ///
 /// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
-  GallerySection(title: '未确认', items: []),
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-list-group',
+        title: '列表组',
+        description: '带标题和独立操作区，内容无额外内边距。',
+        icon: Icons.view_list_outlined,
+        builder: (_) => const HyperListGroupPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-rating',
+        title: '评分',
+        description: '半星、只读、键盘与 Form。',
+        icon: Icons.star_outline,
+        builder: (_) => const HyperRatingPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-transfer',
+        title: '穿梭框',
+        description: '搜索、全选和双向移动。',
+        icon: Icons.swap_horiz,
+        builder: (_) => const HyperTransferPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-resizable',
+        title: '可调整分栏',
+        description: '拖动、键盘、约束与折叠。',
+        icon: Icons.vertical_split_outlined,
+        builder: (_) => const HyperResizablePage(),
+      ),
+      GalleryItem(
+        id: 'hyper-movable-dialog',
+        title: '可移动对话框',
+        description: '公共对话框表面、标题拖动与边界。',
+        icon: Icons.open_with,
+        builder: (_) => const HyperMovableDialogPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-navigation-bar',
+        title: '底部／侧向导航栏',
+        description: '受控选择、标签与键盘导航。',
+        icon: Icons.space_dashboard_outlined,
+        builder: (_) => const HyperNavigationBarPage(),
+      ),
+    ],
+  ),
   GallerySection(
     title: '基础能力',
     items: [
@@ -391,6 +440,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '输入控件',
     items: [
+      GalleryItem(
+        id: 'hyper-inline-edit',
+        title: '行内编辑',
+        description: '草稿、校验、异步保存和取消。',
+        icon: Icons.edit_note,
+        builder: (_) => const HyperInlineEditPage(),
+      ),
       GalleryItem(
         id: 'hyper-number-input',
         title: '数字输入',

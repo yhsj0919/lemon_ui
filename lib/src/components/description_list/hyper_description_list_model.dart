@@ -16,6 +16,7 @@ class HyperDescriptionItem {
     required this.id,
     required this.label,
     this.value,
+    this.action,
     this.span = 1,
     this.style,
     this.labelPlacement,
@@ -27,6 +28,7 @@ class HyperDescriptionItem {
     : kind = HyperDescriptionItemKind.divider,
       label = const SizedBox.shrink(),
       value = null,
+      action = null,
       span = 1,
       child = null,
       labelPlacement = null;
@@ -38,6 +40,7 @@ class HyperDescriptionItem {
   }) : kind = HyperDescriptionItemKind.custom,
        label = const SizedBox.shrink(),
        value = null,
+       action = null,
        line = null,
        labelPlacement = null;
   final HyperDescriptionItemKind kind;
@@ -47,6 +50,9 @@ class HyperDescriptionItem {
   final Object id;
   final Widget label;
   final Widget? value;
+
+  /// 行尾操作区；预留宽度但不参与数据行高度计算。
+  final Widget? action;
   final int span;
   final HyperDescriptionListStyle? style;
 }

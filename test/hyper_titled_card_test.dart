@@ -3,6 +3,56 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  for (final position in HyperCardTitlePosition.values) {
+    testWidgets('large action does not increase header $position', (
+      tester,
+    ) async {
+      var taps = 0;
+      Future<void> render(double height) => tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            duration: Duration.zero,
+            child: Center(
+              child: SizedBox(
+                width: 300,
+                child: HyperTitledCard(
+                  titlePosition: position,
+                  title: const Text('Title', key: Key('header-title')),
+                  action: GestureDetector(
+                    onTap: () => taps++,
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
+                      key: const Key('header-action'),
+                      width: 40,
+                      height: height,
+                    ),
+                  ),
+                  child: const SizedBox(key: Key('header-body'), height: 80),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      double distance() =>
+          tester.getTopLeft(find.byKey(const Key('header-body'))).dy -
+          tester.getTopLeft(find.byKey(const Key('header-title'))).dy;
+      await render(20);
+      final before = distance();
+      await render(48);
+      await tester.pumpAndSettle();
+      expect(distance(), before);
+      final rect = tester.getRect(find.byKey(const Key('header-action')));
+      expect(
+        rect.center.dy,
+        tester.getRect(find.byKey(const Key('header-title'))).center.dy,
+      );
+      await tester.tapAt(rect.center);
+      expect(taps, 1);
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('标题20边距与操作区4边距独立', (tester) async {
     for (final position in HyperCardTitlePosition.values) {
       await tester.pumpWidget(
@@ -93,6 +143,7 @@ void main() {
     expect(outsideTextStyle.fontSize, 14);
     expect(outsideTextStyle.color, colors.textTertiary);
     expect(insideTextStyle.fontSize, 18);
+    expect(insideTextStyle.fontWeight, FontWeight.w500);
     expect(insideTextStyle.color, colors.textPrimary);
     expect(
       IconTheme.of(tester.element(find.byKey(const Key('outside-action'))))

@@ -20,6 +20,8 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
   @override
   Widget build(BuildContext context) {
     final colors = HyperTheme.of(context).colors;
+    final metrics = HyperTheme.sizesOf(context).listTile;
+    final override = HyperListTileTheme.of(context).style;
     return Material(
       color: colors.background,
       child: ListView(
@@ -39,8 +41,10 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
               children: [
                 _TileCard(
                   child: HyperListTile(
-                    title: const HyperText('默认高度'),
-                    trailing: const HyperText('56'),
+                    title: const HyperText('默认最小高度'),
+                    trailing: HyperText(
+                      '${override?.minHeight ?? metrics.minHeight}',
+                    ),
                     onTap: () {},
                   ),
                 ),
@@ -48,8 +52,10 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
                 _TileCard(
                   child: HyperListTile(
                     density: HyperListTileDensity.compact,
-                    title: const HyperText('紧凑高度'),
-                    trailing: const HyperText('48'),
+                    title: const HyperText('紧凑最小高度'),
+                    trailing: HyperText(
+                      '${override?.minHeight ?? metrics.compactMinHeight}',
+                    ),
                     onTap: () {},
                   ),
                 ),

@@ -4,6 +4,57 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui/src/components/surface/hyper_navigation_surface.dart';
 
 void main() {
+  for (final inset in [0.0, 4.0]) {
+    testWidgets('segmented padding is exactly $inset without hidden inset', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: DefaultTabController(
+              length: 2,
+              child: Center(
+                child: SizedBox(
+                  width: 300,
+                  child: HyperTabBar(
+                    padding: EdgeInsets.all(inset),
+                    tabs: const [Text('First'), Text('Second')],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final track = tester.getRect(find.byType(HyperNavigationSurface).first);
+      final selected = tester.getRect(
+        find.byKey(const ValueKey('hyper-tab-selection')),
+      );
+      final selectedSurface = tester.widget<HyperNavigationSurface>(find.byKey(const ValueKey('hyper-tab-selection')));
+      final theme = HyperTheme.of(tester.element(find.byType(HyperTabBar)));
+      final expectedRadius =
+          (theme.sizes
+                      .resolve(
+                        HyperTheme.sizesOf(
+                          tester.element(find.byType(HyperTabBar)),
+                        ).deviceType,
+                      )
+                      .tabBar
+                      .segmentedRadius -
+                  inset)
+              .clamp(0, double.infinity);
+      expect(
+        selectedSurface.style.borderRadius,
+        BorderRadius.circular(expectedRadius.toDouble()),
+      );
+      expect(selected.left - track.left, closeTo(inset, .01));
+      expect(selected.top - track.top, closeTo(inset, .01));
+      expect(track.bottom - selected.bottom, closeTo(inset, .01));
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('下划线保持内容宽度，独立标签保留相邻间距', (tester) async {
     for (final underline in [true, false]) {
       await tester.pumpWidget(
@@ -148,7 +199,11 @@ void main() {
   test('标签栏尺寸按四端解析，局部覆盖与插值只改变明确字段', () {
     const sizes = HyperSizeThemeData();
     expect(sizes.phone.tabBar.height, 42);
-    expect(sizes.phone.tabBar.itemSpacing, 9);
+    expect(sizes.phone.tabBar.itemSpacing, 4);
+    for (final device in HyperDeviceType.values) {
+      expect(sizes.resolve(device).tabBar.padding, const EdgeInsets.all(4));
+      expect(sizes.resolve(device).tabBar.itemSpacing, 4);
+    }
     expect(sizes.phone.tabBar.underlineThickness, 2);
     expect(sizes.tablet.tabBar.height, 44);
     expect(sizes.desktop.tabBar.height, 36);

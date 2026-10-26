@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../card/hyper_card_style.dart';
 
+enum HyperBreadcrumbSeparator { slash, chevron }
+
 @immutable
 final class HyperBreadcrumbStyle {
   const HyperBreadcrumbStyle({
@@ -11,6 +13,7 @@ final class HyperBreadcrumbStyle {
     this.foregroundColor,
     this.highlightForegroundColor,
     this.separatorColor,
+    this.separator,
     this.disabledColor,
     this.textStyle,
     this.itemStyle,
@@ -23,6 +26,7 @@ final class HyperBreadcrumbStyle {
   final Color? foregroundColor;
   final Color? highlightForegroundColor;
   final Color? separatorColor;
+  final HyperBreadcrumbSeparator? separator;
   final Color? disabledColor;
   final TextStyle? textStyle;
   final HyperCardStyle? itemStyle;
@@ -35,6 +39,7 @@ final class HyperBreadcrumbStyle {
     Color? foregroundColor,
     Color? highlightForegroundColor,
     Color? separatorColor,
+    HyperBreadcrumbSeparator? separator,
     Color? disabledColor,
     TextStyle? textStyle,
     HyperCardStyle? itemStyle,
@@ -48,6 +53,7 @@ final class HyperBreadcrumbStyle {
       foregroundColor: foregroundColor,
       highlightForegroundColor: highlightForegroundColor,
       separatorColor: separatorColor,
+      separator: separator,
       disabledColor: disabledColor,
       textStyle: textStyle,
       itemStyle: itemStyle,
@@ -67,6 +73,7 @@ final class HyperBreadcrumbStyle {
           highlightForegroundColor:
               other.highlightForegroundColor ?? highlightForegroundColor,
           separatorColor: other.separatorColor ?? separatorColor,
+          separator: other.separator ?? separator,
           disabledColor: other.disabledColor ?? disabledColor,
           textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
           itemStyle: itemStyle?.merge(other.itemStyle) ?? other.itemStyle,
@@ -99,6 +106,7 @@ final class HyperBreadcrumbStyle {
       t,
     ),
     separatorColor: Color.lerp(a.separatorColor, b.separatorColor, t),
+    separator: t < .5 ? a.separator : b.separator,
     disabledColor: Color.lerp(a.disabledColor, b.disabledColor, t),
     textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
     itemStyle: a.itemStyle == null || b.itemStyle == null
@@ -120,6 +128,7 @@ final class HyperBreadcrumbStyle {
       foregroundColor == other.foregroundColor &&
       highlightForegroundColor == other.highlightForegroundColor &&
       separatorColor == other.separatorColor &&
+      separator == other.separator &&
       disabledColor == other.disabledColor &&
       textStyle == other.textStyle &&
       itemStyle == other.itemStyle &&
@@ -133,6 +142,7 @@ final class HyperBreadcrumbStyle {
     foregroundColor,
     highlightForegroundColor,
     separatorColor,
+    separator,
     disabledColor,
     textStyle,
     itemStyle,

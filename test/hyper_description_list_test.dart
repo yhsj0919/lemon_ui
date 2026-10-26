@@ -3,6 +3,47 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('独立操作不改变文字行高度和间距', (tester) async {
+    Future<void> render(double height) => tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: Center(
+            child: SizedBox(
+              width: 400,
+              child: HyperDescriptionList(
+                items: [
+                  HyperDescriptionItem(
+                    id: 'one',
+                    label: const Text('标签', key: Key('stable-label')),
+                    value: const Text('内容', key: Key('stable-value')),
+                    action: SizedBox(width: 40, height: height),
+                  ),
+                  const HyperDescriptionItem(
+                    id: 'two',
+                    label: Text('下一行', key: Key('next-label')),
+                    value: Text('内容'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await render(20);
+    final first = tester.getTopLeft(find.byKey(const Key('stable-label')));
+    final before =
+        tester.getTopLeft(find.byKey(const Key('next-label'))).dy - first.dy;
+    await render(40);
+    await tester.pumpAndSettle();
+    final after =
+        tester.getTopLeft(find.byKey(const Key('next-label'))).dy -
+        tester.getTopLeft(find.byKey(const Key('stable-label'))).dy;
+    expect(after, before);
+    expect(tester.takeException(), isNull);
+  });
   test('分割线独占整行，任意内容参与跨列布局', () {
     final layout = HyperDescriptionListLayout(
       const [
@@ -56,10 +97,7 @@ void main() {
       await tester.pumpAndSettle();
       final scroll = find.byType(SingleChildScrollView);
       expect(tester.getSize(scroll).height, 100);
-      expect(
-        tester.getSize(find.byType(HyperDescriptionList)).height,
-        100,
-      );
+      expect(tester.getSize(find.byType(HyperDescriptionList)).height, 100);
       await tester.drag(scroll, const Offset(0, -80));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

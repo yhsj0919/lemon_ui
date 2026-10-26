@@ -3,6 +3,118 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('selected page background and foreground interpolate', (
+    tester,
+  ) async {
+    var page = 1;
+    late StateSetter update;
+    final theme = HyperThemeData.light();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: theme,
+          duration: Duration.zero,
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (_, set) {
+                update = set;
+                return HyperPagination(
+                  pageCount: 3,
+                  currentPage: page,
+                  onPageChanged: (_) {},
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    HyperButtonStyle style() => tester
+        .widget<HyperButton>(
+          find
+              .ancestor(of: find.text('2'), matching: find.byType(HyperButton))
+              .first,
+        )
+        .style!;
+    update(() => page = 2);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(style().background!.color, isNot(Colors.transparent));
+    expect(style().background!.color, isNot(theme.colors.primary));
+    expect(style().foregroundColor, isNot(theme.colors.onPrimary));
+    await tester.pumpAndSettle();
+    expect(style().background!.color, theme.colors.primary);
+    expect(style().foregroundColor, theme.colors.onPrimary);
+  });
+  testWidgets('counter changes animate through intermediate frames', (
+    tester,
+  ) async {
+    var page = 1;
+    late StateSetter update;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          duration: Duration.zero,
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (_, set) {
+                update = set;
+                return HyperPagination(
+                  pageCount: 20,
+                  currentPage: page,
+                  showPageNumbers: false,
+                  onPageChanged: (_) {},
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    update(() => page = 2);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('1 / 20'), findsOneWidget);
+    expect(find.text('2 / 20'), findsOneWidget);
+    final fade = tester.widget<FadeTransition>(
+      find
+          .ancestor(
+            of: find.text('2 / 20'),
+            matching: find.byType(FadeTransition),
+          )
+          .first,
+    );
+    expect(fade.opacity.value, inExclusiveRange(0, 1));
+    final slide = tester.widget<SlideTransition>(
+      find
+          .ancestor(
+            of: find.text('2 / 20'),
+            matching: find.byType(SlideTransition),
+          )
+          .first,
+    );
+    expect(slide.position.value.dx, greaterThan(0));
+    expect(slide.position.value.dy, 0);
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 20'), findsNothing);
+    expect(find.text('2 / 20'), findsOneWidget);
+    update(() => page = 1);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final reverseSlide = tester.widget<SlideTransition>(
+      find
+          .ancestor(
+            of: find.text('1 / 20'),
+            matching: find.byType(SlideTransition),
+          )
+          .first,
+    );
+    expect(reverseSlide.position.value.dx, lessThan(0));
+    expect(reverseSlide.position.value.dy, 0);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
   test('首尾邻页、省略号和单页缺口', () {
     expect(HyperPaginationModel(pageCount: 20, currentPage: 1).pages, [
       1,

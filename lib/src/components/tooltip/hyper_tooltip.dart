@@ -126,6 +126,9 @@ class _HyperTooltipState extends State<HyperTooltip> {
                       ),
                     )
                   : HyperCardStyle())
+              .merge(
+                HyperCardStyle(border: const Border(), materialEdge: false),
+              )
               .merge(tooltipTheme.style)
               .merge(widget.style),
     );

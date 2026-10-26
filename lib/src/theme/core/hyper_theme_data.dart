@@ -1,3 +1,9 @@
+import '../../components/rating/hyper_rating_theme.dart';
+import '../../components/transfer/hyper_transfer_theme.dart';
+import '../../components/resizable/hyper_resizable_theme.dart';
+import '../../components/movable_dialog/hyper_movable_dialog_theme.dart';
+import '../../components/navigation_bar/hyper_navigation_bar_theme.dart';
+import '../../components/inline_edit/hyper_inline_edit_theme.dart';
 import '../../components/charts/hyper_chart_theme.dart';
 import '../../components/table/hyper_table_theme.dart';
 import '../../components/form/hyper_form_theme.dart';
@@ -114,6 +120,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.colorPickerTheme = const HyperColorPickerThemeData(),
     this.selectTheme = const HyperSelectThemeData(),
     this.cascaderTheme = const HyperCascaderThemeData(),
+    this.ratingTheme = const HyperRatingThemeData(),
+    this.transferTheme = const HyperTransferThemeData(),
+    this.resizableTheme = const HyperResizableThemeData(),
+    this.movableDialogTheme = const HyperMovableDialogThemeData(),
+    this.navigationBarTheme = const HyperNavigationBarThemeData(),
+    this.inlineEditTheme = const HyperInlineEditThemeData(),
     this.treeSelectTheme = const HyperTreeSelectThemeData(),
     this.tabBarTheme = const HyperTabBarThemeData(),
     this.breadcrumbTheme = const HyperBreadcrumbThemeData(),
@@ -375,6 +387,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局下拉选择器主题。
   final HyperSelectThemeData selectTheme;
   final HyperCascaderThemeData cascaderTheme;
+  final HyperRatingThemeData ratingTheme;
+  final HyperTransferThemeData transferTheme;
+  final HyperResizableThemeData resizableTheme;
+  final HyperMovableDialogThemeData movableDialogTheme;
+  final HyperNavigationBarThemeData navigationBarTheme;
+  final HyperInlineEditThemeData inlineEditTheme;
   final HyperTreeSelectThemeData treeSelectTheme;
 
   /// 全局面包屑视觉主题。
@@ -529,6 +547,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperColorPickerThemeData? colorPickerTheme,
     HyperSelectThemeData? selectTheme,
     HyperCascaderThemeData? cascaderTheme,
+    HyperRatingThemeData? ratingTheme,
+    HyperTransferThemeData? transferTheme,
+    HyperResizableThemeData? resizableTheme,
+    HyperMovableDialogThemeData? movableDialogTheme,
+    HyperNavigationBarThemeData? navigationBarTheme,
+    HyperInlineEditThemeData? inlineEditTheme,
     HyperTreeSelectThemeData? treeSelectTheme,
     HyperTabBarThemeData? tabBarTheme,
     HyperBreadcrumbThemeData? breadcrumbTheme,
@@ -610,6 +634,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       colorPickerTheme: colorPickerTheme ?? this.colorPickerTheme,
       selectTheme: selectTheme ?? this.selectTheme,
       cascaderTheme: cascaderTheme ?? this.cascaderTheme,
+      ratingTheme: ratingTheme ?? this.ratingTheme,
+      transferTheme: transferTheme ?? this.transferTheme,
+      resizableTheme: resizableTheme ?? this.resizableTheme,
+      movableDialogTheme: movableDialogTheme ?? this.movableDialogTheme,
+      navigationBarTheme: navigationBarTheme ?? this.navigationBarTheme,
+      inlineEditTheme: inlineEditTheme ?? this.inlineEditTheme,
       treeSelectTheme: treeSelectTheme ?? this.treeSelectTheme,
       tabBarTheme: tabBarTheme ?? this.tabBarTheme,
       breadcrumbTheme: breadcrumbTheme ?? this.breadcrumbTheme,
@@ -762,6 +792,32 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         t,
       ),
       selectTheme: HyperSelectThemeData.lerp(selectTheme, other.selectTheme, t),
+      ratingTheme: HyperRatingThemeData.lerp(ratingTheme, other.ratingTheme, t),
+      transferTheme: HyperTransferThemeData.lerp(
+        transferTheme,
+        other.transferTheme,
+        t,
+      ),
+      resizableTheme: HyperResizableThemeData.lerp(
+        resizableTheme,
+        other.resizableTheme,
+        t,
+      ),
+      movableDialogTheme: HyperMovableDialogThemeData.lerp(
+        movableDialogTheme,
+        other.movableDialogTheme,
+        t,
+      ),
+      navigationBarTheme: HyperNavigationBarThemeData.lerp(
+        navigationBarTheme,
+        other.navigationBarTheme,
+        t,
+      ),
+      inlineEditTheme: HyperInlineEditThemeData.lerp(
+        inlineEditTheme,
+        other.inlineEditTheme,
+        t,
+      ),
       cascaderTheme: HyperCascaderThemeData.lerp(
         cascaderTheme,
         other.cascaderTheme,
@@ -916,6 +972,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.colorPickerTheme == colorPickerTheme &&
           other.selectTheme == selectTheme &&
           other.cascaderTheme == cascaderTheme &&
+          other.ratingTheme == ratingTheme &&
+          other.transferTheme == transferTheme &&
+          other.resizableTheme == resizableTheme &&
+          other.movableDialogTheme == movableDialogTheme &&
+          other.navigationBarTheme == navigationBarTheme &&
+          other.inlineEditTheme == inlineEditTheme &&
           other.treeSelectTheme == treeSelectTheme &&
           other.tabBarTheme == tabBarTheme &&
           other.breadcrumbTheme == breadcrumbTheme &&
@@ -986,6 +1048,12 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     colorPickerTheme,
     selectTheme,
     cascaderTheme,
+    ratingTheme,
+    transferTheme,
+    resizableTheme,
+    movableDialogTheme,
+    navigationBarTheme,
+    inlineEditTheme,
     treeSelectTheme,
     breadcrumbTheme,
     cardTheme,

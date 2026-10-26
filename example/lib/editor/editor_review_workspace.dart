@@ -632,11 +632,19 @@ extension _ReviewWorkspace on _ThemeEditorState {
         ),
         ...material(sv),
         n(
-          '表面圆角',
+          object == 'tabBar' && _reviewVariant == 'segmented'
+              ? (item ? '内层标签圆角' : '外层底槽圆角')
+              : '表面圆角',
           sm.surfaceRadius,
           object == 'tabBar'
               ? (_reviewVariant == 'segmented'
-                    ? s.tabBar.segmentedRadius
+                    ? (item
+                          ? (s.tabBar.segmentedRadius -
+                                    s.tabBar.padding
+                                        .resolve(TextDirection.ltr)
+                                        .left)
+                                .clamp(0, double.infinity)
+                          : s.tabBar.segmentedRadius)
                     : s.tabBar.separatedRadius)
               : item
               ? extent / 2
@@ -4988,6 +4996,21 @@ extension _ReviewWorkspace on _ThemeEditorState {
         case 'breadcrumb':
           final native = theme.breadcrumbTheme.style;
           return [
+            if (state == 'common') ...[
+              _heading('分隔符'),
+              _select(
+                '分隔符样式',
+                v.breadcrumbSeparator ?? 'inherit',
+                const {
+                  'inherit': '继承主题（默认斜线）',
+                  'slash': '斜线 /',
+                  'chevron': '小箭头 ›',
+                },
+                (x) => _change(
+                  () => v.breadcrumbSeparator = x == 'inherit' ? null : x,
+                ),
+              ),
+            ],
             _heading('文字'),
             if (state == 'common')
               n(

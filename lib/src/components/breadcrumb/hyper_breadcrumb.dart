@@ -34,6 +34,7 @@ class HyperBreadcrumb extends StatefulWidget {
     this.style,
     this.controller,
     this.physics,
+    this.separator,
   });
 
   final List<HyperBreadcrumbItem> items;
@@ -47,6 +48,7 @@ class HyperBreadcrumb extends StatefulWidget {
 
   /// 横向拖动的物理效果；默认使用弹簧回弹。
   final ScrollPhysics? physics;
+  final Widget? separator;
 
   @override
   State<HyperBreadcrumb> createState() => _HyperBreadcrumbState();
@@ -128,11 +130,23 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
                   padding: EdgeInsets.symmetric(
                     horizontal: sizes.separatorSpacing,
                   ),
-                  child: Icon(
-                    Icons.chevron_right,
-                    size: sizes.separatorSize,
-                    color: separatorColor,
-                    textDirection: Directionality.of(context),
+                  child: ExcludeSemantics(
+                    child:
+                        widget.separator ??
+                        (resolved.separator == HyperBreadcrumbSeparator.chevron
+                            ? Icon(
+                                Icons.chevron_right,
+                                size: sizes.separatorSize,
+                                color: separatorColor,
+                                textDirection: Directionality.of(context),
+                              )
+                            : Text(
+                                '/',
+                                style: textStyle.copyWith(
+                                  fontSize: sizes.separatorSize,
+                                  color: separatorColor,
+                                ),
+                              )),
                   ),
                 ),
               Builder(

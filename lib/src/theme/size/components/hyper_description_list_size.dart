@@ -10,10 +10,12 @@ final class HyperDescriptionListSize {
     required this.rowSpacing,
     required this.labelValueSpacing,
     this.contentHeight,
+    this.minimumRowHeight = 32,
     required this.minimumColumnWidth,
     required this.borderThickness,
   });
   final double? contentHeight;
+  final double minimumRowHeight;
   final double radius;
   final EdgeInsetsGeometry cellPadding;
   final double columnSpacing;
@@ -23,6 +25,7 @@ final class HyperDescriptionListSize {
   final double borderThickness;
   HyperDescriptionListSize copyWith({
     double? contentHeight,
+    double? minimumRowHeight,
     double? radius,
     EdgeInsetsGeometry? cellPadding,
     double? columnSpacing,
@@ -32,6 +35,7 @@ final class HyperDescriptionListSize {
     double? borderThickness,
   }) => HyperDescriptionListSize(
     contentHeight: contentHeight ?? this.contentHeight,
+    minimumRowHeight: minimumRowHeight ?? this.minimumRowHeight,
     radius: radius ?? this.radius,
     cellPadding: cellPadding ?? this.cellPadding,
     columnSpacing: columnSpacing ?? this.columnSpacing,
@@ -48,6 +52,8 @@ final class HyperDescriptionListSize {
     contentHeight: a.contentHeight == null || b.contentHeight == null
         ? (t < .5 ? a.contentHeight : b.contentHeight)
         : a.contentHeight! + (b.contentHeight! - a.contentHeight!) * t,
+    minimumRowHeight:
+        a.minimumRowHeight + (b.minimumRowHeight - a.minimumRowHeight) * t,
     radius: a.radius + (b.radius - a.radius) * t,
     cellPadding: EdgeInsetsGeometry.lerp(a.cellPadding, b.cellPadding, t)!,
     columnSpacing: a.columnSpacing + (b.columnSpacing - a.columnSpacing) * t,
@@ -64,6 +70,7 @@ final class HyperDescriptionListSize {
   bool operator ==(Object other) =>
       other is HyperDescriptionListSize &&
       contentHeight == other.contentHeight &&
+      minimumRowHeight == other.minimumRowHeight &&
       radius == other.radius &&
       cellPadding == other.cellPadding &&
       columnSpacing == other.columnSpacing &&
@@ -74,6 +81,7 @@ final class HyperDescriptionListSize {
   @override
   int get hashCode => Object.hashAll([
     contentHeight,
+    minimumRowHeight,
     radius,
     cellPadding,
     columnSpacing,

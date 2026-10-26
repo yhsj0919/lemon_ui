@@ -501,6 +501,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('收藏'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
+    final panelRect = tester.getRect(find.byType(HyperCard).last);
+    final itemRect = tester.getRect(
+      find.byKey(const ValueKey('hyper-sidebar-item-saved')).last,
+    );
+    expect(
+      panelRect.right - itemRect.right,
+      closeTo(itemRect.left - panelRect.left, .01),
+    );
+    expect(
+      panelRect.bottom - itemRect.bottom,
+      closeTo(itemRect.left - panelRect.left, .01),
+    );
     final popup = tester.widget<HyperCard>(find.byType(HyperCard).last);
     expect(
       popup.style?.boxShadow ?? popup.style?.material?.boxShadow,

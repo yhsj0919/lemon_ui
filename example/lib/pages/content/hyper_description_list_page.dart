@@ -1,3 +1,5 @@
+import 'inline_edit_description_demo.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
@@ -35,6 +37,10 @@ class _PageState extends State<HyperDescriptionListPage> {
     return ListView(
       padding: EdgeInsets.all(size.pageHorizontalPadding),
       children: [
+        const DemoSection(
+          title: '紧凑行内编辑 · 布局覆盖，失焦保存、Esc 取消',
+          child: InlineEditDescriptionDemo(),
+        ),
         DemoSection(
           title: '分组分割线与任意内容',
           child: HyperDescriptionList(

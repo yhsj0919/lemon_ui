@@ -48,6 +48,7 @@ part 'editor_table_workspace.dart';
 part 'editor_chart_workspace.dart';
 part 'editor_input_workspace.dart';
 part 'editor_review_workspace.dart';
+part 'editor_extended_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
 class ThemeEditor extends StatefulWidget {
@@ -71,6 +72,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   set _page(String value) => _selection.page.value = value;
   double _textScale = 1;
   String? _gestureStart;
+  String _extendedState = 'common';
   String _radioState = 'common',
       _checkboxState = 'common',
       _switchState = 'common';
@@ -2654,6 +2656,46 @@ class _ThemeEditorState extends State<ThemeEditor> {
       return _panel('文件选择 · 继承现有主题', [
         const HyperText(
           '默认界面复用卡片、按钮、图标按钮和文字主题；实例 pickerStyle 可覆盖表面。文件选择和拖放由第三方适配层提供。',
+        ),
+      ]);
+    }
+    if (_isExtendedPage) return _extendedPanel();
+    if (_page == 'hyper-inline-edit') {
+      return _panel('行内编辑', [
+        const HyperText('样式与行为已由用户确认。四端尺寸继承文本输入、按钮和表单主题；切换继承 Motion。'),
+        _heading('展示内容'),
+        _color(
+          '展示文字颜色',
+          _mode.inlineEdit.displayColor,
+          (v) => _mode.inlineEdit.displayColor = v,
+          inheritedColor: _resolveTheme(_dark).colors.textPrimary,
+        ),
+        _heading('编辑器'),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-text-field';
+            _component = 'field';
+          }),
+          label: const Text('编辑文本输入主题'),
+        ),
+        _heading('校验与保存错误'),
+        _color(
+          '错误文字颜色',
+          _mode.inlineEdit.errorColor,
+          (v) => _mode.inlineEdit.errorColor = v,
+          inheritedColor: _resolveTheme(_dark).colors.error,
+        ),
+        _heading('操作按钮'),
+        HyperButton.text(
+          onPressed: () => rxBatch(() {
+            _page = 'hyper-button';
+            _component = 'button';
+          }),
+          label: const Text('编辑按钮主题'),
+        ),
+        _heading('布局与过渡'),
+        const HyperText(
+          '间距在表单主题中配置，过渡在全局 Motion 中配置。组件不额外绘制表面，输入和按钮表面在各自主题中编辑。',
         ),
       ]);
     }
@@ -5516,6 +5558,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
               _inputState = 'default';
               _iconInputVariant = 'common';
               if (value == 'hyper-scrolling-text') _component = 'text';
+              if (value == 'hyper-list-group') _component = 'card';
               for (final entry in _pages.entries) {
                 if (entry.value == value) _component = entry.key;
               }

@@ -15,6 +15,7 @@ class EditorReviewFields {
   double? collapsedRowGap;
   EditorColor? expandIconColor;
   EditorColor? dotBorderColor;
+  String? breadcrumbSeparator;
   String? materialKind;
   bool? materialEdgeEnabled;
   double? materialBlurX, materialBlurY;
@@ -370,6 +371,7 @@ class EditorReviewFields {
     if (highlightForegroundColor != null)
       'highlightForegroundColor': highlightForegroundColor!.toJson(),
     if (separatorColor != null) 'separatorColor': separatorColor!.toJson(),
+    if (breadcrumbSeparator != null) 'breadcrumbSeparator': breadcrumbSeparator,
     if (curve != null) 'curve': curve,
     if (effect != null) 'effect': effect,
     if (actionsAlignment != null) 'actionsAlignment': actionsAlignment,
@@ -542,6 +544,7 @@ class EditorReviewFields {
       'disabledBackgroundColor',
       'highlightForegroundColor',
       'separatorColor',
+      'breadcrumbSeparator',
       'curve',
       'effect',
       'actionsAlignment',
@@ -553,6 +556,9 @@ class EditorReviewFields {
     }
     for (final entry in {
       'materialKind': HyperSurfaceMaterialKind.values
+          .map((x) => x.name)
+          .toSet(),
+      'breadcrumbSeparator': HyperBreadcrumbSeparator.values
           .map((x) => x.name)
           .toSet(),
       'curve': {'linear', 'easeInOut', 'fastOutSlowIn'},
@@ -854,6 +860,7 @@ class EditorReviewFields {
       ..separatorColor = j['separatorColor'] == null
           ? null
           : EditorColor.fromJson(j['separatorColor'] as Map<String, dynamic>)
+      ..breadcrumbSeparator = j['breadcrumbSeparator'] as String?
       ..curve = j['curve'] as String?
       ..effect = j['effect'] as String?
       ..actionsAlignment = j['actionsAlignment'] as String?
@@ -2635,6 +2642,9 @@ HyperThemeData applyEditorReviews(
   HyperBreadcrumbStyle breadcrumb(EditorReviewFields v) {
     final m = d.breadcrumb;
     return HyperBreadcrumbStyle(
+      separator: v.breadcrumbSeparator == null
+          ? null
+          : HyperBreadcrumbSeparator.values.byName(v.breadcrumbSeparator!),
       itemStyle: surface(v, d.breadcrumb, fallback: colors.surfaceMuted),
       highlightStyle: surface(
         mode.reviews.breadcrumbHighlight,

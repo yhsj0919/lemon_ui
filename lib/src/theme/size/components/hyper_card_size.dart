@@ -7,6 +7,7 @@ final class HyperCardSize {
     required this.padding,
     required this.radius,
     required this.titlePadding,
+    this.listGroupTitlePadding = const EdgeInsets.all(16),
     required this.titleSpacing,
     required this.outsideTitlePadding,
     required this.outsideTitleSpacing,
@@ -19,6 +20,7 @@ final class HyperCardSize {
 
   /// 卡片内标题的边距与到内容的距离。
   final EdgeInsetsGeometry titlePadding;
+  final EdgeInsetsGeometry listGroupTitlePadding;
   final double titleSpacing;
 
   /// 卡片外标题的边距与到卡片表面的距离。
@@ -31,6 +33,7 @@ final class HyperCardSize {
     EdgeInsetsGeometry? padding,
     double? radius,
     EdgeInsetsGeometry? titlePadding,
+    EdgeInsetsGeometry? listGroupTitlePadding,
     double? titleSpacing,
     EdgeInsetsGeometry? outsideTitlePadding,
     double? outsideTitleSpacing,
@@ -40,6 +43,7 @@ final class HyperCardSize {
     padding: padding ?? this.padding,
     radius: radius ?? this.radius,
     titlePadding: titlePadding ?? this.titlePadding,
+    listGroupTitlePadding: listGroupTitlePadding ?? this.listGroupTitlePadding,
     titleSpacing: titleSpacing ?? this.titleSpacing,
     outsideTitlePadding: outsideTitlePadding ?? this.outsideTitlePadding,
     outsideTitleSpacing: outsideTitleSpacing ?? this.outsideTitleSpacing,
@@ -60,6 +64,11 @@ final class HyperCardSize {
     padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t)!,
     radius: a.radius + (b.radius - a.radius) * t,
     titlePadding: EdgeInsetsGeometry.lerp(a.titlePadding, b.titlePadding, t)!,
+    listGroupTitlePadding: EdgeInsetsGeometry.lerp(
+      a.listGroupTitlePadding,
+      b.listGroupTitlePadding,
+      t,
+    )!,
     titleSpacing: a.titleSpacing + (b.titleSpacing - a.titleSpacing) * t,
     outsideTitlePadding: EdgeInsetsGeometry.lerp(
       a.outsideTitlePadding,
@@ -78,6 +87,7 @@ final class HyperCardSize {
       other.padding == padding &&
       other.radius == radius &&
       other.titlePadding == titlePadding &&
+      other.listGroupTitlePadding == listGroupTitlePadding &&
       other.titleSpacing == titleSpacing &&
       other.outsideTitlePadding == outsideTitlePadding &&
       other.outsideTitleSpacing == outsideTitleSpacing &&
@@ -89,6 +99,7 @@ final class HyperCardSize {
     padding,
     radius,
     titlePadding,
+    listGroupTitlePadding,
     titleSpacing,
     outsideTitlePadding,
     outsideTitleSpacing,

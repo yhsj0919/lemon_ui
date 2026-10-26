@@ -45,4 +45,5 @@ double resolveHyperTextFieldActionHeight({
   required double minimumHeight,
   required double iconSize,
   required EdgeInsets padding,
-}) => math.max(iconSize, minimumHeight - padding.vertical);
+  double borderVertical = 0,
+}) => math.max(iconSize, minimumHeight - padding.vertical - borderVertical);

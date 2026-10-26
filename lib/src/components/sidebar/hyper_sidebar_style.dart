@@ -28,6 +28,7 @@ final class HyperSidebarStyle {
     this.indent,
     this.sectionSpacing,
     this.horizontalPadding,
+    this.verticalPadding,
     this.popupWidth,
     this.itemRadius,
     this.backgroundColor,
@@ -74,6 +75,7 @@ final class HyperSidebarStyle {
   final double? indent;
   final double? sectionSpacing;
   final double? horizontalPadding;
+  final double? verticalPadding;
   final double? popupWidth;
   final double? itemRadius;
   final Color? backgroundColor;
@@ -130,6 +132,7 @@ final class HyperSidebarStyle {
     double? indent,
     double? sectionSpacing,
     double? horizontalPadding,
+    double? verticalPadding,
     double? popupWidth,
     double? itemRadius,
     Color? backgroundColor,
@@ -179,6 +182,7 @@ final class HyperSidebarStyle {
     indent: indent ?? this.indent,
     sectionSpacing: sectionSpacing ?? this.sectionSpacing,
     horizontalPadding: horizontalPadding ?? this.horizontalPadding,
+    verticalPadding: verticalPadding ?? this.verticalPadding,
     popupWidth: popupWidth ?? this.popupWidth,
     itemRadius: itemRadius ?? this.itemRadius,
     backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -244,6 +248,7 @@ final class HyperSidebarStyle {
           indent: other.indent ?? indent,
           sectionSpacing: other.sectionSpacing ?? sectionSpacing,
           horizontalPadding: other.horizontalPadding ?? horizontalPadding,
+          verticalPadding: other.verticalPadding ?? verticalPadding,
           popupWidth: other.popupWidth ?? popupWidth,
           itemRadius: other.itemRadius ?? itemRadius,
           backgroundColor: other.backgroundColor ?? backgroundColor,
@@ -347,6 +352,7 @@ final class HyperSidebarStyle {
       indent: number(a.indent, b.indent),
       sectionSpacing: number(a.sectionSpacing, b.sectionSpacing),
       horizontalPadding: number(a.horizontalPadding, b.horizontalPadding),
+      verticalPadding: number(a.verticalPadding, b.verticalPadding),
       popupWidth: number(a.popupWidth, b.popupWidth),
       itemRadius: number(a.itemRadius, b.itemRadius),
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
@@ -457,6 +463,7 @@ final class HyperSidebarStyle {
           other.indent == indent &&
           other.sectionSpacing == sectionSpacing &&
           other.horizontalPadding == horizontalPadding &&
+          other.verticalPadding == verticalPadding &&
           other.popupWidth == popupWidth &&
           other.itemRadius == itemRadius &&
           other.backgroundColor == backgroundColor &&
@@ -501,6 +508,7 @@ final class HyperSidebarStyle {
     indent,
     sectionSpacing,
     horizontalPadding,
+    verticalPadding,
     popupWidth,
     itemRadius,
     backgroundColor,

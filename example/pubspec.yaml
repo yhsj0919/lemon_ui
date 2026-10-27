@@ -7,9 +7,6 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  desktop_drop: 0.7.1
-  cross_file: ^0.3.5+5
-  file_picker: ^13.1.0
   flutter:
     sdk: flutter
   lemon_ui:
@@ -19,6 +16,7 @@ dependencies:
       url: https://github.com/yhsj0919/lemon_x.git
       ref: b6f715b357ab28ca3e60cbcb307ca4a0dd425d71
   shared_preferences: ^2.5.6
+  cupertino_icons: ^2.0.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0

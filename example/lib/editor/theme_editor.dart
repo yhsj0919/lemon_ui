@@ -27,7 +27,6 @@ import 'editor_button_fields.dart';
 import 'dart:convert';
 import 'dart:ui' show AppExitResponse;
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lemon_ui/lemon_ui.dart';
@@ -531,13 +530,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
   Future<void> _import() async {
     if (!await _canReplace()) return;
     try {
-      final file = await FilePicker.pickFile(
-        type: FileType.custom,
+      final files = await HyperFileDialog.pickFiles(
+        multiple: false,
         allowedExtensions: ['json'],
       );
-      if (file == null) return;
+      if (files.isEmpty) return;
       final document = EditorThemeDocument.decode(
-        utf8.decode(await file.readAsBytes()),
+        utf8.decode(await files.single.readAsBytes()),
       );
       if (mounted) {
         _replace(document);
@@ -550,11 +549,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
 
   Future<void> _export() async {
     try {
-      await FilePicker.saveFile(
+      await HyperFileDialog.saveFile(
         dialogTitle: '导出主题 JSON',
         fileName: 'theme.json',
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+        mimeType: 'application/json',
         bytes: Uint8List.fromList(utf8.encode(_document.encode())),
       );
     } catch (e) {

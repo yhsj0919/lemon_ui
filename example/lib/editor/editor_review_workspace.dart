@@ -5,7 +5,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
   Widget _reviewPanel() {
     final theme = _resolveTheme(_dark), s = theme.sizes.resolve(_device);
     final objects = switch (_component) {
-      'popoverReview' => const {'popover': '锚定面板 · 未确认'},
+      'popoverReview' => const {'popover': '锚定面板'},
       'tooltipReview' => const {'tooltip': '文字提示'},
       'appBarReview' => const {'appBar': '应用顶栏'},
       'drawerReview' => const {'drawer': '抽屉'},
@@ -817,7 +817,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
               ) ??
               EdgeInsets.all(s.menu.padding);
           return [
-            const HyperText('未确认：尺寸按当前设备保存，表面外观按亮暗保存。'),
+            const HyperText('尺寸按当前设备保存，表面外观按亮暗保存。'),
             _heading('布局'),
             n(
               '锚点间距',

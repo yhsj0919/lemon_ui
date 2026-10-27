@@ -2,23 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../text/hyper_scrolling_text.dart';
-
 import '../../theme/core/hyper_theme.dart';
 import '../button/hyper_button.dart';
 import '../card/hyper_card.dart';
 import '../card/hyper_card_style.dart';
 import '../icon_button/hyper_icon_button.dart';
 import '../progress/hyper_linear_progress.dart';
+import '../text/hyper_scrolling_text.dart';
+import 'hyper_file_dialog.dart';
+import 'hyper_file_drop_adapter.dart';
+import 'hyper_file_extensions.dart';
+import 'hyper_file_selection.dart';
 
-/// File metadata; source retains the third-party file handle without loading bytes.
-@immutable
-class HyperFileSelection {
-  const HyperFileSelection({required this.name, this.size, this.source});
-  final String name;
-  final int? size;
-  final Object? source;
-}
+export 'hyper_file_selection.dart';
 
 enum HyperFilePickerVariant { dropzone, simple }
 
@@ -42,15 +38,16 @@ typedef HyperFileDropBuilder = Widget Function(
   ValueChanged<String> reject,
 );
 
-/// Presentation wrapper. Native picking and dropping are supplied by adapters.
+/// File picker with built-in platform dialogs and file dropping.
 /// No upload requests are made here; trailingBuilder can show business progress/retry.
 class HyperFilePicker extends StatefulWidget {
   const HyperFilePicker({
     super.key,
     required this.files,
     required this.onChanged,
-    required this.pick,
+    this.pick,
     this.dropBuilder,
+    this.enableDrop = true,
     this.multiple = true,
     this.enabled = true,
     this.variant = HyperFilePickerVariant.dropzone,
@@ -69,8 +66,13 @@ class HyperFilePicker extends StatefulWidget {
        assert(maxFileSize == null || maxFileSize >= 0);
   final List<HyperFileSelection> files;
   final ValueChanged<List<HyperFileSelection>>? onChanged;
-  final HyperFilePickCallback pick;
+
+  /// 覆盖系统选择行为；未指定时使用 [HyperFileDialog.pickFiles]。
+  final HyperFilePickCallback? pick;
   final HyperFileDropBuilder? dropBuilder;
+
+  /// 是否接收拖入文件；禁用控件时同样不接收拖放。
+  final bool enableDrop;
   final bool multiple, enabled;
   final HyperFilePickerVariant variant;
   final List<String>? allowedExtensions;
@@ -91,6 +93,12 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
   bool busy = false, hovering = false;
   String? error;
   bool get enabled => widget.enabled && widget.onChanged != null;
+  @override
+  void didUpdateWidget(HyperFilePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!enabled || !widget.enableDrop) hovering = false;
+  }
+
   Widget fileRow(BuildContext context, HyperFileSelection file, int index) {
     final theme = HyperTheme.of(context);
     final gap = HyperTheme.sizesOf(context).form.gap;
@@ -204,18 +212,14 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
 
   void accept(List<HyperFileSelection> incoming) {
     if (!mounted || !enabled || incoming.isEmpty) return;
-    final extensions = widget.allowedExtensions
-        ?.map((v) => v.replaceFirst(RegExp(r'^\.'), '').toLowerCase())
-        .toSet();
+    final extensions = normalizeHyperFileExtensions(widget.allowedExtensions);
     final accepted = <HyperFileSelection>[];
     String? rejection;
     for (final file in incoming) {
       final extension = file.name.contains('.')
           ? file.name.split('.').last.toLowerCase()
           : '';
-      if (extensions != null &&
-          extensions.isNotEmpty &&
-          !extensions.contains(extension)) {
+      if (extensions.isNotEmpty && !extensions.contains(extension)) {
         rejection ??= '不支持文件 ${file.name} 的格式';
         continue;
       }
@@ -241,7 +245,12 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
     if (!enabled || busy) return;
     setState(() => busy = true);
     try {
-      final files = await widget.pick();
+      final files =
+          await (widget.pick?.call() ??
+              HyperFileDialog.pickFiles(
+                multiple: widget.multiple,
+                allowedExtensions: widget.allowedExtensions,
+              ));
       if (mounted) accept(files);
     } catch (_) {
       if (mounted && enabled) reject('无法选择文件，请重试');
@@ -318,16 +327,20 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
             ).merge(widget.style),
             child: content,
           );
-    if (enabled && widget.dropBuilder != null) {
-      result = widget.dropBuilder!(
+    if (enabled && widget.enableDrop) {
+      result = (widget.dropBuilder ?? buildHyperFileDropTarget)(
         context,
         result,
-        accept,
+        (files) {
+          if (widget.enableDrop) accept(files);
+        },
         (value) {
-          if (mounted && hovering != value) setState(() => hovering = value);
+          if (mounted && enabled && widget.enableDrop && hovering != value) {
+            setState(() => hovering = value);
+          }
         },
         (message) {
-          if (mounted && enabled) reject(message);
+          if (mounted && enabled && widget.enableDrop) reject(message);
         },
       );
     }

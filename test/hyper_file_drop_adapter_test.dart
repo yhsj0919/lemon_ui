@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lemon_ui_example/pages/selection/file_drop_adapter.dart';
+import 'package:lemon_ui/src/components/file_picker/hyper_file_drop_adapter.dart';
 
 class UnreadableFile extends XFile {
   UnreadableFile() : super('unreadable', name: '无法读取.txt');
@@ -22,7 +22,7 @@ void main() {
         '${directory.path}${Platform.pathSeparator}ok.txt',
       ).writeAsString('hello');
       final errors = <String>[];
-      final accepted = await readDroppedFiles([
+      final accepted = await readHyperDroppedFiles([
         XFile(directory.path),
         UnreadableFile(),
         XFile(file.path, name: 'ok.txt'),

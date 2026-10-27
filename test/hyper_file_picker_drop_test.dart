@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
-import 'package:lemon_ui_example/pages/selection/hyper_file_picker_page.dart';
 
 void main() {
   testWidgets(
@@ -17,9 +16,14 @@ void main() {
         MaterialApp(
           home: HyperTheme(
             data: HyperThemeData.light(),
-            child: const MediaQuery(
-              data: MediaQueryData(size: Size(800, 800), devicePixelRatio: 1),
-              child: Scaffold(body: HyperFilePickerPage()),
+            child: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(800, 800),
+                devicePixelRatio: 1,
+              ),
+              child: Scaffold(
+                body: HyperFilePicker(files: const [], onChanged: (_) {}),
+              ),
             ),
           ),
         ),

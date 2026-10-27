@@ -4,7 +4,7 @@ import 'package:lemon_ui/lemon_ui.dart';
 
 import '../../gallery/demo_section.dart';
 
-@Preview(name: '锚定面板 · 未确认', group: '未确认', size: Size(360, 800))
+@Preview(name: '锚定面板', group: '交互基础', size: Size(360, 800))
 Widget popoverPreview() => MaterialApp(
   home: HyperTheme(
     data: HyperThemeData.light(),
@@ -21,7 +21,7 @@ class HyperPopoverPage extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HyperText('锚定面板 · 未确认', variant: HyperTextVariant.pageTitle),
+        const HyperText('锚定面板', variant: HyperTextVariant.pageTitle),
         const HyperText('默认继承公共浮层材质、阴影及当前设备的菜单规格。'),
         DemoSection(
           title: '默认主题预览',

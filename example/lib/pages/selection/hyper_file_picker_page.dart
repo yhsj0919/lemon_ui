@@ -1,53 +1,10 @@
-import 'package:flutter/material.dart';
-
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:cross_file/cross_file.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:desktop_drop/desktop_drop.dart';
-
-import 'file_drop_adapter.dart';
-
+import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 import '../../gallery/demo_section.dart';
-
-Future<List<HyperFileSelection>> _pickFiles() async => [
-  for (final file in await FilePicker.pickFiles())
-    HyperFileSelection(
-      name: file.name,
-      size: await file.length(),
-      source: file,
-    ),
-];
-
-Widget _drop(
-  BuildContext context,
-  Widget child,
-  ValueChanged<List<HyperFileSelection>> accept,
-  ValueChanged<bool> hover,
-  ValueChanged<String> reject,
-) {
-  final previewMedia = MediaQuery.of(context);
-  return MediaQuery(
-    data: previewMedia.copyWith(
-      devicePixelRatio: View.of(context).devicePixelRatio,
-    ),
-    child: DropTarget(
-      onDragEntered: (_) => hover(true),
-      onDragExited: (_) => hover(false),
-      onDragDone: (details) async {
-        hover(false);
-        final rejections = <String>[];
-        final files = await readDroppedFiles(details.files, rejections.add);
-        if (context.mounted) accept(files);
-        if (context.mounted && rejections.isNotEmpty) reject(rejections.first);
-      },
-      child: MediaQuery(data: previewMedia, child: child),
-    ),
-  );
-}
 
 class HyperFilePickerPage extends StatefulWidget {
   const HyperFilePickerPage({super.key});
@@ -115,7 +72,7 @@ class _HyperFilePickerPageState extends State<HyperFilePickerPage> {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText('文件选择 · 未确认。参考 lemon_shadcn；系统选择和拖放由第三方库完成，上传由业务处理。'),
+      const HyperText('文件选择。系统选择与拖放默认由主包提供，上传由业务处理。'),
       DemoSection(
         title: '拖放区域 · 最多三个文件，每个 10 MB',
         child: HyperFilePicker(
@@ -127,8 +84,6 @@ class _HyperFilePickerPageState extends State<HyperFilePickerPage> {
             }
             files = v;
           }),
-          pick: _pickFiles,
-          dropBuilder: _drop,
           maxFiles: 3,
           maxFileSize: 10 * 1024 * 1024,
           uploadState: (f) =>
@@ -182,7 +137,6 @@ class _HyperFilePickerPageState extends State<HyperFilePickerPage> {
         child: HyperFilePicker(
           files: simple,
           onChanged: (v) => setState(() => simple = v),
-          pick: _pickFiles,
           variant: HyperFilePickerVariant.simple,
           multiple: false,
           allowedExtensions: const ['png', 'jpg'],
@@ -197,8 +151,6 @@ class _HyperFilePickerPageState extends State<HyperFilePickerPage> {
               HyperFileFormField(
                 name: 'attachments',
                 label: '附件',
-                pick: _pickFiles,
-                dropBuilder: _drop,
                 validator: (v) => v == null || v.isEmpty ? '请添加附件' : null,
               ),
               Wrap(
@@ -259,13 +211,8 @@ class _FileThumbnailState extends State<_FileThumbnail> {
       r'\.(png|jpe?g|gif|webp)$',
       caseSensitive: false,
     ).hasMatch(file.name);
-    final source = file.source;
     bytes = image && file.size != null && file.size! <= 10 * 1024 * 1024
-        ? source is PlatformFile
-              ? source.xFile.readAsBytes()
-              : source is XFile
-              ? source.readAsBytes()
-              : null
+        ? file.readAsBytes()
         : null;
   }
 

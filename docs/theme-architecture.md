@@ -1,3 +1,13 @@
+## 文件选择的默认平台能力（2026-10-27）
+
+用户明确要求文件选择能力直接集成主包。`HyperFilePicker` 与 `HyperFileFormField`
+的 `pick` 改为可选，默认通过 `HyperFileDialog` 打开系统或浏览器文件窗口；默认
+拖放由主包统一接入 desktop_drop，`enableDrop` 可关闭，自定义 `pick` / `dropBuilder`
+仍优先。原生过滤与选择后校验共用扩展名规范化，文件夹及不可读拖入项逐项拒绝。
+拖放命中使用窗口真实 DPR，内容保留预览 DPR。文件内容通过 `HyperFileSelection.readAsBytes`
+按需读取，默认不加载整份文件；上传网络请求仍归业务。Demo 与编辑器移除插件直接调用，
+由主包提供默认适配及文件导入、保存接口，不改变组件样式、主题尺寸或页面分类。
+
 ## 主题工厂文字样式解析（2026-10-27）
 
 `fromSeed` 与 `fromMaterial` 在应用 Hyper 字阶前，统一将主题根文字样式的
@@ -39,7 +49,7 @@ intrinsic 测量，兼容 `LayoutBuilder`，保留主题宽度上限与显式宽
 菜单主题与实例的 `surfaceStyle` 传给外层呈现器，保留显式阴影、材质和边框覆盖。
 列表项 Demo 使用 `HyperListGroup` 按用途分组，不重复嵌套卡片表面。
 
-## 锚定面板（2026-10-27，未确认）
+## 锚定面板（2026-10-27，已确认）
 
 `HyperPopover` 是带默认表面的公开锚定面板；`HyperAnchoredOverlay` 保留为无表面的
 定位、开合基础设施。面板复用 `resolveHyperMenuSurface`，材质质量、降级和安全过渡
@@ -48,7 +58,8 @@ intrinsic 测量，兼容 `LayoutBuilder`，保留主题宽度上限与显式宽
 
 四端默认圆角、内边距和锚点间距直接读取当前端 `sizes.menu` 与 `sizes.overlaySpacing`，
 来源为 D 级同端既有浮层语义，不新增设备常量或跨端倍率。编辑器独立保存 popover 的
-按设备尺寸与按亮暗外观覆盖，支持继承恢复、保存和导入。Demo 先登记“未确认”。
+按设备尺寸与按亮暗外观覆盖，支持继承恢复、保存和导入。用户于同日明确要求将
+当前“未确认”控件转为正式，Demo 与编辑器同步归入“交互基础”，页面 ID 保持 `hyper-popover`。
 具体接口与待验证项见 [锚定面板](usage/popover.md)。
 
 ## 通知业务边界与导航表面（2026-10-16）

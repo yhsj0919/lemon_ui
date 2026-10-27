@@ -302,6 +302,7 @@ export 'src/components/form/hyper_number_form_field.dart';
 export 'src/components/form/hyper_autocomplete_form_field.dart';
 export 'src/components/form/hyper_form_list_field.dart';
 export 'src/components/file_picker/hyper_file_picker.dart';
+export 'src/components/file_picker/hyper_file_dialog.dart';
 export 'src/components/form/hyper_file_form_field.dart';
 export 'src/components/form/hyper_cascader_form_field.dart';
 export 'src/components/form/hyper_tree_select_form_field.dart';

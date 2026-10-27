@@ -8,15 +8,20 @@ import 'package:lemon_ui_example/pages/interaction/hyper_popover_page.dart';
 
 void main() {
   test(
-    'popover is pending, infrastructure stays separate and config round trips',
+    'confirmed popover uses interaction category and config round trips',
     () {
       expect(
         gallerySections
-            .singleWhere((s) => s.title == '未确认')
+            .singleWhere((s) => s.title == '交互基础')
             .items
             .where((i) => i.id == 'hyper-popover'),
         hasLength(1),
       );
+      expect(
+        gallerySections.singleWhere((s) => s.title == '未确认').items,
+        isEmpty,
+      );
+      expect(galleryItems.where((i) => i.id == 'hyper-popover'), hasLength(1));
       expect(
         galleryItems.where((i) => i.id == 'hyper-anchored-overlay'),
         hasLength(1),
@@ -53,7 +58,9 @@ void main() {
     },
   );
 
-  testWidgets('pending editor navigation exposes popover', (tester) async {
+  testWidgets('interaction editor navigation exposes confirmed popover', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: HyperTheme(
@@ -69,6 +76,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('锚定面板'), findsOneWidget);
+    expect(find.text('未确认'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

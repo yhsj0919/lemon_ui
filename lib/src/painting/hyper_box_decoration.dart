@@ -106,17 +106,31 @@ class _OuterShadowPainter extends BoxPainter {
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final rect = offset & configuration.size!;
-    canvas.save();
-    canvas.clipPath(
-      Path.combine(
-        PathOperation.difference,
-        Path()..addRect(canvas.getLocalClipBounds()),
+    // Recording-canvas clip bounds can be effectively unbounded. Boolean path
+    // subtraction at that scale risks losing the small surface contour. Keep
+    // the clip local to the painted shadows and use even-odd contours instead.
+    var shadowBounds = rect;
+    for (final value in decoration.boxShadow!) {
+      // Four Gaussian standard deviations leave less than one alpha quantum
+      // beyond this bound, including an extra pixel for antialiasing.
+      shadowBounds = shadowBounds.expandToInclude(
+        rect
+            .shift(value.offset)
+            .inflate(value.spreadRadius + value.blurSigma * 4 + 1),
+      );
+    }
+    final outside = Path()
+      ..fillType = PathFillType.evenOdd
+      ..addRect(shadowBounds)
+      ..addPath(
         decoration.getClipPath(
           rect,
           configuration.textDirection ?? TextDirection.ltr,
         ),
-      ),
-    );
+        Offset.zero,
+      );
+    canvas.save();
+    canvas.clipPath(outside);
     shadow.paint(canvas, offset, configuration);
     canvas.restore();
     surface.paint(canvas, offset, configuration);

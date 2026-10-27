@@ -87,18 +87,7 @@ import 'gallery_item.dart';
 ///
 /// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
-  GallerySection(
-    title: '未确认',
-    items: [
-      GalleryItem(
-        id: 'hyper-popover',
-        title: '锚定面板',
-        description: '默认浮层材质、阴影及任意内容。',
-        icon: Icons.chat_bubble_outline,
-        builder: (_) => const HyperPopoverPage(),
-      ),
-    ],
-  ),
+  GallerySection(title: '未确认', items: []),
   GallerySection(
     title: '基础能力',
     items: [
@@ -400,6 +389,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '交互基础',
     items: [
+      GalleryItem(
+        id: 'hyper-popover',
+        title: '锚定面板',
+        description: '默认浮层材质、阴影及任意内容。',
+        icon: Icons.chat_bubble_outline,
+        builder: (_) => const HyperPopoverPage(),
+      ),
       GalleryItem(
         id: 'hyper-anchored-overlay',
         title: '锚定浮层基础设施',

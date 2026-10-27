@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 /// Controls may extend into the surrounding modal padding/title spacing.
 class HyperTitleActionLayout extends MultiChildRenderObjectWidget {
   HyperTitleActionLayout({
+    super.key,
     required Widget title,
     required Widget controls,
     required this.direction,
@@ -16,10 +17,11 @@ class HyperTitleActionLayout extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
     BuildContext context,
-    covariant _RenderTitleActionLayout renderObject,
+    covariant RenderObject renderObject,
   ) {
-    renderObject.direction = direction;
-    renderObject.markNeedsLayout();
+    final layout = renderObject as _RenderTitleActionLayout;
+    layout.direction = direction;
+    layout.markNeedsLayout();
   }
 }
 
@@ -56,8 +58,9 @@ class _RenderTitleActionLayout extends RenderBox
       );
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! _TitleParentData)
+    if (child.parentData is! _TitleParentData) {
       child.parentData = _TitleParentData();
+    }
   }
 
   @override
@@ -114,7 +117,7 @@ class _RenderTitleActionLayout extends RenderBox
 // Header controls can extend into the padding above the column. Keep that
 // painted part interactive while the outer modal still bounds hit testing.
 class HyperOverflowColumn extends MultiChildRenderObjectWidget {
-  const HyperOverflowColumn({required super.children});
+  const HyperOverflowColumn({super.key, required super.children});
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -123,9 +126,11 @@ class HyperOverflowColumn extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
     BuildContext context,
-    covariant _RenderOverflowColumn renderObject,
+    covariant RenderObject renderObject,
   ) {
-    renderObject.textDirection = Directionality.of(context);
+    (renderObject as _RenderOverflowColumn).textDirection = Directionality.of(
+      context,
+    );
   }
 }
 

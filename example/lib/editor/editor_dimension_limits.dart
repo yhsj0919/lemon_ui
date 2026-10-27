@@ -4,6 +4,9 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'editor_chart_fields.dart';
 
 /// Editor bounds for surfaces whose dimensions are supplied by a parent layout.
+/// Includes Popover surfaces: content and overlay constraints determine their
+/// final size. This shared operation boundary is pending visual validation and
+/// is not a component default or an official geometry specification.
 const editorSurfaceRadiusLimit = 60.0;
 
 void constrainEditorChartDimensions(

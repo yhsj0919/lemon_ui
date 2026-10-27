@@ -33,7 +33,7 @@ void main() {
     expect(HyperSurfaceMaterial.lerp(solid, end, .75), end);
   });
 
-  testWidgets('普通质量不创建背景滤镜，高级质量才创建', (tester) async {
+  testWidgets('普通质量禁用背景滤镜，高级质量才启用', (tester) async {
     const glass = HyperSurfaceMaterial.frostedGlass(
       background: HyperFill.color(Color(0x66FFFFFF)),
     );
@@ -58,15 +58,24 @@ void main() {
     );
 
     await pump(HyperMaterialQuality.standard);
-    expect(find.byType(BackdropFilter), findsNothing);
-    expect(find.byType(ClipRRect), findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isFalse,
+    );
+    expect(
+      tester.widget<ClipRRect>(find.byType(ClipRRect)).clipBehavior,
+      Clip.none,
+    );
     expect(
       tester.getSize(find.byType(HyperMaterialSurface)),
       const Size(120, 80),
     );
 
     await pump(HyperMaterialQuality.advanced);
-    expect(find.byType(BackdropFilter), findsOneWidget);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isTrue,
+    );
     expect(find.byType(ClipRRect), findsOneWidget);
     expect(
       tester.getSize(find.byType(HyperMaterialSurface)),

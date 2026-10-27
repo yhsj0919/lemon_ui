@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,6 +9,21 @@ import '../icon_button/hyper_icon_button_style.dart';
 import '../text_field/hyper_text_field.dart';
 import '../text_field/hyper_text_field_style.dart';
 import '../text_field/hyper_text_field_theme.dart';
+import '../text_field/hyper_text_field_layout.dart';
+import 'hyper_number_input_layout.dart';
+import 'hyper_number_input_theme.dart';
+import '../../foundation/hyper_control_state.dart';
+import '../../foundation/hyper_fill.dart';
+import '../../foundation/hyper_surface_material.dart';
+import '../text_field/hyper_text_field_resolver.dart';
+import '../../theme/material/hyper_material_theme.dart';
+import '../widget_group/hyper_widget_group.dart';
+import '../widget_group/hyper_widget_group_style.dart';
+
+// MaterialIcons keyboard_arrow_up/down, measured in the bundled font's
+// 512-unit em: outer vertical ink starts at 171, horizontal ink at 128.
+// Align the ink rather than the differently padded icon canvases.
+const _stepperGlyphInsetCorrection = (171 - 128) / 512;
 
 /// Controlled numeric editor. Incomplete input is kept until blur or submit.
 /// Empty text reports null; invalid text restores the controlled value on blur.
@@ -29,6 +46,7 @@ class HyperNumberInput extends StatefulWidget {
     this.errorText,
     this.style,
     this.stepperStyle,
+    this.layout,
   }) {
     if (!step.isFinite ||
         step <= 0 ||
@@ -54,6 +72,7 @@ class HyperNumberInput extends StatefulWidget {
   final String? hintText, semanticLabel, errorText;
   final HyperTextFieldStyle? style;
   final HyperIconButtonStyle? stepperStyle;
+  final HyperNumberInputLayout? layout;
   @override
   State<HyperNumberInput> createState() => _HyperNumberInputState();
 }
@@ -61,6 +80,8 @@ class HyperNumberInput extends StatefulWidget {
 class _HyperNumberInputState extends State<HyperNumberInput> {
   late final text = TextEditingController(text: format(widget.value));
   final ownedFocus = FocusNode();
+  final _inputKey = GlobalKey();
+  bool _hovered = false;
   FocusNode get focus => widget.focusNode ?? ownedFocus;
   bool get editable =>
       widget.enabled && !widget.readOnly && widget.onChanged != null;
@@ -95,6 +116,7 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
 
   void blur() {
     if (!focus.hasFocus) commit();
+    if (mounted) setState(() {});
   }
 
   void commit() {
@@ -147,44 +169,149 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
   @override
   Widget build(BuildContext context) {
     final sizes = HyperTheme.sizesOf(context).textField;
+    final numberTheme = HyperNumberInputTheme.of(context);
+    final horizontal =
+        (widget.layout ??
+            numberTheme.layout ??
+            HyperNumberInputLayout.trailingVertical) ==
+        HyperNumberInputLayout.leadingTrailing;
+    final field = HyperTextFieldTheme.of(context).style.merge(widget.style);
+    final surface = resolveHyperTextFieldStyle(
+      context,
+      states: {
+        if (_hovered && widget.enabled) HyperControlState.hovered,
+        if (focus.hasFocus) HyperControlState.focused,
+        if (widget.errorText?.isNotEmpty == true) HyperControlState.error,
+        if (!widget.enabled || widget.onChanged == null)
+          HyperControlState.disabled,
+      },
+      style: widget.style,
+    );
+    final surfaceMaterial =
+        surface.material ??
+        HyperMaterialTheme.of(context).material ??
+        HyperSurfaceMaterial.solid(background: surface.background);
     final inheritedPadding =
-        (HyperTextFieldTheme.of(context).style.padding ??
+        (field.padding ??
                 EdgeInsets.symmetric(
                   horizontal: sizes.horizontalPadding,
                   vertical: sizes.verticalPadding,
                 ))
             .resolve(Directionality.of(context));
+    // Keep the pair compact within the field instead of stretching two buttons
+    // across its entire height. The remaining height becomes symmetric insets.
+    final buttonWidth = horizontal
+        ? surface.height ?? surface.minimumHeight ?? sizes.minimumHeight
+        : math.min(
+            (field.minimumHeight ?? sizes.minimumHeight) / 2,
+            field.iconSize ?? sizes.iconSize,
+          );
+    final textPainter = TextPainter(
+      text: TextSpan(text: ' ', style: surface.textStyle),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final lineHeight = textPainter.preferredLineHeight;
+    textPainter.dispose();
+    final layout = resolveHyperTextFieldLayout(
+      height: surface.height,
+      minimumHeight: surface.minimumHeight!,
+      padding: inheritedPadding,
+      contentHeight: lineHeight,
+      borderWidth: 0,
+    );
+    final controlHeight = math.max(
+      layout.minimumHeight,
+      lineHeight + layout.padding.vertical,
+    );
+    final iconExtent = field.iconSize ?? sizes.iconSize;
+    // With the measured glyph bounds, solve for a row height whose middle
+    // ink gap equals the outer vertical inset. Keep the icon itself unscaled.
+    final extent = horizontal
+        ? buttonWidth
+        : math.min(
+            buttonWidth,
+            (controlHeight / 3 + iconExtent * 122 / 1536).roundToDouble(),
+          );
+    final suffixPadding = resolveHyperTextFieldSuffixPadding(
+      padding: Directionality.of(context) == TextDirection.ltr
+          ? inheritedPadding.right
+          : inheritedPadding.left,
+      actionWidth: field.actionWidth ?? sizes.actionWidth,
+      iconSize: field.iconSize ?? sizes.iconSize,
+      endsWithAction: true,
+    );
     final inputStyle = HyperTextFieldStyle(
       padding: EdgeInsetsDirectional.only(
-        start: Directionality.of(context) == TextDirection.ltr
-            ? inheritedPadding.left
-            : inheritedPadding.right,
-        end: 0,
+        start: resolveHyperTextFieldSuffixPadding(
+          padding: Directionality.of(context) == TextDirection.ltr
+              ? inheritedPadding.left
+              : inheritedPadding.right,
+          actionWidth: field.actionWidth ?? sizes.actionWidth,
+          iconSize: field.iconSize ?? sizes.iconSize,
+          endsWithAction: horizontal,
+        ),
+        end: horizontal
+            ? suffixPadding
+            : math.max(
+                0,
+                (controlHeight - extent - buttonWidth) / 2 +
+                    (field.iconSize ?? sizes.iconSize) *
+                        _stepperGlyphInsetCorrection,
+              ),
         top: inheritedPadding.top,
         bottom: inheritedPadding.bottom,
       ),
     ).merge(widget.style);
-    final extent = sizes.minimumHeight / 2;
     final buttons = HyperIconButtonStyle(
-      size: extent,
+      size: buttonWidth,
       minimumTapTargetSize: extent,
-      iconSize: extent,
+      iconSize: field.iconSize ?? sizes.iconSize,
+      foregroundColor:
+          field.iconColor ?? HyperTheme.of(context).colors.textSecondary,
       borderRadius: BorderRadius.zero,
-    ).merge(widget.stepperStyle);
-    return Focus(
-      onKeyEvent: (_, event) {
-        if (!editable || event is KeyUpEvent) return KeyEventResult.ignored;
-        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-          change(1);
-          return KeyEventResult.handled;
-        }
-        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-          change(-1);
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
+    ).merge(numberTheme.stepperStyle).merge(widget.stepperStyle);
+    Widget stepButton(int direction, IconData icon) {
+      final button = HyperIconButton.ghost(
+        icon: horizontal
+            ? Icon(icon)
+            : OverflowBox(
+                minWidth: buttons.iconSize,
+                maxWidth: buttons.iconSize,
+                minHeight: buttons.iconSize,
+                maxHeight: buttons.iconSize,
+                child: Icon(icon),
+              ),
+        tooltip: direction > 0 ? '增加' : '减少',
+        style: buttons,
+        onPressed:
+            editable &&
+                (direction > 0
+                    ? widget.maximum == null ||
+                          widget.value == null ||
+                          widget.value! < widget.maximum!
+                    : widget.minimum == null ||
+                          widget.value == null ||
+                          widget.value! > widget.minimum!)
+            ? () => change(direction)
+            : null,
+      );
+      return horizontal
+          ? button
+          : SizedBox(width: buttons.size, height: extent, child: button);
+    }
+
+    // A global material is a base default, so state themes can still override it.
+    final input = HyperTextFieldTheme(
+      data: HyperTextFieldThemeData(
+        style: HyperTextFieldStyle(
+          material:
+              HyperTextFieldTheme.of(context).style.material ??
+              HyperMaterialTheme.of(context).material,
+        ),
+      ),
       child: HyperTextField(
+        key: _inputKey,
         controller: text,
         focusNode: focus,
         enabled: widget.enabled && widget.onChanged != null,
@@ -192,7 +319,20 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
         hintText: widget.hintText,
         semanticLabel: widget.semanticLabel,
         errorText: widget.errorText,
-        style: inputStyle,
+        style: horizontal
+            ? (widget.style ?? const HyperTextFieldStyle()).merge(
+                const HyperTextFieldStyle(
+                  borderRadius: BorderRadius.zero,
+                  border: Border(),
+                  borderWidth: 0,
+                  background: HyperFill.none(),
+                  material: HyperSurfaceMaterial.solid(
+                    background: HyperFill.none(),
+                  ),
+                  boxShadow: [],
+                ),
+              )
+            : inputStyle,
         showClearButton: editable && widget.showClearButton,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,
@@ -219,36 +359,59 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
         },
         onSubmitted: (_) => commit(),
         trailingAtEnd: true,
-        trailing: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            HyperIconButton.ghost(
-              icon: const Icon(Icons.keyboard_arrow_up),
-              tooltip: '增加',
-              style: buttons,
-              onPressed:
-                  editable &&
-                      (widget.maximum == null ||
-                          widget.value == null ||
-                          widget.value! < widget.maximum!)
-                  ? () => change(1)
-                  : null,
-            ),
-            HyperIconButton.ghost(
-              icon: const Icon(Icons.keyboard_arrow_down),
-              tooltip: '减少',
-              style: buttons,
-              onPressed:
-                  editable &&
-                      (widget.minimum == null ||
-                          widget.value == null ||
-                          widget.value! > widget.minimum!)
-                  ? () => change(-1)
-                  : null,
-            ),
-          ],
-        ),
+        trailing: horizontal
+            ? null
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  stepButton(1, Icons.keyboard_arrow_up),
+                  stepButton(-1, Icons.keyboard_arrow_down),
+                ],
+              ),
       ),
+    );
+    return Focus(
+      onKeyEvent: (_, event) {
+        if (!editable || event is KeyUpEvent) return KeyEventResult.ignored;
+        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          change(1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          change(-1);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: horizontal
+          ? MouseRegion(
+              onEnter: (_) => setState(() => _hovered = true),
+              onExit: (_) => setState(() => _hovered = false),
+              child: HyperWidgetGroup(
+                connected: true,
+                showSeparators: true,
+                style: HyperWidgetGroupStyle(
+                  borderRadius: surface.borderRadius,
+                  material: surfaceMaterial,
+                  border:
+                      surface.border ??
+                      Border.all(
+                        color: surface.borderColor!,
+                        width: surface.borderWidth!,
+                      ),
+                  boxShadow: surface.boxShadow,
+                  spacing: 0,
+                  padding: EdgeInsets.zero,
+                  itemBorderRadius: BorderRadius.zero,
+                ),
+                children: [
+                  stepButton(-1, Icons.remove),
+                  HyperWidgetGroupItem(flex: 1, child: input),
+                  stepButton(1, Icons.add),
+                ],
+              ),
+            )
+          : input,
     );
   }
 }

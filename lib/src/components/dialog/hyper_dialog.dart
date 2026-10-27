@@ -140,6 +140,7 @@ class HyperDialog extends StatelessWidget {
         border: resolved.material == null ? resolved.border : null,
         borderRadius: resolved.borderRadius,
         boxShadow: resolved.material == null ? resolved.boxShadow : null,
+        outerShadowsOnly: true,
       ),
       child: ClipRRect(
         borderRadius: resolved.borderRadius!,

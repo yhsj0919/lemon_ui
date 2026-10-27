@@ -1,3 +1,4 @@
+import 'hyper_text_field_resolver.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:ui' show SemanticsValidationResult;
@@ -6,16 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../foundation/hyper_control_state.dart';
-import '../../foundation/hyper_fill.dart';
 import '../../interaction/hyper_pressable.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../card/hyper_card.dart';
-import '../card/hyper_card_style.dart';
 import '../menu/hyper_menu_surface.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 import '../surface/hyper_material_surface.dart';
 import 'hyper_text_field_style.dart';
-import 'hyper_text_field_theme.dart';
 import 'hyper_text_field_layout.dart';
 
 /// 原生文本编辑，错误以尾部图标和浮层呈现，不增加辅助文字行。
@@ -109,6 +107,8 @@ class HyperTextField extends StatefulWidget {
 }
 
 class _HyperTextFieldState extends State<HyperTextField> {
+  // Keep native editing state when a theme adds or removes a material wrapper.
+  final _nativeFieldKey = GlobalKey();
   TextEditingController? _ownedController;
   FocusNode? _ownedFocus;
   bool _hovered = false, _showPassword = false;
@@ -169,84 +169,17 @@ class _HyperTextFieldState extends State<HyperTextField> {
   @override
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
-    final metrics = HyperTheme.sizesOf(context).textField;
     final states = <HyperControlState>{
       if (_hovered && widget.enabled) HyperControlState.hovered,
       if (_focus.hasFocus) HyperControlState.focused,
       if (_hasError) HyperControlState.error,
       if (!widget.enabled) HyperControlState.disabled,
     };
-    final defaults = HyperTextFieldThemeData(
-      style: HyperTextFieldStyle(
-        background: HyperFill.color(theme.colors.surfaceMuted),
-        borderColor: theme.colors.outline,
-        borderWidth: 1,
-        borderRadius: BorderRadius.circular(metrics.radius),
-        minimumHeight: metrics.minimumHeight,
-        padding: EdgeInsets.symmetric(
-          horizontal: metrics.horizontalPadding,
-          vertical: metrics.verticalPadding,
-        ),
-        iconSize: metrics.iconSize,
-        actionWidth: metrics.actionWidth,
-        labelGap: metrics.labelGap,
-        textStyle: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w400,
-          height: theme.textTheme.labelLarge?.height ?? 1,
-        ),
-        hintStyle: theme.textTheme.labelLarge?.copyWith(
-          color: theme.colors.textTertiary,
-          fontWeight: FontWeight.w400,
-        ),
-        labelStyle: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colors.textSecondary,
-        ),
-        counterStyle: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colors.textSecondary,
-        ),
-        foregroundColor: theme.colors.textPrimary,
-        iconColor: theme.colors.textSecondary,
-        cursorColor: theme.colors.primary,
-        cursorWidth: 2,
-        cursorRadius: const Radius.circular(1),
-        errorIcon: Icons.error_outline,
-        clearIcon: Icons.close,
-        showPasswordIcon: Icons.visibility_outlined,
-        hidePasswordIcon: Icons.visibility_off_outlined,
-        errorIconColor: theme.colors.error,
-        errorMaxWidth: metrics.errorMaxWidth,
-        errorTextStyle: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colors.textPrimary,
-        ),
-        errorPopupStyle: HyperCardStyle(
-          padding: EdgeInsets.all(metrics.horizontalPadding),
-        ),
-      ),
-      hovered: HyperTextFieldStyle(
-        background: HyperFill.color(
-          Color.alphaBlend(
-            theme.colors.stateLayer.withValues(
-              alpha: HyperTheme.sizesOf(context).button.hoverOverlayOpacity,
-            ),
-            theme.colors.surfaceMuted,
-          ),
-        ),
-      ),
-      focused: HyperTextFieldStyle(borderColor: theme.colors.primary),
-      error: HyperTextFieldStyle(
-        borderColor: theme.colors.error,
-        cursorColor: theme.colors.error,
-      ),
-      disabled: HyperTextFieldStyle(
-        foregroundColor: theme.colors.disabled,
-        iconColor: theme.colors.disabled,
-        borderColor: theme.colors.outline,
-      ),
+    var resolved = resolveHyperTextFieldStyle(
+      context,
+      states: states,
+      style: widget.style,
     );
-    var resolved = defaults
-        .merge(HyperTextFieldTheme.of(context))
-        .resolve(states)
-        .merge(widget.style);
     if (resolved.height != null) {
       final textPainter = TextPainter(
         text: TextSpan(text: ' ', style: resolved.textStyle),
@@ -359,6 +292,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
           ),
         );
         Widget field = TextField(
+          key: _nativeFieldKey,
           controller: _controller,
           focusNode: _focus,
           enabled: widget.enabled,

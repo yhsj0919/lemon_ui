@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui_example/pages/button/hyper_icon_button_page.dart';
 
 void main() {
@@ -9,12 +10,36 @@ void main() {
     );
 
     expect(find.text('图标按钮'), findsOneWidget);
-    expect(find.byTooltip('收藏'), findsOneWidget);
-    expect(find.byTooltip('通知'), findsOneWidget);
-    expect(find.byTooltip('分享'), findsOneWidget);
-    expect(find.byTooltip('更多'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperIconButton && widget.tooltip == '收藏',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperIconButton && widget.tooltip == '通知',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperIconButton && widget.tooltip == '分享',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is HyperIconButton && widget.tooltip == '更多',
+      ),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.byTooltip('异步刷新'));
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('async-icon-button')),
+      200,
+    );
+    await tester.tap(find.byKey(const Key('async-icon-button')));
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text('最近事件：异步执行中'), findsOneWidget);

@@ -65,8 +65,8 @@ class _GalleryShellState extends State<GalleryShell> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal:
-                        HyperTheme.sizesOf(context).pageHorizontalPadding,
+                    horizontal: HyperTheme.sizesOf(context)
+                        .pageHorizontalPadding,
                   ),
                   child: const HyperText(GalleryItem.styleOverridesNotice),
                 ),
@@ -197,7 +197,7 @@ class _GalleryMenuState extends State<_GalleryMenu> {
             title: audience.label,
             items: [
               for (final (index, section) in gallerySections.indexed)
-                if (section.audience == audience)
+                if (section.audience == audience && section.items.isNotEmpty)
                   HyperSidebarItem(
                     id: 'gallery-section-$index',
                     label: section.title,

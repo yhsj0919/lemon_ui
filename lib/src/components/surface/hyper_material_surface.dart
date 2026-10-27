@@ -148,7 +148,9 @@ class HyperMaterialSurface extends StatelessWidget {
             height: height,
             padding: padding,
             alignment: alignment,
-            foregroundDecoration: borderDecoration,
+            // Keep the decoration ancestor present when material transitions
+            // add/remove a border, so stateful content is never remounted.
+            foregroundDecoration: borderDecoration ?? const BoxDecoration(),
             child: child,
           ),
         ],

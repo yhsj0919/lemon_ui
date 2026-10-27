@@ -51,17 +51,31 @@ void main() {
       300,
     );
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNWidgets(2));
-    Finder glassVisual() => find.descendant(
-      of: find.byKey(const Key('button-frosted-material')),
-      matching: find.byWidgetPredicate(
-        (widget) => widget is Container && widget.constraints?.maxWidth == 156,
-      ),
-    );
+    final filters = [
+      for (final key in [
+        'button-frosted-material',
+        'button-soft-light-material',
+      ])
+        find.descendant(
+          of: find.byKey(Key(key)),
+          matching: find.byType(BackdropFilter),
+        ),
+    ];
+    for (final filter in filters) {
+      expect(tester.widget<BackdropFilter>(filter).enabled, isTrue);
+    }
+    Finder glassVisual() => find.byKey(const Key('button-frosted-material'));
     final glassSize = tester.getSize(glassVisual());
     await tester.tap(find.text('普通材质'));
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNothing);
+    for (final filter in filters) {
+      expect(
+        tester
+            .widgetList<BackdropFilter>(filter)
+            .where((widget) => widget.enabled),
+        isEmpty,
+      );
+    }
     expect(tester.getSize(glassVisual()), glassSize);
     await tester.tap(find.text('强制反色'));
     await tester.pumpAndSettle();

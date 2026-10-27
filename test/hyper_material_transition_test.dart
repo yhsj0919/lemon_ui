@@ -4,6 +4,49 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui/src/components/overlay/hyper_backdrop_safe_opacity.dart';
 
 void main() {
+  testWidgets('material border changes preserve a mounted form and its input', (
+    tester,
+  ) async {
+    final controller = HyperFormController();
+    addTearDown(controller.dispose);
+    var outlined = true;
+    late StateSetter update;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperTheme(
+          data: HyperThemeData.light(),
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                update = setState;
+                return HyperMaterialSurface(
+                  material: const HyperSurfaceMaterial.solid(),
+                  border: outlined ? Border.all(color: Colors.blue) : null,
+                  child: HyperForm(
+                    controller: controller,
+                    child: HyperTextFormField(name: 'name'),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(EditableText), '保留内容');
+    final form = tester.element(find.byType(HyperForm));
+    final field = tester.element(find.byType(EditableText));
+    for (final border in [false, true, false, true]) {
+      update(() => outlined = border);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(tester.element(find.byType(HyperForm)), same(form));
+      expect(tester.element(find.byType(EditableText)), same(field));
+      expect(controller.value<String>('name'), '保留内容');
+    }
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
   test('过渡配置参与复制与插值，嵌套过渡不能提前恢复高级材质', () {
     const theme = HyperMaterialThemeData(
       transitionFadeFraction: .6,

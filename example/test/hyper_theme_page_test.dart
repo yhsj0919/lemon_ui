@@ -12,6 +12,8 @@ void main() {
     expect(tester.getSize(find.byKey(const Key('global-control'))).height, 52);
     expect(tester.getSize(find.byKey(const Key('local-control'))).height, 68);
 
+    await tester.tap(find.text('试验独立主题'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('暗色'));
     await tester.pumpAndSettle();
     final background = tester.widget<Material>(

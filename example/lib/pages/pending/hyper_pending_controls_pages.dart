@@ -10,15 +10,15 @@ Widget _preview(Widget child) => MaterialApp(
     child: Scaffold(body: child),
   ),
 );
-@Preview(name: '评分 · 未确认', group: '未确认', size: Size(360, 640))
+@Preview(name: '评分', group: '选择控件', size: Size(360, 640))
 Widget ratingPreview() => _preview(const HyperRatingPage());
-@Preview(name: '穿梭框 · 未确认', group: '未确认', size: Size(360, 800))
+@Preview(name: '穿梭框', group: '选择控件', size: Size(360, 800))
 Widget transferPreview() => _preview(const HyperTransferPage());
-@Preview(name: '可调整分栏 · 未确认', group: '未确认', size: Size(640, 600))
+@Preview(name: '可调整分栏', group: '容器与表面', size: Size(640, 600))
 Widget resizablePreview() => _preview(const HyperResizablePage());
-@Preview(name: '可移动对话框 · 未确认', group: '未确认', size: Size(640, 600))
+@Preview(name: '可移动对话框', group: '反馈与状态', size: Size(640, 600))
 Widget movableDialogPreview() => _preview(const HyperMovableDialogPage());
-@Preview(name: '导航栏 · 未确认', group: '未确认', size: Size(360, 800))
+@Preview(name: '导航栏', group: '标签导航', size: Size(360, 800))
 Widget navigationBarPreview() => _preview(const HyperNavigationBarPage());
 
 class HyperRatingPage extends StatefulWidget {
@@ -40,7 +40,7 @@ class _RatingPageState extends State<HyperRatingPage> {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText('评分 · 未确认。默认样式；鼠标预览、点击半星、方向键调整，Home 清空、End 满分。'),
+      const HyperText('评分。默认样式；鼠标预览、点击半星、方向键调整，Home 清空、End 满分。'),
       DemoSection(
         title: '默认 · 半星与允许清空',
         child: Column(
@@ -103,7 +103,7 @@ class _TransferPageState extends State<HyperTransferPage> {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText('穿梭框 · 未确认。勾选后移入/移出；支持搜索、过滤结果全选和禁用项。窄空间上下排列，设备类别保持不变。'),
+      const HyperText('穿梭框。勾选后移入/移出；支持搜索、过滤结果全选和禁用项。窄空间上下排列，设备类别保持不变。'),
       DemoSection(
         title: '默认 · 受控目标集合',
         child: HyperTransfer(
@@ -148,7 +148,7 @@ class _ResizablePageState extends State<HyperResizablePage> {
       padding: EdgeInsets.all(sizes.pageHorizontalPadding),
       children: [
         const HyperText(
-          '可调整分栏 · 未确认。拖动分隔条；聚焦后方向键逐像素调整，Shift 加速。双击或 Enter 收起/恢复可折叠面板。',
+          '可调整分栏。拖动分隔条；聚焦后方向键逐像素调整，Shift 加速。双击或 Enter 收起/恢复可折叠面板。',
         ),
         DemoSection(
           title: '默认 · 水平分栏',
@@ -220,7 +220,7 @@ class _MovableDialogPageState extends State<HyperMovableDialogPage> {
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
       const HyperText(
-        '可移动对话框 · 未确认。复用 HyperDialog 的默认表面、材质和过渡。只拖动标题，内容区仍正常选择文字和输入。双击标题或 Home 复位。',
+        '可移动对话框。复用 HyperDialog 的默认表面、材质和过渡。只拖动标题，内容区仍正常选择文字和输入。双击标题或 Home 复位。',
       ),
       DemoSection(
         title: '默认 · 拖动与窗口边界',
@@ -299,7 +299,7 @@ class _NavigationBarPageState extends State<HyperNavigationBarPage> {
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
       const HyperText(
-        '底部／侧向导航栏 · 未确认。侧向导航复用 Sidebar 展开与折叠，底部导航沿用同一主题规格，背景继承统一高级材质。页面和路由由调用方管理。',
+        '底部／侧向导航栏。侧向导航复用 Sidebar 展开与折叠，底部导航沿用同一主题规格，背景继承统一高级材质。页面和路由由调用方管理。',
       ),
       DemoSection(
         title: '默认 · 底部横向导航',

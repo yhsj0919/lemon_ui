@@ -28,7 +28,11 @@ void main() {
       expect(collapsed.currentExtent, collapsed.minExtent);
       expect(tester.takeException(), isNull);
       if (width < 720) {
-        await tester.tap(find.byTooltip('打开组件菜单'));
+        await tester.tap(
+          find.byWidgetPredicate(
+            (widget) => widget is HyperIconButton && widget.tooltip == '打开组件菜单',
+          ),
+        );
         await tester.pumpAndSettle();
         expect(find.text('Lemon UI 组件演示'), findsOneWidget);
       }

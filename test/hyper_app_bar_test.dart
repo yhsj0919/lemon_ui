@@ -420,7 +420,10 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(BackdropFilter), findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isFalse,
+    );
     expect(
       tester
           .widget<HyperMaterialSurface>(find.byType(HyperMaterialSurface))
@@ -446,7 +449,7 @@ void main() {
           .material
           ?.background
           ?.color,
-      Colors.red,
+      base.colors.background,
     );
   });
 
@@ -488,7 +491,10 @@ void main() {
     );
 
     await tester.pumpWidget(build(HyperMaterialQuality.standard));
-    expect(find.byType(BackdropFilter), findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isFalse,
+    );
     final surface = tester.widget<HyperMaterialSurface>(
       find.byType(HyperMaterialSurface),
     );

@@ -185,7 +185,7 @@ class _HyperIconButtonState extends State<HyperIconButton> {
           style,
           foreground,
           (style.overlayColor ?? colors.stateLayer).withValues(
-            alpha: overlayAlpha,
+            alpha: (style.overlayColor ?? colors.stateLayer).a * overlayAlpha,
           ),
           material,
           explicitBackground,

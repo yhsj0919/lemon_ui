@@ -97,7 +97,7 @@ void main() {
     );
   });
 
-  testWidgets('普通材质不建立背景滤镜', (tester) async {
+  testWidgets('普通材质保留禁用滤镜节点，不过滤背景', (tester) async {
     await tester.pumpWidget(
       app(
         const HyperMaterialSurface(
@@ -109,7 +109,10 @@ void main() {
       ),
     );
 
-    expect(find.byType(BackdropFilter), findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isFalse,
+    );
     expect(find.text('普通内容'), findsOneWidget);
   });
 

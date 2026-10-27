@@ -48,12 +48,8 @@ void main() {
       HyperSizeScheme.watch(),
     ];
     expect(schemes.map((s) => s.navigationItemSpacing), [4, 4, 4, 4]);
-    expect(
-      schemes.every(
-        (s) => s.menu.itemSpacing == null && s.sidebar.rowGap == null,
-      ),
-      isTrue,
-    );
+    expect(schemes.map((s) => s.menu.itemSpacing), [0, null, null, null]);
+    expect(schemes.every((s) => s.sidebar.rowGap == null), isTrue);
     final shared = schemes[2].copyWith(navigationItemSpacing: 6);
     expect(shared.menu.itemSpacing ?? shared.navigationItemSpacing, 6);
     expect(shared.sidebar.rowGap ?? shared.navigationItemSpacing, 6);

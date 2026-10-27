@@ -45,7 +45,7 @@ class HyperPopupListTile<T> extends StatefulWidget {
     this.minPopupWidth,
     this.maxPopupWidth,
     this.transitionBuilder,
-    this.presentation = HyperSelectPresentation.adaptive,
+    this.presentation = HyperSelectPresentation.anchored,
     this.allowDeselect = false,
   }) : assert(minPopupWidth == null || minPopupWidth > 0),
        assert(maxPopupWidth == null || maxPopupWidth > 0),
@@ -144,12 +144,18 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
         presentation == HyperSelectPresentation.fullScreen) {
       if (!_enabled || _open) return;
       setState(() => _open = true);
+      final menuStyle =
+          (HyperMenuTheme.of(context).style ?? const HyperMenuStyle()).merge(
+            widget.menuStyle,
+          );
       await showHyperSelectModal(
         context: context,
         presentation: presentation,
         title: widget.placeholder,
+        surfaceStyle: menuStyle.surfaceStyle,
         builder: (context) => HyperMenu(
-          style: widget.menuStyle,
+          showSurface: false,
+          style: menuStyle,
           selectedId: widget.value == null
               ? null
               : '${widget.options.indexWhere((o) => o.value == widget.value)}',
@@ -220,7 +226,10 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     final surfacePadding =
         widget.menuStyle?.surfacePadding ??
         menuTheme?.surfacePadding ??
+        sizes.menu.surfacePadding ??
         sizes.menu.padding;
+    // 列表项浮窗沿用独立的四边留白：phone 为零，其他端保留既有值。
+    // 显式传给菜单，避免继承普通菜单新增的上下留白。
     final textStyle =
         widget.menuStyle?.itemTextStyle ??
         menuTheme?.itemTextStyle ??
@@ -293,7 +302,9 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
     final desiredHeight = math.min(
       entries.length * menuStyle.itemHeight! +
           math.max(0, entries.length - 1) *
-              (menuStyle.itemSpacing ?? sizes.navigationItemSpacing) +
+              (menuStyle.itemSpacing ??
+                  sizes.menu.itemSpacing ??
+                  sizes.navigationItemSpacing) +
           2 * menuStyle.surfacePadding!,
       menuStyle.maxHeight ?? double.infinity,
     );

@@ -94,6 +94,7 @@ Future<void> _mount(
                       HyperTableColumn(
                         id: 'name',
                         title: 'Name',
+                        headerTextAlign: TextAlign.start,
                         value: (r) => 'R$r',
                         width: 360,
                       ),

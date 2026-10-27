@@ -15,13 +15,18 @@ void main() {
       ),
     );
 
-    expect(find.text('默认高度'), findsOneWidget);
-    expect(find.text('紧凑高度'), findsOneWidget);
+    expect(find.text('默认最小高度'), findsOneWidget);
+    expect(find.text('紧凑最小高度'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('WLAN'),
       300,
-      scrollable: find.byType(Scrollable),
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView).first,
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('WLAN'), findsOneWidget);
     expect(find.text('Xiaomi_5G'), findsOneWidget);
@@ -30,7 +35,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('保持亮屏'),
       400,
-      scrollable: find.byType(Scrollable),
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView).first,
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.byType(HyperSwitch), findsOneWidget);
     expect(find.byType(HyperSwitchListTile), findsOneWidget);
@@ -39,7 +49,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('紧凑布局'),
       300,
-      scrollable: find.byType(Scrollable),
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView).first,
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.byType(HyperRadio<String>), findsNWidgets(2));
     await tester.tap(find.text('紧凑布局'));
@@ -54,7 +69,12 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('不可用列表项'),
       300,
-      scrollable: find.byType(Scrollable),
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView).first,
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(find.text('不可用列表项'), findsOneWidget);
   });

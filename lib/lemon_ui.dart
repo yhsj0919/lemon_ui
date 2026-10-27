@@ -353,3 +353,10 @@ export 'src/theme/size/components/hyper_rating_size.dart';
 export 'src/theme/size/components/hyper_transfer_size.dart';
 export 'src/components/list_tile/hyper_list_group.dart';
 export 'src/theme/size/components/hyper_navigation_bar_size.dart';
+
+export 'src/components/popover/hyper_popover.dart';
+export 'src/components/popover/hyper_popover_style.dart';
+export 'src/components/popover/hyper_popover_theme.dart';
+
+export 'src/components/number_input/hyper_number_input_layout.dart';
+export 'src/components/number_input/hyper_number_input_theme.dart';

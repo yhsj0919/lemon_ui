@@ -51,10 +51,34 @@ class _HyperMenuPageState extends State<HyperMenuPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HyperMenuButton(
-                  groups: groups,
-                  onSelected: select,
-                  child: const HyperText('打开菜单'),
+                Wrap(
+                  spacing: HyperTheme.sizesOf(context).menu.padding,
+                  runSpacing: HyperTheme.sizesOf(context).menu.padding,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    HyperMenuButton(
+                      groups: groups,
+                      onSelected: select,
+                      child: const HyperText('打开菜单'),
+                    ),
+                    PopupMenuButton<String>(
+                      tooltip: 'Flutter 原生 PopupMenu',
+                      onSelected: select,
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: 'new_window', child: Text('新建窗口')),
+                        PopupMenuItem(
+                          value: 'preferences',
+                          child: Text('偏好设置'),
+                        ),
+                        PopupMenuDivider(),
+                        PopupMenuItem(value: 'sign_out', child: Text('退出登录')),
+                      ],
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text('Flutter 原生 PopupMenu'),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 HyperContextMenu(
@@ -75,7 +99,9 @@ class _HyperMenuPageState extends State<HyperMenuPage> {
                   groups: groups,
                   onSelected: select,
                   menuStyle: const HyperMenuStyle(itemSpacing: 6),
-                  child: const HyperText('项间距 6（默认 4）'),
+                  child: HyperText(
+                    '项间距 6（默认 ${HyperTheme.sizesOf(context).menu.itemSpacing ?? HyperTheme.sizesOf(context).navigationItemSpacing}）',
+                  ),
                 ),
               ],
             ),

@@ -898,6 +898,7 @@ class EditorReviewCollection {
   EditorReviewFields paginationNavigation = EditorReviewFields();
   EditorReviewFields paginationSelected = EditorReviewFields();
   EditorReviewFields paginationDefault = EditorReviewFields();
+  EditorReviewFields popover = EditorReviewFields();
   EditorReviewFields tooltip = EditorReviewFields();
   EditorReviewFields appBar = EditorReviewFields();
   EditorReviewFields drawer = EditorReviewFields();
@@ -990,6 +991,7 @@ class EditorReviewCollection {
     'pagination' => pagination,
     'pageIndicator' => pageIndicator,
     'breadcrumb' => breadcrumb,
+    'popover' => popover,
     'tooltip' => tooltip,
     'paginationDefault' => paginationDefault,
     'paginationSelected' => paginationSelected,
@@ -1109,6 +1111,8 @@ class EditorReviewCollection {
         pageIndicator = EditorReviewFields();
       case 'breadcrumb':
         breadcrumb = EditorReviewFields();
+      case 'popover':
+        popover = EditorReviewFields();
       case 'tooltip':
         tooltip = EditorReviewFields();
       case 'paginationDefault':
@@ -1236,6 +1240,7 @@ class EditorReviewCollection {
       'paginationSelected': paginationSelected.toJson(),
     if (paginationDefault.toJson().isNotEmpty)
       'paginationDefault': paginationDefault.toJson(),
+    if (popover.toJson().isNotEmpty) 'popover': popover.toJson(),
     if (tooltip.toJson().isNotEmpty) 'tooltip': tooltip.toJson(),
     if (appBar.toJson().isNotEmpty) 'appBar': appBar.toJson(),
     if (drawer.toJson().isNotEmpty) 'drawer': drawer.toJson(),
@@ -1334,6 +1339,7 @@ class EditorReviewCollection {
       'paginationNavigation',
       'paginationSelected',
       'paginationDefault',
+      'popover',
       'tooltip',
       'appBar',
       'drawer',
@@ -1459,6 +1465,9 @@ class EditorReviewCollection {
       )
       ..paginationDefault = EditorReviewFields.fromJson(
         (j['paginationDefault'] as Map<String, dynamic>?) ?? {},
+      )
+      ..popover = EditorReviewFields.fromJson(
+        (j['popover'] as Map<String, dynamic>?) ?? {},
       )
       ..tooltip = EditorReviewFields.fromJson(
         (j['tooltip'] as Map<String, dynamic>?) ?? {},
@@ -2759,6 +2768,49 @@ HyperThemeData applyEditorReviews(
         segmented: tabs('tabBarSegmented'),
         separated: tabs('tabBarSeparated'),
         underline: tabs('tabBarUnderline'),
+      ),
+    ),
+    popoverTheme: theme.popoverTheme.merge(
+      HyperPopoverThemeData(
+        style: HyperPopoverStyle(
+          spacing: d.popover.spacing,
+          surfaceStyle: HyperCardStyle(
+            materialEdge: mode.reviews.popover.materialEdgeEnabled,
+            foregroundColor: mode.reviews.popover.foregroundColor?.resolve(
+              colors,
+            ),
+            material: resolveEditorReviewMaterial(mode.reviews.popover, theme),
+            padding: _reviewInsets(
+              d.popover.paddingLeft,
+              d.popover.paddingTop,
+              d.popover.paddingRight,
+              d.popover.paddingBottom,
+              theme.popoverTheme.style.surfaceStyle?.padding ??
+                  EdgeInsets.all(theme.sizes.resolve(device).menu.padding),
+            ),
+            borderRadius: d.popover.surfaceRadius == null
+                ? null
+                : BorderRadius.circular(d.popover.surfaceRadius!),
+            background: mode.reviews.popover.background == null
+                ? null
+                : HyperFill.color(
+                    mode.reviews.popover.background!.resolve(colors),
+                  ),
+            border:
+                mode.reviews.popover.borderWidth == null &&
+                    mode.reviews.popover.borderColor == null
+                ? null
+                : Border.all(
+                    width: mode.reviews.popover.borderWidth ?? 1,
+                    color:
+                        mode.reviews.popover.borderColor?.resolve(colors) ??
+                        colors.outline,
+                  ),
+            boxShadow: mode.reviews.popover.shadow.shadows
+                ?.map((s) => s.resolve(colors))
+                .toList(),
+          ),
+        ),
       ),
     ),
     tooltipTheme: theme.tooltipTheme.merge(

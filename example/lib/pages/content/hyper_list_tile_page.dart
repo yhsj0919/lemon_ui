@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
-import '../../gallery/demo_section.dart';
-
 /// 并列展示基础列表项与具有明确导航语义的列表项。
 class HyperListTilePage extends StatefulWidget {
   const HyperListTilePage({super.key});
@@ -34,171 +32,159 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
           const SizedBox(height: 8),
           const HyperText('基础排布不附加语义；进入下一级由导航列表项统一处理。'),
           const SizedBox(height: 28),
-          DemoSection(
-            title: '默认与紧凑',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('默认与紧凑'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperListTile(
-                    title: const HyperText('默认最小高度'),
-                    trailing: HyperText(
-                      '${override?.minHeight ?? metrics.minHeight}',
-                    ),
-                    onTap: () {},
+                HyperListTile(
+                  title: const HyperText('默认最小高度'),
+                  trailing: HyperText(
+                    '${override?.minHeight ?? metrics.minHeight}',
                   ),
+                  onTap: () {},
                 ),
-                const SizedBox(height: 8),
-                _TileCard(
-                  child: HyperListTile(
-                    density: HyperListTileDensity.compact,
-                    title: const HyperText('紧凑最小高度'),
-                    trailing: HyperText(
-                      '${override?.minHeight ?? metrics.compactMinHeight}',
-                    ),
-                    onTap: () {},
+                HyperListTile(
+                  density: HyperListTileDensity.compact,
+                  title: const HyperText('紧凑最小高度'),
+                  trailing: HyperText(
+                    '${override?.minHeight ?? metrics.compactMinHeight}',
                   ),
+                  onTap: () {},
                 ),
               ],
             ),
           ),
-          DemoSection(
-            title: '进入下一级',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('进入下一级'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperNavigationListTile(
-                    leading: const Icon(Icons.wifi),
-                    title: const Text('Text + Icon'),
-                    onTap: () {},
-                  ),
+                HyperNavigationListTile(
+                  leading: const Icon(Icons.wifi),
+                  title: const Text('Text + Icon'),
+                  onTap: () {},
                 ),
-                const SizedBox(height: 8),
-                _TileCard(
-                  child: HyperNavigationListTile(
-                    leading: const HyperIcon(Icons.bluetooth),
-                    title: const HyperText('HyperText + HyperIcon'),
-                    onTap: () {},
-                  ),
+                HyperNavigationListTile(
+                  leading: const HyperIcon(Icons.bluetooth),
+                  title: const HyperText('HyperText + HyperIcon'),
+                  onTap: () {},
                 ),
               ],
             ),
           ),
-          DemoSection(
-            title: '正文层级',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('正文层级'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperNavigationListTile(
-                    leading: const HyperIcon(Icons.backup_outlined),
-                    title: const HyperText('桌面备份密码'),
-                    subtitle: const HyperText('桌面完整备份当前未设置密码保护'),
-                    onTap: () {},
-                  ),
+                HyperNavigationListTile(
+                  leading: const HyperIcon(Icons.backup_outlined),
+                  title: const HyperText('桌面备份密码'),
+                  subtitle: const HyperText('桌面完整备份当前未设置密码保护'),
+                  onTap: () {},
                 ),
-                const SizedBox(height: 8),
-                _TileCard(
-                  child: HyperNavigationListTile(
-                    title: const HyperText('WLAN'),
-                    description: const HyperText('Xiaomi_5G'),
-                    onTap: () {},
-                  ),
+                HyperNavigationListTile(
+                  title: const HyperText('WLAN'),
+                  description: const HyperText('Xiaomi_5G'),
+                  onTap: () {},
                 ),
               ],
             ),
           ),
-          DemoSection(
-            title: '尾部控件',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('尾部控件'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperSwitchListTile(
-                    value: _switchValue,
-                    onChanged: (value) => setState(() => _switchValue = value),
-                    title: const HyperText('保持亮屏'),
-                    subtitle: const HyperText('充电时屏幕不会休眠'),
-                  ),
+                HyperSwitchListTile(
+                  value: _switchValue,
+                  onChanged: (value) => setState(() => _switchValue = value),
+                  title: const HyperText('保持亮屏'),
+                  subtitle: const HyperText('充电时屏幕不会休眠'),
                 ),
-                const SizedBox(height: 8),
-                _TileCard(
-                  child: HyperCheckboxListTile(
-                    value: _checkboxValue,
-                    onChanged: (value) =>
-                        setState(() => _checkboxValue = value ?? false),
-                    title: const HyperText('允许通知'),
-                  ),
+                HyperCheckboxListTile(
+                  value: _checkboxValue,
+                  onChanged: (value) =>
+                      setState(() => _checkboxValue = value ?? false),
+                  title: const HyperText('允许通知'),
                 ),
               ],
             ),
           ),
-          DemoSection(
-            title: '整行单选',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('整行单选'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperRadioListTile<String>(
-                    value: 'standard',
-                    groupValue: _selectedLayout,
-                    onChanged: (value) =>
-                        setState(() => _selectedLayout = value!),
-                    leading: const HyperIcon(Icons.view_agenda_outlined),
-                    title: const HyperText('标准布局'),
-                  ),
+                HyperRadioListTile<String>(
+                  value: 'standard',
+                  groupValue: _selectedLayout,
+                  onChanged: (value) =>
+                      setState(() => _selectedLayout = value!),
+                  leading: const HyperIcon(Icons.view_agenda_outlined),
+                  title: const HyperText('标准布局'),
                 ),
-                const SizedBox(height: 8),
-                _TileCard(
-                  child: HyperRadioListTile<String>(
-                    value: 'compact',
-                    groupValue: _selectedLayout,
-                    onChanged: (value) =>
-                        setState(() => _selectedLayout = value!),
-                    leading: const HyperIcon(Icons.view_compact_outlined),
-                    title: const HyperText('紧凑布局'),
-                  ),
+                HyperRadioListTile<String>(
+                  value: 'compact',
+                  groupValue: _selectedLayout,
+                  onChanged: (value) =>
+                      setState(() => _selectedLayout = value!),
+                  leading: const HyperIcon(Icons.view_compact_outlined),
+                  title: const HyperText('紧凑布局'),
                 ),
               ],
             ),
           ),
-          DemoSection(
-            title: '浮窗选项',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: HyperTheme.sizesOf(context).sectionSpacing,
+            ),
+            child: HyperListGroup(
+              title: Text('浮窗选项'),
+              titlePosition: HyperCardTitlePosition.inside,
               children: [
-                _TileCard(
-                  child: HyperPopupListTile<String>(
-                    title: const HyperText('启用蓝牙堆栈日志'),
-                    subtitle: HyperText(switch (_selectedLogLevel) {
-                      'detail' => '详细',
-                      'debug' => '调试',
-                      'info' => '信息',
-                      'warning' => '警告',
-                      _ => '错误',
-                    }),
-                    value: _selectedLogLevel,
-                    options: const [
-                      HyperSelectOption(value: 'detail', label: '详细'),
-                      HyperSelectOption(value: 'debug', label: '调试'),
-                      HyperSelectOption(value: 'info', label: '信息'),
-                      HyperSelectOption(value: 'warning', label: '警告'),
-                      HyperSelectOption(value: 'error', label: '错误'),
-                    ],
-                    onChanged: (value) => setState(
-                      () => _selectedLogLevel = value ?? _selectedLogLevel,
-                    ),
+                HyperPopupListTile<String>(
+                  title: const HyperText('启用蓝牙堆栈日志'),
+                  subtitle: HyperText(switch (_selectedLogLevel) {
+                    'detail' => '详细',
+                    'debug' => '调试',
+                    'info' => '信息',
+                    'warning' => '警告',
+                    _ => '错误',
+                  }),
+                  value: _selectedLogLevel,
+                  options: const [
+                    HyperSelectOption(value: 'detail', label: '详细'),
+                    HyperSelectOption(value: 'debug', label: '调试'),
+                    HyperSelectOption(value: 'info', label: '信息'),
+                    HyperSelectOption(value: 'warning', label: '警告'),
+                    HyperSelectOption(value: 'error', label: '错误'),
+                  ],
+                  onChanged: (value) => setState(
+                    () => _selectedLogLevel = value ?? _selectedLogLevel,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const _TileCard(
-                  child: HyperListTile(
-                    enabled: false,
-                    title: HyperText('不可用列表项'),
-                    subtitle: HyperText('标题、说明和尾部内容共同使用禁用状态。'),
-                    trailing: HyperIcon(Icons.block),
-                  ),
+                HyperListTile(
+                  enabled: false,
+                  title: HyperText('不可用列表项'),
+                  subtitle: HyperText('标题、说明和尾部内容共同使用禁用状态。'),
+                  trailing: HyperIcon(Icons.block),
                 ),
               ],
             ),
@@ -207,16 +193,4 @@ class _HyperListTilePageState extends State<HyperListTilePage> {
       ),
     );
   }
-}
-
-class _TileCard extends StatelessWidget {
-  const _TileCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => HyperCard(
-    style: HyperCardStyle(padding: EdgeInsets.zero),
-    child: child,
-  );
 }

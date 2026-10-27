@@ -1278,8 +1278,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
             case 'hide':
               setColumnVisible(c.field, false);
             default:
-              if (id.startsWith('show:'))
+              if (id.startsWith('show:')) {
                 setColumnVisible(id.substring(5), true);
+              }
           }
         },
         child: Padding(

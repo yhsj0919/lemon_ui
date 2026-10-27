@@ -15,7 +15,6 @@ void main() {
       ),
     );
     expect(find.text('未选中'), findsOneWidget);
-    expect(find.text('圆角矩形变体'), findsOneWidget);
     await tester.tap(
       find.byWidgetPredicate(
         (widget) => widget is HyperCheckbox && widget.semanticLabel == '三态复选框',
@@ -30,6 +29,8 @@ void main() {
     );
     await tester.pump();
     expect(find.text('半选中'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('圆角矩形变体'), 200);
+    expect(find.text('圆角矩形变体'), findsOneWidget);
   });
   testWidgets('原生与 Hyper 对照控件同步切换三态', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: HyperCheckboxPage()));

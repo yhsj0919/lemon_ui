@@ -15,12 +15,25 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNWidgets(2));
+    await tester.scrollUntilVisible(find.text('普通质量'), 300);
+    await tester.pumpAndSettle();
+    final filters = [
+      for (final name in ['毛玻璃', '柔光玻璃'])
+        find.descendant(
+          of: find.byKey(ValueKey('material-$name')),
+          matching: find.byType(BackdropFilter),
+        ),
+    ];
+    for (final filter in filters) {
+      expect(tester.widget<BackdropFilter>(filter).enabled, isTrue);
+    }
     expect(find.byKey(const ValueKey('material-柔光玻璃')), findsOneWidget);
 
     await tester.tap(find.text('普通质量'));
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNothing);
+    for (final filter in filters) {
+      expect(tester.widget<BackdropFilter>(filter).enabled, isFalse);
+    }
     expect(find.textContaining('普通质量 · 正常透明度'), findsOneWidget);
 
     await tester.tap(find.byType(HyperSwitch));

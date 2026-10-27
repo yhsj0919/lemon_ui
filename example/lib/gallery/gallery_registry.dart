@@ -1,3 +1,4 @@
+import '../pages/interaction/hyper_popover_page.dart';
 import '../pages/pending/hyper_list_group_page.dart';
 import '../pages/pending/hyper_pending_controls_pages.dart';
 import '../pages/selection/hyper_inline_edit_page.dart';
@@ -90,46 +91,11 @@ final List<GallerySection> gallerySections = [
     title: '未确认',
     items: [
       GalleryItem(
-        id: 'hyper-list-group',
-        title: '列表组',
-        description: '带标题和独立操作区，内容无额外内边距。',
-        icon: Icons.view_list_outlined,
-        builder: (_) => const HyperListGroupPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-rating',
-        title: '评分',
-        description: '半星、只读、键盘与 Form。',
-        icon: Icons.star_outline,
-        builder: (_) => const HyperRatingPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-transfer',
-        title: '穿梭框',
-        description: '搜索、全选和双向移动。',
-        icon: Icons.swap_horiz,
-        builder: (_) => const HyperTransferPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-resizable',
-        title: '可调整分栏',
-        description: '拖动、键盘、约束与折叠。',
-        icon: Icons.vertical_split_outlined,
-        builder: (_) => const HyperResizablePage(),
-      ),
-      GalleryItem(
-        id: 'hyper-movable-dialog',
-        title: '可移动对话框',
-        description: '公共对话框表面、标题拖动与边界。',
-        icon: Icons.open_with,
-        builder: (_) => const HyperMovableDialogPage(),
-      ),
-      GalleryItem(
-        id: 'hyper-navigation-bar',
-        title: '底部／侧向导航栏',
-        description: '受控选择、标签与键盘导航。',
-        icon: Icons.space_dashboard_outlined,
-        builder: (_) => const HyperNavigationBarPage(),
+        id: 'hyper-popover',
+        title: '锚定面板',
+        description: '默认浮层材质、阴影及任意内容。',
+        icon: Icons.chat_bubble_outline,
+        builder: (_) => const HyperPopoverPage(),
       ),
     ],
   ),
@@ -249,6 +215,20 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '容器与表面',
     items: [
+      GalleryItem(
+        id: 'hyper-list-group',
+        title: '列表组',
+        description: '带标题和独立操作区，内容无额外内边距。',
+        icon: Icons.view_list_outlined,
+        builder: (_) => const HyperListGroupPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-resizable',
+        title: '可调整分栏',
+        description: '拖动、键盘、约束与折叠。',
+        icon: Icons.vertical_split_outlined,
+        builder: (_) => const HyperResizablePage(),
+      ),
       GalleryItem(
         id: 'hyper-container',
         title: '容器',
@@ -422,7 +402,7 @@ final List<GallerySection> gallerySections = [
     items: [
       GalleryItem(
         id: 'hyper-anchored-overlay',
-        title: '锚定浮层',
+        title: '锚定浮层基础设施',
         description: '点击或悬停打开锚定浮层，自动跟随并避让边缘。',
         icon: Icons.layers_outlined,
         builder: (_) => const HyperAnchoredOverlayPage(),
@@ -467,6 +447,20 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '选择控件',
     items: [
+      GalleryItem(
+        id: 'hyper-rating',
+        title: '评分',
+        description: '半星、只读、键盘与 Form。',
+        icon: Icons.star_outline,
+        builder: (_) => const HyperRatingPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-transfer',
+        title: '穿梭框',
+        description: '搜索、全选和双向移动。',
+        icon: Icons.swap_horiz,
+        builder: (_) => const HyperTransferPage(),
+      ),
       GalleryItem(
         id: 'hyper-tree-select',
         title: '树形选择',
@@ -587,6 +581,13 @@ final List<GallerySection> gallerySections = [
     title: '反馈与状态',
     items: [
       GalleryItem(
+        id: 'hyper-movable-dialog',
+        title: '可移动对话框',
+        description: '公共对话框表面、标题拖动与边界。',
+        icon: Icons.open_with,
+        builder: (_) => const HyperMovableDialogPage(),
+      ),
+      GalleryItem(
         id: 'hyper-progress-indicator',
         title: '进度',
         description: '线性、圆形、确定进度与不确定进度。',
@@ -706,6 +707,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '标签导航',
     items: [
+      GalleryItem(
+        id: 'hyper-navigation-bar',
+        title: '底部／侧向导航栏',
+        description: '受控选择、标签与键盘导航。',
+        icon: Icons.space_dashboard_outlined,
+        builder: (_) => const HyperNavigationBarPage(),
+      ),
       GalleryItem(
         id: 'hyper-tab-bar',
         title: '标签栏',

@@ -15,7 +15,7 @@ void main() {
       ),
     );
 
-    expect(find.text('HyperText'), findsOneWidget);
+    expect(find.text('文字'), findsOneWidget);
     expect(find.text('默认正文'), findsOneWidget);
     await tester.tap(find.byType(HyperSwitch));
     await tester.pumpAndSettle();

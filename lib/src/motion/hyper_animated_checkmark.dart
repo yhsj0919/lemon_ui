@@ -175,5 +175,9 @@ Path hyperCheckboxCheckPath(Offset origin, double edge, double progress) {
     path.lineTo(mid.dx, mid.dy);
     path.lineTo(point.dx, point.dy);
   }
-  return path;
+  // Center the completed glyph, not its nominal square: the original Flutter
+  // points span .25 to .70 vertically. Use the same translation at every
+  // progress value so revealing the strokes does not move the glyph.
+  final bounds = Rect.fromLTRB(start.dx, end.dy, end.dx, mid.dy);
+  return path.shift(origin + Offset(edge / 2, edge / 2) - bounds.center);
 }

@@ -192,7 +192,13 @@ void main() {
 
     expect(visualRect.height, 40);
     expect(text.style?.fontSize, 16);
-    expect(text.style?.height, isNull);
+    expect(
+      text.style?.height,
+      HyperTheme.of(tester.element(find.byType(HyperButton)))
+          .textTheme
+          .labelLarge
+          ?.height,
+    );
     expect(textRect.top, greaterThanOrEqualTo(visualRect.top));
     expect(textRect.bottom, lessThanOrEqualTo(visualRect.bottom));
     expect(textRect.center.dy, closeTo(visualRect.center.dy, .01));

@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../../foundation/hyper_control_state.dart';
+import '../../adaptive/hyper_device_detector.dart';
+import '../../foundation/hyper_device_type.dart';
 import '../../interaction/hyper_pressable.dart';
+import '../../motion/hyper_animated_checkmark.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/motion/hyper_motion_theme.dart';
 import '../card/hyper_card.dart';
+import '../checkbox/hyper_checkbox_style.dart';
+import '../checkbox/hyper_checkbox_theme.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 import 'hyper_menu_surface.dart';
 import 'hyper_menu_model.dart';
 import 'hyper_menu_style.dart';
 import 'hyper_menu_theme.dart';
+import 'hyper_menu_layout.dart';
 
 /// 将菜单键盘导航交给外部编辑器，同时保留编辑器焦点。
 class HyperMenuNavigationController {
@@ -256,12 +263,20 @@ class _HyperMenuState extends State<HyperMenu> {
   Widget build(BuildContext context) {
     final theme = HyperTheme.of(context);
     final metrics = HyperTheme.sizesOf(context).menu;
+    final device = HyperDeviceDetector.maybeOf(context);
+    final phone =
+        device == HyperDeviceType.phone ||
+        (device == null &&
+            (defaultTargetPlatform == TargetPlatform.android ||
+                defaultTargetPlatform == TargetPlatform.iOS));
+    final overrides =
+        HyperMenuTheme.of(context).style?.merge(widget.style) ?? widget.style;
     final style = HyperMenuStyle(
       width: metrics.width,
       itemHeight: metrics.itemHeight,
       itemVerticalPadding: metrics.itemVerticalPadding ?? metrics.padding / 2,
       padding: metrics.padding,
-      surfacePadding: metrics.padding,
+      surfacePadding: metrics.surfacePadding ?? metrics.padding,
       groupSpacing: metrics.groupSpacing,
       itemSpacing:
           metrics.itemSpacing ??
@@ -272,7 +287,10 @@ class _HyperMenuState extends State<HyperMenu> {
       iconSpacing: metrics.iconSpacing,
       foregroundColor: theme.colors.textPrimary,
       disabledColor: theme.colors.disabled,
-      selectedBackgroundColor: theme.colors.primary.withValues(alpha: .08),
+      selectedForegroundColor: phone ? theme.colors.primary : null,
+      selectedBackgroundColor: phone
+          ? Colors.transparent
+          : theme.colors.primary.withValues(alpha: .08),
       activeBackgroundColor: theme.colors.stateLayer.withValues(alpha: .06),
       itemTextStyle: theme.textTheme.titleMedium?.copyWith(
         fontSize: theme.typography.listTitle,
@@ -285,29 +303,40 @@ class _HyperMenuState extends State<HyperMenu> {
       groupTitleStyle: theme.textTheme.labelMedium?.copyWith(
         color: theme.colors.textSecondary,
       ),
-    ).merge(HyperMenuTheme.of(context).style).merge(widget.style);
+    ).merge(overrides);
     final surfaceStyle = resolveHyperMenuSurface(
       context,
       radius: style.surfaceRadius!,
-      padding: EdgeInsets.all(style.surfacePadding!),
+      padding: EdgeInsets.symmetric(
+        horizontal: style.surfacePadding!,
+        vertical:
+            overrides?.surfacePadding ??
+            metrics.surfaceVerticalPadding ??
+            style.surfacePadding!,
+      ),
       style: style.surfaceStyle,
     );
     final viewport = MediaQuery.sizeOf(context);
+    final widthLimit = style.width!.clamp(0.0, viewport.width);
+    final naturalWidth =
+        phone && widget.showSurface && overrides?.width == null;
+    final width = naturalWidth ? null : widthLimit;
     final content = ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: style.maxHeight ?? viewport.height,
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.zero,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: HyperMenuLayout(
+          naturalWidth: naturalWidth,
           children: [
             for (final (index, group) in _groups.indexed) ...[
               if (index > 0) ...[
-                SizedBox(height: style.groupSpacing! / 2),
-                Divider(height: 1, color: theme.colors.outline),
-                SizedBox(height: style.groupSpacing! / 2),
+                if (style.groupSpacing! > 0)
+                  SizedBox(height: style.groupSpacing! / 2),
+                Divider(height: 1, thickness: 1, color: theme.colors.outline),
+                if (style.groupSpacing! > 0)
+                  SizedBox(height: style.groupSpacing! / 2),
               ],
               if (group.title != null)
                 Padding(
@@ -319,35 +348,69 @@ class _HyperMenuState extends State<HyperMenu> {
                 ),
               for (final (itemIndex, item) in group.items.indexed) ...[
                 if (itemIndex > 0) SizedBox(height: style.itemSpacing!),
-                _buildItem(context, item, style),
+                _buildItem(context, item, style, naturalWidth: naturalWidth),
               ],
             ],
           ],
         ),
       ),
     );
+    final panel = widget.showSurface
+        ? HyperCard(width: width, style: surfaceStyle, child: content)
+        : SizedBox(width: width, child: content);
     return Focus(
       focusNode: _focusNode,
       autofocus: widget.requestFocusOnOpen,
       onKeyEvent: _onKeyEvent,
-      child: widget.showSurface
-          ? HyperCard(
-              width: style.width!.clamp(0.0, viewport.width),
-              style: surfaceStyle,
-              child: content,
-            )
-          : SizedBox(
-              width: style.width!.clamp(0.0, viewport.width),
-              child: content,
-            ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: widthLimit),
+        child: panel,
+      ),
+    );
+  }
+
+  Widget _buildCheckmark(
+    BuildContext context,
+    HyperMenuStyle style,
+    Color foreground,
+  ) {
+    final size = style.checkSize ?? style.iconSize!;
+    final color = style.checkColor ?? foreground;
+    if (style.checkIcon != null) {
+      return Icon(style.checkIcon, size: size, color: color);
+    }
+    final theme = HyperTheme.of(context);
+    final metrics = HyperTheme.sizesOf(context).checkbox;
+    final checkbox = HyperCheckboxTheme.of(context)
+        .resolve(HyperCheckboxVariant.circle);
+    final markSize = checkbox.markSize ?? metrics.markSize;
+    return SizedBox.square(
+      dimension: size,
+      child: Center(
+        child: SizedBox.square(
+          dimension:
+              style.checkSize ?? markSize ?? checkbox.size ?? metrics.size,
+          child: HyperAnimatedCheckmark(
+            state: true,
+            glyphScale: markSize == null ? checkbox.glyphScale ?? 1.15 : 2,
+            color: color,
+            strokeWidth: checkbox.markStrokeWidth ?? metrics.markStrokeWidth,
+            duration: (MediaQuery.maybeOf(context)?.disableAnimations ?? false)
+                ? Duration.zero
+                : checkbox.duration ?? theme.motion.standardDuration,
+            curve: checkbox.curve ?? theme.motion.standardCurve,
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildItem(
     BuildContext context,
     HyperMenuItem item,
-    HyperMenuStyle style,
-  ) {
+    HyperMenuStyle style, {
+    required bool naturalWidth,
+  }) {
     final selected =
         widget.selectedId == item.id || widget.selectedIds.contains(item.id);
     final active = item.enabled && _keyboardActive && _activeId == item.id;
@@ -407,16 +470,13 @@ class _HyperMenuState extends State<HyperMenu> {
               vertical: style.itemVerticalPadding!,
             ),
             child: Row(
+              mainAxisSize: naturalWidth ? MainAxisSize.min : MainAxisSize.max,
               children: [
                 if (selected &&
                     (style.showCheckmark ?? true) &&
                     style.checkPlacement ==
                         HyperMenuCheckPlacement.leading) ...[
-                  Icon(
-                    style.checkIcon ?? Icons.check,
-                    size: style.checkSize ?? style.iconSize,
-                    color: style.checkColor ?? foreground,
-                  ),
+                  _buildCheckmark(context, style, foreground),
                   SizedBox(width: style.checkSpacing ?? style.iconSpacing),
                 ],
                 if (item.leading != null) ...[
@@ -429,7 +489,8 @@ class _HyperMenuState extends State<HyperMenu> {
                   ),
                   SizedBox(width: style.iconSpacing),
                 ],
-                Expanded(
+                Flexible(
+                  fit: naturalWidth ? FlexFit.loose : FlexFit.tight,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,11 +524,7 @@ class _HyperMenuState extends State<HyperMenu> {
                     style.checkPlacement !=
                         HyperMenuCheckPlacement.leading) ...[
                   SizedBox(width: style.checkSpacing ?? style.iconSpacing),
-                  Icon(
-                    style.checkIcon ?? Icons.check,
-                    size: style.checkSize ?? style.iconSize,
-                    color: style.checkColor ?? foreground,
-                  ),
+                  _buildCheckmark(context, style, foreground),
                 ],
                 if (item.children.isNotEmpty) ...[
                   SizedBox(width: style.iconSpacing),
@@ -487,31 +544,36 @@ class _HyperMenuState extends State<HyperMenu> {
       ),
     );
     if (!item.enabled || item.children.isEmpty) return row;
-    return HyperAnchoredOverlay(
-      trigger: HyperOverlayTrigger.manual,
-      placement: HyperOverlayPlacement.sideEnd,
-      isOpen: _openSubmenuId == item.id,
-      onOpenChanged: (open) {
-        if (!mounted) return;
-        if (open) {
-          _openSubmenu(item.id);
-        } else {
-          _closeSubmenu();
-        }
-      },
-      transitionBuilder: style.submenuTransitionBuilder,
-      anchor: row,
-      overlayBuilder: (context, close) => HyperMenu._submenu(
-        _closeSubmenu,
-        _keyboardActive,
-        items: item.children,
-        selectedId: widget.selectedId,
-        selectedIds: widget.selectedIds,
-        onSelected: (id) {
-          close();
-          widget.onSelected?.call(id);
+    return LayoutBuilder(
+      builder: (context, constraints) => HyperAnchoredOverlay(
+        trigger: HyperOverlayTrigger.manual,
+        placement: HyperOverlayPlacement.sideEnd,
+        isOpen: _openSubmenuId == item.id,
+        onOpenChanged: (open) {
+          if (!mounted) return;
+          if (open) {
+            _openSubmenu(item.id);
+          } else {
+            _closeSubmenu();
+          }
         },
-        style: widget.style,
+        transitionBuilder: style.submenuTransitionBuilder,
+        anchor: SizedBox(
+          width: constraints.hasTightWidth ? constraints.maxWidth : null,
+          child: row,
+        ),
+        overlayBuilder: (context, close) => HyperMenu._submenu(
+          _closeSubmenu,
+          _keyboardActive,
+          items: item.children,
+          selectedId: widget.selectedId,
+          selectedIds: widget.selectedIds,
+          onSelected: (id) {
+            close();
+            widget.onSelected?.call(id);
+          },
+          style: widget.style,
+        ),
       ),
     );
   }

@@ -144,7 +144,8 @@ void main() {
         )
         .onSelected('hyper-tooltip');
     await tester.pumpAndSettle();
-    expect(find.text('暂不支持编辑'), findsOneWidget);
+    expect(find.text('暂不支持编辑'), findsNothing);
+    expect(find.byKey(const ValueKey('editor-panel-文字提示')), findsOneWidget);
     expect(variants, findsNothing);
     tester
         .widget<EditorComponentNavigation>(
@@ -263,7 +264,13 @@ void main() {
     );
     expect(controller!.indexIsChanging, isTrue);
     await tester.pumpAndSettle();
-    expect(find.text('卡片'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(EditorComponentNavigation),
+        matching: find.text('卡片'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
   testWidgets('预览隔离、撤销重做和主题库保存打开', (tester) async {

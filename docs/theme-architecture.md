@@ -1,3 +1,56 @@
+## 主题工厂文字样式解析（2026-10-27）
+
+`fromSeed` 与 `fromMaterial` 在应用 Hyper 字阶前，统一将主题根文字样式的
+`inherit` 设为 false，并补齐 Flutter 文本输入要求的默认 alphabetic 基线，
+避免回退主题与种子主题动画插值时继承属性不一致触发断言。
+保留传入文字样式的行高、字重等字段，不补入额外 Material 几何，不改写控件尺寸。
+保留主题动画，不在 Demo 中禁用过渡。
+
+## 手机菜单贴边选中背景（2026-10-27）
+
+按用户提供的系统菜单参考图，phone 的菜单项背景横向铺满面板，默认
+`sizes.menu.surfacePadding = 0`、`itemRadius = 0`；文字仍保留 `padding`。
+这是参考图明确的贴边关系，不从截图物理像素反推逻辑尺寸。其他端保持原规格。
+新增可选尺寸字段 `surfacePadding`，未指定时兼容回退 `padding`；全局尺寸、
+局部菜单主题及实例 Style 仍可显式覆盖。列表项浮窗自然宽度同步读取此字段。
+
+同日用户进一步指定 phone 选中态仅使用主题主色文字及对勾，选中背景透明；
+desktop 保持原文字色与淡色选中背景。按真实设备类别解析默认配色，
+全局、局部和实例的显式菜单颜色覆盖仍优先。
+
+同日按用户反馈，phone 菜单默认按内容收缩，`sizes.menu.width` 作为宽度上限；
+显式菜单宽度覆盖仍按指定宽度显示。面板左右留白保持零，上下留白由
+`sizes.menu.surfaceVerticalPadding = 8` 提供（用户明确指定，逻辑像素）。
+分隔线上下间距按用户指定为各 4（`groupSpacing = 8`），同组菜单项间距仍为零。
+显式 `surfacePadding` 仍覆盖四边，`surfaceStyle.padding` 最后覆盖。
+
+手机菜单使用有界的真实布局测量各行，再以最宽行统一菜单项宽度；分隔线与
+间隔不参与自然宽度计算。不再手动估算文字或自定义首尾内容的宽度，也不做
+intrinsic 测量，兼容 `LayoutBuilder`，保留主题宽度上限与显式宽度覆盖。
+列表项浮窗按用户明确要求保持 phone 四边留白为零，desktop 保持既有留白；
+其传入的四边留白有意覆盖普通菜单的上下留白，显式主题和实例覆盖仍优先。
+
+## 列表项选项呈现（2026-10-27）
+
+用户明确要求 `HyperPopupListTile` 在手机端也默认显示锚点浮窗，故其 `presentation`
+默认值为 `anchored`；该列表项不套用普通表单选择器的手机底部弹窗默认策略。
+调用方仍可显式指定 `adaptive`、`bottomSheet` 或 `fullScreen`。
+模态路径由公共选择呈现器提供唯一表面，内部 `HyperMenu(showSurface: false)` 仅展示选项，
+菜单主题与实例的 `surfaceStyle` 传给外层呈现器，保留显式阴影、材质和边框覆盖。
+列表项 Demo 使用 `HyperListGroup` 按用途分组，不重复嵌套卡片表面。
+
+## 锚定面板（2026-10-27，未确认）
+
+`HyperPopover` 是带默认表面的公开锚定面板；`HyperAnchoredOverlay` 保留为无表面的
+定位、开合基础设施。面板复用 `resolveHyperMenuSurface`，材质质量、降级和安全过渡
+由公共设施负责。`popoverTheme`、局部 `HyperPopoverTheme` 与实例 `HyperPopoverStyle`
+逐字段合并，表面复用 `HyperCardStyle`，显式空阴影列表优先于配方。
+
+四端默认圆角、内边距和锚点间距直接读取当前端 `sizes.menu` 与 `sizes.overlaySpacing`，
+来源为 D 级同端既有浮层语义，不新增设备常量或跨端倍率。编辑器独立保存 popover 的
+按设备尺寸与按亮暗外观覆盖，支持继承恢复、保存和导入。Demo 先登记“未确认”。
+具体接口与待验证项见 [锚定面板](usage/popover.md)。
+
 ## 通知业务边界与导航表面（2026-10-16）
 
 2026-10-22：抽屉新增四边 margin，由当前端 sizes.drawer.margin 提供默认值，HyperDrawerStyle.margin 支持全局、局部和实例覆盖；默认零边距不变。此留白属于 Scaffold 抽屉表面的滑动几何，表面宽度不包含边距，四边留白参与父约束收缩和关闭手势范围。四角复用 surfaceStyle.borderRadius，不新增重复 Style 字段；四端可用 sizes.drawer.borderRadius 配置，null 保留旧 radius 按抽屉起止方向解析的贴边圆角。普通与高级表面继续共用 HyperNavigationSurface，未新增材质或降级路径。边距过渡跟随 Motion 并遵守减少动画；Demo 使用显式开关展示示例几何，默认仍继承主题。

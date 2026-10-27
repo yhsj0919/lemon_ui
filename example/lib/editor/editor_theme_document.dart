@@ -322,6 +322,7 @@ class EditorShadow {
 
 /// 当前设备的显式规格覆盖，默认值始终来自 Hyper 主题。
 class EditorDevice {
+  HyperNumberInputLayout? numberInputLayout;
   EditorReviewCollection reviews = EditorReviewCollection();
   EditorInputFields sliderInput = EditorInputFields();
   EditorInputFields segmentedInput = EditorInputFields();
@@ -368,6 +369,7 @@ class EditorDevice {
       menuHeight,
       menuRadius;
   Map<String, Object?> toJson() => {
+    if (numberInputLayout != null) 'numberInputLayout': numberInputLayout!.name,
     if (reviews.toJson().isNotEmpty) 'reviews': reviews.toJson(),
     if (sliderInput.toJson().isNotEmpty) 'sliderInput': sliderInput.toJson(),
     if (segmentedInput.toJson().isNotEmpty)
@@ -435,6 +437,7 @@ class EditorDevice {
   };
   factory EditorDevice.fromJson(Map<String, dynamic> j) {
     _checkFields(j, {
+      'numberInputLayout',
       'reviews',
       'typography',
       'buttonMetrics',
@@ -482,6 +485,11 @@ class EditorDevice {
       'menuRadius',
     });
     return EditorDevice()
+      ..numberInputLayout = j['numberInputLayout'] == null
+          ? null
+          : HyperNumberInputLayout.values.singleWhere(
+              (v) => v.name == j['numberInputLayout'],
+            )
       ..reviews = EditorReviewCollection.fromJson(
         (j['reviews'] as Map<String, dynamic>?) ?? {},
       )
@@ -2336,6 +2344,9 @@ class EditorThemeDocument {
                 ),
           ),
 
+      numberInputTheme: theme.numberInputTheme.copyWith(
+        layout: device(deviceType).numberInputLayout,
+      ),
       ratingTheme: theme.ratingTheme.copyWith(
         style: HyperRatingStyle(
           iconSize: device(deviceType).extendedControls.ratingIconSize,

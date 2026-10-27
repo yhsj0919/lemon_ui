@@ -90,8 +90,9 @@ class _HyperMovableDialogState extends State<HyperMovableDialog>
     controller.addListener(changed);
     _lastMaximized = controller.maximized;
     _geometry.addStatusListener((status) {
-      if (mounted && status == AnimationStatus.completed)
+      if (mounted && status == AnimationStatus.completed) {
         _material.forward(from: 0);
+      }
     });
   }
 

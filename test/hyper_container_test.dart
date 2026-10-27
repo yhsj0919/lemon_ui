@@ -3,6 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  Finder surface(String key) => find.descendant(
+    of: find.byKey(Key(key)),
+    matching: find.byType(HyperMaterialSurface),
+  );
+  BoxDecoration background(WidgetTester tester, String key) {
+    final filter = find.descendant(
+      of: surface(key),
+      matching: find.byType(BackdropFilter),
+    );
+    return tester
+            .widget<DecoratedBox>(
+              find
+                  .descendant(of: filter, matching: find.byType(DecoratedBox))
+                  .first,
+            )
+            .decoration
+        as BoxDecoration;
+  }
+
   testWidgets('实例属性覆盖容器主题且显式尺寸保持精确', (tester) async {
     final theme = HyperThemeData.light().copyWith(
       containerTheme: HyperContainerThemeData(
@@ -30,13 +49,12 @@ void main() {
       ),
     );
 
-    final rendered = find.descendant(
-      of: find.byKey(const Key('target')),
-      matching: find.byType(Container),
+    expect(
+      tester.getSize(find.byKey(const Key('target'))),
+      const Size(180, 100),
     );
-    expect(tester.getSize(rendered), const Size(180, 100));
-    final container = tester.widget<Container>(rendered);
-    final decoration = container.decoration! as BoxDecoration;
+    final container = tester.widget<HyperMaterialSurface>(surface('target'));
+    final decoration = background(tester, 'target');
     expect(decoration.color, Colors.blue);
     expect(decoration.borderRadius, BorderRadius.circular(24));
     expect(container.padding, const EdgeInsets.all(10));
@@ -68,13 +86,8 @@ void main() {
       ),
     );
 
-    final container = tester.widget<Container>(
-      find.descendant(
-        of: find.byKey(const Key('target')),
-        matching: find.byType(Container),
-      ),
-    );
-    final decoration = container.decoration! as BoxDecoration;
+    final container = tester.widget<HyperMaterialSurface>(surface('target'));
+    final decoration = background(tester, 'target');
     expect(decoration.color, Colors.green);
     expect(decoration.borderRadius, BorderRadius.zero);
     expect(container.padding, EdgeInsets.zero);
@@ -100,16 +113,16 @@ void main() {
       ),
     );
 
-    final animated = tester.widgetList<AnimatedContainer>(
-      find.byType(AnimatedContainer),
-    );
-    final first = animated.first.decoration! as BoxDecoration;
-    final second = animated.last.decoration! as BoxDecoration;
+    final first = background(tester, 'gradient');
+    final second = background(tester, 'none');
     expect(first.gradient, gradient);
     expect(first.color, isNull);
     expect(second.color, isNull);
     expect(second.gradient, isNull);
-    expect(second.boxShadow, isEmpty);
+    expect(
+      tester.widget<HyperMaterialSurface>(surface('none')).boxShadow,
+      isEmpty,
+    );
   });
 
   testWidgets('容器默认不裁切且可显式开启裁切', (tester) async {
@@ -134,19 +147,35 @@ void main() {
       ),
     );
 
-    final clipped = tester.widget<Container>(
+    final clipped = tester.widget<HyperMaterialSurface>(
       find.descendant(
         of: find.byKey(const Key('clipped')),
-        matching: find.byType(Container),
+        matching: find.byType(HyperMaterialSurface),
       ),
     );
-    final overflow = tester.widget<Container>(
+    final overflow = tester.widget<HyperMaterialSurface>(
       find.descendant(
         of: find.byKey(const Key('overflow')),
-        matching: find.byType(Container),
+        matching: find.byType(HyperMaterialSurface),
       ),
     );
     expect(clipped.clipBehavior, Clip.antiAlias);
     expect(overflow.clipBehavior, Clip.none);
+    for (final (key, expected) in [
+      ('clipped', Clip.antiAlias),
+      ('overflow', Clip.none),
+    ]) {
+      expect(
+        tester
+            .widget<ClipRRect>(
+              find.descendant(
+                of: surface(key),
+                matching: find.byType(ClipRRect),
+              ),
+            )
+            .clipBehavior,
+        expected,
+      );
+    }
   });
 }

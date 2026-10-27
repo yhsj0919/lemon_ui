@@ -76,7 +76,7 @@ extension _SurfaceWorkspace on _ThemeEditorState {
       bool overridden,
     ) => _number(label, value, 0, max, write, reset, overridden);
     return _panel(
-      listGroup ? '列表组 · 未确认' : _ThemeEditorState._components[_component]!,
+      listGroup ? '列表组' : _ThemeEditorState._components[_component]!,
       [
         if (listGroup) const HyperText('内容区固定无额外内边距；标题与表面设置目前与卡片共享。'),
         const HyperText('布局按设备保存，外观按亮暗保存；未覆盖项继承主题。局部与实例覆盖以 Demo 标记为准。'),

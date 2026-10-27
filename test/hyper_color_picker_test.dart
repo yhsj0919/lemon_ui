@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
-  testWidgets('选色器内部默认关闭全局滑块数值提示', (tester) async {
+  testWidgets('选色器明度关闭数值提示，不透明度仅拖动显示，不继承全局常显', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: HyperTheme(
@@ -26,7 +26,9 @@ void main() {
     for (final element in find.byType(Slider).evaluate()) {
       expect(
         SliderTheme.of(element).showValueIndicator,
-        ShowValueIndicator.never,
+        (element.widget as Slider).label == '明度'
+            ? ShowValueIndicator.never
+            : ShowValueIndicator.onDrag,
       );
     }
     expect(find.byType(Slider), findsWidgets);

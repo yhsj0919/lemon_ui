@@ -8,7 +8,7 @@ class HyperListGroupPage extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText('列表组 · 未确认', variant: HyperTextVariant.pageTitle),
+      const HyperText('列表组', variant: HyperTextVariant.pageTitle),
       const HyperText('默认继承卡片和标题主题；内容无左右及底部内边距。'),
       const SizedBox(height: 24),
       HyperListGroup(

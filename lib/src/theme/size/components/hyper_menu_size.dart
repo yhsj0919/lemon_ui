@@ -8,6 +8,8 @@ final class HyperMenuSize {
     required this.itemHeight,
     this.itemVerticalPadding,
     required this.padding,
+    this.surfacePadding,
+    this.surfaceVerticalPadding,
     this.itemSpacing,
     this.descriptionGap = 2,
     required this.groupSpacing,
@@ -21,6 +23,10 @@ final class HyperMenuSize {
   final double itemHeight;
   final double? itemVerticalPadding;
   final double padding;
+
+  /// 面板外围留白；未指定时兼容沿用菜单项内容内边距。
+  final double? surfacePadding;
+  final double? surfaceVerticalPadding;
   final double? itemSpacing;
 
   /// 菜单标题与描述的逻辑像素间距。
@@ -38,6 +44,8 @@ final class HyperMenuSize {
     double? itemHeight,
     double? itemVerticalPadding,
     double? padding,
+    double? surfacePadding,
+    double? surfaceVerticalPadding,
     double? itemSpacing,
     double? descriptionGap,
     double? groupSpacing,
@@ -50,6 +58,9 @@ final class HyperMenuSize {
     itemHeight: itemHeight ?? this.itemHeight,
     itemVerticalPadding: itemVerticalPadding ?? this.itemVerticalPadding,
     padding: padding ?? this.padding,
+    surfacePadding: surfacePadding ?? this.surfacePadding,
+    surfaceVerticalPadding:
+        surfaceVerticalPadding ?? this.surfaceVerticalPadding,
     itemSpacing: itemSpacing ?? this.itemSpacing,
     descriptionGap: descriptionGap ?? this.descriptionGap,
     groupSpacing: groupSpacing ?? this.groupSpacing,
@@ -69,6 +80,13 @@ final class HyperMenuSize {
           ? (t < .5 ? a.itemVerticalPadding : b.itemVerticalPadding)
           : value(a.itemVerticalPadding!, b.itemVerticalPadding!),
       padding: value(a.padding, b.padding),
+      surfacePadding: a.surfacePadding == null || b.surfacePadding == null
+          ? (t < .5 ? a.surfacePadding : b.surfacePadding)
+          : value(a.surfacePadding!, b.surfacePadding!),
+      surfaceVerticalPadding:
+          a.surfaceVerticalPadding == null || b.surfaceVerticalPadding == null
+          ? (t < .5 ? a.surfaceVerticalPadding : b.surfaceVerticalPadding)
+          : value(a.surfaceVerticalPadding!, b.surfaceVerticalPadding!),
       itemSpacing: a.itemSpacing == null || b.itemSpacing == null
           ? (t < .5 ? a.itemSpacing : b.itemSpacing)
           : value(a.itemSpacing!, b.itemSpacing!),
@@ -88,6 +106,8 @@ final class HyperMenuSize {
       other.itemHeight == itemHeight &&
       other.itemVerticalPadding == itemVerticalPadding &&
       other.padding == padding &&
+      other.surfacePadding == surfacePadding &&
+      other.surfaceVerticalPadding == surfaceVerticalPadding &&
       other.itemSpacing == itemSpacing &&
       other.descriptionGap == descriptionGap &&
       other.groupSpacing == groupSpacing &&
@@ -102,6 +122,8 @@ final class HyperMenuSize {
     itemHeight,
     itemVerticalPadding,
     padding,
+    surfacePadding,
+    surfaceVerticalPadding,
     itemSpacing,
     descriptionGap,
     groupSpacing,

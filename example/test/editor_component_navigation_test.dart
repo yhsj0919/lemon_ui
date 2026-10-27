@@ -5,15 +5,15 @@ import 'package:lemon_ui_example/editor/editor_component_navigation.dart';
 import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 
 void main() {
-  testWidgets('树形选择入口归入未确认分类并能从编辑器导航显示', (tester) async {
-    final pending = gallerySections.singleWhere((s) => s.title == '未确认');
+  testWidgets('树形选择入口归入选择控件分类并能从编辑器导航显示', (tester) async {
+    final pending = gallerySections.singleWhere((s) => s.title == '选择控件');
     expect(
       pending.items.where((i) => i.id == 'hyper-tree-select'),
       hasLength(1),
     );
     expect(
       gallerySections
-          .where((s) => s.title != '未确认')
+          .where((s) => s.title != '选择控件')
           .expand((s) => s.items)
           .where((i) => i.id == 'hyper-tree-select'),
       isEmpty,
@@ -33,7 +33,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('树形选择 · 未确认'), findsOneWidget);
+    expect(find.text('树形选择'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

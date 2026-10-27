@@ -7,7 +7,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: HyperContainerPage()));
     await tester.pumpAndSettle();
 
-    expect(find.text('继承容器主题'), findsOneWidget);
+    expect(find.text('继承当前主题：背景、圆角、边框、阴影、内边距与裁切'), findsOneWidget);
     expect(find.text('实例渐变覆盖'), findsOneWidget);
     expect(find.text('显式清除背景和阴影'), findsOneWidget);
     expect(
@@ -15,14 +15,27 @@ void main() {
       const Size(220, 120),
     );
 
-    final animated = find.descendant(
+    final filter = find.descendant(
       of: find.byKey(const Key('gradient-container')),
-      matching: find.byType(AnimatedContainer),
+      matching: find.byType(BackdropFilter),
     );
-    final before = tester.widget<AnimatedContainer>(animated).decoration;
+    Gradient? gradient() =>
+        (tester
+                    .widget<DecoratedBox>(
+                      find
+                          .descendant(
+                            of: filter,
+                            matching: find.byType(DecoratedBox),
+                          )
+                          .first,
+                    )
+                    .decoration
+                as BoxDecoration)
+            .gradient;
+    final before = gradient();
     await tester.tap(find.text('切换动画效果'));
     await tester.pumpAndSettle();
-    final after = tester.widget<AnimatedContainer>(animated).decoration;
+    final after = gradient();
     expect(after, isNot(before));
   });
 }

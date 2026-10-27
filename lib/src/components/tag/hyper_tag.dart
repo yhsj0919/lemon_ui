@@ -121,6 +121,11 @@ class HyperTag extends StatelessWidget {
                   style: textStyle,
                   child: Text(
                     label,
+                    textHeightBehavior: const TextHeightBehavior(
+                      leadingDistribution: TextLeadingDistribution.even,
+                      applyHeightToFirstAscent: false,
+                      applyHeightToLastDescent: false,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

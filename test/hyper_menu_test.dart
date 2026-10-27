@@ -5,6 +5,193 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  for (final leading in [false, true]) {
+    for (final scale in [1.0, 1.3, 2.0]) {
+      testWidgets(
+        'natural menu measures wide ${leading ? 'leading' : 'trailing'} at $scale',
+        (tester) async {
+          final custom = LayoutBuilder(
+            builder: (context, constraints) => const SizedBox(
+              key: ValueKey('wide-custom'),
+              width: 160,
+              height: 24,
+            ),
+          );
+          await tester.pumpWidget(
+            MaterialApp(
+              home: MediaQuery(
+                data: MediaQueryData(
+                  size: const Size(240, 600),
+                  textScaler: TextScaler.linear(scale),
+                ),
+                child: HyperDeviceDetector(
+                  deviceType: HyperDeviceType.phone,
+                  builder: (context, device, child) => HyperTheme(
+                    data: HyperThemeData.light(),
+                    child: Scaffold(
+                      body: Align(
+                        alignment: Alignment.topLeft,
+                        child: SizedBox(
+                          width: 240,
+                          child: HyperMenu(
+                            items: [
+                              HyperMenuItem(
+                                id: 'wide',
+                                label: '选项',
+                                leading: leading ? custom : null,
+                                trailing: leading ? null : custom,
+                              ),
+                              const HyperMenuItem(
+                                id: 'short',
+                                label: '短',
+                                children: [
+                                  HyperMenuItem(id: 'child', label: '子项'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          final panel = tester.getRect(find.byType(HyperCard));
+          final customRect = tester.getRect(
+            find.byKey(const ValueKey('wide-custom')),
+          );
+          expect(customRect.width, 160);
+          expect(panel.width, lessThanOrEqualTo(240));
+          expect(customRect.left, greaterThanOrEqualTo(panel.left));
+          expect(customRect.right, lessThanOrEqualTo(panel.right));
+          expect(
+            tester
+                .getSize(find.byKey(const ValueKey('hyper-menu-item-short')))
+                .width,
+            panel.width,
+          );
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
+  testWidgets('phone natural menu width supports LayoutBuilder content', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HyperDeviceDetector(
+          deviceType: HyperDeviceType.phone,
+          builder: (context, device, child) => HyperTheme(
+            data: HyperThemeData.light(),
+            child: Scaffold(
+              body: HyperMenu(
+                items: [
+                  HyperMenuItem(
+                    id: 'custom',
+                    label: '自定义',
+                    leading: LayoutBuilder(
+                      builder: (context, constraints) =>
+                          const SizedBox.square(dimension: 24),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.byType(HyperCard)).width,
+      lessThan(HyperSizeScheme.phone().menu.width),
+    );
+  });
+
+  testWidgets(
+    'phone menu has vertical surface and divider padding without item gaps',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperDeviceDetector(
+            deviceType: HyperDeviceType.phone,
+            builder: (context, device, child) => HyperTheme(
+              data: HyperThemeData.light(),
+              child: const Scaffold(
+                body: HyperMenu(
+                  groups: [
+                    HyperMenuGroup(
+                      items: [
+                        HyperMenuItem(id: 'first', label: '新建窗口'),
+                        HyperMenuItem(id: 'second', label: '偏好设置'),
+                      ],
+                    ),
+                    HyperMenuGroup(
+                      items: [HyperMenuItem(id: 'third', label: '退出登录')],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      Rect item(String id) =>
+          tester.getRect(find.byKey(ValueKey('hyper-menu-item-$id')));
+      final divider = tester.getRect(find.byType(Divider));
+      final panel = tester.getRect(find.byType(HyperCard));
+      expect(panel.width, lessThan(HyperSizeScheme.phone().menu.width));
+      expect(item('first').top - panel.top, 8);
+      expect(panel.bottom - item('third').bottom, 8);
+      expect(item('first').left, panel.left);
+      expect(item('first').right, panel.right);
+      final line = tester.widget<Divider>(find.byType(Divider));
+      expect(line.height, line.thickness);
+      expect(divider.height, 1);
+      expect(item('first').bottom, item('second').top);
+      expect(divider.top - item('second').bottom, 4);
+      expect(item('third').top - divider.bottom, 4);
+    },
+  );
+
+  testWidgets(
+    'desktop selected menu retains background and normal foreground',
+    (tester) async {
+      final theme = HyperThemeData.light();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperDeviceDetector(
+            deviceType: HyperDeviceType.desktop,
+            builder: (context, device, child) => HyperTheme(
+              data: theme,
+              child: const Scaffold(
+                body: HyperMenu(
+                  selectedId: 'selected',
+                  items: [HyperMenuItem(id: 'selected', label: 'Selected')],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      final visual = tester.widget<AnimatedContainer>(
+        find.byKey(const ValueKey('hyper-menu-item-selected')),
+      );
+      expect(
+        (visual.decoration! as BoxDecoration).color,
+        theme.colors.primary.withValues(alpha: .08),
+      );
+      expect(
+        tester.widget<Text>(find.text('Selected')).style!.color,
+        theme.colors.textPrimary,
+      );
+    },
+  );
+
   Widget app(Widget child, {HyperThemeData? theme}) => MaterialApp(
     home: HyperTheme(
       data: theme ?? HyperThemeData.light(),

@@ -16,9 +16,10 @@ void main() {
     expect(find.text('Lemon UI 组件演示'), findsOneWidget);
     await tester.tap(find.text('基础能力'));
     await tester.pumpAndSettle();
-    expect(find.text('HyperFill'), findsWidgets);
-    await tester.ensureVisible(find.text('HyperContainerThemeData'));
-    await tester.tap(find.text('HyperContainerThemeData'));
+    expect(find.text('填充'), findsWidgets);
+    await tester.ensureVisible(find.text('容器主题'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('容器主题'));
     await tester.pumpAndSettle();
     expect(find.text('容器主题：逐项覆盖与清除'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -36,8 +37,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('基础能力'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('HyperContainerThemeData'));
-    await tester.tap(find.text('HyperContainerThemeData'));
+    await tester.ensureVisible(find.text('容器主题'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('容器主题'));
     await tester.pumpAndSettle();
     expect(find.text('容器主题：逐项覆盖与清除'), findsOneWidget);
     expect(

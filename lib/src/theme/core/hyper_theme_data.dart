@@ -1,3 +1,5 @@
+import '../../components/number_input/hyper_number_input_theme.dart';
+import '../../components/popover/hyper_popover_theme.dart';
 import '../../components/rating/hyper_rating_theme.dart';
 import '../../components/transfer/hyper_transfer_theme.dart';
 import '../../components/resizable/hyper_resizable_theme.dart';
@@ -77,6 +79,32 @@ import '../typography/hyper_typography_scheme.dart';
 import '../typography/hyper_typography_theme_data.dart';
 
 /// 返回当前平台原生 UI 字体，不依赖随 Flutter 或应用打包的字体文件。
+// Theme-root styles have a consistent inheritance contract for interpolation.
+// Preserve every supplied metric; adding Material geometry here changes control
+// heights when a previously unspecified line height becomes explicit.
+TextStyle? _standaloneTextStyle(TextStyle? style) => style?.copyWith(
+  inherit: false,
+  textBaseline: style.textBaseline ?? TextBaseline.alphabetic,
+);
+
+TextTheme _standaloneTextTheme(TextTheme text) => TextTheme(
+  displayLarge: _standaloneTextStyle(text.displayLarge),
+  displayMedium: _standaloneTextStyle(text.displayMedium),
+  displaySmall: _standaloneTextStyle(text.displaySmall),
+  headlineLarge: _standaloneTextStyle(text.headlineLarge),
+  headlineMedium: _standaloneTextStyle(text.headlineMedium),
+  headlineSmall: _standaloneTextStyle(text.headlineSmall),
+  titleLarge: _standaloneTextStyle(text.titleLarge),
+  titleMedium: _standaloneTextStyle(text.titleMedium),
+  titleSmall: _standaloneTextStyle(text.titleSmall),
+  bodyLarge: _standaloneTextStyle(text.bodyLarge),
+  bodyMedium: _standaloneTextStyle(text.bodyMedium),
+  bodySmall: _standaloneTextStyle(text.bodySmall),
+  labelLarge: _standaloneTextStyle(text.labelLarge),
+  labelMedium: _standaloneTextStyle(text.labelMedium),
+  labelSmall: _standaloneTextStyle(text.labelSmall),
+);
+
 String _systemFontFamily() => switch (defaultTargetPlatform) {
   TargetPlatform.windows => 'Microsoft YaHei UI',
   TargetPlatform.macOS => '.AppleSystemUIFont',
@@ -164,6 +192,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.chipTheme = const HyperChipThemeData(),
     this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
+    this.numberInputTheme = const HyperNumberInputThemeData(),
+    this.popoverTheme = const HyperPopoverThemeData(),
     this.tooltipTheme = const HyperTooltipThemeData(),
     this.iconTheme = const HyperIconThemeData(),
     this.dividerTheme = const HyperDividerThemeData(),
@@ -229,7 +259,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     );
     return HyperThemeData(
       colors: colors,
-      textTheme: resolvedTypography.applyTo(material.textTheme),
+      textTheme: resolvedTypography.applyTo(
+        _standaloneTextTheme(material.textTheme),
+      ),
       sizes: sizes,
       typography: resolvedTypography,
       typographyTheme: resolvedTypographyTheme,
@@ -305,7 +337,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         );
     return HyperThemeData(
       colors: colors,
-      textTheme: resolvedTypography.applyTo(material.textTheme),
+      textTheme: resolvedTypography.applyTo(
+        _standaloneTextTheme(material.textTheme),
+      ),
       sizes: sizes,
       typography: resolvedTypography,
       typographyTheme: resolvedTypographyTheme,
@@ -444,8 +478,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 全局图标按钮主题。
   final HyperIconButtonThemeData iconButtonTheme;
 
-  /// 全局基础图标主题，不与图标按钮主题共用。
+  /// 全局数字输入主题。
+  final HyperNumberInputThemeData numberInputTheme;
+
+  /// 全局锚定面板主题。
+  final HyperPopoverThemeData popoverTheme;
   final HyperTooltipThemeData tooltipTheme;
+
+  /// 全局基础图标主题，不与图标按钮主题共用。
   final HyperIconThemeData iconTheme;
 
   /// 全局分隔线主题，不直接复用 Material DividerTheme。
@@ -591,6 +631,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperChipThemeData? chipTheme,
     HyperWidgetGroupThemeData? widgetGroupTheme,
     HyperIconButtonThemeData? iconButtonTheme,
+    HyperNumberInputThemeData? numberInputTheme,
+    HyperPopoverThemeData? popoverTheme,
     HyperTooltipThemeData? tooltipTheme,
     HyperIconThemeData? iconTheme,
     HyperDividerThemeData? dividerTheme,
@@ -678,6 +720,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       chipTheme: chipTheme ?? this.chipTheme,
       widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
+      numberInputTheme: numberInputTheme ?? this.numberInputTheme,
+      popoverTheme: popoverTheme ?? this.popoverTheme,
       tooltipTheme: tooltipTheme ?? this.tooltipTheme,
       iconTheme: iconTheme ?? this.iconTheme,
       dividerTheme: dividerTheme ?? this.dividerTheme,
@@ -904,6 +948,16 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.iconButtonTheme,
         t,
       ),
+      numberInputTheme: HyperNumberInputThemeData.lerp(
+        numberInputTheme,
+        other.numberInputTheme,
+        t,
+      ),
+      popoverTheme: HyperPopoverThemeData.lerp(
+        popoverTheme,
+        other.popoverTheme,
+        t,
+      ),
       tooltipTheme: HyperTooltipThemeData.lerp(
         tooltipTheme,
         other.tooltipTheme,
@@ -1016,6 +1070,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.tagTheme == tagTheme &&
           other.widgetGroupTheme == widgetGroupTheme &&
           other.iconButtonTheme == iconButtonTheme &&
+          other.numberInputTheme == numberInputTheme &&
+          other.popoverTheme == popoverTheme &&
           other.tooltipTheme == tooltipTheme &&
           other.iconTheme == iconTheme &&
           other.dividerTheme == dividerTheme &&
@@ -1091,6 +1147,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     tagTheme,
     widgetGroupTheme,
     iconButtonTheme,
+    numberInputTheme,
+    popoverTheme,
     tooltipTheme,
     iconTheme,
     dividerTheme,

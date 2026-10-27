@@ -63,6 +63,9 @@ class HyperModalContent extends StatelessWidget {
             SizedBox(height: titleSpacing),
           ],
           Flexible(
+            // Header/actions can change independently; preserve content identity
+            // when the surrounding children are inserted or removed.
+            key: const ValueKey('modal-content'),
             fit: expandContent ? FlexFit.tight : FlexFit.loose,
             child: body,
           ),

@@ -51,9 +51,7 @@ extension _ExtendedWorkspace on _ThemeEditorState {
           label: Text(label),
         );
     final spacingLimit = editorExtendedSpacingLimit(s);
-    final widgets = <Widget>[
-      const HyperText('未确认仅表示默认样式待确认；组件可正常交互、配置和使用。尺寸按当前设备保存，颜色按当前亮暗外观保存。'),
-    ];
+    final widgets = <Widget>[const HyperText('尺寸按当前设备保存，颜色按当前亮暗外观保存。')];
     if (_page == 'hyper-rating') {
       final state =
           const {
@@ -336,9 +334,7 @@ extension _ExtendedWorkspace on _ThemeEditorState {
             (x) => v.navigationText = x,
             inheritedColor: theme.colors.textPrimary,
           ),
-          const HyperText(
-            '侧向导航复用 Sidebar，底部导航沿用同一套图标、文字与尺寸规格。',
-          ),
+          const HyperText('侧向导航复用 Sidebar，底部导航沿用同一套图标、文字与尺寸规格。'),
           _heading('导航栏表面'),
           n(
             '表面圆角',
@@ -372,6 +368,6 @@ extension _ExtendedWorkspace on _ThemeEditorState {
         );
       }
     }
-    return _panel('组件工作区 · 未确认', widgets);
+    return _panel('组件工作区', widgets);
   }
 }

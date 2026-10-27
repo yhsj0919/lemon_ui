@@ -1,0 +1,1 @@
+enum HyperNumberInputLayout { trailingVertical, leadingTrailing }

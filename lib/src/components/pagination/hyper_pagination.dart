@@ -60,8 +60,9 @@ class _HyperPaginationState extends State<HyperPagination> {
   @override
   void didUpdateWidget(HyperPagination oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (currentPage != oldWidget.currentPage)
+    if (currentPage != oldWidget.currentPage) {
       forward = currentPage > oldWidget.currentPage;
+    }
   }
 
   @override
@@ -138,7 +139,7 @@ class _HyperPaginationState extends State<HyperPagination> {
               children: [
                 for (final old in previous)
                   IgnorePointer(child: ExcludeSemantics(child: old)),
-                if (current != null) current,
+                ?current,
               ],
             ),
             transitionBuilder: (child, animation) => FadeTransition(

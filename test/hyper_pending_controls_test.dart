@@ -53,21 +53,17 @@ void main() {
       );
       await t.pumpAndSettle();
       final row = find.byType(HyperCheckboxListTile);
+      final sizes = HyperTheme.sizesOf(t.element(row));
       final clip = t.widget<ClipRRect>(
         find.ancestor(of: row, matching: find.byType(ClipRRect)).first,
       );
-      expect(
-        clip.borderRadius,
-        BorderRadius.circular(theme.sizes.phone.menu.itemRadius),
-      );
+      expect(clip.borderRadius, BorderRadius.circular(sizes.menu.itemRadius));
       final checks = t.widgetList<HyperCheckbox>(find.byType(HyperCheckbox));
       expect(
         checks.every((c) => c.variant == HyperCheckboxVariant.rounded),
         isTrue,
       );
-      expect(checks.map((c) => c.style?.size).toSet(), {
-        theme.sizes.phone.menu.iconSize,
-      });
+      expect(checks.map((c) => c.style?.size).toSet(), {sizes.menu.iconSize});
       expect(t.takeException(), isNull);
       final a = HyperTransferStyle(
         itemRadius: 4,

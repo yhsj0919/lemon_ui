@@ -15,7 +15,7 @@ void main() {
       ),
     );
 
-    expect(find.text('HyperDivider'), findsOneWidget);
+    expect(find.text('分隔线'), findsOneWidget);
     expect(find.byType(HyperDivider), findsWidgets);
     await tester.drag(find.byType(ListView), const Offset(0, -600));
     await tester.pumpAndSettle();

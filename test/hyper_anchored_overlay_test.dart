@@ -147,7 +147,10 @@ void main() {
     await tester.tap(find.text('锚点'));
     await tester.pumpAndSettle();
     expect(find.text('浮层内容'), findsOneWidget);
-    expect(tester.getTopLeft(find.text('浮层内容')), const Offset(100, 140));
+    final spacing = HyperTheme.sizesOf(
+      tester.element(find.byType(HyperAnchoredOverlay)),
+    ).overlaySpacing;
+    expect(tester.getTopLeft(find.text('浮层内容')), Offset(100, 140 + spacing));
 
     await tester.tapAt(const Offset(350, 400));
     await tester.pumpAndSettle();
@@ -190,7 +193,10 @@ void main() {
 
     await tester.tap(find.text('边缘锚点'));
     await tester.pumpAndSettle();
-    expect(tester.getTopLeft(find.text('避让内容')), const Offset(280, 540));
+    final spacing = HyperTheme.sizesOf(
+      tester.element(find.byType(HyperAnchoredOverlay)),
+    ).overlaySpacing;
+    expect(tester.getTopLeft(find.text('避让内容')), Offset(280, 540 - spacing));
   });
 
   testWidgets('侧向浮层在右侧空间不足时翻到锚点左侧', (tester) async {
@@ -221,7 +227,10 @@ void main() {
 
     await tester.tap(find.text('侧向锚点'));
     await tester.pumpAndSettle();
-    expect(tester.getTopLeft(find.text('侧向内容')), const Offset(220, 100));
+    final spacing = HyperTheme.sizesOf(
+      tester.element(find.byType(HyperAnchoredOverlay)),
+    ).overlaySpacing;
+    expect(tester.getTopLeft(find.text('侧向内容')), Offset(220 - spacing, 100));
   });
 
   testWidgets('内容跟随滚动中的锚点', (tester) async {

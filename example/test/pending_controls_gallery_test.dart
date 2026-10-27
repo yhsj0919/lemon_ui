@@ -6,22 +6,33 @@ import 'package:lemon_ui_example/gallery/gallery_registry.dart';
 import 'package:lemon_ui_example/pages/pending/hyper_pending_controls_pages.dart';
 
 void main() {
-  test('five controls are pending with stable unique page ids', () {
-    final pending = gallerySections.firstWhere((s) => s.title == '未确认').items;
-    for (final id in [
-      'hyper-rating',
-      'hyper-transfer',
-      'hyper-resizable',
-      'hyper-movable-dialog',
-      'hyper-navigation-bar',
-    ]) {
-      expect(pending.where((i) => i.id == id), hasLength(1));
+  test(
+    'confirmed controls have formal categories and stable unique page ids',
+    () {
+      const categories = {
+        'hyper-list-group': '容器与表面',
+        'hyper-rating': '选择控件',
+        'hyper-transfer': '选择控件',
+        'hyper-resizable': '容器与表面',
+        'hyper-movable-dialog': '反馈与状态',
+        'hyper-navigation-bar': '标签导航',
+      };
+      for (final entry in categories.entries) {
+        final section = gallerySections.singleWhere(
+          (s) => s.title == entry.value,
+        );
+        expect(section.items.where((i) => i.id == entry.key), hasLength(1));
+        expect(galleryItems.where((i) => i.id == entry.key), hasLength(1));
+      }
       expect(
-        gallerySections.expand((s) => s.items).where((i) => i.id == id),
-        hasLength(1),
+        gallerySections
+            .singleWhere((s) => s.title == '未确认')
+            .items
+            .where((i) => categories.containsKey(i.id)),
+        isEmpty,
       );
-    }
-  });
+    },
+  );
   test('editor extensions round trip dimensions per device and colors per appearance', () {
     final doc = EditorThemeDocument();
     doc.desktop.extendedControls.ratingIconSize = 22;

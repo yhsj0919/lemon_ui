@@ -10,7 +10,7 @@ class HyperNumberInputPage extends StatefulWidget {
 }
 
 class _HyperNumberInputPageState extends State<HyperNumberInputPage> {
-  double? count, price = 1.25;
+  double? count, quantity = 1, price = 1.25;
   @override
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
@@ -21,6 +21,18 @@ class _HyperNumberInputPageState extends State<HyperNumberInputPage> {
         child: HyperNumberInput(
           value: count,
           onChanged: (v) => setState(() => count = v),
+          hintText: '输入数量',
+          showClearButton: true,
+        ),
+      ),
+      DemoSection(
+        title: '前减后加 · 范围 0–10',
+        child: HyperNumberInput(
+          layout: HyperNumberInputLayout.leadingTrailing,
+          value: quantity,
+          minimum: 0,
+          maximum: 10,
+          onChanged: (v) => setState(() => quantity = v),
           hintText: '输入数量',
           showClearButton: true,
         ),

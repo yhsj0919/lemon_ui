@@ -176,6 +176,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   static const _components = {
     'appBarReview': '应用顶栏',
     'drawerReview': '抽屉',
+    'popoverReview': '锚定面板',
     'tooltipReview': '文字提示',
     'notificationReview': '通知卡片',
     'loadingOverlayReview': '加载遮罩',
@@ -226,6 +227,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
   static const _pages = {
     'appBarReview': 'hyper-app-bar',
     'drawerReview': 'hyper-drawer',
+    'popoverReview': 'hyper-popover',
     'tooltipReview': 'hyper-tooltip',
     'notificationReview': 'hyper-notification',
     'loadingOverlayReview': 'hyper-loading-overlay',
@@ -2700,7 +2702,23 @@ class _ThemeEditorState extends State<ThemeEditor> {
       ]);
     }
     if (_page == 'hyper-number-input') {
-      return _panel('数字输入 · 继承现有主题', [
+      return _panel('数字输入', [
+        _select(
+          '按钮布局',
+          _spec.numberInputLayout?.name ?? 'inherit',
+          const {
+            'inherit': '继承主题',
+            'trailingVertical': '尾部上下箭头',
+            'leadingTrailing': '前减后加',
+          },
+          (value) => _change(
+            () => _spec.numberInputLayout = value == 'inherit'
+                ? null
+                : HyperNumberInputLayout.values.singleWhere(
+                    (v) => v.name == value,
+                  ),
+          ),
+        ),
         const HyperText(
           '输入框外观与四端尺寸继承文本输入框；步进图标继承图标按钮。实例可通过 style 和 stepperStyle 分别覆盖。',
         ),

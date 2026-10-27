@@ -23,11 +23,11 @@ void main() {
     expect(find.text('普通顶栏'), findsOneWidget);
     await tester.tap(find.text('中等展开'));
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsOneWidget);
-    await tester.tap(find.text('关闭玻璃'));
-    await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNothing);
     final preview = find.byKey(const ValueKey('app-bar-preview'));
+    final filter = find.descendant(
+      of: preview,
+      matching: find.byType(BackdropFilter),
+    );
     final inner = tester.state<ScrollableState>(
       find.descendant(of: preview, matching: find.byType(Scrollable)),
     );
@@ -37,6 +37,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(inner.position.pixels, greaterThan(0));
     expect(outer.position.pixels, offset);
+    expect(tester.widget<BackdropFilter>(filter).enabled, isTrue);
+    await tester.tap(find.text('关闭玻璃'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<BackdropFilter>(filter).enabled, isFalse);
     expect(tester.takeException(), isNull);
   });
 }

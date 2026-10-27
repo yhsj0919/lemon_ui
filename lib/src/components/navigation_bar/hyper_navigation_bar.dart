@@ -237,8 +237,9 @@ class _HyperNavigationBarState<T> extends State<HyperNavigationBar<T>> {
                           final labelSize = text.size;
                           text.dispose();
                           if (widget.labelVisibility ==
-                              HyperNavigationLabelVisibility.none)
+                              HyperNavigationLabelVisibility.none) {
                             return Center(child: icon);
+                          }
                           final width = beside
                               ? iconSize + gap + labelSize.width
                               : (iconSize > labelSize.width

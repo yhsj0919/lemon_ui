@@ -279,7 +279,16 @@ void main() {
           .first
           .width;
       await tester.drag(
-        find.byIcon(Icons.drag_indicator).first,
+        find
+            .descendant(
+              of: find.byWidgetPredicate(
+                (widget) =>
+                    widget is MouseRegion &&
+                    widget.cursor == SystemMouseCursors.resizeColumn,
+              ),
+              matching: find.byType(GestureDetector),
+            )
+            .first,
         const Offset(40, 0),
       );
       await tester.pumpAndSettle();

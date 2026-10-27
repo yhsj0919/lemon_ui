@@ -5,6 +5,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
   Widget _reviewPanel() {
     final theme = _resolveTheme(_dark), s = theme.sizes.resolve(_device);
     final objects = switch (_component) {
+      'popoverReview' => const {'popover': '锚定面板 · 未确认'},
       'tooltipReview' => const {'tooltip': '文字提示'},
       'appBarReview' => const {'appBar': '应用顶栏'},
       'drawerReview' => const {'drawer': '抽屉'},
@@ -470,7 +471,7 @@ extension _ReviewWorkspace on _ThemeEditorState {
         n(
           '面板内边距',
           pm.horizontalPadding,
-          menu?.surfacePadding ?? s.menu.padding,
+          menu?.surfacePadding ?? s.menu.surfacePadding ?? s.menu.padding,
           0,
           s.minimumInteractiveDimension,
           (x) => pm.horizontalPadding = x,
@@ -807,6 +808,119 @@ extension _ReviewWorkspace on _ThemeEditorState {
 
     List<Widget> body() {
       switch (object) {
+        case 'popover':
+          final tipColors = theme.colors;
+          final native = theme.popoverTheme.style;
+          final insets =
+              native.surfaceStyle?.padding?.resolve(
+                Directionality.of(context),
+              ) ??
+              EdgeInsets.all(s.menu.padding);
+          return [
+            const HyperText('未确认：尺寸按当前设备保存，表面外观按亮暗保存。'),
+            _heading('布局'),
+            n(
+              '锚点间距',
+              m.spacing,
+              s.overlaySpacing,
+              0,
+              editorContentSpacingLimit,
+              (x) => m.spacing = x,
+            ),
+            _heading('文字'),
+            _color(
+              '文字颜色',
+              v.foregroundColor,
+              (x) => v.foregroundColor = x,
+              inheritedColor:
+                  theme.popoverTheme.style.surfaceStyle?.foregroundColor ??
+                  tipColors.textPrimary,
+            ),
+            _heading('浮层表面'),
+            ...material(v),
+            ...[
+              ('Left', '左'),
+              ('Top', '上'),
+              ('Right', '右'),
+              ('Bottom', '下'),
+            ].map(
+              (axis) => switch (axis.$1) {
+                'Left' => n(
+                  '内容内边距 · 左',
+                  m.paddingLeft,
+                  insets.left,
+                  0,
+                  editorContentSpacingLimit,
+                  (x) => m.paddingLeft = x,
+                ),
+                'Top' => n(
+                  '内容内边距 · 上',
+                  m.paddingTop,
+                  insets.top,
+                  0,
+                  editorContentSpacingLimit,
+                  (x) => m.paddingTop = x,
+                ),
+                'Right' => n(
+                  '内容内边距 · 右',
+                  m.paddingRight,
+                  insets.right,
+                  0,
+                  editorContentSpacingLimit,
+                  (x) => m.paddingRight = x,
+                ),
+                _ => n(
+                  '内容内边距 · 下',
+                  m.paddingBottom,
+                  insets.bottom,
+                  0,
+                  editorContentSpacingLimit,
+                  (x) => m.paddingBottom = x,
+                ),
+              },
+            ),
+            n(
+              '表面圆角',
+              m.surfaceRadius,
+              (native.surfaceStyle?.borderRadius
+                      ?.resolve(Directionality.of(context))
+                      .topLeft
+                      .x ??
+                  s.menu.surfaceRadius),
+              0,
+              editorSurfaceRadiusLimit,
+              (x) => m.surfaceRadius = x,
+            ),
+            _color(
+              '背景',
+              v.background,
+              (x) => v.background = x,
+              inheritedColor:
+                  theme.popoverTheme.style.surfaceStyle?.background?.color ??
+                  tipColors.surfaceElevated,
+            ),
+            n(
+              '边框宽度',
+              v.borderWidth,
+              0,
+              0,
+              editorLineThicknessLimit,
+              (x) => v.borderWidth = x,
+            ),
+            _color(
+              '边框颜色',
+              v.borderColor,
+              (x) => v.borderColor = x,
+              inheritedColor: tipColors.outline,
+            ),
+            ..._focusedShadowProperties(
+              maxExtent: s.controlHeightLg,
+              EditorComponent(),
+              stateTarget: v.shadow,
+              label: '浮层阴影',
+              description: '继承公共提示表面；空列表关闭阴影。',
+            ),
+          ];
         case 'tooltip':
           final tipColors =
               theme.tooltipTheme.appearance == HyperTooltipAppearance.theme

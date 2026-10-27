@@ -145,7 +145,10 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(BackdropFilter), findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(find.byType(BackdropFilter)).enabled,
+      isFalse,
+    );
     final boxes = tester.widgetList<DecoratedBox>(
       find.descendant(
         of: find.byType(HyperMaterialSurface),

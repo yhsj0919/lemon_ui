@@ -8,12 +8,14 @@ void main() {
       const MaterialApp(home: Scaffold(body: HyperSwitchPage())),
     );
 
-    expect(find.text('HyperSwitch'), findsOneWidget);
+    expect(find.text('开关'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('关闭'), 200);
     expect(find.text('关闭'), findsOneWidget);
     expect(find.text('开启'), findsOneWidget);
     expect(find.text('禁用关闭'), findsOneWidget);
     expect(find.text('禁用开启'), findsOneWidget);
 
+    await tester.ensureVisible(find.byKey(const Key('interactive-switch')));
     await tester.tap(find.byKey(const Key('interactive-switch')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('interactive-switch')), findsOneWidget);

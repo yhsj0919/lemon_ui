@@ -45,7 +45,12 @@ void main() {
       for (final quality in HyperMaterialQuality.values) {
         final resolved = surface.material!.resolve(quality: quality);
         expect(resolved.boxShadow, isNotEmpty);
-        expect(resolved.border, isNotNull);
+        if (quality == HyperMaterialQuality.advanced) {
+          expect(resolved.border, isNull);
+          expect(resolved.resolveEdgeGradient(defaultEnabled: true), isNotNull);
+        } else {
+          expect(resolved.border, isNotNull);
+        }
         expect(
           resolved.kind,
           quality == HyperMaterialQuality.advanced

@@ -16,16 +16,21 @@ void main() {
     );
 
     expect(find.text('35%'), findsOneWidget);
+    await tester.ensureVisible(find.text('增加'));
+    await tester.pump();
     await tester.tap(find.text('增加'));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('55%'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byType(HyperSwitch),
+      -300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump();
     await tester.tap(find.byType(HyperSwitch));
     await tester.pump();
     expect(
-      tester
-          .widget<MediaQuery>(find.byType(MediaQuery).last)
-          .data
-          .disableAnimations,
+      MediaQuery.of(tester.element(find.byType(HyperSwitch))).disableAnimations,
       isTrue,
     );
     await tester.scrollUntilVisible(find.text('普通圆环'), 250);
@@ -40,4 +45,3 @@ void main() {
     );
   });
 }
-

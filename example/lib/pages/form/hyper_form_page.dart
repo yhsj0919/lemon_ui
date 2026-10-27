@@ -32,7 +32,7 @@ Widget _modalFields(BuildContext context) => HyperFormSection(
       label: '姓名',
       hintText: '请输入姓名',
       requiredIndicator: true,
-      validator: (v) => v == null || v.trim().isEmpty ? '请输入姓名' : null,
+      validator: HyperValidators.required(message: '请输入姓名'),
       description: '输入 admin 可查看异步校验；点击确定执行全部校验。',
       asyncValidator: (v) async {
         await Future<void>.delayed(const Duration(milliseconds: 300));
@@ -202,18 +202,16 @@ class _FormExampleState extends State<_FormExample> {
             return v == 'admin' ? '该用户名已被使用' : null;
           },
         ),
-        HyperTextFormField(
+        HyperTextFormField.password(
           name: 'password',
           label: '密码',
           hintText: '输入密码',
-          obscureText: true,
           validator: (v) => (v?.length ?? 0) < 4 ? '至少输入四个字符' : null,
         ),
-        HyperTextFormField(
+        HyperTextFormField.password(
           name: 'confirm',
           label: '确认密码',
           hintText: '再次输入密码',
-          obscureText: true,
         ),
         HyperColorPickerFormField(
           name: 'accentColor',

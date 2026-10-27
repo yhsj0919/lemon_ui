@@ -2,6 +2,59 @@
 
 [返回目录](README.md)
 
+## 内容型弹窗的标准写法
+
+订单详情、素材选择、图片预览等非表单内容统一使用 `HyperDialog`，无需套用
+表单弹窗。只有需要表单注册、校验和提交生命周期时才使用表单弹窗。
+
+```dart
+showHyperDialog<void>(
+  context: context,
+  style: const HyperDialogStyle(maxWidth: 960),
+  builder: (_) => HyperDialog(
+    title: const HyperText('订单详情'),
+    content: OrderDetails(order: order), // 应用自己的内容组件
+  ),
+);
+```
+
+`style` 是本次调用的实例覆盖，不修改全局主题；也可写在 `HyperDialog(style: ...)`
+上，组件实例显式字段优先。`maxWidth` 控制宽度上限，`width` 指定期望宽度，
+最终均受可用窗口、安全区域、键盘和 insetPadding 约束。示例的 960 是业务内容
+宽度，不是新的组件默认规格，无需再包一层对话框或重复绘制背景。
+
+普通 Column、文字或详情内容沿用默认 `scrollable: true`，长内容滚动，标题和
+操作区固定。内容是 ListView、GridView 或自带滚动的预览器时，使用下列形式，
+不要叠加两层纵向滚动：
+
+```dart
+showHyperDialog<void>(
+  context: context,
+  style: const HyperDialogStyle(maxWidth: 960),
+  builder: (dialogContext) => HyperDialog(
+    title: const HyperText('素材选择'),
+    scrollable: false,
+    content: SizedBox(
+      height: 320, // 业务内容期望高度，仍受弹窗可用高度约束
+      child: ListView.builder(
+        itemCount: assets.length,
+        itemBuilder: (_, index) => Text(assets[index].name),
+      ),
+    ),
+    actions: [
+      HyperButton.tonal(
+        label: const Text('关闭'),
+        onPressed: () => HyperOverlay.close(dialogContext),
+      ),
+    ],
+  ),
+);
+```
+
+返回所选内容时改用 `showHyperDialog<Asset>`，在内容内调用
+`HyperOverlay.close<Asset>(dialogContext, selectedAsset)`，打开方 await 接收结果。
+Dialog Demo 的“内容型大弹窗 · 实例宽度覆盖”提供可运行的列表例子。
+
 ## 打开、关闭和返回结果
 
 ~~~dart
@@ -16,11 +69,11 @@ HyperButton.filled(
         actions: [
           HyperButton.tonal(
             label: const Text('取消'),
-            onPressed: () => Navigator.of(dialogContext).pop(false),
+            onPressed: () => HyperOverlay.close<bool>(dialogContext, false),
           ),
           HyperButton.filled(
             label: const Text('确认'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
+            onPressed: () => HyperOverlay.close<bool>(dialogContext, true),
           ),
         ],
       ),
@@ -33,6 +86,15 @@ HyperButton.filled(
 
 showHyperDialog 返回关闭结果；关闭图标、遮罩或系统返回通常得到 null。
 默认使用根 Navigator，关闭时使用 builder 的 dialogContext，避免关闭错误的页面。
+
+`HyperOverlay.close<T>(context, [result])` 统一关闭最近所属弹层，支持 Dialog、
+MovableDialog、BottomSheet 和锚定浮层。模态结果通过 show 函数返回的 Future 接收。
+作用域内的路由若已被其他路由覆盖，返回 false，不会误关顶层路由；普通页面中也返回 false。
+未提供 Hyper 作用域时仅兼容当前 Flutter PopupRoute，不回退普通页面。
+必须使用弹层内容内的 context，不能使用打开按钮的外部 context。
+
+自定义浮层可用 `HyperOverlayScope<T>(onClose: ..., child: ...)` 接入，
+onClose 返回是否发出了关闭请求。嵌套时只处理最近作用域，失败不向外层继续关闭。
 useRootNavigator: false 可使用最近的嵌套 Navigator。
 
 barrierDismissible 控制遮罩点击和 Escape 关闭，不限制系统返回；业务需要禁止返回时，

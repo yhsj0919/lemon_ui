@@ -114,7 +114,7 @@ void main() {
     expect(files.single.name, 'ok.PNG');
     expect(find.textContaining('不支持文件'), findsOneWidget);
     expect(() => files.clear(), throwsUnsupportedError);
-    await t.tap(find.byIcon(Icons.close));
+    await t.tap(find.byIcon(HyperIcons.x));
     await t.pumpAndSettle();
     expect(files, isEmpty);
     expect(t.takeException(), isNull);

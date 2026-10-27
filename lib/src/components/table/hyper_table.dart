@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -742,8 +744,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                             curve: s.curve!,
                             child: Icon(
                               _childErrors.containsKey(key)
-                                  ? Icons.refresh
-                                  : Icons.chevron_right,
+                                  ? HyperIcons.refreshCw
+                                  : HyperIcons.chevronRight,
                               size: s.iconSize,
                             ),
                           ),
@@ -944,7 +946,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   Widget _rowDragHandle(trina.TrinaRow row) {
     final s = _resolved!;
     final icon = Icon(
-      Icons.drag_indicator,
+      HyperIcons.gripVertical,
       size: s.iconSize,
       color: _canReorderRows ? s.textStyle!.color : s.borderColor,
     );
@@ -977,7 +979,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
           ),
           feedback: Builder(builder: (_) => _rowDragFeedback(row)),
           childWhenDragging: Icon(
-            Icons.drag_indicator,
+            HyperIcons.gripVertical,
             size: s.iconSize,
             color: s.borderColor,
           ),
@@ -1311,8 +1313,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
               if (c.sort != trina.TrinaColumnSort.none)
                 Icon(
                   c.sort == trina.TrinaColumnSort.ascending
-                      ? Icons.arrow_upward
-                      : Icons.arrow_downward,
+                      ? HyperIcons.arrowUp
+                      : HyperIcons.arrowDown,
                   size: _resolved!.iconSize,
                 ),
               if (c.enableDropToResize)

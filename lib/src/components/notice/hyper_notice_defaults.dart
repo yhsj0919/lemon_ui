@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -22,10 +24,10 @@ HyperNoticeStyle noticeDefaults({
     HyperNoticeSeverity.error => colors.error,
   };
   final icon = switch (severity) {
-    HyperNoticeSeverity.info => Icons.info_outline,
-    HyperNoticeSeverity.success => Icons.check_circle_outline,
-    HyperNoticeSeverity.warning => Icons.warning_amber_rounded,
-    HyperNoticeSeverity.error => Icons.error_outline,
+    HyperNoticeSeverity.info => HyperIcons.info,
+    HyperNoticeSeverity.success => HyperIcons.circleCheck,
+    HyperNoticeSeverity.warning => HyperIcons.triangleAlert,
+    HyperNoticeSeverity.error => HyperIcons.circleAlert,
   };
   return HyperNoticeStyle(
     background: HyperFill.color(
@@ -47,7 +49,7 @@ HyperNoticeStyle noticeDefaults({
     icon: icon,
     iconColor: accent,
     iconSize: metrics.iconSize,
-    closeIcon: Icons.close,
+    closeIcon: HyperIcons.x,
     closeIconColor: colors.textSecondary,
     closeIconSize: metrics.closeIconSize,
     closeButtonSize: metrics.closeButtonSize,

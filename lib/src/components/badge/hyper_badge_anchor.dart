@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import 'hyper_badge.dart';
+import 'hyper_badge_style.dart';
 
 /// 徽标相对目标的九宫格位置，均为物理方位。
 enum HyperBadgePosition {
@@ -27,6 +29,39 @@ class HyperBadgeAnchor extends StatelessWidget {
     this.duration,
     this.curve,
   });
+
+  /// 数字角标的组合简写，数字与显隐规则沿用 [HyperBadge]。
+  factory HyperBadgeAnchor.count({
+    Key? key,
+    required int count,
+    required Widget child,
+    int maxCount = 99,
+    bool showZero = false,
+    bool visible = true,
+    String? semanticsLabel,
+    HyperBadgeStyle? badgeStyle,
+    HyperBadgePosition position = HyperBadgePosition.topRight,
+    AlignmentGeometry? alignment,
+    Offset offset = Offset.zero,
+    Duration? duration,
+    Curve? curve,
+  }) => HyperBadgeAnchor(
+    key: key,
+    badge: HyperBadge(
+      count: count,
+      maxCount: maxCount,
+      showZero: showZero,
+      visible: visible,
+      semanticsLabel: semanticsLabel,
+      style: badgeStyle,
+    ),
+    position: position,
+    alignment: alignment,
+    offset: offset,
+    duration: duration,
+    curve: curve,
+    child: child,
+  );
 
   final Widget child;
   final Widget badge;

@@ -15,8 +15,7 @@ HyperForm(
         label: '姓名',
         hintText: '请输入姓名',
         requiredIndicator: true,
-        validator: (value) => value == null || value.trim().isEmpty
-            ? '请输入姓名' : null,
+        validator: HyperValidators.required(message: '请输入姓名'),
       ),
       HyperFormField<DateTime>(
         name: 'date',
@@ -43,6 +42,40 @@ HyperForm(
 `horizontal` 为标签在左、控件在右；窄宽会重排。`labelHidden` 隐藏可见标签，仍应提供 label 或 semanticLabel 作为语义名称。`HyperFormSection(columns: 2)` 可组合多列，空间不足时减少列数；字段行高随内容增长。
 
 `requiredIndicator` 只绘制星号；是否为空由明确的 validator 决定，false 和 0 不自动视为空。`asyncValidator` 在完整校验时运行；跨字段规则放在 controller.crossValidators，通过稳定 name 返回错误。默认仅提交时校验；原生 autovalidateMode 管理同步自动校验，异步与跨字段规则通过 controller.validate/submit 显式执行。
+
+### 密码字段快捷入口
+
+登录页密码可直接使用命名构造：
+
+```dart
+HyperTextFormField.password(
+  name: 'password',
+  label: '密码',
+  validator: HyperValidators.required(message: '请输入密码'),
+)
+```
+
+默认单行、隐藏输入并提供显隐切换，关闭自动纠错和输入建议，使用密码键盘及
+`AutofillHints.password`。`showPasswordToggle: false` 可关闭显隐按钮；注册页可传
+`autofillHints: const [AutofillHints.newPassword]`，传 null 可移除填充提示。
+它不自动添加必填或长度规则，沿用原有 validator、异步校验、保存与重置机制。
+
+### 常用同步校验器
+
+```dart
+validator: HyperValidators.compose<String>([
+  HyperValidators.required(message: '请输入姓名'),
+  HyperValidators.minLength(2, message: '姓名至少两个字符'),
+  HyperValidators.maxLength(30),
+]),
+```
+
+`required<T>` 拒绝 null、空字符串和空 Iterable/Map，字符串默认 trim；
+false、0 及非空自定义对象有效。协议必须勾选等规则仍需显式判断 `value == true`。
+`minLength` / `maxLength` 按用户可见字符（包括组合 emoji）计数；默认不 trim，
+可传 `trim: true`。长度规则跳过 null 和空字符串，必填需另外组合 required。
+这些规则只校验，不修改字段值；错误文案可自行传入本地化文本。
+`compose` 按顺序返回第一个非 null 错误，可混用业务 validator；空规则列表通过。
 
 `controller.values` 为当前具名字段的不可变快照，`value<T>(name)` 返回当前值。`dirtyFields/touchedFields/isDirty` 可用于提示，`markClean()` 只更新修改比较基准；`reset()` 恢复 initialValue 并清理错误。集合有默认快照，自定义可变对象须配套提供 valueSnapshot 和 valueEquals。
 

@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'package:flutter/material.dart';
@@ -89,8 +90,8 @@ class HyperStepsBody extends StatelessWidget {
               HyperStepStatus.error => '错误',
               HyperStepStatus.disabled => '禁用',
             },
-            completedIcon: Icons.check,
-            errorIcon: Icons.close,
+            completedIcon: HyperIcons.check,
+            errorIcon: HyperIcons.x,
             interactionRadius: BorderRadius.circular(metrics.interactionRadius),
             overlayColor: theme.colors.stateLayer,
             hoverOpacity: 0,

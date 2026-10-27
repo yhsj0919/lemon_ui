@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -374,7 +376,7 @@ class _HyperCalendarState extends State<HyperCalendar> {
                               ? (_view == 0 ? '上个月' : '上一页')
                               : l.previousMonthTooltip,
                           child: Icon(
-                            Icons.chevron_left,
+                            HyperIcons.chevronLeft,
                             size: HyperTheme.sizesOf(context).iconSize,
                           ),
                         ),
@@ -466,7 +468,7 @@ class _HyperCalendarState extends State<HyperCalendar> {
                               ? (_view == 0 ? '下个月' : '下一页')
                               : l.nextMonthTooltip,
                           child: Icon(
-                            Icons.chevron_right,
+                            HyperIcons.chevronRight,
                             size: HyperTheme.sizesOf(context).iconSize,
                           ),
                         ),

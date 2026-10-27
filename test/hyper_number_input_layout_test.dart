@@ -40,8 +40,8 @@ void main() {
             ),
           );
           await t.pumpAndSettle();
-          final minus = find.byIcon(Icons.remove),
-              plus = find.byIcon(Icons.add);
+          final minus = find.byIcon(HyperIcons.minus),
+              plus = find.byIcon(HyperIcons.plus);
           expect(
             t.widget<HyperWidgetGroup>(find.byType(HyperWidgetGroup)).connected,
             isTrue,
@@ -89,7 +89,7 @@ void main() {
           await t.tap(minus);
           await t.pumpAndSettle();
           expect(value, 1);
-          await t.tap(find.byIcon(Icons.close));
+          await t.tap(find.byIcon(HyperIcons.x));
           await t.pumpAndSettle();
           expect(value, isNull);
           expect(t.takeException(), isNull);
@@ -128,10 +128,10 @@ void main() {
       );
       await t.pumpAndSettle();
       final input = t.element(find.byType(EditableText));
-      expect(find.byIcon(Icons.remove), findsOneWidget);
+      expect(find.byIcon(HyperIcons.minus), findsOneWidget);
       update(() => layout = HyperNumberInputLayout.trailingVertical);
       await t.pumpAndSettle();
-      expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
+      expect(find.byIcon(HyperIcons.chevronUp), findsOneWidget);
       expect(t.element(find.byType(EditableText)), same(input));
       expect(theme.copyWith(), theme);
       expect(theme.numberInputTheme, isNot(const HyperNumberInputThemeData()));

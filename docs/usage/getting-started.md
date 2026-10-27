@@ -14,7 +14,38 @@
 
 导入统一入口，无需逐个导入内部文件。
 
+默认图标库为 `lucide_icons_flutter`，统一入口导出其完整常规图标类的别名
+`HyperIcons`，例如 `const Icon(HyperIcons.search)`。图标名称沿用 Lucide 的
+camelCase 命名；组件主题和实例仍可传入其他 `IconData`。
+
+当前使用 Lucide 4.x。由于 `trina_grid 2.3.0` 的间接依赖仍限制 Lucide 3.x，
+使用本包的应用暂需在自己的 pubspec.yaml 中添加以下覆盖（依赖包的覆盖不会传递）：
+
+```yaml
+dependency_overrides:
+  lucide_icons_flutter: ^4.0.1
+```
+
+上游允许 Lucide 4.x 后可移除此覆盖。
+
 ## 2. 建立主题和设备作用域
+
+自定义字体可直接写入 Hyper 主题，所有字阶及生成的 Material textTheme 同步使用：
+
+```dart
+final theme = HyperThemeData.light(
+  fontFamily: 'SourceHanSansSC',
+  fontFamilyFallback: const ['Microsoft YaHei', 'sans-serif'],
+);
+final updated = theme.copyWith(fontFamily: 'AnotherBrandFont');
+```
+
+`dark`、`fromSeed`、`fromMaterial` 同样支持这两个参数。
+工厂未指定时保留系统默认字体；fromMaterial 未指定时保留传入主题字体。
+copyWith 中 null 表示保留，空 fallback 列表显式清空回退列表；同时传入 textTheme
+时，字体参数最后应用到其全部字阶，不改变字号、字重和行高。
+自定义字体需由应用在 pubspec.yaml 的 flutter/fonts 中声明，fontFamily 与 family
+名称一致；主题配置本身不包含或下载字体文件。
 
 下面是可直接放入 main.dart 的最小应用。Detector 放在 MaterialApp.builder 中，
 可获取窗口约束；主题放在其内部，使用稳定设备类别解析尺寸与字体。

@@ -42,7 +42,7 @@ void main() {
     );
     await tester.pumpWidget(host(const HyperResult.empty(), theme: theme));
     expect(find.byType(HyperResult), findsOneWidget);
-    var icon = tester.widget<Icon>(find.byIcon(Icons.inbox_outlined));
+    var icon = tester.widget<Icon>(find.byIcon(HyperIcons.inbox));
     expect(icon.color, Colors.blue);
     expect(icon.size, 24);
     await tester.pumpWidget(
@@ -54,7 +54,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    icon = tester.widget<Icon>(find.byIcon(Icons.inbox_outlined));
+    icon = tester.widget<Icon>(find.byIcon(HyperIcons.inbox));
     expect(icon.color, Colors.green);
   });
 
@@ -110,7 +110,7 @@ void main() {
         theme: theme,
       ),
     );
-    final icon = tester.widget<Icon>(find.byIcon(Icons.inbox_outlined));
+    final icon = tester.widget<Icon>(find.byIcon(HyperIcons.inbox));
     expect(icon.size, 29);
     expect(icon.color, Colors.green);
     final surface = tester.widget<HyperMaterialSurface>(

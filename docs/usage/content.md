@@ -4,6 +4,24 @@
 
 ## HyperText 文字
 
+常用语义可使用 const 命名构造：
+
+```dart
+const HyperText.title('分区标题'); // sectionTitle 字阶
+const HyperText.body('正文');
+const HyperText.caption('小字说明');
+const HyperText.muted('次要正文');
+```
+
+这些构造保留 style、maxLines、textAlign、textScaler 等普通文字参数。
+页面大标题可直接使用 `HyperText.pageTitle`，原有 variant 写法保持兼容。
+全部字阶均提供同名构造：`displayLarge`、`displayMedium`、`displaySmall`、
+`pageTitle`、`sectionTitle`、`subsectionTitle`、`bodyLarge`、`body`、`bodySmall`、
+`control`、`label`、`caption`，例如 `const HyperText.pageTitle('页面标题')`。
+muted 使用正文字阶和 textSecondary 默认颜色；配色与字阶独立，也可通过
+`HyperText('说明', variant: HyperTextVariant.caption, tone: HyperTextTone.muted)`
+组合。文字公共主题、字阶主题和实例 style 仍优先于 muted 默认色。
+
 ~~~dart
 Column(
   crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,17 +139,18 @@ blendPetalRotation 单位为弧度，blendPetalOpacity 为不透明度；
 ## HyperBadge 与 HyperBadgeAnchor 徽标
 
 ~~~dart
-HyperBadgeAnchor(
-  child: const HyperIcon(Icons.notifications_outlined),
-  badge: const HyperBadge.number(count: 128),
-  position: HyperBadgePosition.topRight,
-  offset: const Offset(2, -2),
+HyperBadgeAnchor.count(
+  count: 128,
+  child: const HyperIcon(HyperIcons.bell),
 )
 ~~~
 
 - HyperBadge() 是圆点；label 是短文本；content 是完全自定义徽标内容，三者互斥。
 - .number 默认最多显示 99+；使用 HyperBadge(count: ..., maxCount: 999) 改上限。
 - 0 默认隐藏，showZero 可显示；visible 控制显示。
+- 数字角标推荐使用 `HyperBadgeAnchor.count(count: ..., child: ...)`，默认右上角、
+  超过 99 显示 99+。可传 maxCount、showZero、visible、semanticsLabel、badgeStyle，
+  以及原有 position、alignment、offset、duration、curve；自定义内容继续用普通 Anchor。
 - Anchor 提供九宫格位置：topLeft/topCenter/topRight、centerLeft/center/centerRight、
   bottomLeft/bottomCenter/bottomRight；位置为物理方位，正偏移向右/下。
 - 应包住实际图标，再把整体放进按钮；包住大点击容器会按容器边界定位。
@@ -155,6 +174,26 @@ Wrap(
 ~~~
 
 Tag 是展示标签，不提供点击、选择或删除行为；需要交互使用 HyperChip。
+业务状态可直接使用语义构造，无需在页面中手写基础颜色：
+
+~~~dart
+const HyperTag.success(label: '已完成');
+const HyperTag.warning(label: '待处理');
+const HyperTag.error(label: '失败');
+const HyperTag.destructive(label: '已删除'); // 与 error 同色
+const HyperTag.info(label: '进行中');
+const HyperTag.neutral(label: '草稿');
+
+const HyperTag.success(
+  label: '已完成',
+  style: HyperTagStyle(colorVariant: HyperTagColorVariant.outlined),
+);
+~~~
+
+语义色跟随当前主题：success、warning、error 分别使用同名色，info 使用 primary，
+neutral 使用 textSecondary。默认采用 soft 外观；可通过 colorVariant 改为 filled、
+outlined 或 text，语义与外观独立。通用构造也可传 severity 动态选择语义。
+全局/局部主题、强调外观、禁用状态和实例 Style 沿用原有覆盖顺序；实例优先。
 可传 icon；颜色、字体、边框、圆角与尺寸用 tagTheme / HyperTagTheme / HyperTagStyle。
 [源码](../../lib/src/components/tag/hyper_tag.dart)。
 

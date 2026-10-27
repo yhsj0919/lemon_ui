@@ -69,6 +69,7 @@ class HyperPopoverPage extends StatelessWidget {
             contentBuilder: (context, close) => const HyperText('仅此实例关闭阴影'),
           ),
         ),
+        DemoSection(title: '统一关闭与返回值', child: _OverlayResultExample()),
         DemoSection(
           title: '局部主题覆盖 · 表面圆角',
           child: HyperPopoverTheme(
@@ -88,5 +89,30 @@ class HyperPopoverPage extends StatelessWidget {
         ),
       ],
     ),
+  );
+}
+
+class _OverlayResultExample extends StatefulWidget {
+  @override
+  State<_OverlayResultExample> createState() => _OverlayResultExampleState();
+}
+
+class _OverlayResultExampleState extends State<_OverlayResultExample> {
+  String? _result;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      HyperPopover<String>(
+        anchor: const HyperCard(child: HyperText('打开返回值示例')),
+        onResult: (result) => setState(() => _result = result ?? '取消'),
+        contentBuilder: (context, close) => HyperButton.text(
+          onPressed: () => HyperOverlay.close<String>(context, '已确认'),
+          label: const Text('确认并关闭'),
+        ),
+      ),
+      HyperText('最近结果：${_result ?? '尚未操作'}'),
+    ],
   );
 }

@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../tooltip/hyper_tooltip.dart';
 
 import 'package:flutter/material.dart';
@@ -113,10 +114,10 @@ class _HyperPaginationState extends State<HyperPagination> {
       nextLabel: '下一页',
       firstLabel: '第一页',
       lastLabel: '最后一页',
-      previousIcon: Icons.chevron_left,
-      nextIcon: Icons.chevron_right,
-      firstIcon: Icons.first_page,
-      lastIcon: Icons.last_page,
+      previousIcon: HyperIcons.chevronLeft,
+      nextIcon: HyperIcons.chevronRight,
+      firstIcon: HyperIcons.chevronFirst,
+      lastIcon: HyperIcons.chevronLast,
     ).merge(HyperPaginationTheme.of(context).style).merge(style);
     final active = enabled && onPageChanged != null;
     final duration = (MediaQuery.maybeOf(context)?.disableAnimations ?? false)

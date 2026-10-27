@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -64,7 +66,7 @@ class HyperNavigationListTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (description != null) ...[description!, SizedBox(width: spacing)],
-          const HyperIcon(Icons.chevron_right),
+          const HyperIcon(HyperIcons.chevronRight),
         ],
       ),
       density: density,

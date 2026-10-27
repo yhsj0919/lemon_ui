@@ -232,6 +232,37 @@ class _HyperDialogPageState extends State<HyperDialogPage> {
               ),
             ),
             section(
+              '内容型大弹窗 · 实例宽度覆盖',
+              HyperButton.tonal(
+                label: const Text('打开订单详情'),
+                onPressed: () => showHyperDialog<void>(
+                  context: context,
+                  style: const HyperDialogStyle(maxWidth: 960),
+                  builder: (dialogContext) => HyperDialog(
+                    title: const HyperText('订单详情'),
+                    scrollable: false,
+                    content: SizedBox(
+                      height: 320,
+                      child: ListView.separated(
+                        itemCount: 30,
+                        separatorBuilder: (_, _) => const HyperDivider(),
+                        itemBuilder: (_, index) => HyperListTile(
+                          title: HyperText('商品 ${index + 1}'),
+                          subtitle: const HyperText('订单内容预览，无表单校验或提交状态。'),
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      HyperButton.tonal(
+                        label: const Text('关闭详情'),
+                        onPressed: () => HyperOverlay.close(dialogContext),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            section(
               '异步操作与重试',
               HyperButton.tonal(
                 label: const Text('打开异步示例'),

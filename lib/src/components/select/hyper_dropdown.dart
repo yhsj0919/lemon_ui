@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import 'hyper_select_focus.dart';
 
 import 'package:flutter/material.dart';
@@ -234,7 +235,7 @@ class _HyperDropdownState extends State<HyperDropdown> {
                     width: visual.arrowSpacing ?? sizes.select.arrowSpacing,
                   ),
                   Icon(
-                    open ? Icons.expand_less : Icons.expand_more,
+                    open ? HyperIcons.chevronUp : HyperIcons.chevronDown,
                     size: visual.arrowSize ?? sizes.select.arrowSize,
                     color: widget.enabled
                         ? visual.arrowColor ??

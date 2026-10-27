@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -531,8 +533,8 @@ class _HyperMenuState extends State<HyperMenu> {
                   Icon(
                     item.submenuIcon ??
                         (Directionality.of(context) == TextDirection.ltr
-                            ? Icons.chevron_right
-                            : Icons.chevron_left),
+                            ? HyperIcons.chevronRight
+                            : HyperIcons.chevronLeft),
                     size: style.iconSize,
                     color: foreground,
                   ),

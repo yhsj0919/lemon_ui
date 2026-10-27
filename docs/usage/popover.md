@@ -21,6 +21,23 @@ HyperPopover.builder(
 ```
 
 全局 `popoverTheme`、局部 `HyperPopoverTheme`、实例 `HyperPopoverStyle` 按显式字段合并。
+
+需要结果时可使用泛型和统一关闭入口，`HyperAnchoredOverlay<T>` 同样支持：
+
+```dart
+HyperPopover<String>(
+  anchor: const Text('打开'),
+  onResult: (result) => debugPrint('结果：$result'),
+  contentBuilder: (context, close) => HyperButton.text(
+    onPressed: () => HyperOverlay.close<String>(context, '确认'),
+    label: const Text('确认并关闭'),
+  ),
+)
+```
+
+onResult 在浮层发起关闭时通知，不等待退场动画；外部点击、Escape 或旧 close 回调
+产生 null。受控模式仍由 onOpenChanged 更新 isOpen，close 返回 true 表示已发出请求，
+不表示父组件已接受。父组件直接改 isOpen 不触发结果通知；内容退场动画保持不变。
 `surfaceStyle` 复用 `HyperCardStyle` 的背景、材质、内边距、圆角、边框、阴影及约束。
 空阴影列表显式关闭阴影；实色材质可替换玻璃。材质质量和减少透明度由统一材质主题决定。
 

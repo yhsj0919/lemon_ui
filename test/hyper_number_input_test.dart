@@ -31,7 +31,7 @@ void main() {
         );
         await t.pumpAndSettle();
         final right = t.getRect(find.byType(HyperTextField)).right;
-        final arrow = t.getCenter(find.byIcon(Icons.keyboard_arrow_up)).dx;
+        final arrow = t.getCenter(find.byIcon(HyperIcons.chevronUp)).dx;
         inset ??= right - arrow;
         expect(right - arrow, closeTo(inset, .01));
         expect(t.takeException(), isNull);
@@ -50,13 +50,13 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    final clear = find.byIcon(Icons.close);
-    final up = find.byIcon(Icons.keyboard_arrow_up);
-    final down = find.byIcon(Icons.keyboard_arrow_down);
+    final clear = find.byIcon(HyperIcons.x);
+    final up = find.byIcon(HyperIcons.chevronUp);
+    final down = find.byIcon(HyperIcons.chevronDown);
     expect(t.getCenter(clear).dx, lessThan(t.getCenter(up).dx));
     expect(t.getCenter(up).dx, closeTo(t.getCenter(down).dx, .01));
     expect(
-      t.getCenter(find.byIcon(Icons.error_outline)).dx,
+      t.getCenter(find.byIcon(HyperIcons.circleAlert)).dx,
       lessThan(t.getCenter(up).dx),
     );
     expect(t.takeException(), isNull);
@@ -78,7 +78,7 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    await t.tap(find.byIcon(Icons.keyboard_arrow_up));
+    await t.tap(find.byIcon(HyperIcons.chevronUp));
     await t.pumpAndSettle();
     expect(value, .2);
     await t.tap(find.byType(EditableText));

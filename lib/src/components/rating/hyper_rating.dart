@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -117,7 +119,7 @@ class _HyperRatingState extends State<HyperRating> {
     }
 
     Widget icon(Color color) =>
-        Icon(style.icon ?? Icons.star_rounded, size: iconSize, color: color);
+        Icon(style.icon ?? HyperIcons.star, size: iconSize, color: color);
     final children = <Widget>[];
     for (var i = 0; i < widget.count; i++) {
       if (i > 0) {

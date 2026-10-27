@@ -299,7 +299,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byKey(const ValueKey('picker-number-分')),
-        matching: find.byIcon(Icons.keyboard_arrow_up),
+        matching: find.byIcon(HyperIcons.chevronUp),
       ),
     );
     await tester.pumpAndSettle();

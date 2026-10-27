@@ -15,7 +15,7 @@ void main() {
               child: Scaffold(
                 body: Center(
                   child: HyperIconButton.ghost(
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(HyperIcons.plus),
                     onPressed: () {},
                     style: HyperIconButtonStyle(
                       overlayColor: Colors.red.withValues(alpha: alpha),
@@ -67,7 +67,7 @@ void main() {
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer(location: Offset.zero);
     addTearDown(mouse.removePointer);
-    for (final icon in [Icons.keyboard_arrow_up, Icons.keyboard_arrow_down]) {
+    for (final icon in [HyperIcons.chevronUp, HyperIcons.chevronDown]) {
       final button = find.ancestor(
         of: find.byIcon(icon),
         matching: find.byType(HyperIconButton),

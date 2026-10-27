@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -419,7 +421,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
                 enabled: _enabled && node.enabled,
                 trailing: _controller.isBranch(node)
                     ? Icon(
-                        visual.branchIcon ?? Icons.chevron_right,
+                        visual.branchIcon ?? HyperIcons.chevronRight,
                         textDirection: Directionality.of(context),
                         size: menuStyle.iconSize ?? sizes.menu.iconSize,
                       )
@@ -463,7 +465,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
                       ? () => _controller.goTo(path.length - 1)
                       : null,
                   icon: Icon(
-                    visual.backIcon ?? Icons.arrow_back,
+                    visual.backIcon ?? HyperIcons.arrowLeft,
                     size: menuStyle.iconSize ?? sizes.menu.iconSize,
                   ),
                   label: Text('${widget.backLabel} · ${path.last.label}'),

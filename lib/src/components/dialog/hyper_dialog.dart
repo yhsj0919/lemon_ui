@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+import '../overlay/hyper_overlay.dart';
 import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
@@ -87,7 +89,7 @@ class HyperDialog extends StatelessWidget {
       actionRunSpacing: metrics.actionRunSpacing,
       actionsAlignment: WrapAlignment.end,
       actionsDirection: Axis.horizontal,
-      closeIcon: Icons.close,
+      closeIcon: HyperIcons.x,
       closeIconColor: theme.colors.textSecondary,
       closeIconSize: metrics.closeIconSize,
       clipBehavior: Clip.antiAlias,
@@ -109,7 +111,7 @@ class HyperDialog extends StatelessWidget {
                       foregroundColor: resolved.closeIconColor,
                       iconSize: resolved.closeIconSize,
                     ),
-                    onPressed: onClose ?? () => Navigator.of(context).pop(),
+                    onPressed: onClose ?? () => HyperOverlay.close(context),
                   ),
               ],
             ),
@@ -233,7 +235,10 @@ Future<T?> showHyperDialog<T>({
             data: HyperDialogThemeData(
               style: style ?? const HyperDialogStyle(),
             ),
-            child: Builder(builder: builder),
+            child: HyperOverlayScope.route<T>(
+              context: routeContext,
+              child: Builder(builder: builder),
+            ),
           ),
         );
         if (useSafeArea) page = SafeArea(child: page);

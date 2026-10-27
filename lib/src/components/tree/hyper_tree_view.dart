@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:math' as math;
@@ -177,8 +178,8 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       contentSpacing: size.contentSpacing,
       rowPadding: size.rowPadding,
       rowRadius: BorderRadius.circular(size.rowRadius),
-      expandIcon: Icons.chevron_right,
-      errorIcon: Icons.error_outline,
+      expandIcon: HyperIcons.chevronRight,
+      errorIcon: HyperIcons.circleAlert,
       loadingLabel: '加载中',
       retryLabel: '加载失败，点击重试',
       emptyLabel: '暂无节点',

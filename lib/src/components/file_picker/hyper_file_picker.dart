@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -121,7 +123,7 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
         Row(
           children: [
             widget.thumbnailBuilder?.call(context, file) ??
-                const Icon(Icons.insert_drive_file_outlined),
+                const Icon(HyperIcons.file),
             SizedBox(width: gap),
             Expanded(
               child: Column(
@@ -149,7 +151,7 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
               ),
             ),
             HyperIconButton.ghost(
-              icon: const Icon(Icons.close),
+              icon: const Icon(HyperIcons.x),
               tooltip: '移除文件',
               onPressed: enabled
                   ? () {
@@ -270,7 +272,7 @@ class _HyperFilePickerState extends State<HyperFilePicker> {
         if (widget.variant == HyperFilePickerVariant.dropzone &&
             widget.files.isEmpty) ...[
           Icon(
-            Icons.attach_file,
+            HyperIcons.paperclip,
             color: enabled ? theme.colors.textSecondary : theme.colors.disabled,
           ),
           SizedBox(height: gap),

@@ -6,6 +6,9 @@ import '../../theme/core/hyper_theme.dart';
 import 'hyper_text_style.dart';
 import 'hyper_text_theme.dart';
 
+/// 配色语义，与文字字阶分开配置。
+enum HyperTextTone { normal, muted }
+
 /// 使用 Hyper 语义字号和系统字体的基础文字控件。
 ///
 /// 普通构造直接返回 Flutter [Text]；[HyperText.scrolling] 提供单行溢出滚动。最终样式优先级为：
@@ -15,6 +18,7 @@ class HyperText extends StatelessWidget {
     this.data, {
     super.key,
     this.variant = HyperTextVariant.body,
+    this.tone = HyperTextTone.normal,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -36,11 +40,520 @@ class HyperText extends StatelessWidget {
        _loopGap = null,
        _scrollCurve = Curves.linear;
 
+  /// 使用 displayLarge 字阶的简写。
+  const HyperText.displayLarge(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.displayLarge,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 displayMedium 字阶的简写。
+  const HyperText.displayMedium(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.displayMedium,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 displaySmall 字阶的简写。
+  const HyperText.displaySmall(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.displaySmall,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 pageTitle 字阶的简写。
+  const HyperText.pageTitle(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.pageTitle,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 sectionTitle 字阶的简写。
+  const HyperText.sectionTitle(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.sectionTitle,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 subsectionTitle 字阶的简写。
+  const HyperText.subsectionTitle(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.subsectionTitle,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 bodyLarge 字阶的简写。
+  const HyperText.bodyLarge(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.bodyLarge,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 bodySmall 字阶的简写。
+  const HyperText.bodySmall(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.bodySmall,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 control 字阶的简写。
+  const HyperText.control(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.control,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 label 字阶的简写。
+  const HyperText.label(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.label,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 body 字阶的简写。
+  const HyperText.body(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.body,
+         tone: HyperTextTone.normal,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 使用 caption 字阶的简写。
+  const HyperText.caption(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.caption,
+         tone: HyperTextTone.normal,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 分区标题，等价于 sectionTitle 字阶。
+  const HyperText.title(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.sectionTitle,
+         tone: HyperTextTone.normal,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
+  /// 正文的次要配色；局部主题和实例 style 仍优先。
+  const HyperText.muted(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) : this(
+         data,
+         variant: HyperTextVariant.body,
+         tone: HyperTextTone.muted,
+         key: key,
+         style: style,
+         strutStyle: strutStyle,
+         textAlign: textAlign,
+         textDirection: textDirection,
+         locale: locale,
+         softWrap: softWrap,
+         overflow: overflow,
+         textScaler: textScaler,
+         maxLines: maxLines,
+         semanticsLabel: semanticsLabel,
+         textWidthBasis: textWidthBasis,
+         textHeightBehavior: textHeightBehavior,
+         selectionColor: selectionColor,
+       );
+
   /// 单行溢出滚动；支持往返、跑马灯以及自动或悬停触发。
   const HyperText.scrolling(
     this.data, {
     super.key,
     this.variant = HyperTextVariant.body,
+    this.tone = HyperTextTone.normal,
     this.style,
     this.semanticsLabel,
     HyperTextScrollTrigger trigger = HyperTextScrollTrigger.automatic,
@@ -86,6 +599,9 @@ class HyperText extends StatelessWidget {
   /// 当前文字使用的语义层级，默认是正文。
   final HyperTextVariant variant;
 
+  /// muted 默认使用主题 textSecondary，显式主题或实例颜色可覆盖。
+  final HyperTextTone tone;
+
   /// 当前实例样式，最后合并并具有最高优先级。
   final TextStyle? style;
 
@@ -127,11 +643,18 @@ class HyperText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = HyperTheme.of(context);
+    final componentStyle = HyperTextTheme.of(context).resolve(variant);
+    final toneStyle = tone == HyperTextTone.muted
+        ? TextStyle(color: theme.colors.textSecondary)
+        : null;
     if (_scrollTrigger != null) {
       return HyperScrollingText(
         data,
         variant: variant,
-        style: style,
+        style: toneStyle == null
+            ? style
+            : toneStyle.merge(componentStyle).merge(style),
         semanticsLabel: semanticsLabel,
         trigger: _scrollTrigger,
         mode: _scrollMode,
@@ -142,14 +665,15 @@ class HyperText extends StatelessWidget {
         curve: _scrollCurve,
       );
     }
-    final theme = HyperTheme.of(context);
     // 默认正文服从父级文字环境，使按钮、列表项等容器能够统一控制排版。
     // 显式语义层级仍从 Hyper 主题读取完整样式，不受普通正文环境覆盖。
     final baseStyle = variant == HyperTextVariant.body
         ? DefaultTextStyle.of(context).style
         : variant.resolve(theme.textTheme) ?? const TextStyle();
-    final componentStyle = HyperTextTheme.of(context).resolve(variant);
-    final resolvedStyle = baseStyle.merge(componentStyle).merge(style);
+    final resolvedStyle = baseStyle
+        .merge(toneStyle)
+        .merge(componentStyle)
+        .merge(style);
 
     return Text(
       data,

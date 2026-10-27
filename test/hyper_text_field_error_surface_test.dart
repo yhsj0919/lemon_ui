@@ -46,7 +46,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byIcon(Icons.error_outline));
+      await tester.tap(find.byIcon(HyperIcons.circleAlert));
       await tester.pumpAndSettle();
       final card = tester.widget<HyperCard>(find.byType(HyperCard));
       final context = tester.element(find.byType(HyperCard));

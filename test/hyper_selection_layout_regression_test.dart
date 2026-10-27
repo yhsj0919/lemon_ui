@@ -137,7 +137,7 @@ void main() {
         ),
       ),
     );
-    final arrow = find.byIcon(Icons.unfold_more);
+    final arrow = find.byIcon(HyperIcons.chevronsUpDown);
     final rect = tester.getRect(arrow);
     await tester.tap(find.text('布局'));
     await tester.pumpAndSettle();

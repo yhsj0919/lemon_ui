@@ -104,9 +104,9 @@ class _HyperBadgePageState extends State<HyperBadgePage> {
                     HyperIconButton.ghost(
                       onPressed: () {},
                       tooltip: '通知',
-                      icon: const HyperBadgeAnchor(
-                        badge: HyperBadge.number(count: 3),
-                        child: Icon(Icons.notifications_outlined),
+                      icon: HyperBadgeAnchor.count(
+                        count: 3,
+                        child: const Icon(HyperIcons.bell),
                       ),
                     ),
                     HyperIconButton.ghost(

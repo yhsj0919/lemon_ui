@@ -36,7 +36,7 @@ void main() {
     );
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer(location: Offset.zero);
-    final arrow = find.byIcon(Icons.chevron_right).first;
+    final arrow = find.byIcon(HyperIcons.chevronRight).first;
     await mouse.moveTo(tester.getCenter(arrow));
     await tester.pumpAndSettle();
     final arrowSurface = tester.widget<DecoratedBox>(

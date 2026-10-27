@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
@@ -27,13 +29,13 @@ HyperNotificationStyle notificationDefaults({
   timeStyle: (theme.textTheme.bodySmall ?? const TextStyle()).copyWith(
     color: theme.colors.textTertiary,
   ),
-  icon: Icons.notifications_none,
+  icon: HyperIcons.bell,
   iconColor: theme.colors.primary,
   iconSize: metrics.iconSize,
   unreadColor: theme.colors.primary,
   unreadSize: metrics.unreadSize,
   unreadLabel: '未读',
-  closeIcon: Icons.close,
+  closeIcon: HyperIcons.x,
   closeIconColor: theme.colors.textSecondary,
   closeIconSize: metrics.closeIconSize,
   closeButtonSize: metrics.closeButtonSize,

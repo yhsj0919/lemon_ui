@@ -8,7 +8,7 @@ import 'hyper_popover_style.dart';
 import 'hyper_popover_theme.dart';
 
 /// 带菜单语义表面的锚定浮层，内容由调用方提供。
-class HyperPopover extends StatelessWidget {
+class HyperPopover<T> extends StatelessWidget {
   const HyperPopover({
     super.key,
     required this.anchor,
@@ -19,6 +19,7 @@ class HyperPopover extends StatelessWidget {
     this.transitionBuilder,
     this.isOpen,
     this.onOpenChanged,
+    this.onResult,
     this.anchorPosition,
   }) : anchorBuilder = null;
 
@@ -31,6 +32,7 @@ class HyperPopover extends StatelessWidget {
     this.transitionBuilder,
     this.isOpen,
     this.onOpenChanged,
+    this.onResult,
     this.anchorPosition,
   }) : anchor = null,
        trigger = HyperOverlayTrigger.manual;
@@ -46,6 +48,9 @@ class HyperPopover extends StatelessWidget {
   final HyperOverlayTransitionBuilder? transitionBuilder;
   final bool? isOpen;
   final ValueChanged<bool>? onOpenChanged;
+
+  /// 浮层发起关闭时的类型化结果；取消为 null。
+  final ValueChanged<T?>? onResult;
   final Offset? anchorPosition;
 
   @override
@@ -65,7 +70,7 @@ class HyperPopover extends StatelessWidget {
     }
 
     if (anchorBuilder != null) {
-      return HyperAnchoredOverlay.builder(
+      return HyperAnchoredOverlay<T>.builder(
         anchorBuilder: anchorBuilder!,
         overlayBuilder: panel,
         placement: placement,
@@ -74,10 +79,11 @@ class HyperPopover extends StatelessWidget {
         transitionBuilder: transitionBuilder,
         isOpen: isOpen,
         onOpenChanged: onOpenChanged,
+        onResult: onResult,
         anchorPosition: anchorPosition,
       );
     }
-    return HyperAnchoredOverlay(
+    return HyperAnchoredOverlay<T>(
       anchor: anchor!,
       overlayBuilder: panel,
       trigger: trigger,
@@ -87,6 +93,7 @@ class HyperPopover extends StatelessWidget {
       transitionBuilder: transitionBuilder,
       isOpen: isOpen,
       onOpenChanged: onOpenChanged,
+      onResult: onResult,
       anchorPosition: anchorPosition,
     );
   }

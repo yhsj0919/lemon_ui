@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -135,7 +137,7 @@ class _HyperBreadcrumbState extends State<HyperBreadcrumb> {
                         widget.separator ??
                         (resolved.separator == HyperBreadcrumbSeparator.chevron
                             ? Icon(
-                                Icons.chevron_right,
+                                HyperIcons.chevronRight,
                                 size: sizes.separatorSize,
                                 color: separatorColor,
                                 textDirection: Directionality.of(context),

@@ -181,17 +181,17 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.tap(find.byIcon(HyperIcons.chevronRight));
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.refresh), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.refresh));
+    expect(find.byIcon(HyperIcons.refreshCw), findsOneWidget);
+    await tester.tap(find.byIcon(HyperIcons.refreshCw));
     await tester.pumpAndSettle();
     expect(find.text('Child'), findsOneWidget);
     expect(calls, 2);
-    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.tap(find.byIcon(HyperIcons.chevronRight));
     await tester.pumpAndSettle();
     expect(find.text('Child'), findsNothing);
-    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.tap(find.byIcon(HyperIcons.chevronRight));
     await tester.pumpAndSettle();
     expect(find.text('Child'), findsOneWidget);
     expect(calls, 2);
@@ -400,7 +400,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.tap(find.byIcon(HyperIcons.chevronRight));
       await tester.pump();
       await tester.pump();
       final expand = find.byWidgetPredicate(
@@ -411,7 +411,7 @@ void main() {
       request.complete(['Late child']);
       await tester.pumpAndSettle();
       expect(find.text('Late child'), findsNothing);
-      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.tap(find.byIcon(HyperIcons.chevronRight));
       await tester.pumpAndSettle();
       expect(find.text('Late child'), findsOneWidget);
       expect(tester.takeException(), isNull);

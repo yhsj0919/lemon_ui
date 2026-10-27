@@ -112,7 +112,7 @@ void main() {
       find
           .descendant(
             of: find.byKey(const ValueKey('hyper-sidebar-item-library')).first,
-            matching: find.byIcon(Icons.chevron_right),
+            matching: find.byIcon(HyperIcons.chevronRight),
           )
           .first,
     );

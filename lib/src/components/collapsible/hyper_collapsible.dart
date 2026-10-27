@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
@@ -73,7 +74,7 @@ class HyperCollapsible extends StatelessWidget {
                 color: theme.colors.textPrimary,
               ),
               iconColor: theme.colors.textSecondary,
-              indicatorIcon: Icons.expand_more,
+              indicatorIcon: HyperIcons.chevronDown,
               overlayColor: theme.colors.stateLayer,
               hoverOpacity: .06,
               focusOpacity: .06,

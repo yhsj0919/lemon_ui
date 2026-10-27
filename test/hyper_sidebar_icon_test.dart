@@ -132,7 +132,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       final leading = tester.widget<Icon>(find.byIcon(Icons.folder));
-      final arrow = tester.widget<Icon>(find.byIcon(Icons.chevron_right).first);
+      final arrow = tester.widget<Icon>(find.byIcon(HyperIcons.chevronRight).first);
       expect(leading.size, 28);
       expect(arrow.size, 10);
       expect(
@@ -193,7 +193,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.folder), findsNothing);
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(HyperIcons.chevronRight), findsNothing);
     expect(find.text('父级'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -228,7 +228,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.getSize(find.byIcon(Icons.folder)), const Size(28, 28));
       expect(
-        tester.getSize(find.byIcon(Icons.chevron_right)),
+        tester.getSize(find.byIcon(HyperIcons.chevronRight)),
         const Size(10, 10),
       );
       expect(tester.takeException(), isNull);

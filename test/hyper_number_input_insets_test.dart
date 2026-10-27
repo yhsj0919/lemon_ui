@@ -31,8 +31,8 @@ void main() {
           );
           await t.pumpAndSettle();
           final field = t.getRect(find.byType(HyperTextField));
-          final up = t.getRect(find.byIcon(Icons.keyboard_arrow_up));
-          final down = t.getRect(find.byIcon(Icons.keyboard_arrow_down));
+          final up = t.getRect(find.byIcon(HyperIcons.chevronUp));
+          final down = t.getRect(find.byIcon(HyperIcons.chevronDown));
           // Bundled MaterialIcons ink bounds in a 512-unit em.
           final top = up.top + up.height * 171 / 512 - field.top;
           final bottom = field.bottom - (down.top + down.height * 341 / 512);

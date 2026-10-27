@@ -23,7 +23,7 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
-      final button = find.widgetWithIcon(HyperIconButton, Icons.crop_square);
+      final button = find.widgetWithIcon(HyperIconButton, HyperIcons.square);
       expect(
         find.ancestor(
           of: button,
@@ -34,7 +34,7 @@ void main() {
       await t.tap(button);
       expect(position.maximized, isTrue);
       await t.pumpAndSettle();
-      await t.tap(find.widgetWithIcon(HyperIconButton, Icons.filter_none));
+      await t.tap(find.widgetWithIcon(HyperIconButton, HyperIcons.copy));
       expect(position.maximized, isFalse);
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);

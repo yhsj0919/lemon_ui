@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -476,7 +478,7 @@ class HyperField extends StatelessWidget {
                           Tooltip(
                             message: errorText!,
                             child: Icon(
-                              Icons.error_outline,
+                              HyperIcons.circleAlert,
                               color: errorStyle.color,
                               size: theme.textTheme.bodyMedium?.fontSize,
                             ),

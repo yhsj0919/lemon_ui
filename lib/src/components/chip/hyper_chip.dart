@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../../motion/hyper_animated_checkmark.dart';
 
 import 'dart:math' as math;
@@ -199,9 +200,9 @@ class HyperChip extends StatelessWidget {
         deleteTargetWidth: metrics.deleteTargetWidth,
         minimumTapTargetSize: sizes.minimumInteractiveDimension,
         showCheckmark: true,
-        checkmarkIcon: Icons.check,
+        checkmarkIcon: HyperIcons.check,
         checkmarkPlacement: HyperChipCheckmarkPlacement.leading,
-        deleteIcon: Icons.close,
+        deleteIcon: HyperIcons.x,
         duration: theme.motion.fastDuration,
         curve: theme.motion.fastCurve,
       );
@@ -326,7 +327,7 @@ class HyperChip extends StatelessWidget {
                                             leading,
                                           if (overlayCheck)
                                             resolved.checkmarkIcon ==
-                                                        Icons.check &&
+                                                        HyperIcons.check &&
                                                     resolved.transitionBuilder ==
                                                         null
                                                 ? Center(
@@ -421,7 +422,7 @@ class HyperChip extends StatelessWidget {
                                       ExcludeSemantics(
                                         child:
                                             resolved.checkmarkIcon ==
-                                                    Icons.check &&
+                                                    HyperIcons.check &&
                                                 resolved.transitionBuilder ==
                                                     null
                                             ? SizedBox.square(

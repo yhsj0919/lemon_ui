@@ -47,9 +47,21 @@ class _HyperTextPageState extends State<HyperTextPage> {
               vertical: 24,
             ),
             children: [
-              const HyperText('文字', variant: HyperTextVariant.pageTitle),
+              const HyperText.pageTitle('文字'),
               const SizedBox(height: 8),
               const HyperText('直接使用系统字体和明确语义字号，不执行倍率缩放。'),
+              const DemoSection(
+                title: '语义快捷构造',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HyperText.title('分区标题'),
+                    HyperText.body('正文内容'),
+                    HyperText.caption('小字说明'),
+                    HyperText.muted('次要正文'),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               DemoSection(
                 title: '基础用法',

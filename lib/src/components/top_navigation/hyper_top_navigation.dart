@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -81,7 +82,7 @@ class _HyperTopNavigationState extends State<HyperTopNavigation> {
       descriptionStyle: theme.textTheme.bodySmall?.copyWith(
         color: theme.colors.textSecondary,
       ),
-      dropdownIcon: Icons.expand_more,
+      dropdownIcon: HyperIcons.chevronDown,
       itemStyle: HyperButtonStyle(
         minimumSize: Size(0, sizes.height),
         padding: sizes.padding,

@@ -361,3 +361,6 @@ export 'src/components/popover/hyper_popover_theme.dart';
 
 export 'src/components/number_input/hyper_number_input_layout.dart';
 export 'src/components/number_input/hyper_number_input_theme.dart';
+export 'src/foundation/hyper_icons.dart';
+export 'src/components/overlay/hyper_overlay.dart';
+export 'src/components/form/hyper_validators.dart';

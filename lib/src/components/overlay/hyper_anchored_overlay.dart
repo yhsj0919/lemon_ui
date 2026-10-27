@@ -1,4 +1,5 @@
 import 'hyper_backdrop_safe_opacity.dart';
+import 'hyper_overlay.dart';
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -48,7 +49,7 @@ typedef HyperOverlayTransitionBuilder = Widget Function(
 ///
 /// 默认点击锚点开合；悬停和受控开合适用于侧栏子菜单等场景。
 /// 不要求页面使用 HyperScaffold，直接复用最近的 Flutter Overlay。
-class HyperAnchoredOverlay extends StatefulWidget {
+class HyperAnchoredOverlay<T> extends StatefulWidget {
   const HyperAnchoredOverlay({
     super.key,
     required this.anchor,
@@ -60,6 +61,7 @@ class HyperAnchoredOverlay extends StatefulWidget {
     this.transitionBuilder,
     this.isOpen,
     this.onOpenChanged,
+    this.onResult,
     this.anchorPosition,
   }) : anchorBuilder = null;
 
@@ -74,6 +76,7 @@ class HyperAnchoredOverlay extends StatefulWidget {
     this.transitionBuilder,
     this.isOpen,
     this.onOpenChanged,
+    this.onResult,
     this.anchorPosition,
   }) : anchor = null,
        trigger = HyperOverlayTrigger.manual;
@@ -95,14 +98,18 @@ class HyperAnchoredOverlay extends StatefulWidget {
   final bool? isOpen;
   final ValueChanged<bool>? onOpenChanged;
 
+  /// 由浮层发起关闭时接收结果；取消为 null。受控模式下仍需响应 onOpenChanged。
+  final ValueChanged<T?>? onResult;
+
   /// 锚点子控件内的局部坐标；右键菜单可在指针处定位。
   final Offset? anchorPosition;
 
   @override
-  State<HyperAnchoredOverlay> createState() => _HyperAnchoredOverlayState();
+  State<HyperAnchoredOverlay<T>> createState() =>
+      _HyperAnchoredOverlayState<T>();
 }
 
-class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
+class _HyperAnchoredOverlayState<T> extends State<HyperAnchoredOverlay<T>>
     with SingleTickerProviderStateMixin {
   final OverlayPortalController _portal = OverlayPortalController();
   final FocusNode _focusNode = FocusNode();
@@ -113,6 +120,7 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
     duration: Duration.zero,
   )..addStatusListener(_onAnimationStatus);
   bool _internalOpen = false;
+  bool _closeRequested = false;
 
   bool get _open => widget.isOpen ?? _internalOpen;
 
@@ -139,9 +147,12 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
   }
 
   @override
-  void didUpdateWidget(HyperAnchoredOverlay oldWidget) {
+  void didUpdateWidget(HyperAnchoredOverlay<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.isOpen != widget.isOpen) _syncPortalAfterFrame();
+    if (oldWidget.isOpen != widget.isOpen) {
+      if (widget.isOpen == true) _closeRequested = false;
+      _syncPortalAfterFrame();
+    }
     if (oldWidget.trigger != widget.trigger) _hoverCloseTimer?.cancel();
   }
 
@@ -178,11 +189,21 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
     if (status == AnimationStatus.dismissed && !_open) _portal.hide();
   }
 
-  void _setOpen(bool value) {
+  void _setOpen(bool value, [T? result]) {
     _hoverCloseTimer?.cancel();
     if (_open == value) return;
+    if (!value && _closeRequested) return;
+    _closeRequested = !value;
     if (widget.isOpen == null) setState(() => _internalOpen = value);
     widget.onOpenChanged?.call(value);
+    if (!value) widget.onResult?.call(result);
+    if (!value && widget.isOpen != null) {
+      // A controlled owner may reject the request; allow a later retry while
+      // suppressing duplicate requests during this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _open) _closeRequested = false;
+      });
+    }
     _syncPortalAfterFrame();
   }
 
@@ -290,9 +311,16 @@ class _HyperAnchoredOverlayState extends State<HyperAnchoredOverlay>
               );
               final content = _HyperOverlayTapGroup(
                 groupId: tapGroup,
-                child: Builder(
-                  builder: (context) =>
-                      widget.overlayBuilder(context, () => _setOpen(false)),
+                child: HyperOverlayScope<T>(
+                  onClose: (result) {
+                    if (!_open || _closeRequested) return false;
+                    _setOpen(false, result);
+                    return true;
+                  },
+                  child: Builder(
+                    builder: (context) =>
+                        widget.overlayBuilder(context, () => _setOpen(false)),
+                  ),
                 ),
               );
               final transition = widget.transitionBuilder;

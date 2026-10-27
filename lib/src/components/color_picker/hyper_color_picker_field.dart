@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+import 'hyper_color_swatch.dart';
 import '../select/hyper_select_focus.dart';
 
 import 'dart:async';
@@ -198,7 +200,7 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
                   ? MainAxisAlignment.center
                   : MainAxisAlignment.start,
               children: [
-                Icon(Icons.square, color: widget.value),
+                HyperColorSwatch(color: widget.value),
                 if (widget.display ==
                     HyperColorPickerFieldDisplay.colorAndValue) ...[
                   SizedBox(width: gap),
@@ -212,7 +214,7 @@ class _HyperColorPickerFieldState extends State<HyperColorPickerField> {
                     width: select?.arrowSpacing ?? sizes.select.arrowSpacing,
                   ),
                   Icon(
-                    _open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    _open ? HyperIcons.chevronUp : HyperIcons.chevronDown,
                     size: select?.arrowSize ?? sizes.select.arrowSize,
                     color: _enabled
                         ? select?.arrowColor ??

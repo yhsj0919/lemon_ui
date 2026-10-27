@@ -59,7 +59,7 @@ void main() {
         const HyperListTile(
           leading: Icon(Icons.settings, key: Key('leading')),
           title: Text('设置', key: Key('title')),
-          trailing: HyperIcon(Icons.chevron_right, key: Key('trailing')),
+          trailing: HyperIcon(HyperIcons.chevronRight, key: Key('trailing')),
         ),
       ),
     );
@@ -162,7 +162,7 @@ void main() {
   testWidgets('基础列表项不会隐式添加导航箭头', (tester) async {
     await tester.pumpWidget(app(const HyperListTile(title: Text('基础项目'))));
 
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(HyperIcons.chevronRight), findsNothing);
   });
 
   testWidgets('导航列表项统一添加描述、箭头和尾部间距', (tester) async {
@@ -180,7 +180,7 @@ void main() {
     final descriptionRect = tester.getRect(
       find.byKey(const Key('description')),
     );
-    final chevron = find.byIcon(Icons.chevron_right);
+    final chevron = find.byIcon(HyperIcons.chevronRight);
     final chevronRect = tester.getRect(chevron);
     expect(chevron, findsOneWidget);
     expect(tester.widget<Icon>(chevron).size, 24);
@@ -207,7 +207,7 @@ void main() {
     );
 
     expect(
-      tester.getRect(find.byIcon(Icons.chevron_right)).left -
+      tester.getRect(find.byIcon(HyperIcons.chevronRight)).left -
           tester.getRect(find.byKey(const Key('description'))).right,
       14,
     );
@@ -314,7 +314,7 @@ void main() {
             children: [
               Text('Xiaomi_5G'),
               SizedBox(width: 8),
-              HyperIcon(Icons.chevron_right),
+              HyperIcon(HyperIcons.chevronRight),
             ],
           ),
         ),

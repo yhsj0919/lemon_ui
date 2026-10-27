@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
 import 'dart:math' as math;
@@ -519,7 +520,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                                                   duration: expandDuration,
                                                   curve: theme.motion.fastCurve,
                                                   child: Icon(
-                                                    Icons.chevron_right,
+                                                    HyperIcons.chevronRight,
                                                     size: style.expandIconSize,
                                                     color: expandIconColor,
                                                   ),

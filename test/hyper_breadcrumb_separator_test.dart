@@ -26,7 +26,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('/'), separator == null ? findsOneWidget : findsNothing);
       expect(
-        find.byIcon(Icons.chevron_right),
+        find.byIcon(HyperIcons.chevronRight),
         separator == null ? findsNothing : findsOneWidget,
       );
       expect(tester.takeException(), isNull);

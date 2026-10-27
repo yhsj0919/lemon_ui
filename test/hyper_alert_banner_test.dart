@@ -58,7 +58,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(tester.widget<HyperAlert>(find.byType(HyperAlert)).isBanner, isTrue);
-    final icon = IconTheme.of(tester.element(find.byIcon(Icons.info_outline)));
+    final icon = IconTheme.of(tester.element(find.byIcon(HyperIcons.info)));
     expect(icon.size, 31);
     expect(icon.color, Colors.blue);
     await tester.pumpWidget(
@@ -77,7 +77,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(
-      IconTheme.of(tester.element(find.byIcon(Icons.info_outline))).color,
+      IconTheme.of(tester.element(find.byIcon(HyperIcons.info))).color,
       Colors.black,
     );
     expect(tester.takeException(), isNull);

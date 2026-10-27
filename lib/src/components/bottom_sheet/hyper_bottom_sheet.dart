@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+import '../overlay/hyper_overlay.dart';
 import '../../painting/hyper_box_decoration.dart';
 import '../overlay/hyper_navigator_scope.dart';
 import '../overlay/hyper_live_route_themes.dart';
@@ -51,7 +53,7 @@ HyperBottomSheetStyle _resolveStyle(
     actionRunSpacing: metrics.actionRunSpacing,
     actionsAlignment: WrapAlignment.end,
     actionsDirection: Axis.horizontal,
-    closeIcon: Icons.close,
+    closeIcon: HyperIcons.x,
     closeIconColor: theme.colors.textSecondary,
     closeIconSize: metrics.closeIconSize,
     dragHandleColor: theme.colors.textTertiary,
@@ -138,7 +140,7 @@ class HyperBottomSheet extends StatelessWidget {
                       foregroundColor: resolved.closeIconColor,
                       iconSize: resolved.closeIconSize,
                     ),
-                    onPressed: onClose ?? () => Navigator.of(context).pop(),
+                    onPressed: onClose ?? () => HyperOverlay.close(context),
                   )
                 : null,
             content: content,
@@ -253,7 +255,10 @@ Future<T?> showHyperBottomSheet<T>({
             ),
             child: Directionality(
               textDirection: direction,
-              child: Builder(builder: builder),
+              child: HyperOverlayScope.route<T>(
+                context: routeContext,
+                child: Builder(builder: builder),
+              ),
             ),
           ),
         );

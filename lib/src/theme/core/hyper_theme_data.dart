@@ -114,6 +114,11 @@ String _systemFontFamily() => switch (defaultTargetPlatform) {
   TargetPlatform.fuchsia => 'sans-serif',
 };
 
+TextTheme _applyFont(TextTheme text, String? family, List<String>? fallback) =>
+    family == null && fallback == null
+    ? text
+    : text.apply(fontFamily: family, fontFamilyFallback: fallback);
+
 /// 中文字体放在前面，桌面端缺少某个字体时仍能回退到系统字库。
 List<String> _systemFontFallback() => switch (defaultTargetPlatform) {
   TargetPlatform.windows => const ['Microsoft YaHei', 'Segoe UI'],
@@ -211,11 +216,15 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   });
 
   factory HyperThemeData.light({
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     Color seedColor = const Color(0xFF3482FF),
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme? typography,
     HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) => HyperThemeData.fromSeed(
+    fontFamily: fontFamily,
+    fontFamilyFallback: fontFamilyFallback,
     seedColor: seedColor,
     sizes: sizes,
     typography: typography,
@@ -223,11 +232,15 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   );
 
   factory HyperThemeData.dark({
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     Color seedColor = const Color(0xFF3482FF),
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme? typography,
     HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
   }) => HyperThemeData.fromSeed(
+    fontFamily: fontFamily,
+    fontFamilyFallback: fontFamilyFallback,
     seedColor: seedColor,
     brightness: Brightness.dark,
     sizes: sizes,
@@ -237,6 +250,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   /// 从种子色和一套明确尺寸创建开箱即用的完整主题。
   factory HyperThemeData.fromSeed({
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     required Color seedColor,
     Brightness brightness = Brightness.light,
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
@@ -254,8 +269,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     final material = ThemeData(
       colorScheme: colors.toMaterialColorScheme(),
       useMaterial3: true,
-      fontFamily: _systemFontFamily(),
-      fontFamilyFallback: _systemFontFallback(),
+      fontFamily: fontFamily ?? _systemFontFamily(),
+      fontFamilyFallback: fontFamilyFallback ?? _systemFontFallback(),
     );
     return HyperThemeData(
       colors: colors,
@@ -301,6 +316,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   /// 从当前 Flutter Material 主题建立 Hyper 主题回退值。
   factory HyperThemeData.fromMaterial(
     ThemeData material, {
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     HyperSizeThemeData sizes = const HyperSizeThemeData(),
     HyperTypographyScheme? typography,
     HyperTypographyThemeData typographyTheme = const HyperTypographyThemeData(),
@@ -338,7 +355,11 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     return HyperThemeData(
       colors: colors,
       textTheme: resolvedTypography.applyTo(
-        _standaloneTextTheme(material.textTheme),
+        _applyFont(
+          _standaloneTextTheme(material.textTheme),
+          fontFamily,
+          fontFamilyFallback,
+        ),
       ),
       sizes: sizes,
       typography: resolvedTypography,
@@ -570,6 +591,8 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
 
   @override
   HyperThemeData copyWith({
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     HyperColorScheme? colors,
     TextTheme? textTheme,
     HyperSizeThemeData? sizes,
@@ -653,11 +676,14 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         (typography == null
             ? this.typographyTheme
             : HyperTypographyThemeData.uniform(typography));
-    final resolvedTextTheme =
-        textTheme ??
-        (typography == null && typographyTheme == null
-            ? this.textTheme
-            : resolvedTypography.applyTo(this.textTheme));
+    final resolvedTextTheme = _applyFont(
+      textTheme ??
+          (typography == null && typographyTheme == null
+              ? this.textTheme
+              : resolvedTypography.applyTo(this.textTheme)),
+      fontFamily,
+      fontFamilyFallback,
+    );
     return HyperThemeData(
       colors: colors ?? this.colors,
       textTheme: resolvedTextTheme,

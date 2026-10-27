@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -49,10 +51,10 @@ HyperTextFieldStyle resolveHyperTextFieldStyle(
       cursorColor: theme.colors.primary,
       cursorWidth: 2,
       cursorRadius: const Radius.circular(1),
-      errorIcon: Icons.error_outline,
-      clearIcon: Icons.close,
-      showPasswordIcon: Icons.visibility_outlined,
-      hidePasswordIcon: Icons.visibility_off_outlined,
+      errorIcon: HyperIcons.circleAlert,
+      clearIcon: HyperIcons.x,
+      showPasswordIcon: HyperIcons.eye,
+      hidePasswordIcon: HyperIcons.eyeOff,
       errorIconColor: theme.colors.error,
       errorMaxWidth: metrics.errorMaxWidth,
       errorTextStyle: theme.textTheme.bodySmall?.copyWith(

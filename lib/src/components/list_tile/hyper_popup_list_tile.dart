@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../overlay/hyper_live_route_themes.dart';
 import '../overlay/hyper_backdrop_safe_opacity.dart';
 
@@ -408,7 +409,7 @@ class _HyperPopupListTileState<T> extends State<HyperPopupListTile<T>> {
                 ),
                 SizedBox(width: metrics.trailingSpacing),
                 Icon(
-                  Icons.unfold_more,
+                  HyperIcons.chevronsUpDown,
                   key: _anchorKey,
                   size: metrics.trailingIconSize,
                 ),

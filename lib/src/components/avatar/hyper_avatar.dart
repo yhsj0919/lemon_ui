@@ -1,3 +1,4 @@
+import '../../foundation/hyper_icons.dart';
 import '../../painting/hyper_box_decoration.dart';
 
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class HyperAvatar extends StatelessWidget {
                   child: Text(text!, maxLines: 1),
                 ),
               )
-            : icon ?? const Icon(Icons.person_outline));
+            : icon ?? const Icon(HyperIcons.user));
     Widget content = fallback;
     if (image != null) {
       content = Image(

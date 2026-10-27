@@ -175,6 +175,11 @@ class HyperListTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DefaultTextStyle.merge(
+                            textHeightBehavior: const TextHeightBehavior(
+                              leadingDistribution: TextLeadingDistribution.even,
+                              applyHeightToFirstAscent: false,
+                              applyHeightToLastDescent: false,
+                            ),
                             style: resolved.titleStyle!.copyWith(
                               color: foreground,
                             ),
@@ -182,6 +187,11 @@ class HyperListTile extends StatelessWidget {
                           ),
                           if (subtitle != null)
                             DefaultTextStyle.merge(
+                              textHeightBehavior: const TextHeightBehavior(
+                                leadingDistribution: TextLeadingDistribution.even,
+                                applyHeightToFirstAscent: false,
+                                applyHeightToLastDescent: false,
+                              ),
                               style: resolved.subtitleStyle!.copyWith(
                                 color: subtitleColor,
                               ),

@@ -301,7 +301,7 @@ void main() {
     expect(day(2024, 2, 29), findsOneWidget);
     expect(find.text('2024年'), findsOneWidget);
     expect(find.text('2月'), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(HyperIcons.chevronLeft), findsOneWidget);
     expect(find.text('一'), findsOneWidget);
     expect(day(2024, 2, 30), findsNothing);
     await tester.tap(day(2024, 2, 29));

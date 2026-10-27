@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -364,8 +366,8 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  stepButton(1, Icons.keyboard_arrow_up),
-                  stepButton(-1, Icons.keyboard_arrow_down),
+                  stepButton(1, HyperIcons.chevronUp),
+                  stepButton(-1, HyperIcons.chevronDown),
                 ],
               ),
       ),
@@ -405,9 +407,9 @@ class _HyperNumberInputState extends State<HyperNumberInput> {
                   itemBorderRadius: BorderRadius.zero,
                 ),
                 children: [
-                  stepButton(-1, Icons.remove),
+                  stepButton(-1, HyperIcons.minus),
                   HyperWidgetGroupItem(flex: 1, child: input),
-                  stepButton(1, Icons.add),
+                  stepButton(1, HyperIcons.plus),
                 ],
               ),
             )

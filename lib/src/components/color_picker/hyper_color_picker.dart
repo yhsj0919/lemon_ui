@@ -1,3 +1,5 @@
+import 'hyper_color_swatch.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -300,7 +302,7 @@ class _HyperColorPickerState extends State<HyperColorPicker> {
                 for (final color in widget.recommendedColors)
                   HyperIconButton.outlined(
                     tooltip: _hex(color),
-                    icon: Icon(Icons.circle, color: color),
+                    icon: HyperColorSwatch(color: color, circle: true),
                     onPressed: enabled
                         ? () => _change(
                             HSVColor.fromColor(

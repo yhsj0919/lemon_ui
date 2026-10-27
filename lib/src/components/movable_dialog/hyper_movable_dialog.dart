@@ -1,3 +1,5 @@
+import '../../foundation/hyper_icons.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -246,9 +248,7 @@ class _HyperMovableDialogState extends State<HyperMovableDialog>
                 HyperIconButton.ghost(
                   tooltip: controller.maximized ? '还原' : '最大化',
                   icon: Icon(
-                    controller.maximized
-                        ? Icons.filter_none
-                        : Icons.crop_square,
+                    controller.maximized ? HyperIcons.copy : HyperIcons.square,
                   ),
                   onPressed: widget.enabled ? controller.toggleMaximized : null,
                 ),

@@ -125,6 +125,7 @@ class HyperMaterialSurface extends StatelessWidget {
           ? Clip.antiAlias
           : clipBehavior,
       child: Stack(
+        fit: StackFit.passthrough,
         children: [
           Positioned.fill(
             child: BackdropFilter(

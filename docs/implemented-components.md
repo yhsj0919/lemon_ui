@@ -2,6 +2,10 @@
 
 本页按 `lib/lemon_ui.dart` 的公开导出与 `lib/src/components` 实际实现核对，更新时间：2026-10-21。只列用户可直接使用的 UI 控件；主题、Style、尺寸、数据模型、Form 适配器和内部绘制辅助类不作为重复控件计数。目录状态仍需结合 Demo、测试、使用文档和设备审核台账判断。
 
+## 动效包装（未确认）
+
+`HyperMotion.lift`：悬停/聚焦上浮、微缩放、阴影及按下回压；包装子控件，不增加激活语义。
+
 ## 基础与布局
 
 `HyperContainer`、`HyperMaterialSurface`、`HyperCard`、`HyperTitledCard`、`HyperDivider`、`HyperScaffold`、`HyperAppBar`、`HyperSliverAppBar`、`HyperDrawer`、`HyperSidebar`、`HyperWidgetGroup`、`HyperListTile`、`HyperNavigationListTile`、`HyperCheckboxListTile`、`HyperRadioListTile`、`HyperSwitchListTile`、`HyperPopupListTile`。

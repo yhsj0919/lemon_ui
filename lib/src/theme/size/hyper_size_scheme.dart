@@ -1,3 +1,4 @@
+import 'components/hyper_lift_size.dart';
 import 'components/hyper_image_editor_size.dart';
 import 'components/hyper_image_preview_size.dart';
 import 'components/hyper_image_size.dart';
@@ -86,6 +87,7 @@ final class HyperSizeScheme {
   static const double radius4xl = 48;
 
   const HyperSizeScheme({
+    HyperLiftSize? motionLift,
     HyperImagePreviewSize? imagePreview,
     HyperImageEditorSize? imageEditor,
     HyperImageSize? image,
@@ -164,7 +166,9 @@ final class HyperSizeScheme {
     required this.progress,
     // Preserve the public named parameter while deriving legacy defaults lazily.
     // ignore: prefer_initializing_formals
-  }) : _imagePreview = imagePreview,
+  }) : _motionLift = motionLift,
+       // ignore: prefer_initializing_formals
+       _imagePreview = imagePreview,
        // ignore: prefer_initializing_formals
        _imageEditor = imageEditor,
        // ignore: prefer_initializing_formals
@@ -1977,6 +1981,16 @@ final class HyperSizeScheme {
   final HyperButtonSize button;
   final HyperBadgeSize badge;
   final HyperTagSize tag;
+  final HyperLiftSize? _motionLift;
+
+  /// Initial offsets follow the user's legacy lift request on all devices.
+  HyperLiftSize get motionLift =>
+      _motionLift ??
+      HyperLiftSize(
+        hoverOffset: const Offset(0, -2),
+        pressedOffset: Offset.zero,
+        shadowRadius: card.radius,
+      );
   final HyperImagePreviewSize? _imagePreview;
   HyperImagePreviewSize get imagePreview =>
       _imagePreview ??
@@ -2085,6 +2099,7 @@ final class HyperSizeScheme {
     HyperButtonSize? button,
     HyperBadgeSize? badge,
     HyperTagSize? tag,
+    HyperLiftSize? motionLift,
     HyperImagePreviewSize? imagePreview,
     HyperImageEditorSize? imageEditor,
     HyperImageSize? image,
@@ -2164,6 +2179,7 @@ final class HyperSizeScheme {
     button: button ?? this.button,
     badge: badge ?? this.badge,
     tag: tag ?? this.tag,
+    motionLift: motionLift ?? _motionLift,
     imagePreview: imagePreview ?? _imagePreview,
     imageEditor: imageEditor ?? _imageEditor,
     image: image ?? _image,
@@ -2304,6 +2320,7 @@ final class HyperSizeScheme {
       button: HyperButtonSize.lerp(a.button, b.button, t),
       badge: HyperBadgeSize.lerp(a.badge, b.badge, t),
       tag: HyperTagSize.lerp(a.tag, b.tag, t),
+      motionLift: HyperLiftSize.lerp(a.motionLift, b.motionLift, t),
       imagePreview: HyperImagePreviewSize.lerp(
         a.imagePreview,
         b.imagePreview,
@@ -2386,6 +2403,7 @@ final class HyperSizeScheme {
           other.button == button &&
           other.badge == badge &&
           other.tag == tag &&
+          other.motionLift == motionLift &&
           other.imagePreview == imagePreview &&
           other.imageEditor == imageEditor &&
           other.image == image &&
@@ -2465,6 +2483,7 @@ final class HyperSizeScheme {
     button,
     badge,
     tag,
+    motionLift,
     imagePreview,
     imageEditor,
     image,

@@ -48,6 +48,7 @@ part 'editor_chart_workspace.dart';
 part 'editor_input_workspace.dart';
 part 'editor_review_workspace.dart';
 part 'editor_image_workspace.dart';
+part 'editor_motion_workspace.dart';
 part 'editor_extended_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
@@ -179,6 +180,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'imagePreviewReview': '图片预览',
     'imageEditorReview': '图片编辑',
     'imageReview': '图片',
+    'motionLiftReview': '悬停上浮',
     'popoverReview': '锚定面板',
     'tooltipReview': '文字提示',
     'notificationReview': '通知卡片',
@@ -233,6 +235,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     'imagePreviewReview': 'hyper-image-preview',
     'imageEditorReview': 'hyper-image-editor',
     'imageReview': 'hyper-image',
+    'motionLiftReview': 'hyper-motion-lift',
     'popoverReview': 'hyper-popover',
     'tooltipReview': 'hyper-tooltip',
     'notificationReview': 'hyper-notification',
@@ -1346,6 +1349,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
     VoidCallback reset,
     bool overridden, {
     bool wholeNumbers = true,
+    int decimalPlaces = 2,
   }) {
     final lower = wholeNumbers ? min.ceilToDouble() : min;
     final upper = wholeNumbers ? max.floorToDouble() : max;
@@ -1369,7 +1373,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     children: [
                       Expanded(
                         child: HyperText(
-                          '$label  ${sliderValue.toStringAsFixed(wholeNumbers ? 0 : 2)}',
+                          '$label  ${sliderValue.toStringAsFixed(wholeNumbers ? 0 : decimalPlaces)}',
                         ),
                       ),
                       const Icon(Icons.info_outline, size: 14),
@@ -2738,6 +2742,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
         _component == 'imageEditorReview') {
       return _imageToolsPanel();
     }
+    if (_component == 'motionLiftReview') return _motionLiftPanel();
     if (_component == 'imageReview') return _imagePanel();
     if (_isReviewControl) return _reviewPanel();
     if (_isInputControl) return _inputPanel();

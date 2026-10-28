@@ -1,3 +1,7 @@
+## 悬停上浮（2026-10-28，未确认）
+
+`HyperMotion.lift` 只处理视觉状态，不接管子控件业务交互或布局。全局配方为 `HyperMotionThemeData.lift`，局部为 `HyperLiftTheme`，实例为 `HyperLiftStyle`；几何默认集中在四端 `HyperSizeScheme.motionLift`，支持 copyWith、插值和值相等。位移与阴影圆角的编辑值按设备保存，缩放、阴影、时长与曲线按亮暗外观保存；通用、悬停/聚焦、按下分别设置和重置，阴影置于设置底部。系统减少动画禁用位移/缩放且取消过渡；子控件字体继续跟随系统 TextScaler。来源与使用方式见 [基础能力](usage/foundation.md#hypermotionlift未确认)。
+
 ## 图片编辑裁剪边界（2026-10-28）
 
 HyperImageEditor 默认开启 constrainCropRect，使手柄停止于真实图像边界，越过视口后保留自动适配，自由裁剪不跨轴改变尺寸。该行为属于裁剪几何，不新增主题尺寸常量；通过主包内部 lib/src/vendor/extended_image 源码补丁在底层 crop_layer 处理，保留原生比例模型与其余交互。上游默认仍为 false，其他库的 hosted extended_image 不受影响。补丁说明与移除条件见 [LEMON_PATCHES](../lib/src/vendor/extended_image/LEMON_PATCHES.md)。

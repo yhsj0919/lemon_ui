@@ -285,3 +285,13 @@ const editorImageTransitionDurationLimit = 2000.0;
 /// below one logical pixel of handle length. Not a component default.
 double editorImageCropStrokeLimit(double handleLength) =>
     handleLength.floorToDouble();
+
+/// Lift editor operation boundary: keep translation within half an interaction
+/// target. This is an exploration limit, not a platform visual specification.
+double editorMotionTranslationLimit(HyperSizeScheme sizes) =>
+    (sizes.minimumInteractiveDimension / 2).floorToDouble();
+
+/// Subtle lift-scale exploration range; pending user review, not default tokens.
+const editorMotionMinimumScale = .9;
+const editorMotionMaximumScale = 1.1;
+const editorMotionDurationLimit = 2000.0;

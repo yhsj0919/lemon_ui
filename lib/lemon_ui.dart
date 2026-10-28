@@ -383,3 +383,8 @@ export 'src/components/image/hyper_image_editor.dart';
 export 'src/components/image/hyper_image_editor_style.dart';
 export 'src/components/image/hyper_image_editor_theme.dart';
 export 'src/theme/size/components/hyper_image_editor_size.dart';
+
+export 'src/motion/hyper_motion.dart';
+export 'src/motion/hyper_lift_style.dart';
+export 'src/motion/hyper_lift_theme.dart';
+export 'src/theme/size/components/hyper_lift_size.dart';

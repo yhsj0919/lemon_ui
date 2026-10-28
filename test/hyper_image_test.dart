@@ -62,6 +62,107 @@ Future<ui.Image> sample(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets(
+    'grid thumbnails fill cells while an unbounded image retains intrinsic size',
+    (tester) async {
+      final provider = _Provider();
+      final image = await sample(tester);
+      Widget photo() => HyperImage(
+        image: provider,
+        style: HyperImageStyle(
+          surfaceStyle: HyperCardStyle(
+            material: const HyperSurfaceMaterial.frostedGlass(),
+          ),
+        ),
+      );
+      await tester.pumpWidget(
+        host(
+          SizedBox(
+            width: 240,
+            height: 180,
+            child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 4 / 3,
+              children: [photo(), photo()],
+            ),
+          ),
+        ),
+      );
+      provider.attempts.single.succeed(image);
+      await tester.pumpAndSettle();
+      for (final element in find.byType(ExtendedRawImage).evaluate()) {
+        expect(
+          tester.getSize(find.byWidget(element.widget)),
+          const Size(120, 90),
+        );
+      }
+      await tester.pumpWidget(
+        host(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(child: photo()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(ExtendedRawImage)), const Size(20, 10));
+      await tester.pumpWidget(const SizedBox());
+      image.dispose();
+      expect(tester.takeException(), isNull);
+    },
+  );
+  for (final config in [
+    (false, false),
+    (false, true),
+    (true, false),
+    (true, true),
+  ]) {
+    final (infinity, material) = config;
+    testWidgets(
+      'tight thumbnail fills every load state; infinity=$infinity material=$material',
+      (tester) async {
+        final provider = _Provider();
+        final image = await sample(tester);
+        await tester.pumpWidget(
+          host(
+            SizedBox(
+              width: 240,
+              height: 180,
+              child: HyperImage(
+                image: provider,
+                width: infinity ? double.infinity : null,
+                height: infinity ? double.infinity : null,
+                style: HyperImageStyle(
+                  surfaceStyle: HyperCardStyle(
+                    material: material
+                        ? const HyperSurfaceMaterial.frostedGlass()
+                        : null,
+                  ),
+                ),
+              ),
+            ),
+            reduced: true,
+          ),
+        );
+        Size current(HyperImageLoadState state) =>
+            tester.getSize(find.byKey(ValueKey(state)));
+        expect(current(HyperImageLoadState.loading), const Size(240, 180));
+        provider.attempts.single.succeed(image);
+        await tester.pumpAndSettle();
+        expect(current(HyperImageLoadState.completed), const Size(240, 180));
+        expect(
+          tester.getSize(find.byType(ExtendedRawImage)),
+          const Size(240, 180),
+        );
+        provider.attempts.single.fail();
+        await tester.pumpAndSettle();
+        expect(current(HyperImageLoadState.failed), const Size(240, 180));
+        await tester.pumpWidget(const SizedBox());
+        image.dispose();
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   test('empty style copies preserve equality and nullable inheritance', () {
     const base = HyperImageStyle();
     expect(base.copyWith(), base);

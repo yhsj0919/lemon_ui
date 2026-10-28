@@ -1,3 +1,5 @@
+import '../../motion/hyper_lift_theme.dart';
+
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -8,6 +10,7 @@ enum HyperMotionSpeed { instant, fast, standard, emphasized }
 @immutable
 final class HyperMotionThemeData {
   const HyperMotionThemeData({
+    this.lift = const HyperLiftThemeData(),
     this.fastDuration = const Duration(milliseconds: 120),
     this.standardDuration = const Duration(milliseconds: 240),
     this.emphasizedDuration = const Duration(milliseconds: 360),
@@ -17,6 +20,7 @@ final class HyperMotionThemeData {
     this.spring = const SpringDescription(mass: 1, stiffness: 420, damping: 34),
   });
 
+  final HyperLiftThemeData lift;
   final Duration fastDuration;
   final Duration standardDuration;
   final Duration emphasizedDuration;
@@ -50,6 +54,7 @@ final class HyperMotionThemeData {
   };
 
   HyperMotionThemeData copyWith({
+    HyperLiftThemeData? lift,
     Duration? fastDuration,
     Duration? standardDuration,
     Duration? emphasizedDuration,
@@ -58,6 +63,7 @@ final class HyperMotionThemeData {
     Curve? emphasizedCurve,
     SpringDescription? spring,
   }) => HyperMotionThemeData(
+    lift: lift ?? this.lift,
     fastDuration: fastDuration ?? this.fastDuration,
     standardDuration: standardDuration ?? this.standardDuration,
     emphasizedDuration: emphasizedDuration ?? this.emphasizedDuration,
@@ -81,6 +87,7 @@ final class HyperMotionThemeData {
     );
     double value(double x, double y) => x + (y - x) * t;
     return HyperMotionThemeData(
+      lift: HyperLiftThemeData.lerp(a.lift, b.lift, t),
       fastDuration: duration(a.fastDuration, b.fastDuration),
       standardDuration: duration(a.standardDuration, b.standardDuration),
       emphasizedDuration: duration(a.emphasizedDuration, b.emphasizedDuration),
@@ -99,6 +106,7 @@ final class HyperMotionThemeData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is HyperMotionThemeData &&
+          other.lift == lift &&
           other.fastDuration == fastDuration &&
           other.standardDuration == standardDuration &&
           other.emphasizedDuration == emphasizedDuration &&
@@ -111,6 +119,7 @@ final class HyperMotionThemeData {
 
   @override
   int get hashCode => Object.hash(
+    lift,
     fastDuration,
     standardDuration,
     emphasizedDuration,

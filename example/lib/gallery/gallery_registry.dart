@@ -1,3 +1,4 @@
+import '../pages/pending/hyper_motion_lift_page.dart';
 import '../pages/content/hyper_image_tools_pages.dart';
 import '../pages/content/hyper_image_page.dart';
 import '../pages/interaction/hyper_popover_page.dart';
@@ -89,7 +90,19 @@ import 'gallery_item.dart';
 ///
 /// 新控件先登记“未确认”，用户明确确认后再移入对应分类，保持 id 稳定。
 final List<GallerySection> gallerySections = [
-  GallerySection(title: '未确认', items: []),
+  GallerySection(
+    title: '未确认',
+    items: [
+      GalleryItem(
+        id: 'hyper-motion-lift',
+        title: '悬停上浮',
+        description: '悬停上浮、微缩放、阴影与按下回压。',
+        icon: Icons.open_in_full,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperMotionLiftPage(),
+      ),
+    ],
+  ),
   GallerySection(
     title: '基础能力',
     items: [

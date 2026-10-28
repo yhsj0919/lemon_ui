@@ -8,6 +8,7 @@ import 'editor_dimension_limits.dart';
 /// Explicit editor overrides shared by feedback and navigation workspaces.
 /// Dimensions are stored per device, visual values per appearance.
 class EditorReviewFields {
+  double? translationX, translationY, scale, pressDuration;
   double? radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft;
   double? dotRadius, dotBorderWidth;
   double? expandIconSize;
@@ -173,6 +174,10 @@ class EditorReviewFields {
   String? textAlign;
   final shadow = EditorComponentShadow();
   Map<String, Object?> toJson() => {
+    if (pressDuration != null) 'pressDuration': pressDuration,
+    if (translationX != null) 'translationX': translationX,
+    if (translationY != null) 'translationY': translationY,
+    if (scale != null) 'scale': scale,
     if (radiusTopLeft != null) 'radiusTopLeft': radiusTopLeft,
     if (radiusTopRight != null) 'radiusTopRight': radiusTopRight,
     if (radiusBottomRight != null) 'radiusBottomRight': radiusBottomRight,
@@ -381,6 +386,10 @@ class EditorReviewFields {
   };
   static EditorReviewFields fromJson(Map<String, dynamic> j) {
     const keys = {
+      'pressDuration',
+      'translationX',
+      'translationY',
+      'scale',
       'radiusTopLeft',
       'radiusTopRight',
       'radiusBottomRight',
@@ -573,6 +582,10 @@ class EditorReviewFields {
     }
     final result = EditorReviewFields()
       ..expandIconSize = number(j['expandIconSize'], min: 0)
+      ..pressDuration = number(j['pressDuration'], min: 0)
+      ..translationX = number(j['translationX'])
+      ..translationY = number(j['translationY'])
+      ..scale = number(j['scale'], min: 0.001)
       ..radiusTopLeft = number(j['radiusTopLeft'], min: 0)
       ..radiusTopRight = number(j['radiusTopRight'], min: 0)
       ..radiusBottomRight = number(j['radiusBottomRight'], min: 0)
@@ -898,6 +911,9 @@ class EditorReviewCollection {
   EditorReviewFields paginationNavigation = EditorReviewFields();
   EditorReviewFields paginationSelected = EditorReviewFields();
   EditorReviewFields paginationDefault = EditorReviewFields();
+  EditorReviewFields motionLift = EditorReviewFields();
+  EditorReviewFields motionLiftHover = EditorReviewFields();
+  EditorReviewFields motionLiftPressed = EditorReviewFields();
   EditorReviewFields imagePreview = EditorReviewFields();
   EditorReviewFields imageEditor = EditorReviewFields();
   EditorReviewFields image = EditorReviewFields();
@@ -1009,6 +1025,9 @@ class EditorReviewCollection {
     'pagination' => pagination,
     'pageIndicator' => pageIndicator,
     'breadcrumb' => breadcrumb,
+    'motionLift' => motionLift,
+    'motionLiftHover' => motionLiftHover,
+    'motionLiftPressed' => motionLiftPressed,
     'imagePreview' => imagePreview,
     'imageEditor' => imageEditor,
     'image' => image,
@@ -1147,6 +1166,12 @@ class EditorReviewCollection {
         pageIndicator = EditorReviewFields();
       case 'breadcrumb':
         breadcrumb = EditorReviewFields();
+      case 'motionLift':
+        motionLift = EditorReviewFields();
+      case 'motionLiftHover':
+        motionLiftHover = EditorReviewFields();
+      case 'motionLiftPressed':
+        motionLiftPressed = EditorReviewFields();
       case 'imagePreview':
         imagePreview = EditorReviewFields();
       case 'imageEditor':
@@ -1312,6 +1337,11 @@ class EditorReviewCollection {
       'paginationSelected': paginationSelected.toJson(),
     if (paginationDefault.toJson().isNotEmpty)
       'paginationDefault': paginationDefault.toJson(),
+    if (motionLift.toJson().isNotEmpty) 'motionLift': motionLift.toJson(),
+    if (motionLiftHover.toJson().isNotEmpty)
+      'motionLiftHover': motionLiftHover.toJson(),
+    if (motionLiftPressed.toJson().isNotEmpty)
+      'motionLiftPressed': motionLiftPressed.toJson(),
     if (imagePreview.toJson().isNotEmpty) 'imagePreview': imagePreview.toJson(),
     if (imageEditor.toJson().isNotEmpty) 'imageEditor': imageEditor.toJson(),
     if (image.toJson().isNotEmpty) 'image': image.toJson(),
@@ -1441,6 +1471,9 @@ class EditorReviewCollection {
       'paginationNavigation',
       'paginationSelected',
       'paginationDefault',
+      'motionLift',
+      'motionLiftHover',
+      'motionLiftPressed',
       'imagePreview',
       'imageEditor',
       'image',
@@ -1585,6 +1618,15 @@ class EditorReviewCollection {
       )
       ..paginationDefault = EditorReviewFields.fromJson(
         (j['paginationDefault'] as Map<String, dynamic>?) ?? {},
+      )
+      ..motionLift = EditorReviewFields.fromJson(
+        (j['motionLift'] as Map<String, dynamic>?) ?? {},
+      )
+      ..motionLiftHover = EditorReviewFields.fromJson(
+        (j['motionLiftHover'] as Map<String, dynamic>?) ?? {},
+      )
+      ..motionLiftPressed = EditorReviewFields.fromJson(
+        (j['motionLiftPressed'] as Map<String, dynamic>?) ?? {},
       )
       ..imagePreview = EditorReviewFields.fromJson(
         (j['imagePreview'] as Map<String, dynamic>?) ?? {},
@@ -1828,6 +1870,17 @@ HyperThemeData applyEditorReviews(
     final s = theme.sizes.resolve(type);
     final d = document.device(type).reviews;
     return s.copyWith(
+      motionLift: s.motionLift.copyWith(
+        hoverOffset: Offset(
+          d.motionLiftHover.translationX ?? s.motionLift.hoverOffset.dx,
+          d.motionLiftHover.translationY ?? s.motionLift.hoverOffset.dy,
+        ),
+        pressedOffset: Offset(
+          d.motionLiftPressed.translationX ?? s.motionLift.pressedOffset.dx,
+          d.motionLiftPressed.translationY ?? s.motionLift.pressedOffset.dy,
+        ),
+        shadowRadius: d.motionLift.surfaceRadius,
+      ),
       imagePreview: s.imagePreview.copyWith(
         iconSize: d.imagePreview.iconSize,
         spacing: d.imagePreview.spacing,
@@ -3009,6 +3062,34 @@ HyperThemeData applyEditorReviews(
   }
 
   return theme.copyWith(
+    motion: theme.motion.copyWith(
+      lift: theme.motion.lift.merge(
+        HyperLiftThemeData(
+          style: HyperLiftStyle(
+            hoverScale: mode.reviews.motionLiftHover.scale,
+            pressedScale: mode.reviews.motionLiftPressed.scale,
+            hoverShadows: mode.reviews.motionLiftHover.shadow.shadows
+                ?.map((shadow) => shadow.resolve(colors))
+                .toList(),
+            pressedShadows: mode.reviews.motionLiftPressed.shadow.shadows
+                ?.map((shadow) => shadow.resolve(colors))
+                .toList(),
+            duration: mode.reviews.motionLift.duration == null
+                ? null
+                : Duration(
+                    milliseconds: mode.reviews.motionLift.duration!.round(),
+                  ),
+            pressDuration: mode.reviews.motionLift.pressDuration == null
+                ? null
+                : Duration(
+                    milliseconds: mode.reviews.motionLift.pressDuration!
+                        .round(),
+                  ),
+            curve: editorControlCurve(mode.reviews.motionLift.curve),
+          ),
+        ),
+      ),
+    ),
     imagePreviewTheme: theme.imagePreviewTheme.merge(
       HyperImagePreviewThemeData(
         style: HyperImagePreviewStyle(

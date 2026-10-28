@@ -21,6 +21,14 @@ import 'hyper_menu_style.dart';
 import 'hyper_menu_theme.dart';
 import 'hyper_menu_layout.dart';
 
+// Match buttons/list tiles: trim external line leading while retaining the
+// themed spacing between lines of wrapped titles and descriptions.
+const _menuTextHeightBehavior = TextHeightBehavior(
+  leadingDistribution: TextLeadingDistribution.even,
+  applyHeightToFirstAscent: false,
+  applyHeightToLastDescent: false,
+);
+
 /// 将菜单键盘导航交给外部编辑器，同时保留编辑器焦点。
 class HyperMenuNavigationController {
   KeyEventResult Function(KeyEvent)? _handle;
@@ -346,7 +354,11 @@ class _HyperMenuState extends State<HyperMenu> {
                     horizontal: style.padding!,
                     vertical: style.groupSpacing! / 2,
                   ),
-                  child: Text(group.title!, style: style.groupTitleStyle),
+                  child: Text(
+                    group.title!,
+                    style: style.groupTitleStyle,
+                    textHeightBehavior: _menuTextHeightBehavior,
+                  ),
                 ),
               for (final (itemIndex, item) in group.items.indexed) ...[
                 if (itemIndex > 0) SizedBox(height: style.itemSpacing!),
@@ -499,6 +511,7 @@ class _HyperMenuState extends State<HyperMenu> {
                     children: [
                       Text(
                         item.label,
+                        textHeightBehavior: _menuTextHeightBehavior,
                         maxLines: item.wrapLabel ? null : 1,
                         overflow: item.wrapLabel ? null : TextOverflow.ellipsis,
                         style: style.itemTextStyle!.copyWith(color: foreground),
@@ -507,6 +520,7 @@ class _HyperMenuState extends State<HyperMenu> {
                         SizedBox(height: style.descriptionGap),
                         Text(
                           item.description!,
+                          textHeightBehavior: _menuTextHeightBehavior,
                           style: style.descriptionStyle!.copyWith(
                             color: item.enabled
                                 ? style.descriptionStyle!.color

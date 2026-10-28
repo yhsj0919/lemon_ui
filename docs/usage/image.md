@@ -117,7 +117,7 @@ Demo 的首次失败由示例专用图片流发出预期状态，点击重试后
 
 `HyperImageEditor.constrainCropRect` 默认 true：裁剪手柄到真实图像边界时停止扩张。视口边缘不作为裁剪边界；放大后持续向外拖动会复用底层自动适配，逐步扩选至全图。自由裁剪的横向移动不改变上下边，纵向移动不改变左右边；固定比例继续采用底层的比例候选矩形，并在首次触及边界处停止。原生自动居中与缩放、图像平移、旋转、撤销重做、PNG 导出保持原职责。显式 false 可恢复底层的越界扩张与适配行为；弹窗 helper 同样支持该参数。
 
-该选项通过项目内 `lemon_extended_image` 依赖的最小补丁实现，基于 extended_image 10.1.0 并保留 MIT 许可。补丁位于真正负责手柄几何的 crop_layer，不在 HyperImageEditor 外面叠加偏移或指针特判。命名隔离避免影响表格等其他库使用的原版 extended_image。维护与移除条件见 `third_party/extended_image/LEMON_PATCHES.md`；发布到 pub.dev 前需处理本地 path 依赖。
+该选项通过主包内部 `lib/src/vendor/extended_image` 源码补丁实现，基于 extended_image 10.1.0 并保留 MIT 许可。补丁位于真正负责手柄几何的 crop_layer，不在 HyperImageEditor 外面叠加偏移或指针特判。内部路径隔离避免影响表格等其他库使用的原版 extended_image，公共入口不导出后端类型。维护与移除条件见 `lib/src/vendor/extended_image/LEMON_PATCHES.md`；源码随主包发布，不再含本地 path 或 Git 依赖。
 
 
 ### Hero 预览

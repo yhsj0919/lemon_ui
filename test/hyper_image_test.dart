@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

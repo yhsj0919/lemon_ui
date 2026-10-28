@@ -397,13 +397,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  lemon_extended_image:
-    dependency: transitive
-    description:
-      path: "../third_party/extended_image"
-      relative: true
-    source: path
-    version: "10.1.0"
   lemon_ui:
     dependency: "direct main"
     description:

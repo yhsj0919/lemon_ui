@@ -1,6 +1,6 @@
-# Lemon UI local patch
+# Lemon UI vendored image backend
 
-Base: extended_image 10.1.0 from the local pub cache, upstream https://github.com/fluttercandies/extended_image. Original MIT license and upstream sources are preserved. The package namespace is lemon_extended_image; self-imports are renamed accordingly so the patched editor does not override unrelated transitive consumers of hosted extended_image (universal_image / table dependencies).
+Base: extended_image 10.1.0 from the local pub cache, upstream https://github.com/fluttercandies/extended_image. Original MIT license and upstream sources are preserved. Sources live inside lemon_ui at lib/src/vendor/extended_image. Self-imports use that internal namespace; no backend declarations are exported from lemon_ui.dart. This leaves unrelated consumers of hosted extended_image (universal_image / table dependencies) unchanged.
 
 ## Bounded crop dragging (2026-10-28)
 
@@ -10,7 +10,9 @@ The optional `EditorConfig.constrainCropRect` defaults to false for upstream com
 
 The patch changes editor_config.dart and crop_layer.dart and adds crop_rect_boundary.dart. Root tests cover real mouse drags, geometry boundaries, fixed ratios and editor export. Keep the opt-in default and tests when updating the base. Remove the local patch when upstream provides equivalent bounded-handle behavior and the regressions pass against it.
 
-The root dependency points to this vendored package so checkouts/builds are reproducible; no Pub cache source is edited. Publishing Lemon UI to pub.dev will require publishing the patched dependency or waiting for its upstream equivalent, because hosted packages cannot contain path dependencies.
+The backend is ordinary library source shipped with lemon_ui; no Git or path dependency is required and no Pub cache source is edited. Its runtime imports, extended_image_library and vector_math, are declared as hosted dependencies in the root pubspec. The original MIT copyright and license are retained in LICENSE. UPSTREAM_README.md and CHANGELOG.md are historical upstream reference, not the public Lemon UI API.
+
+To return to upstream: verify crop-boundary, flip-frame, crop-mask, undo/export, native paging and Hero regressions against an official extended_image release; replace the internal barrel imports in lib/src/components/image with the hosted package, migrate dependency-specific tests, then remove this directory and any root runtime dependencies no longer directly imported. Keep Hyper APIs and their tests stable.
 
 ## Axis-correct flip animation (2026-10-28)
 

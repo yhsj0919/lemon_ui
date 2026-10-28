@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 // These tests target the dependency code that owns crop-handle geometry.
 // ignore: implementation_imports
-import 'package:lemon_extended_image/src/editor/crop_layer.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/crop_layer.dart';
 // ignore: implementation_imports
-import 'package:lemon_extended_image/src/editor/crop_rect_boundary.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/crop_rect_boundary.dart';
 
 import 'hyper_image_tools_test.dart' as support;
 

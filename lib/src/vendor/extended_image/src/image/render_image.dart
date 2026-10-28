@@ -2,9 +2,9 @@ import 'dart:ui' as ui show Image;
 
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
-import 'package:lemon_extended_image/src/editor/edit_action_details.dart';
-import 'package:lemon_extended_image/src/gesture/utils.dart';
-import 'package:lemon_extended_image/src/typedef.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/edit_action_details.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/gesture/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/typedef.dart';
 
 import 'painting.dart';
 

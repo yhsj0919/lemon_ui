@@ -1,8 +1,8 @@
 // The regression targets the backend crop layer that owns drag geometry.
 // ignore: implementation_imports
-import 'package:lemon_extended_image/src/editor/crop_layer.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/crop_layer.dart';
 import 'package:flutter/gestures.dart' show PointerScrollEvent;
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 
 import 'dart:ui' as ui;

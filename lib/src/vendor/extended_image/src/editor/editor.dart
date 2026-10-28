@@ -7,8 +7,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lemon_extended_image/src/image/raw_image.dart';
-import 'package:lemon_extended_image/src/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/image/raw_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/utils.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import '../extended_image.dart';

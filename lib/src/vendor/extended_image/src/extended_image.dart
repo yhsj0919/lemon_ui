@@ -6,11 +6,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
-import 'package:lemon_extended_image/src/border_painter.dart';
-import 'package:lemon_extended_image/src/gesture/gesture.dart';
-import 'package:lemon_extended_image/src/image/raw_image.dart';
-import 'package:lemon_extended_image/src/typedef.dart';
-import 'package:lemon_extended_image/src/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/border_painter.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/gesture/gesture.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/image/raw_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/typedef.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/utils.dart';
 
 import 'editor/editor.dart';
 import 'gesture/slide_page.dart';

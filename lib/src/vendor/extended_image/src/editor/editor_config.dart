@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/src/editor/editor.dart';
-import 'package:lemon_extended_image/src/typedef.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/editor.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/typedef.dart';
 
 import 'editor_crop_layer_painter.dart';
 import 'editor_utils.dart';

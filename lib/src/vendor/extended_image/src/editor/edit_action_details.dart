@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class EditActionDetails {

@@ -1,6 +1,6 @@
 import 'hyper_image_preview_gesture.dart';
 
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 
 import '../icon_button/hyper_icon_button_style.dart';
 import 'hyper_image_workspace_layout.dart';

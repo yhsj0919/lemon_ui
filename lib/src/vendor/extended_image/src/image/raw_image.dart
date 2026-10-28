@@ -2,10 +2,10 @@ import 'dart:ui' as ui show Image;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/src/editor/edit_action_details.dart';
-import 'package:lemon_extended_image/src/gesture/utils.dart';
-import 'package:lemon_extended_image/src/image/render_image.dart';
-import 'package:lemon_extended_image/src/typedef.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/edit_action_details.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/gesture/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/image/render_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/typedef.dart';
 
 /// A widget that displays a [dart:ui.Image] directly.
 ///

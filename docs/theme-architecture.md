@@ -1,6 +1,6 @@
 ## 图片编辑裁剪边界（2026-10-28）
 
-HyperImageEditor 默认开启 constrainCropRect，使手柄停止于可见图像和编辑区边界，自由裁剪不跨轴改变尺寸。该行为属于裁剪几何，不新增主题尺寸常量；通过本地隔离命名的 lemon_extended_image 补丁在底层 crop_layer 处理，保留原生比例模型与其余交互。上游默认仍为 false，其他库的 hosted extended_image 不受影响。补丁说明与移除条件见 [LEMON_PATCHES](../third_party/extended_image/LEMON_PATCHES.md)。
+HyperImageEditor 默认开启 constrainCropRect，使手柄停止于真实图像边界，越过视口后保留自动适配，自由裁剪不跨轴改变尺寸。该行为属于裁剪几何，不新增主题尺寸常量；通过主包内部 lib/src/vendor/extended_image 源码补丁在底层 crop_layer 处理，保留原生比例模型与其余交互。上游默认仍为 false，其他库的 hosted extended_image 不受影响。补丁说明与移除条件见 [LEMON_PATCHES](../lib/src/vendor/extended_image/LEMON_PATCHES.md)。
 
 ## 图片预览与编辑（2026-10-28，用户已确认）
 

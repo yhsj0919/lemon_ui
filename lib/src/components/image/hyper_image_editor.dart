@@ -9,7 +9,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../foundation/hyper_icons.dart';

@@ -5,7 +5,7 @@ import 'dart:ui' as ui show FlutterView, Image;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 
 /// Used by [paintExtendedImage] to report image sizes drawn at the end of the frame.
 Map<String, ImageSizeInfo> _pendingImageSizeInfo = <String, ImageSizeInfo>{};

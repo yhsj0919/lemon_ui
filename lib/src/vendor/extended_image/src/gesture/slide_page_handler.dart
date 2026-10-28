@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/src/typedef.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/typedef.dart';
 
 import '../utils.dart';
 import 'slide_page.dart';

@@ -1,4 +1,4 @@
-import 'package:lemon_extended_image/extended_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/extended_image.dart';
 import 'package:flutter/widgets.dart';
 
 // Integration adapter only: image transforms, bounds, inertia and page physics

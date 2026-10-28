@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:lemon_extended_image/src/editor/editor_utils.dart';
-import 'package:lemon_extended_image/src/gesture/utils.dart';
-import 'package:lemon_extended_image/src/image/raw_image.dart';
-import 'package:lemon_extended_image/src/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/editor/editor_utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/gesture/utils.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/image/raw_image.dart';
+import 'package:lemon_ui/src/vendor/extended_image/src/utils.dart';
 
 import '../typedef.dart';
 import 'page_view/gesture_page_view.dart';

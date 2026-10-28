@@ -23,9 +23,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-# Match the root override until trina_grid permits Lucide 4.x.
-dependency_overrides:
-  lucide_icons_flutter: ^4.0.1
-
 flutter:
   uses-material-design: true

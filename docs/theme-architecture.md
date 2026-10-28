@@ -1,3 +1,15 @@
+## 图片编辑裁剪边界（2026-10-28）
+
+HyperImageEditor 默认开启 constrainCropRect，使手柄停止于可见图像和编辑区边界，自由裁剪不跨轴改变尺寸。该行为属于裁剪几何，不新增主题尺寸常量；通过本地隔离命名的 lemon_extended_image 补丁在底层 crop_layer 处理，保留原生比例模型与其余交互。上游默认仍为 false，其他库的 hosted extended_image 不受影响。补丁说明与移除条件见 [LEMON_PATCHES](../third_party/extended_image/LEMON_PATCHES.md)。
+
+## 图片预览与编辑（2026-10-28，用户已确认）
+
+新增 `HyperImagePreview`、`HyperImageEditor` 及各自独立的强类型 ThemeData、局部 Theme 和 Style；`sizes.imagePreview` / `sizes.imageEditor` 从同端 image 与命中区域语义推导默认规格。嵌入控件要求有限高度，弹窗入口复用 HyperDialog。预览通过 HyperImage 复用加载、失败与重试；编辑器通过相同状态绘制路径保留 extended_image 的裁剪子树。PNG 导出使用解码快照并按变换后的裁剪坐标绘制，不依赖原生编辑插件；保存与上传由调用方负责。Demo 归“文字与内容”，主题编辑器归“内容”，页面 id 分别为 `hyper-image-preview` 和 `hyper-image-editor`。默认来源与平台边界见 [图片](usage/image.md)。
+
+## 图片（2026-10-28，用户已确认）
+
+新增 `HyperImage`，基于 extended_image 封装三种外观与加载、成功、失败重试。四端内部尺寸由 `sizes.image` 管理，旧尺寸构造未指定 image 时从同端图标、进度和卡片语义推导；图像宽高由父布局和实例负责。全局 `imageTheme`、局部 `HyperImageTheme` 和实例 `HyperImageStyle` 提供强类型覆盖。材质复用公共表面和全局质量策略，内容淡入不包裹背景滤镜。Demo 归“文字与内容”，编辑器归“内容”，页面 id `hyper-image`。来源、平台边界与接口见 [图片](usage/image.md)。
+
 ## 文件选择的默认平台能力（2026-10-27）
 
 用户明确要求文件选择能力直接集成主包。`HyperFilePicker` 与 `HyperFileFormField`

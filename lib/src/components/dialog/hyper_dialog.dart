@@ -189,6 +189,9 @@ class HyperDialog extends StatelessWidget {
 }
 
 /// 捕获调用处的全局及局部主题，使用 Flutter 原生模态路由与焦点循环。
+///
+/// [heroAnimation] opts into a non-opaque page route for native Hero flights,
+/// retaining the shared dialog surface, barrier and material-safe transition.
 Future<T?> showHyperDialog<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -200,6 +203,7 @@ Future<T?> showHyperDialog<T>({
   bool? requestFocus,
   RouteSettings? routeSettings,
   Offset? anchorPoint,
+  bool heroAnimation = false,
 }) {
   final navigator = Navigator.of(
     context,
@@ -212,6 +216,82 @@ Future<T?> showHyperDialog<T>({
   final motion = HyperTheme.of(context).motion;
   final reduced = MediaQuery.of(context).disableAnimations;
   final textDirection = Directionality.of(context);
+  Widget pageBuilder(
+    BuildContext routeContext,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    Widget page = HyperLiveRouteThemes(
+      source: context,
+      destination: navigator.context,
+      child: HyperDialogTheme(
+        data: HyperDialogThemeData(style: style ?? const HyperDialogStyle()),
+        child: HyperOverlayScope.route<T>(
+          context: routeContext,
+          child: Builder(builder: builder),
+        ),
+      ),
+    );
+    if (useSafeArea) page = SafeArea(child: page);
+    // Navigator 之外的局部设置不会被 InheritedTheme.capture 捕获。
+    page = Directionality(textDirection: textDirection, child: page);
+    if (reduced) {
+      page = MediaQuery(
+        data: MediaQuery.of(routeContext).copyWith(disableAnimations: true),
+        child: page,
+      );
+    }
+    return page;
+  }
+
+  Widget transitionsBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (reduced) return child;
+    if (resolved.transitionBuilder case final custom?) {
+      return custom(context, animation, secondaryAnimation, child);
+    }
+    final eased = animation.drive(
+      CurveTween(curve: resolved.curve ?? motion.fastCurve),
+    );
+    return HyperBackdropSafeFade(
+      opacity: eased,
+      child: ScaleTransition(
+        scale: Tween<double>(begin: .96, end: 1).animate(eased),
+        alignment: (resolved.alignment ?? Alignment.center).resolve(
+          textDirection,
+        ),
+        child: child,
+      ),
+    );
+  }
+
+  if (heroAnimation && !reduced) {
+    return navigator.push<T>(
+      _HyperHeroDialogRoute<T>(
+        opaque: false,
+        barrierDismissible: barrierDismissible,
+        barrierLabel:
+            barrierLabel ??
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        barrierColor:
+            resolved.barrierColor ?? HyperTheme.of(context).colors.scrim,
+        transitionDuration: resolved.duration ?? motion.standardDuration,
+        reverseTransitionDuration: resolved.duration ?? motion.standardDuration,
+        settings: routeSettings,
+        requestFocus: requestFocus,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            DisplayFeatureSubScreen(
+              anchorPoint: anchorPoint,
+              child: pageBuilder(context, animation, secondaryAnimation),
+            ),
+        transitionsBuilder: transitionsBuilder,
+      ),
+    );
+  }
   return navigator.push<T>(
     RawDialogRoute<T>(
       barrierDismissible: barrierDismissible,
@@ -227,50 +307,27 @@ Future<T?> showHyperDialog<T>({
       anchorPoint: anchorPoint,
       requestFocus: requestFocus,
       traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
-      pageBuilder: (routeContext, animation, secondaryAnimation) {
-        Widget page = HyperLiveRouteThemes(
-          source: context,
-          destination: navigator.context,
-          child: HyperDialogTheme(
-            data: HyperDialogThemeData(
-              style: style ?? const HyperDialogStyle(),
-            ),
-            child: HyperOverlayScope.route<T>(
-              context: routeContext,
-              child: Builder(builder: builder),
-            ),
-          ),
-        );
-        if (useSafeArea) page = SafeArea(child: page);
-        // Navigator 之外的局部设置不会被 InheritedTheme.capture 捕获。
-        page = Directionality(textDirection: textDirection, child: page);
-        if (reduced) {
-          page = MediaQuery(
-            data: MediaQuery.of(routeContext).copyWith(disableAnimations: true),
-            child: page,
-          );
-        }
-        return page;
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        if (reduced) return child;
-        if (resolved.transitionBuilder case final custom?) {
-          return custom(context, animation, secondaryAnimation, child);
-        }
-        final eased = animation.drive(
-          CurveTween(curve: resolved.curve ?? motion.fastCurve),
-        );
-        return HyperBackdropSafeFade(
-          opacity: eased,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: .96, end: 1).animate(eased),
-            alignment: (resolved.alignment ?? Alignment.center).resolve(
-              textDirection,
-            ),
-            child: child,
-          ),
-        );
-      },
+      pageBuilder: pageBuilder,
+      transitionBuilder: transitionsBuilder,
     ),
   );
+}
+
+class _HyperHeroDialogRoute<T> extends PageRouteBuilder<T> {
+  _HyperHeroDialogRoute({
+    required super.pageBuilder,
+    required super.transitionsBuilder,
+    required super.opaque,
+    required super.barrierDismissible,
+    required super.barrierLabel,
+    required super.barrierColor,
+    required super.transitionDuration,
+    required super.reverseTransitionDuration,
+    super.settings,
+    super.requestFocus,
+  });
+
+  @override
+  TraversalEdgeBehavior get traversalEdgeBehavior =>
+      TraversalEdgeBehavior.closedLoop;
 }

@@ -1,3 +1,5 @@
+import '../pages/content/hyper_image_tools_pages.dart';
+import '../pages/content/hyper_image_page.dart';
 import '../pages/interaction/hyper_popover_page.dart';
 import '../pages/pending/hyper_list_group_page.dart';
 import '../pages/pending/hyper_pending_controls_pages.dart';
@@ -271,6 +273,30 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '文字与内容',
     items: [
+      GalleryItem(
+        id: 'hyper-image-preview',
+        title: '图片预览',
+        description: '缩放、拖动、多图切换与弹窗预览。',
+        icon: Icons.photo_library_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperImagePreviewPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-image-editor',
+        title: '图片编辑',
+        description: '裁剪、旋转、翻转与 PNG 导出。',
+        icon: Icons.crop,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperImageEditorPage(),
+      ),
+      GalleryItem(
+        id: 'hyper-image',
+        title: '图片',
+        description: '图片变体、默认加载状态与失败重试。',
+        icon: Icons.image_outlined,
+        hasStyleOverrides: true,
+        builder: (_) => const HyperImagePage(),
+      ),
       GalleryItem(
         id: 'hyper-charts',
         title: '图表',

@@ -18,15 +18,7 @@
 `HyperIcons`，例如 `const Icon(HyperIcons.search)`。图标名称沿用 Lucide 的
 camelCase 命名；组件主题和实例仍可传入其他 `IconData`。
 
-当前使用 Lucide 4.x。由于 `trina_grid 2.3.0` 的间接依赖仍限制 Lucide 3.x，
-使用本包的应用暂需在自己的 pubspec.yaml 中添加以下覆盖（依赖包的覆盖不会传递）：
-
-```yaml
-dependency_overrides:
-  lucide_icons_flutter: ^4.0.1
-```
-
-上游允许 Lucide 4.x 后可移除此覆盖。
+当前使用 `lucide_icons_flutter: ^3.1.25`，与 `trina_grid 2.3.0` 的间接依赖约束一致，应用无需添加 Lucide 的 `dependency_overrides`。2026-10-28 为避免维护表格源码副本，暂从 4.x 回退至 3.x；待上游允许 4.x 后再统一升级。
 
 ## 2. 建立主题和设备作用域
 

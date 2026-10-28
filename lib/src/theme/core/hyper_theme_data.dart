@@ -1,3 +1,6 @@
+import '../../components/image/hyper_image_editor_theme.dart';
+import '../../components/image/hyper_image_preview_theme.dart';
+import '../../components/image/hyper_image_theme.dart';
 import '../../components/number_input/hyper_number_input_theme.dart';
 import '../../components/popover/hyper_popover_theme.dart';
 import '../../components/rating/hyper_rating_theme.dart';
@@ -198,6 +201,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     this.widgetGroupTheme = const HyperWidgetGroupThemeData(),
     this.iconButtonTheme = const HyperIconButtonThemeData(),
     this.numberInputTheme = const HyperNumberInputThemeData(),
+    this.imagePreviewTheme = const HyperImagePreviewThemeData(),
+    this.imageEditorTheme = const HyperImageEditorThemeData(),
+    this.imageTheme = const HyperImageThemeData(),
     this.popoverTheme = const HyperPopoverThemeData(),
     this.tooltipTheme = const HyperTooltipThemeData(),
     this.iconTheme = const HyperIconThemeData(),
@@ -503,6 +509,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
   final HyperNumberInputThemeData numberInputTheme;
 
   /// 全局锚定面板主题。
+  final HyperImagePreviewThemeData imagePreviewTheme;
+  final HyperImageEditorThemeData imageEditorTheme;
+  final HyperImageThemeData imageTheme;
   final HyperPopoverThemeData popoverTheme;
   final HyperTooltipThemeData tooltipTheme;
 
@@ -655,6 +664,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     HyperWidgetGroupThemeData? widgetGroupTheme,
     HyperIconButtonThemeData? iconButtonTheme,
     HyperNumberInputThemeData? numberInputTheme,
+    HyperImagePreviewThemeData? imagePreviewTheme,
+    HyperImageEditorThemeData? imageEditorTheme,
+    HyperImageThemeData? imageTheme,
     HyperPopoverThemeData? popoverTheme,
     HyperTooltipThemeData? tooltipTheme,
     HyperIconThemeData? iconTheme,
@@ -747,6 +759,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
       widgetGroupTheme: widgetGroupTheme ?? this.widgetGroupTheme,
       iconButtonTheme: iconButtonTheme ?? this.iconButtonTheme,
       numberInputTheme: numberInputTheme ?? this.numberInputTheme,
+      imagePreviewTheme: imagePreviewTheme ?? this.imagePreviewTheme,
+      imageEditorTheme: imageEditorTheme ?? this.imageEditorTheme,
+      imageTheme: imageTheme ?? this.imageTheme,
       popoverTheme: popoverTheme ?? this.popoverTheme,
       tooltipTheme: tooltipTheme ?? this.tooltipTheme,
       iconTheme: iconTheme ?? this.iconTheme,
@@ -979,6 +994,17 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
         other.numberInputTheme,
         t,
       ),
+      imagePreviewTheme: HyperImagePreviewThemeData.lerp(
+        imagePreviewTheme,
+        other.imagePreviewTheme,
+        t,
+      ),
+      imageEditorTheme: HyperImageEditorThemeData.lerp(
+        imageEditorTheme,
+        other.imageEditorTheme,
+        t,
+      ),
+      imageTheme: HyperImageThemeData.lerp(imageTheme, other.imageTheme, t),
       popoverTheme: HyperPopoverThemeData.lerp(
         popoverTheme,
         other.popoverTheme,
@@ -1097,6 +1123,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
           other.widgetGroupTheme == widgetGroupTheme &&
           other.iconButtonTheme == iconButtonTheme &&
           other.numberInputTheme == numberInputTheme &&
+          other.imagePreviewTheme == imagePreviewTheme &&
+          other.imageEditorTheme == imageEditorTheme &&
+          other.imageTheme == imageTheme &&
           other.popoverTheme == popoverTheme &&
           other.tooltipTheme == tooltipTheme &&
           other.iconTheme == iconTheme &&
@@ -1174,6 +1203,9 @@ final class HyperThemeData extends ThemeExtension<HyperThemeData> {
     widgetGroupTheme,
     iconButtonTheme,
     numberInputTheme,
+    imagePreviewTheme,
+    imageEditorTheme,
+    imageTheme,
     popoverTheme,
     tooltipTheme,
     iconTheme,

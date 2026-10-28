@@ -276,3 +276,12 @@ double editorExtendedHandleLimit(Size viewport) =>
 /// Transfer panel corner editor: at most half the configured shorter side.
 double editorTransferRadiusLimit(double width, double height) =>
     editorRadiusLimit(width < height ? width : height);
+
+/// Image status transition exploration boundary (milliseconds), pending review.
+/// Independent of Motion defaults; allows disabling or slowing transitions.
+const editorImageTransitionDurationLimit = 2000.0;
+
+/// Crop handle thickness fits inside its length; no integer thickness exists
+/// below one logical pixel of handle length. Not a component default.
+double editorImageCropStrokeLimit(double handleLength) =>
+    handleLength.floorToDouble();

@@ -35,6 +35,73 @@ List<HyperTableColumn<String>> _columns() => [
 ];
 
 void main() {
+  for (final count in [1, 60]) {
+    testWidgets(
+      'flex columns fill the body without a scrollbar gutter: $count rows',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            HyperTable<String>(
+              columns: [
+                HyperTableColumn(
+                  id: 'name',
+                  title: '名称',
+                  value: (row) => row,
+                  widthMode: HyperTableColumnWidthMode.flex,
+                ),
+                HyperTableColumn(
+                  id: 'date',
+                  title: '清除日期',
+                  value: (row) => '-',
+                  widthMode: HyperTableColumnWidthMode.flex,
+                ),
+              ],
+              rows: List.generate(count, (index) => 'row-$index'),
+              rowKey: (row) => row,
+              style: const HyperTableStyle(
+                borderWidth: 0,
+                scrollbarTheme: ScrollbarThemeData(
+                  thumbVisibility: WidgetStatePropertyAll(true),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final grid = tester.widget<trina.TrinaGrid>(
+          find.byType(trina.TrinaGrid),
+        );
+        final gridRect = tester.getRect(find.byType(trina.TrinaGrid));
+        expect(grid.configuration.scrollbar.showVertical, isFalse);
+        expect(grid.configuration.scrollbar.showHorizontal, isFalse);
+        expect(
+          grid.columns.fold<double>(0, (width, column) => width + column.width),
+          closeTo(gridRect.width, .01),
+        );
+        final scrollbar = tester.widget<RawScrollbar>(
+          find.byType(RawScrollbar),
+        );
+        final scroll = scrollbar.controller!;
+        if (count == 1) {
+          expect(scroll.position.maxScrollExtent, 0);
+        } else {
+          expect(scroll.position.maxScrollExtent, greaterThan(0));
+          await tester.dragFrom(
+            Offset(gridRect.right - 3, gridRect.top + 75),
+            const Offset(0, 80),
+          );
+          await tester.pumpAndSettle();
+          expect(
+            scroll.offset,
+            greaterThan(0),
+            reason: 'The overlaid native thumb must remain draggable.',
+          );
+        }
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
   test('table themes and four-device dimensions support copy, merge and interpolation', () {
     final base = HyperThemeData.light();
     const style = HyperTableStyle(

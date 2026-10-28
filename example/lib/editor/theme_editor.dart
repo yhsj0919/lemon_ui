@@ -47,6 +47,7 @@ part 'editor_table_workspace.dart';
 part 'editor_chart_workspace.dart';
 part 'editor_input_workspace.dart';
 part 'editor_review_workspace.dart';
+part 'editor_image_workspace.dart';
 part 'editor_extended_workspace.dart';
 
 /// 编辑器外壳使用启动主题，草稿只进入独立预览 Navigator。
@@ -175,6 +176,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
   static const _components = {
     'appBarReview': '应用顶栏',
     'drawerReview': '抽屉',
+    'imagePreviewReview': '图片预览',
+    'imageEditorReview': '图片编辑',
+    'imageReview': '图片',
     'popoverReview': '锚定面板',
     'tooltipReview': '文字提示',
     'notificationReview': '通知卡片',
@@ -226,6 +230,9 @@ class _ThemeEditorState extends State<ThemeEditor> {
   static const _pages = {
     'appBarReview': 'hyper-app-bar',
     'drawerReview': 'hyper-drawer',
+    'imagePreviewReview': 'hyper-image-preview',
+    'imageEditorReview': 'hyper-image-editor',
+    'imageReview': 'hyper-image',
     'popoverReview': 'hyper-popover',
     'tooltipReview': 'hyper-tooltip',
     'notificationReview': 'hyper-notification',
@@ -2727,6 +2734,11 @@ class _ThemeEditorState extends State<ThemeEditor> {
     if (_page == 'hyper-color-picker') {
       return _panel('颜色选择器', [const HyperText('本页仅提供 Demo 预览，外观跟随主题。')]);
     }
+    if (_component == 'imagePreviewReview' ||
+        _component == 'imageEditorReview') {
+      return _imageToolsPanel();
+    }
+    if (_component == 'imageReview') return _imagePanel();
     if (_isReviewControl) return _reviewPanel();
     if (_isInputControl) return _inputPanel();
     if (_page == 'hyper-charts') return _chartPanel();

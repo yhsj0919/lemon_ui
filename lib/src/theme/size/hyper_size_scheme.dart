@@ -1,3 +1,6 @@
+import 'components/hyper_image_editor_size.dart';
+import 'components/hyper_image_preview_size.dart';
+import 'components/hyper_image_size.dart';
 import 'components/hyper_navigation_bar_size.dart';
 import 'components/hyper_transfer_size.dart';
 import 'components/hyper_rating_size.dart';
@@ -83,6 +86,9 @@ final class HyperSizeScheme {
   static const double radius4xl = 48;
 
   const HyperSizeScheme({
+    HyperImagePreviewSize? imagePreview,
+    HyperImageEditorSize? imageEditor,
+    HyperImageSize? image,
     this.navigationItemSpacing = spaceXs,
     required this.deviceType,
     required this.controlHeightXs,
@@ -156,7 +162,13 @@ final class HyperSizeScheme {
     this.rating = const HyperRatingSize(),
     this.transfer = const HyperTransferSize(),
     required this.progress,
-  });
+    // Preserve the public named parameter while deriving legacy defaults lazily.
+    // ignore: prefer_initializing_formals
+  }) : _imagePreview = imagePreview,
+       // ignore: prefer_initializing_formals
+       _imageEditor = imageEditor,
+       // ignore: prefer_initializing_formals
+       _image = image;
 
   /// 手机尺寸方案。
   const HyperSizeScheme.phone()
@@ -1965,6 +1977,39 @@ final class HyperSizeScheme {
   final HyperButtonSize button;
   final HyperBadgeSize badge;
   final HyperTagSize tag;
+  final HyperImagePreviewSize? _imagePreview;
+  HyperImagePreviewSize get imagePreview =>
+      _imagePreview ??
+      HyperImagePreviewSize(
+        spacing: image.spacing,
+        padding: image.padding,
+        iconSize: image.iconSize,
+      );
+  final HyperImageEditorSize? _imageEditor;
+  HyperImageEditorSize get imageEditor =>
+      _imageEditor ??
+      HyperImageEditorSize(
+        spacing: image.spacing,
+        padding: image.padding,
+        iconSize: image.iconSize,
+        handleLength: image.iconSize,
+        handleThickness: image.progressThickness,
+        lineWidth: 1,
+        handleHitSize: minimumInteractiveDimension,
+      );
+  final HyperImageSize? _image;
+
+  /// D-level derivation from the same device's icon, progress and card metrics.
+  HyperImageSize get image =>
+      _image ??
+      HyperImageSize(
+        iconSize: iconSize,
+        progressSize: progress.circularSize,
+        progressThickness: progress.circularThickness,
+        spacing: spaceSm,
+        padding: card.padding.resolve(TextDirection.ltr).left,
+        radius: card.radius,
+      );
   final HyperAvatarSize avatar;
   final HyperSkeletonSize skeleton;
   final HyperPageIndicatorSize pageIndicator;
@@ -2040,6 +2085,9 @@ final class HyperSizeScheme {
     HyperButtonSize? button,
     HyperBadgeSize? badge,
     HyperTagSize? tag,
+    HyperImagePreviewSize? imagePreview,
+    HyperImageEditorSize? imageEditor,
+    HyperImageSize? image,
     HyperAvatarSize? avatar,
     HyperSkeletonSize? skeleton,
     HyperPageIndicatorSize? pageIndicator,
@@ -2116,6 +2164,9 @@ final class HyperSizeScheme {
     button: button ?? this.button,
     badge: badge ?? this.badge,
     tag: tag ?? this.tag,
+    imagePreview: imagePreview ?? _imagePreview,
+    imageEditor: imageEditor ?? _imageEditor,
+    image: image ?? _image,
     avatar: avatar ?? this.avatar,
     skeleton: skeleton ?? this.skeleton,
     pageIndicator: pageIndicator ?? this.pageIndicator,
@@ -2253,6 +2304,13 @@ final class HyperSizeScheme {
       button: HyperButtonSize.lerp(a.button, b.button, t),
       badge: HyperBadgeSize.lerp(a.badge, b.badge, t),
       tag: HyperTagSize.lerp(a.tag, b.tag, t),
+      imagePreview: HyperImagePreviewSize.lerp(
+        a.imagePreview,
+        b.imagePreview,
+        t,
+      ),
+      imageEditor: HyperImageEditorSize.lerp(a.imageEditor, b.imageEditor, t),
+      image: HyperImageSize.lerp(a.image, b.image, t),
       avatar: HyperAvatarSize.lerp(a.avatar, b.avatar, t),
       skeleton: HyperSkeletonSize.lerp(a.skeleton, b.skeleton, t),
       pageIndicator: HyperPageIndicatorSize.lerp(
@@ -2328,6 +2386,9 @@ final class HyperSizeScheme {
           other.button == button &&
           other.badge == badge &&
           other.tag == tag &&
+          other.imagePreview == imagePreview &&
+          other.imageEditor == imageEditor &&
+          other.image == image &&
           other.avatar == avatar &&
           other.skeleton == skeleton &&
           other.pageIndicator == pageIndicator &&
@@ -2404,6 +2465,9 @@ final class HyperSizeScheme {
     button,
     badge,
     tag,
+    imagePreview,
+    imageEditor,
+    image,
     avatar,
     skeleton,
     pageIndicator,

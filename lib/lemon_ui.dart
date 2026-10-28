@@ -364,3 +364,22 @@ export 'src/components/number_input/hyper_number_input_theme.dart';
 export 'src/foundation/hyper_icons.dart';
 export 'src/components/overlay/hyper_overlay.dart';
 export 'src/components/form/hyper_validators.dart';
+
+export 'src/components/image/hyper_image.dart'
+    show
+        HyperImage,
+        HyperImageLoadingBuilder,
+        HyperImageErrorBuilder,
+        resolveHyperImageStyle;
+export 'src/components/image/hyper_image_style.dart';
+export 'src/components/image/hyper_image_theme.dart';
+export 'src/theme/size/components/hyper_image_size.dart';
+
+export 'src/components/image/hyper_image_preview.dart';
+export 'src/components/image/hyper_image_preview_style.dart';
+export 'src/components/image/hyper_image_preview_theme.dart';
+export 'src/theme/size/components/hyper_image_preview_size.dart';
+export 'src/components/image/hyper_image_editor.dart';
+export 'src/components/image/hyper_image_editor_style.dart';
+export 'src/components/image/hyper_image_editor_theme.dart';
+export 'src/theme/size/components/hyper_image_editor_size.dart';

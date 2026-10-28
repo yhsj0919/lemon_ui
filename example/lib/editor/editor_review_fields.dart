@@ -898,6 +898,24 @@ class EditorReviewCollection {
   EditorReviewFields paginationNavigation = EditorReviewFields();
   EditorReviewFields paginationSelected = EditorReviewFields();
   EditorReviewFields paginationDefault = EditorReviewFields();
+  EditorReviewFields imagePreview = EditorReviewFields();
+  EditorReviewFields imageEditor = EditorReviewFields();
+  EditorReviewFields image = EditorReviewFields();
+  EditorReviewFields imageLoading = EditorReviewFields();
+  EditorReviewFields imageCompleted = EditorReviewFields();
+  EditorReviewFields imageFailed = EditorReviewFields();
+  EditorReviewFields imagePlain = EditorReviewFields();
+  EditorReviewFields imagePlainLoading = EditorReviewFields();
+  EditorReviewFields imagePlainCompleted = EditorReviewFields();
+  EditorReviewFields imagePlainFailed = EditorReviewFields();
+  EditorReviewFields imageOutlined = EditorReviewFields();
+  EditorReviewFields imageOutlinedLoading = EditorReviewFields();
+  EditorReviewFields imageOutlinedCompleted = EditorReviewFields();
+  EditorReviewFields imageOutlinedFailed = EditorReviewFields();
+  EditorReviewFields imageElevated = EditorReviewFields();
+  EditorReviewFields imageElevatedLoading = EditorReviewFields();
+  EditorReviewFields imageElevatedCompleted = EditorReviewFields();
+  EditorReviewFields imageElevatedFailed = EditorReviewFields();
   EditorReviewFields popover = EditorReviewFields();
   EditorReviewFields tooltip = EditorReviewFields();
   EditorReviewFields appBar = EditorReviewFields();
@@ -991,6 +1009,24 @@ class EditorReviewCollection {
     'pagination' => pagination,
     'pageIndicator' => pageIndicator,
     'breadcrumb' => breadcrumb,
+    'imagePreview' => imagePreview,
+    'imageEditor' => imageEditor,
+    'image' => image,
+    'imageLoading' => imageLoading,
+    'imageCompleted' => imageCompleted,
+    'imageFailed' => imageFailed,
+    'imagePlain' => imagePlain,
+    'imagePlainLoading' => imagePlainLoading,
+    'imagePlainCompleted' => imagePlainCompleted,
+    'imagePlainFailed' => imagePlainFailed,
+    'imageOutlined' => imageOutlined,
+    'imageOutlinedLoading' => imageOutlinedLoading,
+    'imageOutlinedCompleted' => imageOutlinedCompleted,
+    'imageOutlinedFailed' => imageOutlinedFailed,
+    'imageElevated' => imageElevated,
+    'imageElevatedLoading' => imageElevatedLoading,
+    'imageElevatedCompleted' => imageElevatedCompleted,
+    'imageElevatedFailed' => imageElevatedFailed,
     'popover' => popover,
     'tooltip' => tooltip,
     'paginationDefault' => paginationDefault,
@@ -1111,6 +1147,42 @@ class EditorReviewCollection {
         pageIndicator = EditorReviewFields();
       case 'breadcrumb':
         breadcrumb = EditorReviewFields();
+      case 'imagePreview':
+        imagePreview = EditorReviewFields();
+      case 'imageEditor':
+        imageEditor = EditorReviewFields();
+      case 'image':
+        image = EditorReviewFields();
+      case 'imageLoading':
+        imageLoading = EditorReviewFields();
+      case 'imageCompleted':
+        imageCompleted = EditorReviewFields();
+      case 'imageFailed':
+        imageFailed = EditorReviewFields();
+      case 'imagePlain':
+        imagePlain = EditorReviewFields();
+      case 'imagePlainLoading':
+        imagePlainLoading = EditorReviewFields();
+      case 'imagePlainCompleted':
+        imagePlainCompleted = EditorReviewFields();
+      case 'imagePlainFailed':
+        imagePlainFailed = EditorReviewFields();
+      case 'imageOutlined':
+        imageOutlined = EditorReviewFields();
+      case 'imageOutlinedLoading':
+        imageOutlinedLoading = EditorReviewFields();
+      case 'imageOutlinedCompleted':
+        imageOutlinedCompleted = EditorReviewFields();
+      case 'imageOutlinedFailed':
+        imageOutlinedFailed = EditorReviewFields();
+      case 'imageElevated':
+        imageElevated = EditorReviewFields();
+      case 'imageElevatedLoading':
+        imageElevatedLoading = EditorReviewFields();
+      case 'imageElevatedCompleted':
+        imageElevatedCompleted = EditorReviewFields();
+      case 'imageElevatedFailed':
+        imageElevatedFailed = EditorReviewFields();
       case 'popover':
         popover = EditorReviewFields();
       case 'tooltip':
@@ -1240,6 +1312,36 @@ class EditorReviewCollection {
       'paginationSelected': paginationSelected.toJson(),
     if (paginationDefault.toJson().isNotEmpty)
       'paginationDefault': paginationDefault.toJson(),
+    if (imagePreview.toJson().isNotEmpty) 'imagePreview': imagePreview.toJson(),
+    if (imageEditor.toJson().isNotEmpty) 'imageEditor': imageEditor.toJson(),
+    if (image.toJson().isNotEmpty) 'image': image.toJson(),
+    if (imageLoading.toJson().isNotEmpty) 'imageLoading': imageLoading.toJson(),
+    if (imageCompleted.toJson().isNotEmpty)
+      'imageCompleted': imageCompleted.toJson(),
+    if (imageFailed.toJson().isNotEmpty) 'imageFailed': imageFailed.toJson(),
+    if (imagePlain.toJson().isNotEmpty) 'imagePlain': imagePlain.toJson(),
+    if (imagePlainLoading.toJson().isNotEmpty)
+      'imagePlainLoading': imagePlainLoading.toJson(),
+    if (imagePlainCompleted.toJson().isNotEmpty)
+      'imagePlainCompleted': imagePlainCompleted.toJson(),
+    if (imagePlainFailed.toJson().isNotEmpty)
+      'imagePlainFailed': imagePlainFailed.toJson(),
+    if (imageOutlined.toJson().isNotEmpty)
+      'imageOutlined': imageOutlined.toJson(),
+    if (imageOutlinedLoading.toJson().isNotEmpty)
+      'imageOutlinedLoading': imageOutlinedLoading.toJson(),
+    if (imageOutlinedCompleted.toJson().isNotEmpty)
+      'imageOutlinedCompleted': imageOutlinedCompleted.toJson(),
+    if (imageOutlinedFailed.toJson().isNotEmpty)
+      'imageOutlinedFailed': imageOutlinedFailed.toJson(),
+    if (imageElevated.toJson().isNotEmpty)
+      'imageElevated': imageElevated.toJson(),
+    if (imageElevatedLoading.toJson().isNotEmpty)
+      'imageElevatedLoading': imageElevatedLoading.toJson(),
+    if (imageElevatedCompleted.toJson().isNotEmpty)
+      'imageElevatedCompleted': imageElevatedCompleted.toJson(),
+    if (imageElevatedFailed.toJson().isNotEmpty)
+      'imageElevatedFailed': imageElevatedFailed.toJson(),
     if (popover.toJson().isNotEmpty) 'popover': popover.toJson(),
     if (tooltip.toJson().isNotEmpty) 'tooltip': tooltip.toJson(),
     if (appBar.toJson().isNotEmpty) 'appBar': appBar.toJson(),
@@ -1339,6 +1441,24 @@ class EditorReviewCollection {
       'paginationNavigation',
       'paginationSelected',
       'paginationDefault',
+      'imagePreview',
+      'imageEditor',
+      'image',
+      'imageLoading',
+      'imageCompleted',
+      'imageFailed',
+      'imagePlain',
+      'imagePlainLoading',
+      'imagePlainCompleted',
+      'imagePlainFailed',
+      'imageOutlined',
+      'imageOutlinedLoading',
+      'imageOutlinedCompleted',
+      'imageOutlinedFailed',
+      'imageElevated',
+      'imageElevatedLoading',
+      'imageElevatedCompleted',
+      'imageElevatedFailed',
       'popover',
       'tooltip',
       'appBar',
@@ -1465,6 +1585,60 @@ class EditorReviewCollection {
       )
       ..paginationDefault = EditorReviewFields.fromJson(
         (j['paginationDefault'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imagePreview = EditorReviewFields.fromJson(
+        (j['imagePreview'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageEditor = EditorReviewFields.fromJson(
+        (j['imageEditor'] as Map<String, dynamic>?) ?? {},
+      )
+      ..image = EditorReviewFields.fromJson(
+        (j['image'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageLoading = EditorReviewFields.fromJson(
+        (j['imageLoading'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageCompleted = EditorReviewFields.fromJson(
+        (j['imageCompleted'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageFailed = EditorReviewFields.fromJson(
+        (j['imageFailed'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imagePlain = EditorReviewFields.fromJson(
+        (j['imagePlain'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imagePlainLoading = EditorReviewFields.fromJson(
+        (j['imagePlainLoading'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imagePlainCompleted = EditorReviewFields.fromJson(
+        (j['imagePlainCompleted'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imagePlainFailed = EditorReviewFields.fromJson(
+        (j['imagePlainFailed'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageOutlined = EditorReviewFields.fromJson(
+        (j['imageOutlined'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageOutlinedLoading = EditorReviewFields.fromJson(
+        (j['imageOutlinedLoading'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageOutlinedCompleted = EditorReviewFields.fromJson(
+        (j['imageOutlinedCompleted'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageOutlinedFailed = EditorReviewFields.fromJson(
+        (j['imageOutlinedFailed'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageElevated = EditorReviewFields.fromJson(
+        (j['imageElevated'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageElevatedLoading = EditorReviewFields.fromJson(
+        (j['imageElevatedLoading'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageElevatedCompleted = EditorReviewFields.fromJson(
+        (j['imageElevatedCompleted'] as Map<String, dynamic>?) ?? {},
+      )
+      ..imageElevatedFailed = EditorReviewFields.fromJson(
+        (j['imageElevatedFailed'] as Map<String, dynamic>?) ?? {},
       )
       ..popover = EditorReviewFields.fromJson(
         (j['popover'] as Map<String, dynamic>?) ?? {},
@@ -1654,6 +1828,29 @@ HyperThemeData applyEditorReviews(
     final s = theme.sizes.resolve(type);
     final d = document.device(type).reviews;
     return s.copyWith(
+      imagePreview: s.imagePreview.copyWith(
+        iconSize: d.imagePreview.iconSize,
+        spacing: d.imagePreview.spacing,
+        padding: d.imagePreview.paddingLeft,
+      ),
+      imageEditor: s.imageEditor.copyWith(
+        cropPadding: d.imageEditor.paddingTop,
+        iconSize: d.imageEditor.iconSize,
+        spacing: d.imageEditor.spacing,
+        padding: d.imageEditor.paddingLeft,
+        handleLength: d.imageEditor.nodeSize,
+        handleThickness: d.imageEditor.lineWidth,
+        lineWidth: d.imageEditor.lineHeight,
+        handleHitSize: d.imageEditor.interactionRadius,
+      ),
+      image: s.image.copyWith(
+        iconSize: d.image.iconSize,
+        progressSize: d.image.circleSize,
+        progressThickness: d.image.lineWidth,
+        spacing: d.image.spacing,
+        padding: d.image.paddingLeft,
+        radius: d.image.surfaceRadius,
+      ),
       appBar: s.appBar.copyWith(
         collapsedHeight: d.appBar.collapsedHeight,
         mediumExpandedHeight: d.appBar.mediumExpandedHeight,
@@ -2761,7 +2958,113 @@ HyperThemeData applyEditorReviews(
     );
   }
 
+  HyperImageStyle imageStyle(String slot) {
+    final v = mode.reviews.object(slot), m = d.object(slot);
+    return HyperImageStyle(
+      surfaceStyle: (surface(v, m) ?? HyperCardStyle()).merge(
+        HyperCardStyle(
+          border: m.borderWidth == null && v.borderColor == null
+              ? null
+              : Border.all(
+                  width: m.borderWidth ?? 1,
+                  color: v.borderColor?.resolve(colors) ?? colors.outline,
+                ),
+        ),
+      ),
+      placeholderColor: v.contentBackground?.resolve(colors),
+      progressColor: v.foregroundColor?.resolve(colors),
+      progressTrackColor: v.overlayColor?.resolve(colors),
+      iconColor: v.iconColor?.resolve(colors),
+      textStyle: _reviewText(
+        d.image.textStyleSize,
+        v.textStyleWeight,
+        v.textStyleColor,
+        colors,
+      ),
+      animationCurve: editorControlCurve(v.curve),
+      animationDuration: v.duration == null
+          ? null
+          : Duration(milliseconds: v.duration!.round()),
+    );
+  }
+
+  HyperImageAppearance imageAppearance(String slot) => HyperImageAppearance(
+    style: imageStyle(slot),
+    loading: imageStyle('${slot}Loading'),
+    completed: imageStyle('${slot}Completed'),
+    failed: imageStyle('${slot}Failed'),
+  );
+  HyperCardStyle? imageToolsSurface(String name) {
+    final v = mode.reviews.object(name), m = d.object(name);
+    final base = surface(v, m);
+    if (m.borderWidth == null) return base;
+    return (base ?? HyperCardStyle()).merge(
+      HyperCardStyle(
+        border: Border.all(
+          width: m.borderWidth!,
+          color: v.borderColor?.resolve(colors) ?? colors.outline,
+        ),
+      ),
+    );
+  }
+
   return theme.copyWith(
+    imagePreviewTheme: theme.imagePreviewTheme.merge(
+      HyperImagePreviewThemeData(
+        style: HyperImagePreviewStyle(
+          surfaceStyle: imageToolsSurface('imagePreview'),
+          toolbarBackground: mode.reviews.imagePreview.contentBackground
+              ?.resolve(colors),
+          foregroundColor: mode.reviews.imagePreview.iconColor?.resolve(colors),
+          textStyle: _reviewText(
+            d.imagePreview.textStyleSize,
+            mode.reviews.imagePreview.textStyleWeight,
+            mode.reviews.imagePreview.textStyleColor,
+            colors,
+          ),
+          animationDuration: mode.reviews.imagePreview.duration == null
+              ? null
+              : Duration(
+                  milliseconds: mode.reviews.imagePreview.duration!.round(),
+                ),
+          animationCurve: editorControlCurve(mode.reviews.imagePreview.curve),
+        ),
+      ),
+    ),
+    imageEditorTheme: theme.imageEditorTheme.merge(
+      HyperImageEditorThemeData(
+        style: HyperImageEditorStyle(
+          surfaceStyle: imageToolsSurface('imageEditor'),
+          toolbarBackground: mode.reviews.imageEditor.contentBackground
+              ?.resolve(colors),
+          foregroundColor: mode.reviews.imageEditor.iconColor?.resolve(colors),
+          textStyle: _reviewText(
+            d.imageEditor.textStyleSize,
+            mode.reviews.imageEditor.textStyleWeight,
+            mode.reviews.imageEditor.textStyleColor,
+            colors,
+          ),
+          cropColor: mode.reviews.imageEditor.foregroundColor?.resolve(colors),
+          cropLineColor: mode.reviews.imageEditor.separatorColor?.resolve(
+            colors,
+          ),
+          maskColor: mode.reviews.imageEditor.overlayColor?.resolve(colors),
+          animationDuration: mode.reviews.imageEditor.duration == null
+              ? null
+              : Duration(
+                  milliseconds: mode.reviews.imageEditor.duration!.round(),
+                ),
+        ),
+      ),
+    ),
+    imageTheme: theme.imageTheme.merge(
+      HyperImageThemeData(
+        appearance: imageAppearance('image'),
+        plain: imageAppearance('imagePlain'),
+        outlined: imageAppearance('imageOutlined'),
+        elevated: imageAppearance('imageElevated'),
+      ),
+    ),
     tabBarTheme: theme.tabBarTheme.merge(
       HyperTabBarThemeData(
         style: tabs('tabBar'),

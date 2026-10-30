@@ -19,6 +19,7 @@ class EditorReviewFields {
   String? breadcrumbSeparator;
   String? materialKind;
   bool? materialEdgeEnabled;
+  bool? liftSurface;
   double? materialBlurX, materialBlurY;
   double? surfaceRadius;
   double? borderWidth;
@@ -191,6 +192,7 @@ class EditorReviewFields {
     if (dotBorderColor != null) 'dotBorderColor': dotBorderColor!.toJson(),
     if (materialKind != null) 'materialKind': materialKind,
     if (materialEdgeEnabled != null) 'materialEdgeEnabled': materialEdgeEnabled,
+    if (liftSurface != null) 'liftSurface': liftSurface,
     if (materialBlurX != null) 'materialBlurX': materialBlurX,
     if (materialBlurY != null) 'materialBlurY': materialBlurY,
     if (surfaceRadius != null) 'surfaceRadius': surfaceRadius,
@@ -403,6 +405,7 @@ class EditorReviewFields {
       'dotBorderColor',
       'materialKind',
       'materialEdgeEnabled',
+      'liftSurface',
       'materialBlurX',
       'materialBlurY',
       'surfaceRadius',
@@ -602,6 +605,7 @@ class EditorReviewFields {
           : EditorColor.fromJson(j['dotBorderColor'] as Map<String, dynamic>)
       ..materialKind = j['materialKind'] as String?
       ..materialEdgeEnabled = j['materialEdgeEnabled'] as bool?
+      ..liftSurface = j['liftSurface'] as bool?
       ..materialBlurX = number(j['materialBlurX'], min: 0)
       ..materialBlurY = number(j['materialBlurY'], min: 0)
       ..surfaceRadius = number(j['surfaceRadius'], min: 0)
@@ -3066,6 +3070,7 @@ HyperThemeData applyEditorReviews(
       lift: theme.motion.lift.merge(
         HyperLiftThemeData(
           style: HyperLiftStyle(
+            surface: mode.reviews.motionLift.liftSurface,
             hoverScale: mode.reviews.motionLiftHover.scale,
             pressedScale: mode.reviews.motionLiftPressed.scale,
             hoverShadows: mode.reviews.motionLiftHover.shadow.shadows

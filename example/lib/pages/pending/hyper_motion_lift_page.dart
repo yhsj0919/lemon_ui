@@ -92,6 +92,29 @@ class _HyperMotionLiftPageState extends State<HyperMotionLiftPage> {
           ),
         ),
         DemoSection(
+          title: '叠层内容 · surface: false（保留位移和缩放）',
+          child: HyperMotion.lift(
+            surface: false,
+            child: Stack(
+              children: [
+                const HyperCard(child: Text('内容表面自行管理')),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: HyperContainer(
+                    background: HyperFill.color(
+                      HyperTheme.of(context).colors.primary,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    padding: const EdgeInsets.all(4),
+                    child: const Text('NEW'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        DemoSection(
           title: '禁用动效包装',
           child: HyperMotion.lift(
             enabled: false,

@@ -146,6 +146,12 @@ HyperMotion.lift(
 
 `style: HyperLiftStyle(...)` 可配置 hoverOffset / pressedOffset、hoverScale / pressedScale、hoverShadows / pressedShadows、shadowRadius、duration / pressDuration、curve 和 alignment。空字段继承，空阴影列表显式关闭对应阴影。全局使用 `theme.copyWith(motion: theme.motion.copyWith(lift: HyperLiftThemeData(style: ...)))`；局部使用 `HyperLiftTheme`。位移与阴影圆角的四端默认值由 `sizes.motionLift` 管理，实例 Style 仅覆盖当前解析结果。
 
+叠层、异形或自带阴影的内容可使用 `HyperMotion.lift(surface: false, child: ...)`，
+仅保留位移与缩放，不绘制包装层的矩形阴影。child 自身的表面、阴影与交互不受影响。
+也可通过全局/局部 `HyperLiftStyle(surface: false)` 统一关闭；优先级为实例
+`surface` 参数 → 实例 Style → 局部主题 → 全局主题 → true（兼容原效果）。
+主题编辑器“悬停上浮 → 通用 → 阴影表面”可编辑并保存该选项，恢复继承不会清空已配置的阴影配方。
+
 可传 `WidgetStatesController` 从业务或其他控件驱动 hovered、pressed、focused、disabled 状态，创建方负责 dispose。包装器会将实际指针/子树焦点变化同步到该 controller，`onStateChanged` 可观察它们；它不是一个新增的点击控件。`enabled: false` 仅禁用包装动效，不禁用子控件。内部使用原生 MouseRegion / Listener / Focus 观察输入；不套有激活手势的 HyperPressable，避免抢夺子控件手势。
 
 状态中断会从当前视觉值继续，静态 child 不随动画帧重建。默认使用全局标准时长和曲线，按下使用快速时长；仅以 Transform 和外侧阴影绘制，不对整棵材质子树施加分数透明度，也不另建背景材质或降级策略。

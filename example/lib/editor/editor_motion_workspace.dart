@@ -81,6 +81,14 @@ extension _MotionWorkspace on _ThemeEditorState {
           (value) => _change(() => v.curve = value == 'inherit' ? null : value),
         ),
         _heading('阴影表面'),
+        _select(
+          '包装层阴影表面',
+          v.liftSurface?.toString() ?? 'inherit',
+          const {'inherit': '继承主题（默认开启）', 'true': '开启', 'false': '关闭（仅位移与缩放）'},
+          (value) => _change(
+            () => v.liftSurface = value == 'inherit' ? null : value == 'true',
+          ),
+        ),
         n(
           '阴影圆角',
           m.surfaceRadius,

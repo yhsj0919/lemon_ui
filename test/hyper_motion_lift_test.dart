@@ -42,6 +42,65 @@ HyperBoxDecoration shadow(WidgetTester tester) => tester
     .whereType<HyperBoxDecoration>()
     .first;
 void main() {
+  test('surface participates in style merge, interpolation and equality', () {
+    const base = HyperLiftStyle(surface: false);
+    expect(base.copyWith(), base);
+    expect(base.copyWith().hashCode, base.hashCode);
+    expect(base.merge(const HyperLiftStyle(surface: true)).surface, isTrue);
+    expect(
+      HyperLiftStyle.lerp(
+        base,
+        const HyperLiftStyle(surface: true),
+        .75,
+      ).surface,
+      isTrue,
+    );
+  });
+  testWidgets(
+    'surface false preserves child state, transforms and child shadows',
+    (tester) async {
+      final states = WidgetStatesController({WidgetState.hovered});
+      final childKey = GlobalKey();
+      Widget view(bool? surface) => host(
+        HyperLiftTheme(
+          data: const HyperLiftThemeData(style: HyperLiftStyle(surface: false)),
+          child: HyperMotion.lift(
+            surface: surface,
+            statesController: states,
+            child: DecoratedBox(
+              key: childKey,
+              decoration: const BoxDecoration(
+                boxShadow: [BoxShadow(blurRadius: 5)],
+              ),
+              child: const SizedBox(width: 120, height: 80),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(view(null));
+      await tester.pumpAndSettle();
+      final element = childKey.currentContext;
+      expect(shadow(tester).boxShadow, isEmpty);
+      expect(transforms(tester).first.transform.entry(1, 3), -2);
+      expect(transforms(tester)[1].transform.entry(0, 0), closeTo(1.008, 1e-9));
+      expect(
+        (tester.widget<DecoratedBox>(find.byKey(childKey)).decoration
+                as BoxDecoration)
+            .boxShadow,
+        isNotEmpty,
+      );
+      await tester.pumpWidget(view(true));
+      await tester.pumpAndSettle();
+      expect(shadow(tester).boxShadow, isNotEmpty);
+      expect(childKey.currentContext, same(element));
+      await tester.pumpWidget(view(false));
+      await tester.pump(const Duration(milliseconds: 30));
+      expect(shadow(tester).boxShadow, isEmpty);
+      expect(childKey.currentContext, same(element));
+      await tester.pumpWidget(const SizedBox());
+      states.dispose();
+    },
+  );
   testWidgets(
     'hover lifts continuously; pressing restores; wrapper preserves taps and layout',
     (tester) async {

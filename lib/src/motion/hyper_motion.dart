@@ -19,6 +19,7 @@ class HyperMotion extends StatefulWidget {
     required this.child,
     this.enabled = true,
     this.surface,
+    this.showShadow,
     this.style,
     this.statesController,
     this.onStateChanged,
@@ -30,7 +31,14 @@ class HyperMotion extends StatefulWidget {
   ///
   /// False retains translation and scale and leaves the child's own shadows
   /// untouched. Null inherits the lift style, whose default is true.
+  /// An explicit [showShadow] or style shadow setting overrides this flag.
   final bool? surface;
+
+  /// Whether to retain the wrapper shadow, independently of [surface].
+  ///
+  /// When omitted, the style is used, then the legacy [surface] setting.
+  /// The child's own background and shadows are never changed.
+  final bool? showShadow;
   final HyperLiftStyle? style;
   final WidgetStatesController? statesController;
   final ValueChanged<Set<WidgetState>>? onStateChanged;
@@ -125,7 +133,8 @@ class _HyperMotionState extends State<HyperMotion> {
   @override
   Widget build(BuildContext context) {
     final s = resolveHyperLiftStyle(context, widget.style);
-    final surface = widget.surface ?? s.surface!;
+    final showShadow =
+        widget.showShadow ?? s.showShadow ?? widget.surface ?? s.surface!;
     assert(s.hoverScale! > 0 && s.pressedScale! > 0 && s.shadowRadius! >= 0);
     final pressed = _enabled && _states.value.contains(WidgetState.pressed);
     final elevated =
@@ -192,7 +201,7 @@ class _HyperMotionState extends State<HyperMotion> {
                 child: DecoratedBox(
                   decoration: HyperBoxDecoration(
                     borderRadius: BorderRadius.circular(s.shadowRadius!),
-                    boxShadow: surface ? value.shadows : const [],
+                    boxShadow: showShadow ? value.shadows : const [],
                     outerShadowsOnly: true,
                   ),
                   child: child,

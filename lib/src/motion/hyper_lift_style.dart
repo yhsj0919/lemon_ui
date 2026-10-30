@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 final class HyperLiftStyle {
   const HyperLiftStyle({
     this.surface,
+    this.showShadow,
     this.hoverOffset,
     this.pressedOffset,
     this.hoverScale,
@@ -22,6 +23,9 @@ final class HyperLiftStyle {
 
   /// Whether the lift wrapper paints a shadow surface around its bounds.
   final bool? surface;
+
+  /// Overrides the legacy [surface] setting for the wrapper shadow.
+  final bool? showShadow;
   final double? hoverScale, pressedScale, shadowRadius;
   final List<BoxShadow>? hoverShadows, pressedShadows;
   final Duration? duration, pressDuration;
@@ -30,6 +34,7 @@ final class HyperLiftStyle {
 
   HyperLiftStyle copyWith({
     bool? surface,
+    bool? showShadow,
     Offset? hoverOffset,
     Offset? pressedOffset,
     double? hoverScale,
@@ -43,6 +48,7 @@ final class HyperLiftStyle {
     AlignmentGeometry? alignment,
   }) => HyperLiftStyle(
     surface: surface ?? this.surface,
+    showShadow: showShadow ?? this.showShadow,
     hoverOffset: hoverOffset ?? this.hoverOffset,
     pressedOffset: pressedOffset ?? this.pressedOffset,
     hoverScale: hoverScale ?? this.hoverScale,
@@ -59,6 +65,7 @@ final class HyperLiftStyle {
       ? this
       : copyWith(
           surface: other.surface,
+          showShadow: other.showShadow,
           hoverOffset: other.hoverOffset,
           pressedOffset: other.pressedOffset,
           hoverScale: other.hoverScale,
@@ -83,6 +90,7 @@ final class HyperLiftStyle {
           );
     return HyperLiftStyle(
       surface: t < .5 ? a.surface : b.surface,
+      showShadow: t < .5 ? a.showShadow : b.showShadow,
       hoverOffset: a.hoverOffset == null || b.hoverOffset == null
           ? (t < .5 ? a.hoverOffset : b.hoverOffset)
           : Offset.lerp(a.hoverOffset, b.hoverOffset, t),
@@ -107,6 +115,7 @@ final class HyperLiftStyle {
   bool operator ==(Object other) =>
       other is HyperLiftStyle &&
       surface == other.surface &&
+      showShadow == other.showShadow &&
       hoverOffset == other.hoverOffset &&
       pressedOffset == other.pressedOffset &&
       hoverScale == other.hoverScale &&
@@ -121,6 +130,7 @@ final class HyperLiftStyle {
   @override
   int get hashCode => Object.hash(
     surface,
+    showShadow,
     hoverOffset,
     pressedOffset,
     hoverScale,

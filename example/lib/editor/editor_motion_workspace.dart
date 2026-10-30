@@ -82,6 +82,15 @@ extension _MotionWorkspace on _ThemeEditorState {
         ),
         _heading('阴影表面'),
         _select(
+          '保留包装层阴影',
+          v.liftShowShadow?.toString() ?? 'inherit',
+          const {'inherit': '继承主题 / surface', 'true': '保留', 'false': '关闭'},
+          (value) => _change(
+            () =>
+                v.liftShowShadow = value == 'inherit' ? null : value == 'true',
+          ),
+        ),
+        _select(
           '包装层阴影表面',
           v.liftSurface?.toString() ?? 'inherit',
           const {'inherit': '继承主题（默认开启）', 'true': '开启', 'false': '关闭（仅位移与缩放）'},

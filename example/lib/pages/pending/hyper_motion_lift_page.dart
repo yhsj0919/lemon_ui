@@ -92,9 +92,10 @@ class _HyperMotionLiftPageState extends State<HyperMotionLiftPage> {
           ),
         ),
         DemoSection(
-          title: '叠层内容 · surface: false（保留位移和缩放）',
+          title: '叠层内容 · surface: false、showShadow: true（保留阴影）',
           child: HyperMotion.lift(
             surface: false,
+            showShadow: true,
             child: Stack(
               children: [
                 const HyperCard(child: Text('内容表面自行管理')),

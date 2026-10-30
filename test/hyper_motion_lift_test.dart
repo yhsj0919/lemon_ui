@@ -42,6 +42,52 @@ HyperBoxDecoration shadow(WidgetTester tester) => tester
     .whereType<HyperBoxDecoration>()
     .first;
 void main() {
+  test('showShadow participates in style value operations', () {
+    const base = HyperLiftStyle(showShadow: false);
+    expect(base.copyWith(), base);
+    expect(base.copyWith().hashCode, base.hashCode);
+    expect(base.merge(const HyperLiftStyle(showShadow: true)).showShadow, true);
+    expect(
+      HyperLiftStyle.lerp(
+        base,
+        const HyperLiftStyle(showShadow: true),
+        .75,
+      ).showShadow,
+      true,
+    );
+    expect(base, isNot(const HyperLiftStyle(showShadow: true)));
+  });
+  testWidgets('shadow override is independent of surface and adds no fill', (
+    tester,
+  ) async {
+    final states = WidgetStatesController({WidgetState.hovered});
+    Widget view(bool? showShadow, {bool? themedShadow}) => host(
+      HyperLiftTheme(
+        data: HyperLiftThemeData(
+          style: HyperLiftStyle(showShadow: themedShadow),
+        ),
+        child: HyperMotion.lift(
+          surface: false,
+          showShadow: showShadow,
+          statesController: states,
+          child: const SizedBox(width: 120, height: 80),
+        ),
+      ),
+    );
+    await tester.pumpWidget(view(true));
+    await tester.pumpAndSettle();
+    expect(shadow(tester).boxShadow, isNotEmpty);
+    expect(shadow(tester).color, isNull);
+    expect(shadow(tester).gradient, isNull);
+    await tester.pumpWidget(view(false, themedShadow: true));
+    await tester.pumpAndSettle();
+    expect(shadow(tester).boxShadow, isEmpty);
+    await tester.pumpWidget(view(null, themedShadow: true));
+    await tester.pumpAndSettle();
+    expect(shadow(tester).boxShadow, isNotEmpty);
+    await tester.pumpWidget(const SizedBox());
+    states.dispose();
+  });
   test('surface participates in style merge, interpolation and equality', () {
     const base = HyperLiftStyle(surface: false);
     expect(base.copyWith(), base);

@@ -20,6 +20,7 @@ class EditorReviewFields {
   String? materialKind;
   bool? materialEdgeEnabled;
   bool? liftSurface;
+  bool? liftShowShadow;
   double? materialBlurX, materialBlurY;
   double? surfaceRadius;
   double? borderWidth;
@@ -193,6 +194,7 @@ class EditorReviewFields {
     if (materialKind != null) 'materialKind': materialKind,
     if (materialEdgeEnabled != null) 'materialEdgeEnabled': materialEdgeEnabled,
     if (liftSurface != null) 'liftSurface': liftSurface,
+    if (liftShowShadow != null) 'liftShowShadow': liftShowShadow,
     if (materialBlurX != null) 'materialBlurX': materialBlurX,
     if (materialBlurY != null) 'materialBlurY': materialBlurY,
     if (surfaceRadius != null) 'surfaceRadius': surfaceRadius,
@@ -406,6 +408,7 @@ class EditorReviewFields {
       'materialKind',
       'materialEdgeEnabled',
       'liftSurface',
+      'liftShowShadow',
       'materialBlurX',
       'materialBlurY',
       'surfaceRadius',
@@ -606,6 +609,7 @@ class EditorReviewFields {
       ..materialKind = j['materialKind'] as String?
       ..materialEdgeEnabled = j['materialEdgeEnabled'] as bool?
       ..liftSurface = j['liftSurface'] as bool?
+      ..liftShowShadow = j['liftShowShadow'] as bool?
       ..materialBlurX = number(j['materialBlurX'], min: 0)
       ..materialBlurY = number(j['materialBlurY'], min: 0)
       ..surfaceRadius = number(j['surfaceRadius'], min: 0)
@@ -3071,6 +3075,7 @@ HyperThemeData applyEditorReviews(
         HyperLiftThemeData(
           style: HyperLiftStyle(
             surface: mode.reviews.motionLift.liftSurface,
+            showShadow: mode.reviews.motionLift.liftShowShadow,
             hoverScale: mode.reviews.motionLiftHover.scale,
             pressedScale: mode.reviews.motionLiftPressed.scale,
             hoverShadows: mode.reviews.motionLiftHover.shadow.shadows

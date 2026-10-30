@@ -152,6 +152,11 @@ HyperMotion.lift(
 `surface` 参数 → 实例 Style → 局部主题 → 全局主题 → true（兼容原效果）。
 主题编辑器“悬停上浮 → 通用 → 阴影表面”可编辑并保存该选项，恢复继承不会清空已配置的阴影配方。
 
+独立控制阴影使用 `showShadow`：`HyperMotion.lift(surface: false, showShadow: true, child: ...)`
+保留包装层阴影，`showShadow: false` 则关闭。优先级为实例 `showShadow` → 合并后的
+`HyperLiftStyle.showShadow` → 上述 `surface` 兼容路径；不指定时保持原行为。
+lift 本身不绘制背景填充，child 的背景需由 child 自行配置。
+
 可传 `WidgetStatesController` 从业务或其他控件驱动 hovered、pressed、focused、disabled 状态，创建方负责 dispose。包装器会将实际指针/子树焦点变化同步到该 controller，`onStateChanged` 可观察它们；它不是一个新增的点击控件。`enabled: false` 仅禁用包装动效，不禁用子控件。内部使用原生 MouseRegion / Listener / Focus 观察输入；不套有激活手势的 HyperPressable，避免抢夺子控件手势。
 
 状态中断会从当前视觉值继续，静态 child 不随动画帧重建。默认使用全局标准时长和曲线，按下使用快速时长；仅以 Transform 和外侧阴影绘制，不对整棵材质子树施加分数透明度，也不另建背景材质或降级策略。

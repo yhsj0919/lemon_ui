@@ -6,6 +6,60 @@ import 'package:lemon_ui/src/components/overlay/hyper_overlay_material.dart';
 
 void main() {
   final colors = HyperThemeData.light().colors;
+  test('Card 无阴影材质保留浮层阴影，主题与实例阴影覆盖优先', () {
+    const customShadow = [BoxShadow(blurRadius: 7)];
+    for (final material in [
+      const HyperSurfaceMaterial.solid(),
+      const HyperSurfaceMaterial.translucent(),
+      const HyperSurfaceMaterial.frostedGlass(),
+      const HyperSurfaceMaterial.softLightGlass(),
+    ]) {
+      HyperCardStyle surface({
+        List<BoxShadow>? shadows,
+        HyperCardStyle? style,
+      }) => resolveHyperMenuSurfaceStyle(
+        colors: colors,
+        radius: 12,
+        padding: EdgeInsets.zero,
+        cardThemeStyle: HyperCardStyle(material: material, boxShadow: shadows),
+        style: style,
+      );
+      expect(surface().boxShadow, isNotEmpty);
+      // Null lets HyperCard inherit the theme's explicit shadow list.
+      expect(surface(shadows: const []).boxShadow, isNull);
+      expect(surface(shadows: customShadow).boxShadow, isNull);
+      expect(
+        surface(style: HyperCardStyle(boxShadow: const [])).boxShadow,
+        isEmpty,
+      );
+      expect(
+        surface(style: HyperCardStyle(boxShadow: customShadow)).boxShadow,
+        customShadow,
+      );
+    }
+  });
+  test('阴影依据最终材质解析，保留配方阴影及实例材质优先级', () {
+    final surface = resolveHyperMenuSurfaceStyle(
+      colors: colors,
+      radius: 12,
+      padding: EdgeInsets.zero,
+      cardThemeStyle: HyperCardStyle(
+        material: const HyperSurfaceMaterial.clearFrostedGlass(),
+      ),
+    );
+    expect(surface.boxShadow, isNull);
+    final overridden = resolveHyperMenuSurfaceStyle(
+      colors: colors,
+      radius: 12,
+      padding: EdgeInsets.zero,
+      globalMaterial: const HyperSurfaceMaterial.clearFrostedGlass(),
+      cardThemeStyle: HyperCardStyle(
+        material: const HyperSurfaceMaterial.clearFrostedGlass(),
+      ),
+      style: HyperCardStyle(material: const HyperSurfaceMaterial.solid()),
+    );
+    expect(overridden.boxShadow, isNotEmpty);
+  });
   test('切换无阴影的全局材质保留浮层阴影，显式关闭仍优先', () {
     for (final material in [
       const HyperSurfaceMaterial.solid(),

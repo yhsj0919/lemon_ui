@@ -9,6 +9,71 @@ const opts = [
   HyperSelectOption(value: 'b', label: '选项乙'),
 ];
 void main() {
+  for (final scale in [1.0, 1.3, 2.0]) {
+    testWidgets('Select trigger inherits button text metrics at scale $scale', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperDeviceDetector(
+            deviceType: HyperDeviceType.desktop,
+            builder: (context, device, child) =>
+                HyperTheme(data: HyperThemeData.light(), child: child!),
+            child: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: Scaffold(
+                body: Column(
+                  children: [
+                    HyperSelect<String>(
+                      value: 'TOP10',
+                      onChanged: (_) {},
+                      size: HyperButtonSizeVariant.small,
+                      buttonStyle: HyperButtonStyle(
+                        minimumTapTargetSize: Size.zero,
+                      ),
+                      options: const [
+                        HyperSelectOption(value: 'TOP10', label: 'TOP10'),
+                      ],
+                    ),
+                    HyperButton.outlined(
+                      size: HyperButtonSizeVariant.small,
+                      style: HyperButtonStyle(minimumTapTargetSize: Size.zero),
+                      onPressed: () {},
+                      label: const Text('TOP10'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final texts = find.text('TOP10');
+      expect(texts, findsNWidgets(2));
+      for (final text in [texts.first, texts.last]) {
+        final visual = find
+            .ancestor(
+              of: text,
+              matching: find.byWidgetPredicate(
+                (widget) =>
+                    widget is AnimatedContainer &&
+                    widget.decoration is BoxDecoration,
+              ),
+            )
+            .first;
+        expect(
+          tester.getCenter(text).dy,
+          closeTo(tester.getCenter(visual).dy, .01),
+        );
+      }
+      expect(
+        tester.getSize(texts.first).height,
+        closeTo(tester.getSize(texts.last).height, .01),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('默认 Select 和 Autocomplete 的可视表面高度一致', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

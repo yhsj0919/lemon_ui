@@ -209,6 +209,7 @@ class HyperMovableDialogPage extends StatefulWidget {
 
 class _MovableDialogPageState extends State<HyperMovableDialogPage> {
   final controller = HyperMovableDialogController();
+  bool _showClose = true, _showMaximize = true, _customButtons = false;
   @override
   void dispose() {
     controller.dispose();
@@ -219,11 +220,44 @@ class _MovableDialogPageState extends State<HyperMovableDialogPage> {
   Widget build(BuildContext context) => ListView(
     padding: EdgeInsets.all(HyperTheme.sizesOf(context).pageHorizontalPadding),
     children: [
-      const HyperText(
-        '可移动对话框。复用 HyperDialog 的默认表面、材质和过渡。只拖动标题，内容区仍正常选择文字和输入。双击标题或 Home 复位。',
+      const HyperText('拖动标题移动，拖动四边或四角自由调整宽高。正文仍可选择文字和输入。双击标题最大化或还原，Home 复位位置。'),
+      Wrap(
+        spacing: HyperTheme.sizesOf(context).form.gap,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              HyperSwitch(
+                value: _showClose,
+                onChanged: (value) => setState(() => _showClose = value),
+              ),
+              const HyperText('显示关闭按钮'),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              HyperSwitch(
+                value: _showMaximize,
+                onChanged: (value) => setState(() => _showMaximize = value),
+              ),
+              const HyperText('显示最大化按钮'),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              HyperSwitch(
+                value: _customButtons,
+                onChanged: (value) => setState(() => _customButtons = value),
+              ),
+              const HyperText('实例覆盖 · 自定义按钮'),
+            ],
+          ),
+        ],
       ),
       DemoSection(
-        title: '默认 · 拖动与窗口边界',
+        title: '默认 · 移动、调整大小与窗口边界',
         child: HyperButton.filled(
           label: const Text('打开可移动对话框'),
           onPressed: () async {
@@ -231,6 +265,20 @@ class _MovableDialogPageState extends State<HyperMovableDialogPage> {
               context: context,
               builder: (dialogContext) => HyperMovableDialog(
                 controller: controller,
+                showCloseButton: _showClose,
+                showMaximizeButton: _showMaximize,
+                closeButtonBuilder: _customButtons
+                    ? (context, close) => HyperButton.text(
+                        onPressed: close,
+                        label: const Text('关闭窗口'),
+                      )
+                    : null,
+                maximizeButtonBuilder: _customButtons
+                    ? (context, maximized, toggle) => HyperButton.text(
+                        onPressed: toggle,
+                        label: Text(maximized ? '还原窗口' : '放大窗口'),
+                      )
+                    : null,
                 title: const HyperText('拖动标题移动'),
                 content: const HyperTextArea(
                   initialValue: '这里可以编辑多行内容。',
@@ -251,7 +299,7 @@ class _MovableDialogPageState extends State<HyperMovableDialogPage> {
           },
         ),
       ),
-      const HyperText('位置控制器由调用方管理；外观设置继承对话框主题，可通过 MovableDialog Style 显式覆盖。'),
+      const HyperText('控制器保留位置与手动尺寸，最大化后可还原；外观继承对话框主题。'),
     ],
   );
 }

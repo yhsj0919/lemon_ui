@@ -166,6 +166,9 @@ class _HyperScrollingTextState extends State<HyperScrollingText>
           textDirection: direction,
           textScaler: scaler,
           locale: Localizations.maybeLocaleOf(context),
+          textHeightBehavior:
+              DefaultTextStyle.of(context).textHeightBehavior ??
+              DefaultTextHeightBehavior.maybeOf(context),
           maxLines: 1,
         )..layout();
         _distance = constraints.hasBoundedWidth

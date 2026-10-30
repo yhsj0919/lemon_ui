@@ -51,6 +51,52 @@ double offset(WidgetTester tester) {
 }
 
 void main() {
+  for (final inheritedViaStyle in [false, true]) {
+    testWidgets(
+      'loop height matches inherited text metrics, via style=$inheritedViaStyle',
+      (tester) async {
+        const behavior = TextHeightBehavior(
+          applyHeightToFirstAscent: false,
+          applyHeightToLastDescent: false,
+          leadingDistribution: TextLeadingDistribution.even,
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: DefaultTextHeightBehavior(
+              textHeightBehavior: behavior,
+              child: DefaultTextStyle(
+                style: const TextStyle(fontSize: 20, height: 3),
+                textHeightBehavior: inheritedViaStyle ? behavior : null,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(longText, maxLines: 1, softWrap: false),
+                      const SizedBox(
+                        width: 100,
+                        child: HyperScrollingText(
+                          longText,
+                          mode: HyperTextScrollMode.loop,
+                          trigger: HyperTextScrollTrigger.hover,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        final plain = find.text(longText).first;
+        final scrolling = find.byType(HyperScrollingText);
+        expect(
+          tester.getSize(scrolling).height,
+          closeTo(tester.getSize(plain).height, .01),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets('往返与循环按同一速度移动，长度不改变速度', (tester) async {
     for (final mode in HyperTextScrollMode.values) {
       for (final text in [longText, longText + longText]) {

@@ -32,11 +32,17 @@
 
 ## 可移动对话框
 
-使用 `showHyperMovableDialog` 打开 `HyperMovableDialog`。路由复用 `showHyperDialog`，内容与表面复用 `HyperDialog`，没有独立的 Card 弹窗配方或材质降级路径。只有标题可拖动，正文仍可输入、选择文字与滚动。聚焦标题后方向键移动、Shift 加速、Home 或双击复位。
+使用 `showHyperMovableDialog` 打开 `HyperMovableDialog`。路由复用 `showHyperDialog`，内容与表面复用 `HyperDialog`，没有独立的 Card 弹窗配方或材质降级路径。只有标题可拖动，正文仍可输入、选择文字与滚动。聚焦标题后方向键移动、Shift 加速、Home 复位位置；双击标题最大化或还原。
 
-`HyperMovableDialogController` 管理相对初始对齐位置的偏移。拖动和程序化移动限制在有界宿主内，宿主大小或键盘遮挡变化后重新校正。关闭和重新打开可复用同一控制器保持位置；控制器由调用方销毁。
+`HyperMovableDialogController` 管理相对初始对齐位置的偏移，以及可选的手动尺寸 `size`。默认支持拖动四边或四角调整宽高，拖动一侧时保持另一侧不动；`resizable: false` 可关闭边缘缩放。`initialSize` 指定初始尺寸，`resizeTo(size)` 支持程序化修改，`onSizeChanged` 接收尺寸更新。`resizeConstraints` 可设置拖拽的最小、最大尺寸；实际可用范围同时受宿主、键盘遮挡及标题/按钮所需空间约束。
 
-`movableDialogTheme` / `HyperMovableDialogTheme` / `HyperMovableDialogStyle` 通过强类型 `dialogStyle` 覆盖公共对话框表面、内容和过渡，`mouseCursor` 覆盖标题鼠标样式。实例的空阴影列表仍能关闭阴影。仅对公共表面施加平移，不对高级模糊表面新增分数透明度层。
+拖动和程序化移动限制在有界宿主内，宿主大小或键盘遮挡变化后重新校正。最大化时不显示缩放手柄，还原后保留手动尺寸和位置。关闭和重新打开可复用同一控制器保持位置与尺寸；`reset()` 只复位位置，控制器由调用方销毁。
+
+边缘命中宽度复用 `HyperResizableTheme.style.handleExtent`，未覆盖时读取当前设备的 `sizes.form.gap`，与分栏缩放使用同一语义。这是 D 级既有交互规格复用，单位为逻辑像素，不是新增官方窗口边框规格。最小高度由当前实际标题、操作区和内边距推导，并保留一行可交互内容空间；不通过固定高度或关闭文字缩放处理溢出。
+
+`movableDialogTheme` / `HyperMovableDialogTheme` / `HyperMovableDialogStyle` 通过强类型 `dialogStyle` 覆盖公共对话框表面、内容和过渡，`mouseCursor` 覆盖标题鼠标样式。实例的空阴影列表仍能关闭阴影。复用公共表面，仅改变布局尺寸与位置，不对高级模糊表面新增分数透明度层。
+
+标题按钮可独立隐藏：`showCloseButton: false`、`showMaximizeButton: false`。`closeButtonBuilder(context, close)` 可替换关闭按钮；`close` 调用 `onClose`，未指定时关闭当前公共弹窗路由。`maximizeButtonBuilder(context, maximized, toggle)` 可按最大化/还原状态返回任意控件；`enabled: false` 时 `toggle` 为 null。隐藏开关优先于自定义构建入口，隐藏的按钮不会构建。自定义按钮与默认按钮一样位于标题拖动区域之外。
 
 ## 底部／侧向导航栏
 

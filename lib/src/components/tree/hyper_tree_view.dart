@@ -429,41 +429,87 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       );
     }
 
-    final rows = <Widget>[
-      for (final entry in entries) ...[
-        row(entry),
-        if (_controller.isExpanded(entry.node.id) &&
-            (_controller.loadState(entry.node.id) ==
-                    HyperTreeLoadState.loading ||
-                _controller.loadState(entry.node.id) ==
-                    HyperTreeLoadState.error))
-          feedback(entry),
+    Widget column(List<Widget> rows) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < rows.length; i++) ...[
+          if (i > 0) SizedBox(height: s.rowSpacing),
+          rows[i],
+        ],
       ],
-    ];
+    );
+    bool hasFeedback(HyperTreeEntry<T> entry) =>
+        _controller.isExpanded(entry.node.id) &&
+        (_controller.loadState(entry.node.id) == HyperTreeLoadState.loading ||
+            _controller.loadState(entry.node.id) == HyperTreeLoadState.error);
+    var index = 0;
+    Widget level(int depth) {
+      final groups = <Widget>[];
+      while (index < entries.length && entries[index].depth == depth) {
+        final entry = entries[index++];
+        final children = <Widget>[
+          if (hasFeedback(entry)) feedback(entry),
+          if (index < entries.length && entries[index].depth > depth)
+            level(entries[index].depth),
+        ];
+        groups.add(
+          Column(
+            key: ValueKey(entry.node.id),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              row(entry),
+              _TreeBranchTransition(
+                expanded: _controller.isExpanded(entry.node.id),
+                duration: duration,
+                curve: s.curve!,
+                child: children.isEmpty
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: EdgeInsets.only(top: s.rowSpacing!),
+                        child: column(children),
+                      ),
+              ),
+            ],
+          ),
+        );
+      }
+      return column(groups);
+    }
+
+    final customTransition = s.expansionTransitionBuilder;
+    final rows = customTransition == null
+        ? <Widget>[]
+        : <Widget>[
+            for (final entry in entries) ...[
+              row(entry),
+              if (_controller.isExpanded(entry.node.id) &&
+                  (_controller.loadState(entry.node.id) ==
+                          HyperTreeLoadState.loading ||
+                      _controller.loadState(entry.node.id) ==
+                          HyperTreeLoadState.error))
+                feedback(entry),
+            ],
+          ];
     Widget body = rows.isEmpty
         ? widget.empty ??
               Text(
                 s.emptyLabel!,
                 style: s.textStyle!.copyWith(color: s.foregroundColor),
               )
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var i = 0; i < rows.length; i++) ...[
-                if (i > 0) SizedBox(height: s.rowSpacing),
-                rows[i],
-              ],
-            ],
-          );
-    body =
-        s.expansionTransitionBuilder?.call(context, body, duration, s.curve!) ??
-        AnimatedSize(
-          duration: duration,
-          curve: s.curve!,
-          alignment: Alignment.topCenter,
-          child: body,
-        );
+        : column(rows);
+    body = customTransition != null
+        ? customTransition(context, body, duration, s.curve!)
+        : entries.isEmpty
+        ? body
+        : level(entries.first.depth);
+    final content = body;
+    body = LayoutBuilder(
+      builder: (context, constraints) => constraints.hasBoundedHeight
+          ? SingleChildScrollView(primary: false, child: content)
+          : content,
+    );
     if (!widget.showSurface) return body;
     body = AnimatedContainer(
       duration: duration,
@@ -496,4 +542,82 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
       child: body,
     );
   }
+}
+
+class _TreeBranchTransition extends StatefulWidget {
+  const _TreeBranchTransition({
+    required this.expanded,
+    required this.duration,
+    required this.curve,
+    required this.child,
+  });
+  final bool expanded;
+  final Duration duration;
+  final Curve curve;
+  final Widget child;
+
+  @override
+  State<_TreeBranchTransition> createState() => _TreeBranchTransitionState();
+}
+
+class _TreeBranchTransitionState extends State<_TreeBranchTransition>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animation = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+    value: widget.expanded ? 1 : 0,
+  );
+  Widget? _content;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.expanded) _content = widget.child;
+    _animation.addStatusListener(_statusChanged);
+  }
+
+  void _statusChanged(AnimationStatus status) {
+    if (status == AnimationStatus.dismissed && !widget.expanded) {
+      setState(() => _content = null);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_TreeBranchTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _animation.duration = widget.duration;
+    if (widget.expanded) _content = widget.child;
+    if (widget.duration == Duration.zero) {
+      _animation.value = widget.expanded ? 1 : 0;
+      if (!widget.expanded) _content = null;
+    } else if (widget.expanded != oldWidget.expanded) {
+      if (widget.expanded) {
+        _animation.forward();
+      } else {
+        _animation.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animation.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ExcludeFocus(
+    excluding: !widget.expanded,
+    child: ExcludeSemantics(
+      excluding: !widget.expanded,
+      child: IgnorePointer(
+        ignoring: !widget.expanded,
+        child: SizeTransition(
+          sizeFactor: _animation.drive(CurveTween(curve: widget.curve)),
+          alignment: Alignment.topCenter,
+          child: _content ?? const SizedBox.shrink(),
+        ),
+      ),
+    ),
+  );
 }

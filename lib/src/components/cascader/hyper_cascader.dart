@@ -26,9 +26,10 @@ import 'hyper_cascader_style.dart';
 import 'hyper_cascader_theme.dart';
 import 'hyper_cascader_wheel_panel.dart';
 
-/// A controlled single selection represented by its complete root-to-leaf path.
+/// A controlled single selection represented by its complete root-to-node path.
 ///
-/// Browsing and dismissal never change [value]. Only leaves commit a selection.
+/// Browsing and dismissal never change [value]. Leaves or nodes at [maxDepth]
+/// commit a selection.
 class HyperCascader<T> extends StatefulWidget {
   const HyperCascader({
     super.key,
@@ -36,6 +37,7 @@ class HyperCascader<T> extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.loadChildren,
+    this.maxDepth,
     this.enabled = true,
     this.allowClear = true,
     this.placeholder = '请选择',
@@ -46,12 +48,12 @@ class HyperCascader<T> extends StatefulWidget {
     this.presentation,
     this.style,
     this.surfaceStyle,
-  });
+  }) : assert(maxDepth == null || maxDepth > 0);
 
   /// The roots of an immutable tree with globally unique node values.
   final List<HyperCascaderNode<T>> nodes;
 
-  /// The selected root-to-leaf values, or an empty list for no selection.
+  /// The selected root-to-node values, or an empty list for no selection.
   final List<T> value;
 
   /// The callback receiving an immutable complete path or an empty list.
@@ -64,6 +66,11 @@ class HyperCascader<T> extends StatefulWidget {
   /// Replacing this callback clears the branch cache. Use a stable method
   /// reference when retaining the same remote data source across builds.
   final HyperCascaderChildrenLoader<T>? loadChildren;
+
+  /// The maximum selectable path length; null requires a natural leaf.
+  ///
+  /// A value of one selects root nodes without loading their children.
+  final int? maxDepth;
 
   /// Whether navigation and selection are enabled.
   final bool enabled;
@@ -104,6 +111,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
     _controller = HyperCascaderController<T>(
       nodes: widget.nodes,
       loadChildren: widget.loadChildren,
+      maxDepth: widget.maxDepth,
     )..addListener(_refresh);
   }
 
@@ -118,7 +126,8 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
     super.didUpdateWidget(oldWidget);
     final changed =
         !listEquals(oldWidget.nodes, widget.nodes) ||
-        oldWidget.loadChildren != widget.loadChildren;
+        oldWidget.loadChildren != widget.loadChildren ||
+        oldWidget.maxDepth != widget.maxDepth;
     if (changed) {
       _controller.dispose();
       _createController();

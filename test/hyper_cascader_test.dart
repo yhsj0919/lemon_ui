@@ -47,6 +47,47 @@ Widget _app(
 );
 
 void main() {
+  for (final device in [
+    HyperDeviceType.desktop,
+    HyperDeviceType.phone,
+    HyperDeviceType.watch,
+  ]) {
+    testWidgets(
+      'maxDepth one selects a root without loading children on $device',
+      (tester) async {
+        var loads = 0;
+        List<int>? selected;
+        await tester.pumpWidget(
+          _app(
+            HyperCascader<int>(
+              nodes: const [
+                HyperCascaderNode(value: 1, label: '一级行业', hasChildren: true),
+              ],
+              value: const [],
+              maxDepth: 1,
+              onChanged: (value) => selected = value,
+              loadChildren: (_) async {
+                loads++;
+                return const [HyperCascaderNode(value: 2, label: '二级行业')];
+              },
+            ),
+            device: device,
+          ),
+        );
+        await tester.tap(find.text('请选择').first);
+        await tester.pumpAndSettle();
+        if (device == HyperDeviceType.phone) {
+          await tester.tap(find.text('确定').last);
+        } else {
+          await tester.tap(find.text('一级行业').last);
+        }
+        await tester.pumpAndSettle();
+        expect(selected, [1]);
+        expect(loads, 0);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets(
     'only leaves commit full paths; closing and browsing preserve value',
     (tester) async {

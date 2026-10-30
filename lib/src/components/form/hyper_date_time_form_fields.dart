@@ -165,8 +165,10 @@ class HyperDateTimeRangeFormField extends HyperFormField<DateTimeRange> {
     DateTime? maximum,
     int minuteInterval = 1,
     bool showSeconds = false,
+    String? placeholder,
   }) : super(
          fieldBuilder: (f) => HyperDateTimeRangePicker(
+           placeholder: placeholder,
            value: f.value,
            onChanged: f.enabled ? f.didChange : null,
            enabled: f.enabled,

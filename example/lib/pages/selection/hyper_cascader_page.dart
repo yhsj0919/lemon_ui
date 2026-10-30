@@ -44,7 +44,11 @@ class HyperCascaderPage extends StatefulWidget {
 }
 
 class _HyperCascaderPageState extends State<HyperCascaderPage> {
-  List<String> _region = [], _remote = [], _local = [], _instance = [];
+  List<String> _region = [],
+      _remote = [],
+      _local = [],
+      _instance = [],
+      _industry = [];
   bool _failNext = true;
   final _form = HyperFormController();
   String _submitted = '尚未提交';
@@ -89,6 +93,29 @@ class _HyperCascaderPageState extends State<HyperCascaderPage> {
               ),
               HyperText(_region.isEmpty ? '尚未选择' : _region.join(' → ')),
             ],
+          ),
+        ),
+        DemoSection(
+          title: '仅选择一级行业 · maxDepth: 1',
+          child: HyperCascader<String>(
+            nodes: const [
+              HyperCascaderNode(
+                value: 'technology',
+                label: '信息技术',
+                children: [HyperCascaderNode(value: 'software', label: '软件服务')],
+              ),
+              HyperCascaderNode(
+                value: 'manufacturing',
+                label: '制造业',
+                children: [
+                  HyperCascaderNode(value: 'equipment', label: '设备制造'),
+                ],
+              ),
+            ],
+            value: _industry,
+            maxDepth: 1,
+            placeholder: '选择一级行业',
+            onChanged: (value) => setState(() => _industry = value),
           ),
         ),
         DemoSection(

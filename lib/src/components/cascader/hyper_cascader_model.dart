@@ -41,11 +41,18 @@ class HyperCascaderController<T> extends ChangeNotifier {
   HyperCascaderController({
     required List<HyperCascaderNode<T>> nodes,
     this.loadChildren,
+    this.maxDepth,
   }) {
+    if (maxDepth != null && maxDepth! < 1) {
+      throw ArgumentError.value(maxDepth, 'maxDepth');
+    }
     _roots = _snapshot(nodes, <T>{});
   }
 
   final HyperCascaderChildrenLoader<T>? loadChildren;
+
+  /// The displayed depth limit; null retains the complete tree.
+  final int? maxDepth;
   late final List<HyperCascaderNode<T>> _roots;
   final _index = <T, HyperCascaderNode<T>>{};
   final _children = <T, List<HyperCascaderNode<T>>>{};
@@ -85,8 +92,9 @@ class HyperCascaderController<T> extends ChangeNotifier {
 
   List<HyperCascaderNode<T>> _snapshot(
     List<HyperCascaderNode<T>> nodes,
-    Set<T> seen,
-  ) {
+    Set<T> seen, [
+    int depth = 0,
+  ]) {
     // Validate before committing any of an async response to the index.
     void validate(List<HyperCascaderNode<T>> items) {
       for (final node in items) {
@@ -98,19 +106,24 @@ class HyperCascaderController<T> extends ChangeNotifier {
     }
 
     validate(nodes);
-    List<HyperCascaderNode<T>> copy(List<HyperCascaderNode<T>> items) =>
-        List.unmodifiable([
-          for (final node in items)
-            _index[node.value] = HyperCascaderNode<T>(
-              value: node.value,
-              label: node.label,
-              children: copy(node.children),
-              hasChildren: node.hasChildren,
-              enabled: node.enabled,
-              leading: node.leading,
-            ),
-        ]);
-    return copy(nodes);
+    List<HyperCascaderNode<T>> copy(
+      List<HyperCascaderNode<T>> items,
+      int level,
+    ) => List.unmodifiable([
+      for (final node in items)
+        _index[node.value] = HyperCascaderNode<T>(
+          value: node.value,
+          label: node.label,
+          children: maxDepth != null && level + 1 >= maxDepth!
+              ? const []
+              : copy(node.children, level + 1),
+          hasChildren:
+              (maxDepth == null || level + 1 < maxDepth!) && node.hasChildren,
+          enabled: node.enabled,
+          leading: node.leading,
+        ),
+    ]);
+    return copy(nodes, depth);
   }
 
   /// Resolves only contiguous, known ancestors.
@@ -202,7 +215,9 @@ class HyperCascaderController<T> extends ChangeNotifier {
           throw StateError('动态分支需要 loadChildren。');
         }
         final result = await loadChildren!(List.unmodifiable(path));
-        if (!_disposed) _children[parent.value] = _snapshot(result, <T>{});
+        if (!_disposed) {
+          _children[parent.value] = _snapshot(result, <T>{}, path.length);
+        }
       } catch (error) {
         if (!_disposed) _errors[parent.value] = error;
       } finally {

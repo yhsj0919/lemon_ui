@@ -1,6 +1,8 @@
 /// Lemon UI 组件库。
 library;
 
+export 'src/foundation/hyper_image_colors.dart';
+
 export 'src/foundation/hyper_line.dart';
 export 'src/painting/hyper_dashed_border.dart';
 

@@ -39,6 +39,29 @@ HyperCascader<int> _picker(WidgetTester tester) =>
     tester.widget<HyperCascader<int>>(find.byType(HyperCascader<int>));
 
 void main() {
+  testWidgets('form forwards maxDepth and commits a first-level path', (
+    tester,
+  ) async {
+    final form = HyperFormController();
+    await tester.pumpWidget(
+      _app(
+        form,
+        HyperCascaderFormField<int>(
+          name: 'industry',
+          nodes: _nodes,
+          maxDepth: 1,
+        ),
+      ),
+    );
+    expect(_picker(tester).maxDepth, 1);
+    await tester.tap(find.text('请选择').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('浙江省').last);
+    await tester.pumpAndSettle();
+    expect(_picker(tester).value, [1]);
+    await tester.pumpWidget(const SizedBox());
+    form.dispose();
+  });
   testWidgets(
     'required path validates, branches do not touch form, leaf saves and clear fails validation',
     (tester) async {

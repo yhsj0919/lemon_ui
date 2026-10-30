@@ -274,6 +274,7 @@ String _label(String id) => switch (id) {
   'hyper-image-editor' => '图片编辑',
   'hyper-image' => '图片',
   'hyper-motion-lift' => '悬停上浮',
+  'hyper-image-gradient' => '图片取色渐变',
   'hyper-popover' => '锚定面板',
   'hyper-pressable' => '按压交互',
   'hyper-text-field' => '文本输入',

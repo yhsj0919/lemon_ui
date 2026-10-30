@@ -58,6 +58,14 @@ class _State extends State<HyperDateTimePickerPage> {
         ),
       ),
       DemoSection(
+        title: '日期时间区间 · 自定义空态文案',
+        child: HyperDateTimeRangePicker(
+          value: dateTimeRange,
+          placeholder: '请选择统计时间范围',
+          onChanged: (v) => setState(() => dateTimeRange = v),
+        ),
+      ),
+      DemoSection(
         title: '日期和时间 · 默认主题',
         child: HyperDateTimePicker(
           value: dateTime,

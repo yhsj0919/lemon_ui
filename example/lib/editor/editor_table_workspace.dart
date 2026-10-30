@@ -5,6 +5,14 @@ extension _TableWorkspace on _ThemeEditorState {
     final t = _resolveTheme(_dark), s = t.sizes.resolve(_device).table;
     final m = _spec.tableMetrics, v = _mode.tableVisual;
     final font = t.textTheme.bodyMedium!.fontSize!;
+    Widget flag(String label, bool? value, ValueChanged<bool?> set) =>
+        _select<String>(
+          label,
+          value?.toString() ?? 'inherit',
+          const {'inherit': '继承主题', 'true': '开启', 'false': '关闭'},
+          (value) =>
+              _change(() => set(value == 'inherit' ? null : value == 'true')),
+        );
     Widget n(
       String label,
       double? value,
@@ -36,6 +44,11 @@ extension _TableWorkspace on _ThemeEditorState {
     return _panel('数据表格', [
       const HyperText('尺寸按真实设备保存，外观按亮暗保存。默认继承；各审核示例不使用实例样式覆盖。'),
       _heading('表头'),
+      flag(
+        '常显列宽调整线',
+        v.showColumnResizeHandles,
+        (value) => v.showColumnResizeHandles = value,
+      ),
       n(
         '表头最小高度',
         m.headerHeight,
@@ -59,6 +72,7 @@ extension _TableWorkspace on _ThemeEditorState {
         inheritedColor: t.colors.textPrimary,
       ),
       _heading('单元格'),
+      flag('斑马纹', v.striped, (value) => v.striped = value),
       n(
         '单元格最小高度',
         m.rowHeight,
@@ -170,6 +184,7 @@ extension _TableWorkspace on _ThemeEditorState {
         child: const Text('编辑统一输入框主题'),
       ),
       _heading('动效'),
+      flag('悬停浮起', v.hoverLift, (value) => v.hoverLift = value),
       n(
         '行状态过渡（毫秒）',
         v.duration,
@@ -186,7 +201,7 @@ extension _TableWorkspace on _ThemeEditorState {
         editorReviewDurationLimit,
         (x) => v.liftDuration = x,
       ),
-      const HyperText('浮起通过 Demo 的“开启悬停浮起”开关预览；拖动预览共用浮起阴影与圆角。'),
+      const HyperText('悬停浮起默认继承主题；Demo 中手动切换会形成实例覆盖。拖动预览共用浮起阴影与圆角。'),
       _heading('行状态'),
       _select<String>('状态覆盖', _tableState, const {
         'hover': '悬停',

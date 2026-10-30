@@ -19,8 +19,15 @@ void main() {
       doc.light.tableVisual.selectedBackground = const EditorColor(
         argb: 0xff123456,
       );
+      doc.light.tableVisual.hoverLift = true;
+      doc.light.tableVisual.striped = false;
+      doc.light.tableVisual.showColumnResizeHandles = true;
       final restored = EditorThemeDocument.decode(doc.encode());
       final desktop = restored.resolve(false);
+      expect(desktop.tableTheme.style.hoverLift, isTrue);
+      expect(desktop.tableTheme.style.striped, isFalse);
+      expect(desktop.tableTheme.style.showColumnResizeHandles, isTrue);
+      expect(restored.resolve(true).tableTheme.style.hoverLift, isNull);
       expect(desktop.sizes.desktop.table.rowHeight, 60);
       expect(desktop.sizes.phone.table.rowHeight, 68);
       expect(desktop.sizes.desktop.table.treeIndent, 24);

@@ -11,6 +11,9 @@ import '../../foundation/hyper_surface_material.dart';
 @immutable
 final class HyperTableStyle {
   const HyperTableStyle({
+    this.hoverLift,
+    this.striped,
+    this.showColumnResizeHandles,
     this.editorStyle,
     this.footerPadding,
     this.scrollbarTheme,
@@ -48,6 +51,7 @@ final class HyperTableStyle {
     this.curve,
   });
   final HyperTextFieldStyle? editorStyle;
+  final bool? hoverLift, striped, showColumnResizeHandles;
   final EdgeInsetsGeometry? footerPadding;
   final ScrollbarThemeData? scrollbarTheme;
   final double? treeIndent;
@@ -87,6 +91,9 @@ final class HyperTableStyle {
   final Duration? liftDuration;
   final Curve? curve;
   HyperTableStyle copyWith({
+    bool? hoverLift,
+    bool? striped,
+    bool? showColumnResizeHandles,
     HyperTextFieldStyle? editorStyle,
     EdgeInsetsGeometry? footerPadding,
     ScrollbarThemeData? scrollbarTheme,
@@ -123,6 +130,10 @@ final class HyperTableStyle {
     Duration? liftDuration,
     Curve? curve,
   }) => HyperTableStyle(
+    hoverLift: hoverLift ?? this.hoverLift,
+    striped: striped ?? this.striped,
+    showColumnResizeHandles:
+        showColumnResizeHandles ?? this.showColumnResizeHandles,
     editorStyle: editorStyle ?? this.editorStyle,
     footerPadding: footerPadding ?? this.footerPadding,
     scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
@@ -162,6 +173,10 @@ final class HyperTableStyle {
   HyperTableStyle merge(HyperTableStyle? other) => other == null
       ? this
       : HyperTableStyle(
+          hoverLift: other.hoverLift ?? hoverLift,
+          striped: other.striped ?? striped,
+          showColumnResizeHandles:
+              other.showColumnResizeHandles ?? showColumnResizeHandles,
           footerPadding: other.footerPadding ?? footerPadding,
           editorStyle:
               editorStyle?.merge(other.editorStyle) ?? other.editorStyle,
@@ -207,6 +222,11 @@ final class HyperTableStyle {
       : t == 1
       ? b
       : HyperTableStyle(
+          hoverLift: t < .5 ? a.hoverLift : b.hoverLift,
+          striped: t < .5 ? a.striped : b.striped,
+          showColumnResizeHandles: t < .5
+              ? a.showColumnResizeHandles
+              : b.showColumnResizeHandles,
           editorStyle: a.editorStyle == null || b.editorStyle == null
               ? (t < .5 ? a.editorStyle : b.editorStyle)
               : HyperTextFieldStyle.lerp(a.editorStyle!, b.editorStyle!, t),
@@ -316,6 +336,9 @@ final class HyperTableStyle {
   @override
   bool operator ==(Object other) =>
       other is HyperTableStyle &&
+      hoverLift == other.hoverLift &&
+      striped == other.striped &&
+      showColumnResizeHandles == other.showColumnResizeHandles &&
       footerPadding == other.footerPadding &&
       editorStyle == other.editorStyle &&
       scrollbarTheme == other.scrollbarTheme &&
@@ -353,6 +376,9 @@ final class HyperTableStyle {
       curve == other.curve;
   @override
   int get hashCode => Object.hashAll([
+    hoverLift,
+    striped,
+    showColumnResizeHandles,
     footerPadding,
     editorStyle,
     scrollbarTheme,

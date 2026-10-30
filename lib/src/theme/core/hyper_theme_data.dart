@@ -88,6 +88,8 @@ import '../typography/hyper_typography_theme_data.dart';
 TextStyle? _standaloneTextStyle(TextStyle? style) => style?.copyWith(
   inherit: false,
   textBaseline: style.textBaseline ?? TextBaseline.alphabetic,
+  leadingDistribution:
+      style.leadingDistribution ?? TextLeadingDistribution.even,
 );
 
 TextTheme _standaloneTextTheme(TextTheme text) => TextTheme(

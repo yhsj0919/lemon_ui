@@ -35,10 +35,19 @@ HyperTextFieldStyle resolveHyperTextFieldStyle(
       textStyle: theme.textTheme.labelLarge?.copyWith(
         fontWeight: FontWeight.w400,
         height: theme.textTheme.labelLarge?.height ?? 1,
+        // Compact CJK fonts can have a large natural ascent/descent ratio.
+        // Even leading keeps the editable strut and its visible line balanced
+        // without changing font size, text scaling or the theme's line height.
+        leadingDistribution:
+            theme.textTheme.labelLarge?.leadingDistribution ??
+            TextLeadingDistribution.even,
       ),
       hintStyle: theme.textTheme.labelLarge?.copyWith(
         color: theme.colors.textTertiary,
         fontWeight: FontWeight.w400,
+        leadingDistribution:
+            theme.textTheme.labelLarge?.leadingDistribution ??
+            TextLeadingDistribution.even,
       ),
       labelStyle: theme.textTheme.labelMedium?.copyWith(
         color: theme.colors.textSecondary,

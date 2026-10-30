@@ -2,6 +2,8 @@
 
 公开控件包括 `HyperDatePicker`、`HyperTimePicker`、`HyperDateTimePicker`、`HyperDateTimeRangePicker` 和 `HyperCalendar`。Picker 浮层复用 Select 的设备呈现与表面主题；desktop 默认锚定呈现，phone/tablet 默认底部面板。可用 `presentation` 明确覆盖。
 
+`HyperDateTimeRangePicker` 的 `placeholder` 可自定义未选择时的提示，例如 `placeholder: '请选择统计时间范围'`。省略时保留按 `mode` 生成的默认文案；已选择范围时仍显示起止值。`HyperDateTimeRangeFormField` 透传同名参数。
+
 ## 单值选择
 
 ```dart

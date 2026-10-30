@@ -103,6 +103,7 @@ class EditorTableMetrics {
 }
 
 class EditorTableVisual {
+  bool? hoverLift, striped, showColumnResizeHandles;
   EditorColor? liftBackground;
   EditorColor? liftBorderColor;
   double? duration, liftDuration;
@@ -118,6 +119,10 @@ class EditorTableVisual {
   EditorColor? borderColor;
   EditorColor? focusColor;
   Map<String, Object?> toJson() => {
+    if (hoverLift != null) 'hoverLift': hoverLift,
+    if (striped != null) 'striped': striped,
+    if (showColumnResizeHandles != null)
+      'showColumnResizeHandles': showColumnResizeHandles,
     if (liftBackground != null) 'liftBackground': liftBackground!.toJson(),
     if (liftBorderColor != null) 'liftBorderColor': liftBorderColor!.toJson(),
     if (duration != null) 'duration': duration,
@@ -143,6 +148,9 @@ class EditorTableVisual {
   static EditorTableVisual fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'hoverLift',
+        'striped',
+        'showColumnResizeHandles',
         'liftBackground',
         'liftBorderColor',
         'duration',
@@ -163,6 +171,9 @@ class EditorTableVisual {
       throw const FormatException('未知表格主题字段');
     }
     return EditorTableVisual()
+      ..hoverLift = _optionalBool(j['hoverLift'])
+      ..striped = _optionalBool(j['striped'])
+      ..showColumnResizeHandles = _optionalBool(j['showColumnResizeHandles'])
       ..liftBorderColor = j['liftBorderColor'] == null
           ? null
           : EditorColor.fromJson(j['liftBorderColor'] as Map<String, dynamic>)
@@ -215,6 +226,9 @@ class EditorTableVisual {
     EditorTableMetrics m, {
     HyperTableSize? inherited,
   }) => HyperTableStyle(
+    hoverLift: hoverLift,
+    striped: striped,
+    showColumnResizeHandles: showColumnResizeHandles,
     footerPadding:
         m.footerHorizontalPadding == null && m.footerVerticalPadding == null
         ? null
@@ -269,4 +283,9 @@ double? _number(dynamic v) {
     throw const FormatException('表格尺寸必须为非负有限数字');
   }
   return v.toDouble();
+}
+
+bool? _optionalBool(dynamic value) {
+  if (value == null || value is bool) return value as bool?;
+  throw const FormatException('表格开关必须为布尔值');
 }

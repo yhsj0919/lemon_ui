@@ -24,6 +24,27 @@ const _roots = [
 ];
 
 void main() {
+  test('maxDepth applies to dynamically loaded children', () async {
+    var loads = 0;
+    final controller = HyperCascaderController<int>(
+      maxDepth: 2,
+      nodes: const [
+        HyperCascaderNode(value: 1, label: 'root', hasChildren: true),
+      ],
+      loadChildren: (_) async {
+        loads++;
+        return const [
+          HyperCascaderNode(value: 2, label: 'level2', hasChildren: true),
+        ];
+      },
+    );
+    await controller.enter(controller.nodes.first);
+    final second = controller.options.first;
+    expect(controller.isBranch(second), isFalse);
+    await controller.loadBranch([controller.nodes.first, second]);
+    expect(loads, 1);
+    controller.dispose();
+  });
   test(
     'navigation restores only known contiguous ancestors and skips disabled',
     () async {

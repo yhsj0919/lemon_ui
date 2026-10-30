@@ -5,6 +5,8 @@
 可选首部 `leading`、静态 `children`、动态分支标记 `hasChildren` 和 `enabled`。
 节点值必须全树唯一且具有稳定的相等性；传入的数据列表应视为不可变配置。
 
+默认需选到叶子节点。设置 `maxDepth: 1` 可只选择一级行业：根节点即使有子节点也可直接提交 `[rootValue]`，不展示或加载下级；`maxDepth: 2` 则最多选到第二级，提前遇到自然叶子时仍可提交。限制在公共控制器的数据视图中应用，桌面菜单、移动端滚轮与独立页面遵守同一规则，不修改传入的原始节点。`maxDepth` 须为正整数，省略时保留完整级联；`HyperCascaderFormField` 同样支持该参数。
+
 ```dart
 HyperCascader<String>(
   nodes: const [

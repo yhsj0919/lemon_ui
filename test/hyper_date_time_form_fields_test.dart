@@ -33,6 +33,7 @@ void main() {
                   HyperDateTimeFormField(name: 'dateTime', initialValue: date),
                   HyperDateTimeRangeFormField(
                     name: 'range',
+                    placeholder: '请选择统计区间',
                     initialValue: range,
                   ),
                 ],
@@ -43,6 +44,14 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
+    expect(
+      t
+          .widget<HyperDateTimeRangePicker>(
+            find.byType(HyperDateTimeRangePicker),
+          )
+          .placeholder,
+      '请选择统计区间',
+    );
     t.widget<HyperDatePicker>(find.byType(HyperDatePicker)).onChanged!(null);
     t.widget<HyperTimePicker>(find.byType(HyperTimePicker)).onChanged!(null);
     final fullPicker = find.byWidgetPredicate(

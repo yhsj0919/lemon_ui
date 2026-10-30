@@ -976,3 +976,12 @@ Gallery 预留“表单”正式分类；Form Demo 与编辑入口暂位于“�
 新增 ratingTheme、transferTheme、resizableTheme、movableDialogTheme、navigationBarTheme 强类型全局主题，局部 Theme 和实例 Style 只覆盖显式字段；复制、插值、值相等和哈希保持完整。默认四端几何复用当前已解析的 icon/button/form/divider/menu/selection/card/dialog 等语义规格，不在组件内分设备保存常量。编辑器设备尺寸与亮暗颜色分开保存。详见 usage/pending-controls.md。
 
 HyperDialog 新增 surfaceBuilder，只包装已完成材质、边框、阴影与圆角解析的表面；可移动对话框以此复用公共路径，仅施加平移。路由继续使用 showHyperDialog 的调用处主题捕获和安全材质过渡，空阴影与显式边框优先。
+## CJK 字体的 leading 默认值（2026-10-30）
+
+主题工厂生成的所有文字字阶，在未显式指定时采用
+`TextLeadingDistribution.even`，保留字体、字号、行高、字重及系统 TextScaler。
+输入框解析使用同样的默认值，使普通输入和数字输入的测量样式与可编辑文字一致。
+显式的 proportional 或自定义行高仍优先；不统一把正文行高压成 1，不用文字偏移
+或关闭缩放处理对齐。实测思源黑体 14 逻辑像素、0.875 缩放时，默认比例 leading
+会令可编辑数字行框低于测量行高；even 消除该差异。真实字体回归入口为
+`test/hyper_input_leading_test.dart` 的 `CJK_REVIEW_FONT` 参数。

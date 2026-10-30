@@ -157,6 +157,14 @@ height 是输入框表面的期望高度，不包含上方 label。降低高度�
 保留字号、行高和系统文字缩放；文字、图标或多行内容放不下时，实际高度会自然撑高。
 不设置 height 时，继续使用主题 minimumHeight 和 padding。自定义前后缀也可能撑高输入框。
 
+输入文字和占位文字默认采用 `TextLeadingDistribution.even`，让紧凑行高下的
+CJK 字体（如思源黑体）均匀分配上下 leading，避免可编辑行框与数字字形出现
+不一致的高度和基线观感。此设置由普通输入框与 `HyperNumberInput` 共用，
+不缩放文字、不重写主题行高，也不改变正文 `HyperText` 的排版。
+显式设置的全局字阶、输入框主题、状态或实例文字样式仍优先。
+真实字体回归可通过 `--dart-define=CJK_REVIEW_FONT=字体文件路径` 运行
+`test/hyper_input_leading_test.dart`。
+
 [组件源码](../../lib/src/components/text_field/hyper_text_field.dart) ·
 [Style](../../lib/src/components/text_field/hyper_text_field_style.dart) ·
 [ThemeData](../../lib/src/components/text_field/hyper_text_field_theme.dart) ·

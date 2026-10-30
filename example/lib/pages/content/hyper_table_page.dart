@@ -130,11 +130,8 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
   );
   Set<Object> _selected = {};
   HyperTableDataMode _mode = HyperTableDataMode.local;
-  bool _paginate = false,
-      _striped = true,
-      _hoverLift = false,
-      _showDepartment = true,
-      _failNext = false;
+  bool? _striped, _hoverLift;
+  bool _paginate = false, _showDepartment = true, _failNext = false;
   String _message = '表头可拖动、点击排序、右键打开列菜单；名称与数量使用输入框，部门使用自定义下拉编辑器。';
   late final List<HyperTableColumn<_Record>> _columns = [
     HyperTableColumn(
@@ -247,10 +244,7 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
     return ListView(
       padding: EdgeInsets.all(s.pageHorizontalPadding),
       children: [
-        const HyperText(
-          '数据表格',
-          variant: HyperTextVariant.pageTitle,
-        ),
+        const HyperText('数据表格', variant: HyperTextVariant.pageTitle),
         const HyperText('默认主题审核：本页不覆盖实例样式。旧版只作功能对照，新版没有复制旧封装或补丁。'),
         SizedBox(height: s.compactSectionSpacing),
         Wrap(
@@ -322,12 +316,39 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
               child: Text(_paginate ? '关闭本地分页' : '开启本地分页'),
             ),
             HyperButton.tonal(
-              onPressed: () => setState(() => _striped = !_striped),
-              child: Text(_striped ? '关闭斑马色' : '开启斑马色'),
+              onPressed: () => setState(
+                () => _striped =
+                    !(_striped ??
+                        HyperTableTheme.of(context).style.striped ??
+                        true),
+              ),
+              child: Text(
+                (_striped ?? HyperTableTheme.of(context).style.striped ?? true)
+                    ? '实例覆盖 · 关闭斑马色'
+                    : '实例覆盖 · 开启斑马色',
+              ),
             ),
             HyperButton.tonal(
-              onPressed: () => setState(() => _hoverLift = !_hoverLift),
-              child: Text(_hoverLift ? '关闭悬停浮起' : '开启悬停浮起'),
+              onPressed: () => setState(
+                () => _hoverLift =
+                    !(_hoverLift ??
+                        HyperTableTheme.of(context).style.hoverLift ??
+                        false),
+              ),
+              child: Text(
+                (_hoverLift ??
+                        HyperTableTheme.of(context).style.hoverLift ??
+                        false)
+                    ? '实例覆盖 · 关闭悬停浮起'
+                    : '实例覆盖 · 开启悬停浮起',
+              ),
+            ),
+            HyperButton.text(
+              onPressed: () => setState(() {
+                _hoverLift = null;
+                _striped = null;
+              }),
+              label: const Text('恢复表格外观继承'),
             ),
             HyperButton.tonal(
               onPressed: () =>

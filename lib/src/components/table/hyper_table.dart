@@ -50,7 +50,7 @@ class HyperTable<T> extends StatefulWidget {
     this.pageSize = 20,
     this.paginateLocalRows = false,
     this.showPagination = true,
-    this.showColumnResizeHandles = false,
+    this.showColumnResizeHandles,
     this.controller,
     this.selectionMode = HyperTableSelectionMode.none,
     this.selectedKeys = const {},
@@ -70,8 +70,8 @@ class HyperTable<T> extends StatefulWidget {
     this.treeColumnId,
     this.expandedKeys,
     this.onExpandedChanged,
-    this.striped = true,
-    this.hoverLift = false,
+    this.striped,
+    this.hoverLift,
     this.style,
     this.empty,
     this.noMore,
@@ -89,7 +89,8 @@ class HyperTable<T> extends StatefulWidget {
   final VoidCallback? onRefreshRequested;
   final HyperTableDataMode dataMode;
   final int pageSize;
-  final bool paginateLocalRows, striped, reorderableRows;
+  final bool paginateLocalRows, reorderableRows;
+  final bool? striped;
 
   /// Whether to show the built-in pager; pagination and controller commands
   /// remain available when an external pager is used.
@@ -97,10 +98,10 @@ class HyperTable<T> extends StatefulWidget {
 
   /// Keeps column resize lines visible; otherwise they appear on hover.
   /// The resize hit region remains stable while the handle fades.
-  final bool showColumnResizeHandles;
+  final bool? showColumnResizeHandles;
 
   /// Gives hovered rows the same lifted surface treatment as drag feedback.
-  final bool hoverLift;
+  final bool? hoverLift;
   final HyperTableController? controller;
   final HyperTableSelectionMode selectionMode;
   final Set<Object> selectedKeys;
@@ -167,6 +168,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       widget.dataMode == HyperTableDataMode.infinite &&
       _data.isNotEmpty;
   HyperTableStyle? _resolved;
+  bool get _hoverLift => widget.hoverLift ?? _resolved?.hoverLift ?? false;
+  bool get _striped => widget.striped ?? _resolved?.striped ?? true;
+  bool get _showColumnResizeHandles =>
+      widget.showColumnResizeHandles ??
+      _resolved?.showColumnResizeHandles ??
+      false;
   final _captureKey = GlobalKey();
   final _rowsStackKey = GlobalKey();
   final _hoverLiftRect = ValueNotifier<Rect?>(null);
@@ -293,7 +300,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       : 0;
 
   void _showHoverLift(BuildContext rowContext) {
-    if (!widget.hoverLift || _draggingRow) return;
+    if (!_hoverLift || _draggingRow) return;
     final stack =
         _rowsStackKey.currentContext?.findRenderObject() as RenderBox?;
     final rowBox = rowContext.findRenderObject() as RenderBox?;
@@ -467,6 +474,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final previous = _resolved;
     final t = HyperTheme.of(context), m = HyperTheme.sizesOf(context).table;
     _resolved = HyperTableStyle(
+      hoverLift: false,
+      striped: true,
+      showColumnResizeHandles: false,
       scrollbarTheme: ScrollbarTheme.of(context),
       footerPadding: EdgeInsets.all(m.horizontalPadding),
       rowBoxShadow:
@@ -1325,8 +1335,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                       width: _resolved!.iconSize,
                       height: double.infinity,
                       child: AnimatedOpacity(
-                        opacity:
-                            widget.showColumnResizeHandles || hovered == c.field
+                        opacity: _showColumnResizeHandles || hovered == c.field
                             ? 1
                             : 0,
                         duration: MediaQuery.of(context).disableAnimations
@@ -1388,7 +1397,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         // Each separator belongs to the preceding row. Hide both edges of
         // the lifted row, including the separator painted by its neighbour.
         final hideSeparator =
-            widget.hoverLift &&
+            _hoverLift &&
             !_draggingRow &&
             hovered != null &&
             (hovered == key ||
@@ -1411,17 +1420,17 @@ class _HyperTableState<T> extends State<HyperTable<T>>
           child: AnimatedContainer(
             duration: MediaQuery.of(context).disableAnimations
                 ? Duration.zero
-                : (widget.hoverLift ? s.liftDuration! : s.duration!),
+                : (_hoverLift ? s.liftDuration! : s.duration!),
             curve: s.curve!,
             decoration: BoxDecoration(color: s.background),
             child: ColoredBox(
-              color: widget.striped && index.isOdd
+              color: _striped && index.isOdd
                   ? s.stripeBackground!
                   : Colors.transparent,
               child: AnimatedContainer(
                 duration: MediaQuery.of(context).disableAnimations
                     ? Duration.zero
-                    : (widget.hoverLift ? s.liftDuration! : s.duration!),
+                    : (_hoverLift ? s.liftDuration! : s.duration!),
                 curve: s.curve!,
                 foregroundDecoration: BoxDecoration(
                   border: Border(
@@ -1437,19 +1446,19 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                 // interpolating its RGB channels from transparent black.
                 decoration: widget.selectedKeys.contains(key)
                     ? BoxDecoration(
-                        color: widget.hoverLift && hovered == key
+                        color: _hoverLift && hovered == key
                             ? s.liftBackground ?? s.selectedBackground
                             : s.selectedBackground,
-                        borderRadius: widget.hoverLift && hovered == key
+                        borderRadius: _hoverLift && hovered == key
                             ? _liftSegmentRadius(context)
                             : null,
                       )
                     : hovered == key
                     ? BoxDecoration(
-                        color: widget.hoverLift
+                        color: _hoverLift
                             ? s.liftBackground
                             : s.hoverBackground,
-                        borderRadius: widget.hoverLift
+                        borderRadius: _hoverLift
                             ? _liftSegmentRadius(context)
                             : null,
                       )
@@ -1993,16 +2002,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                       gridBorderWidth: 0,
                                       gridBorderColor: s.borderColor!,
                                       borderColor: s.borderColor!,
-                                      activatedBorderColor:
-                                          widget.selectionMode ==
-                                              HyperTableSelectionMode.none
-                                          ? s.focusColor!
-                                          : Colors.transparent,
-                                      inactivatedBorderColor:
-                                          widget.selectionMode ==
-                                              HyperTableSelectionMode.none
-                                          ? s.borderColor!
-                                          : Colors.transparent,
+                                      activatedBorderColor: Colors.transparent,
+                                      inactivatedBorderColor: Colors.transparent,
                                       enableCellBorderVertical: false,
                                       enableCellBorderHorizontal: false,
                                       // Row separators are painted inside _rowSurface. Do not
@@ -2270,7 +2271,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                   },
                                   child:
                                       rect != null &&
-                                          widget.hoverLift &&
+                                          _hoverLift &&
                                           !_draggingRow
                                       ? CustomPaint(
                                           key: ValueKey(rect),

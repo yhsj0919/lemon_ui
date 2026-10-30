@@ -35,6 +35,54 @@ List<HyperTableColumn<String>> _columns() => [
 ];
 
 void main() {
+  for (final mode in HyperTableSelectionMode.values) {
+    testWidgets(
+      'ordinary cell activation has no border in selection mode $mode',
+      (tester) async {
+        final theme = HyperThemeData.light().copyWith(
+          tableTheme: const HyperTableThemeData(
+            style: HyperTableStyle(
+              focusColor: Colors.purple,
+              borderColor: Colors.red,
+            ),
+          ),
+        );
+        await tester.pumpWidget(
+          _host(
+            HyperTable<String>(
+              columns: _columns(),
+              rows: const ['row-a', 'row-b'],
+              rowKey: (row) => row,
+              selectionMode: mode,
+            ),
+            theme: theme,
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('row-a').first);
+        await tester.pumpAndSettle();
+        final grid = tester.widget<trina.TrinaGrid>(
+          find.byType(trina.TrinaGrid),
+        );
+        expect(
+          grid.configuration.style.activatedBorderColor,
+          Colors.transparent,
+        );
+        expect(
+          grid.configuration.style.inactivatedBorderColor,
+          Colors.transparent,
+        );
+        expect(grid.configuration.style.borderColor, Colors.red);
+        expect(
+          HyperTableTheme.of(tester.element(find.byType(HyperTable<String>)))
+              .style
+              .focusColor,
+          Colors.purple,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   for (final count in [1, 60]) {
     testWidgets(
       'flex columns fill the body without a scrollbar gutter: $count rows',

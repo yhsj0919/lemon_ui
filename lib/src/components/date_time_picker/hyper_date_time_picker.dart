@@ -768,6 +768,7 @@ class HyperDateTimeRangePicker extends StatefulWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.placeholder,
     this.mode = HyperDateTimePickerMode.dateTime,
     this.minimum,
     this.maximum,
@@ -780,6 +781,9 @@ class HyperDateTimeRangePicker extends StatefulWidget {
   });
   final DateTimeRange? value;
   final ValueChanged<DateTimeRange?>? onChanged;
+
+  /// The empty-state label, otherwise derived from [mode].
+  final String? placeholder;
   final HyperDateTimePickerMode mode;
   final DateTime? minimum, maximum;
   final int minuteInterval;
@@ -876,11 +880,12 @@ class _RangePickerHostState extends State<HyperDateTimeRangePicker> {
       surfaceStyle: _pickerSurface(context, style, surfaceStyle),
       label: HyperScrollingText(
         value == null
-            ? switch (mode) {
-                HyperDateTimePickerMode.date => '选择日期区间',
-                HyperDateTimePickerMode.time => '选择时间段',
-                HyperDateTimePickerMode.dateTime => '选择日期时间区间',
-              }
+            ? widget.placeholder ??
+                  switch (mode) {
+                    HyperDateTimePickerMode.date => '选择日期区间',
+                    HyperDateTimePickerMode.time => '选择时间段',
+                    HyperDateTimePickerMode.dateTime => '选择日期时间区间',
+                  }
             : '${format(value!.start)} — ${format(value!.end)}',
         trigger: HyperTextScrollTrigger.hover,
       ),

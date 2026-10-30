@@ -1,4 +1,5 @@
 import '../pages/pending/hyper_motion_lift_page.dart';
+import '../pages/pending/hyper_image_gradient_page.dart';
 import '../pages/content/hyper_image_tools_pages.dart';
 import '../pages/content/hyper_image_page.dart';
 import '../pages/interaction/hyper_popover_page.dart';
@@ -93,6 +94,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '未确认',
     items: [
+      GalleryItem(
+        id: 'hyper-image-gradient',
+        title: '图片取色渐变',
+        description: '本地或链接图片取主色，与指定颜色生成渐变。',
+        icon: Icons.gradient,
+        builder: (_) => const HyperImageGradientPage(),
+      ),
       GalleryItem(
         id: 'hyper-motion-lift',
         title: '悬停上浮',

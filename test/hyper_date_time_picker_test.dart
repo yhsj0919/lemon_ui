@@ -48,6 +48,36 @@ Future<void> confirm(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('range placeholder customizes only the empty label', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        HyperDateTimeRangePicker(
+          value: null,
+          onChanged: (_) {},
+          placeholder: '请选择统计区间',
+        ),
+      ),
+    );
+    expect(find.text('请选择统计区间'), findsOneWidget);
+    final range = DateTimeRange(
+      start: DateTime(2026, 10, 1),
+      end: DateTime(2026, 10, 2),
+    );
+    await tester.pumpWidget(
+      host(
+        HyperDateTimeRangePicker(
+          value: range,
+          onChanged: (_) {},
+          placeholder: '请选择统计区间',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('请选择统计区间'), findsNothing);
+    expect(find.textContaining('2026年10月1日'), findsOneWidget);
+  });
   testWidgets('desktop time actions fit one row by default', (tester) async {
     await open(
       tester,

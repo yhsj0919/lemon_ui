@@ -2544,6 +2544,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
   Widget _componentPanel() => Obx(_buildComponentPanel);
 
   Widget _buildComponentPanel() {
+    if (_page == 'hyper-image-gradient') {
+      return _panel('图片取色渐变 · 未确认', [
+        const HyperText(
+          '图片来源与上方颜色在 Demo 中设置。此变体复用 HyperContainer 主题；圆角、内边距、边框、阴影及过渡在容器工作区配置。',
+        ),
+      ]);
+    }
     final sections = switch (_page) {
       'hyper-color-scheme' => {
         '主题与强调色',

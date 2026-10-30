@@ -5,12 +5,89 @@ import 'package:flutter/material.dart';
 
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
+import '../../foundation/hyper_image_colors.dart';
+
+part 'hyper_container_image_gradient.dart';
 
 /// 轻量的主题化容器。
 ///
 /// 视觉属性按“实例 → 容器主题 → 中性默认值”解析。
 /// 所有尺寸均直接使用 Flutter 逻辑尺寸，不执行倍率换算。
 class HyperContainer extends StatelessWidget {
+  /// Creates a gradient from [startColor] to a native Material color of [image].
+  ///
+  /// Accepts NetworkImage, AssetImage, MemoryImage and platform file providers.
+  /// Loading and failures use [fallbackColor], or [startColor].
+  /// The endpoint defaults to primary; [colorRole] can select primaryContainer.
+  /// [colorStrength] blends the image color toward [startColor], defaulting to
+  /// the container theme's imageColorStrength or 0.2. A value of one uses raw color.
+  /// The default direction is top to bottom; container theme overrides still apply.
+  factory HyperContainer.imageGradient({
+    Key? key,
+    required ImageProvider image,
+    required Color startColor,
+    HyperImageColorRole colorRole = HyperImageColorRole.primary,
+    double? colorStrength,
+    Color? fallbackColor,
+    AlignmentGeometry begin = Alignment.topCenter,
+    AlignmentGeometry end = Alignment.bottomCenter,
+    List<double>? stops,
+    ValueChanged<Color>? onColorExtracted,
+    ValueChanged<Object>? onImageError,
+    Widget? child,
+    HyperSurfaceMaterial? material,
+    BoxBorder? border,
+    BorderRadiusGeometry? borderRadius,
+    List<BoxShadow>? boxShadow,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    AlignmentGeometry? alignment,
+    double? width,
+    double? height,
+    BoxConstraints? constraints,
+    Duration? animationDuration,
+    Curve? animationCurve,
+    Clip? clipBehavior,
+  }) {
+    if (colorStrength != null &&
+        (!colorStrength.isFinite || colorStrength < 0 || colorStrength > 1)) {
+      throw ArgumentError.value(colorStrength, 'colorStrength');
+    }
+    if (stops != null &&
+        (stops.length != 2 ||
+            stops.any((stop) => !stop.isFinite || stop < 0 || stop > 1) ||
+            stops[0] > stops[1])) {
+      throw ArgumentError.value(stops, 'stops', '需要两个按顺序排列的 0 到 1 之间的位置');
+    }
+    return _HyperImageGradientContainer(
+      key: key,
+      image: image,
+      startColor: startColor,
+      colorRole: colorRole,
+      colorStrength: colorStrength,
+      fallbackColor: fallbackColor,
+      begin: begin,
+      end: end,
+      onColorExtracted: onColorExtracted,
+      onImageError: onImageError,
+      stops: stops == null ? null : List<double>.unmodifiable(stops),
+      material: material,
+      border: border,
+      borderRadius: borderRadius,
+      boxShadow: boxShadow,
+      padding: padding,
+      margin: margin,
+      alignment: alignment,
+      width: width,
+      height: height,
+      constraints: constraints,
+      animationDuration: animationDuration,
+      animationCurve: animationCurve,
+      clipBehavior: clipBehavior,
+      child: child,
+    );
+  }
+
   const HyperContainer({
     super.key,
     this.child,

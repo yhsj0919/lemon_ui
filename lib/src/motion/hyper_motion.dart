@@ -202,7 +202,6 @@ class _HyperMotionState extends State<HyperMotion> {
                   decoration: HyperBoxDecoration(
                     borderRadius: BorderRadius.circular(s.shadowRadius!),
                     boxShadow: showShadow ? value.shadows : const [],
-                    outerShadowsOnly: true,
                   ),
                   child: child,
                 ),
@@ -240,6 +239,27 @@ class _LiftTween extends Tween<_LiftVisual> {
   _LiftVisual lerp(double t) => _LiftVisual(
     offset: Offset.lerp(begin!.offset, end!.offset, t)!,
     scale: begin!.scale + (end!.scale - begin!.scale) * t,
-    shadows: BoxShadow.lerpList(begin!.shadows, end!.shadows, t)!,
+    shadows: _lerpShadows(begin!.shadows, end!.shadows, t),
   );
+
+  static List<BoxShadow> _lerpShadows(
+    List<BoxShadow> a,
+    List<BoxShadow> b,
+    double t,
+  ) {
+    // BoxShadow.lerpList scales unmatched shadows without fading their color.
+    // Fade to a transparent counterpart instead, keeping soft edges throughout.
+    return [
+      for (var i = 0; i < (a.length > b.length ? a.length : b.length); i++)
+        BoxShadow.lerp(
+          i < a.length
+              ? a[i]
+              : b[i].copyWith(color: b[i].color.withValues(alpha: 0)),
+          i < b.length
+              ? b[i]
+              : a[i].copyWith(color: a[i].color.withValues(alpha: 0)),
+          t,
+        )!,
+    ];
+  }
 }

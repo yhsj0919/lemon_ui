@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../painting/hyper_surface_border.dart';
+
 import '../../theme/core/hyper_theme.dart';
 import '../../foundation/hyper_fill.dart';
 import '../card/hyper_card_style.dart';
@@ -73,6 +75,17 @@ class HyperTabBar extends StatelessWidget {
     final visual = HyperTabBarTheme.of(context).resolve(variant).merge(style);
     final segmented = variant == HyperTabBarVariant.segmented;
     final separated = variant == HyperTabBarVariant.separated;
+    final itemHorizontalPadding =
+        visual.itemHorizontalPadding ??
+        sizes.tabBar.itemHorizontalPadding ??
+        sizes.controlPadding.horizontal / 2;
+    final itemInsets = EdgeInsets.symmetric(horizontal: itemHorizontalPadding);
+    // Keep the underline's default indicator fitted to the content. Explicit
+    // surface padding replaces the default inset instead of adding to it.
+    final nativeLabelPadding =
+        variant == HyperTabBarVariant.underline &&
+        visual.itemStyle?.padding == null &&
+        visual.selectedItemStyle?.padding == null;
     final effectiveController = controller ?? DefaultTabController.of(context);
     final radius = BorderRadius.circular(
       segmented ? sizes.tabBar.segmentedRadius : sizes.tabBar.separatedRadius,
@@ -165,20 +178,11 @@ class HyperTabBar extends StatelessWidget {
                     ? theme.colors.surface
                     : Colors.transparent,
                 radius: radius,
-                normalStyle: visual.itemStyle,
+                normalStyle: HyperCardStyle(
+                  padding: nativeLabelPadding ? EdgeInsets.zero : itemInsets,
+                ).merge(visual.itemStyle),
                 selectedStyle: segmented ? null : visual.selectedItemStyle,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: separated
-                        ? (sizes.controlPadding.horizontal +
-                                  sizes.tabBar.itemSpacing) /
-                              2
-                        : segmented
-                        ? sizes.controlPadding.horizontal / 2
-                        : 0,
-                  ),
-                  child: tab,
-                ),
+                child: tab,
               ),
             ),
           ),
@@ -186,11 +190,7 @@ class HyperTabBar extends StatelessWidget {
       isScrollable: isScrollable,
       onTap: onTap,
       tabAlignment: isScrollable ? TabAlignment.start : TabAlignment.fill,
-      labelPadding: variant == HyperTabBarVariant.underline
-          ? EdgeInsets.symmetric(
-              horizontal: sizes.controlPadding.horizontal / 2,
-            )
-          : EdgeInsets.zero,
+      labelPadding: nativeLabelPadding ? itemInsets : EdgeInsets.zero,
       labelColor:
           visual.selectedForegroundColor ??
           (variant == HyperTabBarVariant.underline
@@ -216,9 +216,11 @@ class HyperTabBar extends StatelessWidget {
       indicatorPadding: EdgeInsets.zero,
       indicator: variant == HyperTabBarVariant.underline
           ? UnderlineTabIndicator(
-              borderSide: BorderSide(
-                color: visual.indicatorColor ?? theme.colors.primary,
-                width: sizes.tabBar.underlineThickness,
+              borderSide: normalizeHyperBorderSide(
+                BorderSide(
+                  color: visual.indicatorColor ?? theme.colors.primary,
+                  width: sizes.tabBar.underlineThickness,
+                ),
               ),
             )
           : const BoxDecoration(),
@@ -296,20 +298,20 @@ class _IndependentTabSurface extends StatelessWidget {
           .merge(HyperCardStyle(background: HyperFill.color(selectedColor)))
           .merge(selectedStyle);
       final style = HyperCardStyle.lerp(normal, active, selected);
-      return Stack(
-        fit: StackFit.passthrough,
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: inset,
+      return Padding(
+        padding: inset,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            Positioned.fill(
               child: HyperNavigationSurface(
                 style: style.merge(HyperCardStyle(padding: EdgeInsets.zero)),
                 child: const SizedBox.expand(),
               ),
             ),
-          ),
-          Padding(padding: style.padding ?? EdgeInsets.zero, child: child!),
-        ],
+            Padding(padding: style.padding ?? EdgeInsets.zero, child: child!),
+          ],
+        ),
       );
     },
     child: child,

@@ -42,6 +42,53 @@ HyperBoxDecoration shadow(WidgetTester tester) => tester
     .whereType<HyperBoxDecoration>()
     .first;
 void main() {
+  testWidgets(
+    'unmatched lift shadows fade without hardening, including reversal',
+    (tester) async {
+      final states = WidgetStatesController();
+      const recipe = BoxShadow(
+        color: Color(0x80000000),
+        blurRadius: 20,
+        spreadRadius: 4,
+        offset: Offset(0, 6),
+      );
+      await tester.pumpWidget(
+        host(
+          HyperMotion.lift(
+            surface: false,
+            showShadow: true,
+            statesController: states,
+            style: const HyperLiftStyle(
+              hoverShadows: [recipe],
+              duration: Duration(milliseconds: 200),
+              curve: Curves.linear,
+            ),
+            child: const SizedBox(width: 120, height: 80),
+          ),
+        ),
+      );
+      states.update(WidgetState.hovered, true);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      final entering = shadow(tester).boxShadow!.single;
+      expect(entering.blurRadius, recipe.blurRadius);
+      expect(entering.spreadRadius, recipe.spreadRadius);
+      expect(entering.color.a, closeTo(recipe.color.a / 2, .01));
+      states.update(WidgetState.hovered, false);
+      await tester.pump();
+      expect(shadow(tester).boxShadow!.single, entering);
+      await tester.pump(const Duration(milliseconds: 190));
+      final leaving = shadow(tester).boxShadow!.single;
+      expect(leaving.blurRadius, recipe.blurRadius);
+      expect(leaving.spreadRadius, recipe.spreadRadius);
+      expect(leaving.offset, recipe.offset);
+      expect(leaving.color.a, lessThan(.02));
+      await tester.pumpAndSettle();
+      expect(shadow(tester).boxShadow, isEmpty);
+      await tester.pumpWidget(const SizedBox());
+      states.dispose();
+    },
+  );
   test('showShadow participates in style value operations', () {
     const base = HyperLiftStyle(showShadow: false);
     expect(base.copyWith(), base);
@@ -77,6 +124,7 @@ void main() {
     await tester.pumpWidget(view(true));
     await tester.pumpAndSettle();
     expect(shadow(tester).boxShadow, isNotEmpty);
+    expect(shadow(tester).outerShadowsOnly, isFalse);
     expect(shadow(tester).color, isNull);
     expect(shadow(tester).gradient, isNull);
     await tester.pumpWidget(view(false, themedShadow: true));

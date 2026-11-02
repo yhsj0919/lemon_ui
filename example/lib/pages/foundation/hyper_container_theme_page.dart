@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
+// Share the component painter so theme previews honor zero-width borders.
+// ignore: implementation_imports
+import 'package:lemon_ui/src/painting/hyper_box_decoration.dart';
 
 import '../../gallery/demo_section.dart';
 
@@ -93,7 +96,7 @@ class _HyperContainerThemePageState extends State<HyperContainerThemePage> {
           width: 180,
           height: 100,
           padding: data.padding,
-          decoration: BoxDecoration(
+          decoration: HyperBoxDecoration(
             color: data.background?.color,
             gradient: data.background?.gradient,
             border: data.border,

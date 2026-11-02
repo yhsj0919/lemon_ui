@@ -103,7 +103,7 @@ class EditorTableMetrics {
 }
 
 class EditorTableVisual {
-  bool? hoverLift, striped, showColumnResizeHandles;
+  bool? embedded, hoverLift, striped, showColumnResizeHandles;
   EditorColor? liftBackground;
   EditorColor? liftBorderColor;
   double? duration, liftDuration;
@@ -115,10 +115,12 @@ class EditorTableVisual {
   EditorColor? stripeBackground;
   EditorColor? hoverBackground;
   EditorColor? selectedBackground;
+  EditorColor? selectedForeground;
   EditorColor? editingBackground;
   EditorColor? borderColor;
   EditorColor? focusColor;
   Map<String, Object?> toJson() => {
+    if (embedded != null) 'embedded': embedded,
     if (hoverLift != null) 'hoverLift': hoverLift,
     if (striped != null) 'striped': striped,
     if (showColumnResizeHandles != null)
@@ -140,6 +142,8 @@ class EditorTableVisual {
     if (hoverBackground != null) 'hoverBackground': hoverBackground!.toJson(),
     if (selectedBackground != null)
       'selectedBackground': selectedBackground!.toJson(),
+    if (selectedForeground != null)
+      'selectedForeground': selectedForeground!.toJson(),
     if (editingBackground != null)
       'editingBackground': editingBackground!.toJson(),
     if (borderColor != null) 'borderColor': borderColor!.toJson(),
@@ -148,6 +152,7 @@ class EditorTableVisual {
   static EditorTableVisual fromJson(Map<String, dynamic> j) {
     if (j.keys.any(
       (k) => !{
+        'embedded',
         'hoverLift',
         'striped',
         'showColumnResizeHandles',
@@ -163,6 +168,7 @@ class EditorTableVisual {
         'stripeBackground',
         'hoverBackground',
         'selectedBackground',
+        'selectedForeground',
         'editingBackground',
         'borderColor',
         'focusColor',
@@ -171,6 +177,7 @@ class EditorTableVisual {
       throw const FormatException('未知表格主题字段');
     }
     return EditorTableVisual()
+      ..embedded = _optionalBool(j['embedded'])
       ..hoverLift = _optionalBool(j['hoverLift'])
       ..striped = _optionalBool(j['striped'])
       ..showColumnResizeHandles = _optionalBool(j['showColumnResizeHandles'])
@@ -210,6 +217,11 @@ class EditorTableVisual {
           : EditorColor.fromJson(
               j['selectedBackground'] as Map<String, dynamic>,
             )
+      ..selectedForeground = j['selectedForeground'] == null
+          ? null
+          : EditorColor.fromJson(
+              j['selectedForeground'] as Map<String, dynamic>,
+            )
       ..editingBackground = j['editingBackground'] == null
           ? null
           : EditorColor.fromJson(j['editingBackground'] as Map<String, dynamic>)
@@ -226,6 +238,7 @@ class EditorTableVisual {
     EditorTableMetrics m, {
     HyperTableSize? inherited,
   }) => HyperTableStyle(
+    embedded: embedded,
     hoverLift: hoverLift,
     striped: striped,
     showColumnResizeHandles: showColumnResizeHandles,
@@ -271,6 +284,7 @@ class EditorTableVisual {
     stripeBackground: stripeBackground?.resolve(c),
     hoverBackground: hoverBackground?.resolve(c),
     selectedBackground: selectedBackground?.resolve(c),
+    selectedForeground: selectedForeground?.resolve(c),
     editingBackground: editingBackground?.resolve(c),
     borderColor: borderColor?.resolve(c),
     focusColor: focusColor?.resolve(c),

@@ -24,6 +24,9 @@ final class HyperSidebarStyle {
     this.ancestorSelectedExpandIconColor,
     this.disabledExpandIconColor,
     this.itemSpacing,
+    this.itemPadding,
+    this.trailingSpacing,
+    this.badgeSpacing,
     this.rowGap,
     this.indent,
     this.sectionSpacing,
@@ -70,7 +73,18 @@ final class HyperSidebarStyle {
   final Color? selectedExpandIconColor;
   final Color? ancestorSelectedExpandIconColor;
   final Color? disabledExpandIconColor;
+
+  /// 前置图标与文字之间的距离。
   final double? itemSpacing;
+
+  /// 展开态条目左右内边距，不影响图标与文字间距。
+  final double? itemPadding;
+
+  /// 文字与尾部内容之间的距离。
+  final double? trailingSpacing;
+
+  /// 尾部徽标与展开箭头之间的距离。
+  final double? badgeSpacing;
   final double? rowGap;
   final double? indent;
   final double? sectionSpacing;
@@ -128,6 +142,9 @@ final class HyperSidebarStyle {
     Color? ancestorSelectedExpandIconColor,
     Color? disabledExpandIconColor,
     double? itemSpacing,
+    double? itemPadding,
+    double? trailingSpacing,
+    double? badgeSpacing,
     double? rowGap,
     double? indent,
     double? sectionSpacing,
@@ -178,6 +195,9 @@ final class HyperSidebarStyle {
     disabledExpandIconColor:
         disabledExpandIconColor ?? this.disabledExpandIconColor,
     itemSpacing: itemSpacing ?? this.itemSpacing,
+    itemPadding: itemPadding ?? this.itemPadding,
+    trailingSpacing: trailingSpacing ?? this.trailingSpacing,
+    badgeSpacing: badgeSpacing ?? this.badgeSpacing,
     rowGap: rowGap ?? this.rowGap,
     indent: indent ?? this.indent,
     sectionSpacing: sectionSpacing ?? this.sectionSpacing,
@@ -244,6 +264,9 @@ final class HyperSidebarStyle {
           disabledExpandIconColor:
               other.disabledExpandIconColor ?? disabledExpandIconColor,
           itemSpacing: other.itemSpacing ?? itemSpacing,
+          itemPadding: other.itemPadding ?? itemPadding,
+          trailingSpacing: other.trailingSpacing ?? trailingSpacing,
+          badgeSpacing: other.badgeSpacing ?? badgeSpacing,
           rowGap: other.rowGap ?? rowGap,
           indent: other.indent ?? indent,
           sectionSpacing: other.sectionSpacing ?? sectionSpacing,
@@ -348,6 +371,9 @@ final class HyperSidebarStyle {
         t,
       ),
       itemSpacing: number(a.itemSpacing, b.itemSpacing),
+      itemPadding: number(a.itemPadding, b.itemPadding),
+      trailingSpacing: number(a.trailingSpacing, b.trailingSpacing),
+      badgeSpacing: number(a.badgeSpacing, b.badgeSpacing),
       rowGap: number(a.rowGap, b.rowGap),
       indent: number(a.indent, b.indent),
       sectionSpacing: number(a.sectionSpacing, b.sectionSpacing),
@@ -459,6 +485,9 @@ final class HyperSidebarStyle {
               ancestorSelectedExpandIconColor &&
           other.disabledExpandIconColor == disabledExpandIconColor &&
           other.itemSpacing == itemSpacing &&
+          other.itemPadding == itemPadding &&
+          other.trailingSpacing == trailingSpacing &&
+          other.badgeSpacing == badgeSpacing &&
           other.rowGap == rowGap &&
           other.indent == indent &&
           other.sectionSpacing == sectionSpacing &&
@@ -504,6 +533,9 @@ final class HyperSidebarStyle {
     ancestorSelectedExpandIconColor,
     disabledExpandIconColor,
     itemSpacing,
+    itemPadding,
+    trailingSpacing,
+    badgeSpacing,
     rowGap,
     indent,
     sectionSpacing,

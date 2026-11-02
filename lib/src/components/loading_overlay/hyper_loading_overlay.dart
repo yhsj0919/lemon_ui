@@ -1,4 +1,5 @@
 import '../overlay/hyper_backdrop_safe_opacity.dart';
+import '../../painting/hyper_box_decoration.dart';
 
 import 'package:flutter/material.dart';
 
@@ -118,7 +119,7 @@ class _HyperLoadingOverlayState extends State<HyperLoadingOverlay> {
       constraints: BoxConstraints(maxWidth: _style.maxContentWidth!),
       child: Container(
         padding: _style.padding,
-        decoration: BoxDecoration(
+        decoration: HyperBoxDecoration(
           color: _style.contentBackground?.color,
           gradient: _style.contentBackground?.gradient,
           border: _style.contentBorder,

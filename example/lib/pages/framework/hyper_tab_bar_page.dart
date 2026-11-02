@@ -28,6 +28,13 @@ class HyperTabBarPage extends StatelessWidget {
           variant: HyperTabBarVariant.underline,
           labels: ['概览', '详情'],
         ),
+        const _TabExample(
+          title: '实例 Style · 紧凑滚动标签（单侧留白 4）',
+          variant: HyperTabBarVariant.separated,
+          labels: ['概览', '记录', '设置'],
+          isScrollable: true,
+          style: HyperTabBarStyle(itemHorizontalPadding: 4),
+        ),
       ],
     );
   }
@@ -38,11 +45,15 @@ class _TabExample extends StatelessWidget {
     required this.title,
     required this.variant,
     required this.labels,
+    this.style,
+    this.isScrollable = false,
   });
 
   final String title;
   final HyperTabBarVariant variant;
   final List<String> labels;
+  final HyperTabBarStyle? style;
+  final bool isScrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +67,8 @@ class _TabExample extends StatelessWidget {
           children: [
             HyperTabBar(
               variant: variant,
+              style: style,
+              isScrollable: isScrollable,
               tabs: [for (final label in labels) HyperTab(text: label)],
             ),
             SizedBox(

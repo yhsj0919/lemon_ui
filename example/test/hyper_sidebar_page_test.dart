@@ -20,6 +20,25 @@ void main() {
     expect(find.text('固定头部'), findsOneWidget);
     expect(find.text('固定尾部'), findsOneWidget);
     expect(find.text('收藏'), findsOneWidget);
+    expect(
+      tester.widget<HyperSidebar>(find.byType(HyperSidebar)).style!.itemPadding,
+      isNull,
+    );
+    await tester.tap(find.text('默认主题间距'));
+    await tester.pumpAndSettle();
+    final spacing = tester
+        .widget<HyperSidebar>(find.byType(HyperSidebar))
+        .style!;
+    expect(spacing.itemPadding, 4);
+    expect(spacing.itemSpacing, 20);
+    expect(spacing.trailingSpacing, 8);
+    expect(spacing.badgeSpacing, 4);
+    await tester.tap(find.text('实例 Style · 独立间距'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<HyperSidebar>(find.byType(HyperSidebar)).style!.itemPadding,
+      isNull,
+    );
     await tester.tap(find.text('最近'));
     await tester.pumpAndSettle();
     expect(find.text('当前选择：recent'), findsOneWidget);

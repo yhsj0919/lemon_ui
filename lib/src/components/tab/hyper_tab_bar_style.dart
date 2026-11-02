@@ -7,6 +7,7 @@ enum HyperTabBarVariant { segmented, separated, underline }
 @immutable
 final class HyperTabBarStyle {
   const HyperTabBarStyle({
+    this.itemHorizontalPadding,
     this.trackStyle,
     this.itemStyle,
     this.selectedItemStyle,
@@ -17,6 +18,9 @@ final class HyperTabBarStyle {
     this.dividerColor,
     this.indicatorColor,
   });
+
+  /// 当前作用域内标签内容单侧的水平留白。
+  final double? itemHorizontalPadding;
   final HyperCardStyle? trackStyle;
   final HyperCardStyle? itemStyle;
   final HyperCardStyle? selectedItemStyle;
@@ -27,6 +31,7 @@ final class HyperTabBarStyle {
   final Color? dividerColor;
   final Color? indicatorColor;
   HyperTabBarStyle copyWith({
+    double? itemHorizontalPadding,
     HyperCardStyle? trackStyle,
     HyperCardStyle? itemStyle,
     HyperCardStyle? selectedItemStyle,
@@ -38,6 +43,7 @@ final class HyperTabBarStyle {
     Color? indicatorColor,
   }) => merge(
     HyperTabBarStyle(
+      itemHorizontalPadding: itemHorizontalPadding,
       trackStyle: trackStyle,
       itemStyle: itemStyle,
       selectedItemStyle: selectedItemStyle,
@@ -52,6 +58,8 @@ final class HyperTabBarStyle {
   HyperTabBarStyle merge(HyperTabBarStyle? other) => other == null
       ? this
       : HyperTabBarStyle(
+          itemHorizontalPadding:
+              other.itemHorizontalPadding ?? itemHorizontalPadding,
           trackStyle: trackStyle?.merge(other.trackStyle) ?? other.trackStyle,
           itemStyle: itemStyle?.merge(other.itemStyle) ?? other.itemStyle,
           selectedItemStyle:
@@ -72,6 +80,11 @@ final class HyperTabBarStyle {
     HyperTabBarStyle b,
     double t,
   ) => HyperTabBarStyle(
+    itemHorizontalPadding:
+        a.itemHorizontalPadding == null || b.itemHorizontalPadding == null
+        ? (t < .5 ? a.itemHorizontalPadding : b.itemHorizontalPadding)
+        : a.itemHorizontalPadding! +
+              (b.itemHorizontalPadding! - a.itemHorizontalPadding!) * t,
     trackStyle: a.trackStyle == null || b.trackStyle == null
         ? (t < .5 ? a.trackStyle : b.trackStyle)
         : HyperCardStyle.lerp(a.trackStyle!, b.trackStyle!, t),
@@ -100,6 +113,7 @@ final class HyperTabBarStyle {
   @override
   bool operator ==(Object other) =>
       other is HyperTabBarStyle &&
+      itemHorizontalPadding == other.itemHorizontalPadding &&
       trackStyle == other.trackStyle &&
       itemStyle == other.itemStyle &&
       selectedItemStyle == other.selectedItemStyle &&
@@ -111,6 +125,7 @@ final class HyperTabBarStyle {
       indicatorColor == other.indicatorColor;
   @override
   int get hashCode => Object.hashAll([
+    itemHorizontalPadding,
     trackStyle,
     itemStyle,
     selectedItemStyle,

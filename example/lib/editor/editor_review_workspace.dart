@@ -571,6 +571,25 @@ extension _ReviewWorkspace on _ThemeEditorState {
                 : theme.colors.textPrimary,
           ),
         if (object == 'sidebar' && part == 'item') ...[
+          if (state == 'common') ...[
+            _heading('条目布局'),
+            n(
+              '条目最小高度',
+              m.itemHeight,
+              s.sidebar.itemHeight,
+              0,
+              editorLayoutInsetLimit,
+              (x) => m.itemHeight = x,
+            ),
+            n(
+              '条目左右内边距',
+              m.itemPadding,
+              s.sidebar.itemPadding ?? s.sidebar.itemSpacing,
+              0,
+              editorSidebarItemPaddingLimit(s.sidebar),
+              (x) => m.itemPadding = x,
+            ),
+          ],
           _heading('前置图标'),
           if (state == 'common')
             n(
@@ -580,6 +599,15 @@ extension _ReviewWorkspace on _ThemeEditorState {
               0,
               editorSidebarIconSizeLimit(s),
               (x) => _spec.reviews.sidebar.iconSize = x,
+            ),
+          if (state == 'common')
+            n(
+              '图标到文字间距',
+              m.itemSpacing,
+              s.sidebar.itemSpacing,
+              0,
+              editorSidebarContentSpacingLimit(s.sidebar),
+              (x) => m.itemSpacing = x,
             ),
           _color(
             '前置图标颜色',
@@ -608,6 +636,24 @@ extension _ReviewWorkspace on _ThemeEditorState {
               (x) => _spec.reviews.sidebar.collapsedRowGap = x,
             ),
           _heading('展开 / 收起图标'),
+          if (state == 'common') ...[
+            n(
+              '文字到尾部间距',
+              m.trailingSpacing,
+              s.sidebar.trailingSpacing ?? s.sidebar.itemSpacing,
+              0,
+              editorSidebarContentSpacingLimit(s.sidebar),
+              (x) => m.trailingSpacing = x,
+            ),
+            n(
+              '徽标到箭头间距',
+              m.badgeSpacing,
+              s.sidebar.badgeSpacing ?? s.sidebar.itemSpacing,
+              0,
+              editorSidebarContentSpacingLimit(s.sidebar),
+              (x) => m.badgeSpacing = x,
+            ),
+          ],
           if (state == 'common')
             n(
               '展开收起图标尺寸',
@@ -3914,24 +3960,6 @@ extension _ReviewWorkspace on _ThemeEditorState {
                 decimal: false,
               ),
               n(
-                '条目最小高度',
-                m.itemHeight,
-                s.sidebar.itemHeight,
-                0,
-                editorLayoutInsetLimit,
-                (x) => m.itemHeight = x,
-                decimal: false,
-              ),
-              n(
-                '条目间距',
-                m.itemSpacing,
-                s.sidebar.itemSpacing,
-                0,
-                editorContentSpacingLimit,
-                (x) => m.itemSpacing = x,
-                decimal: false,
-              ),
-              n(
                 '行间距',
                 m.rowGap,
                 s.sidebar.rowGap ?? 0,
@@ -4091,6 +4119,16 @@ extension _ReviewWorkspace on _ThemeEditorState {
                   0,
                   editorContentSpacingLimit,
                   (x) => m.itemSpacing = x,
+                  decimal: false,
+                ),
+                n(
+                  '标签水平内边距',
+                  m.itemHorizontalPadding,
+                  s.tabBar.itemHorizontalPadding ??
+                      s.controlPadding.horizontal / 2,
+                  0,
+                  editorContentSpacingLimit,
+                  (x) => m.itemHorizontalPadding = x,
                   decimal: false,
                 ),
                 n(
@@ -5492,6 +5530,11 @@ extension _ReviewWorkspace on _ThemeEditorState {
               _spec.reviews.sidebar.expandIconSize = null;
               _spec.reviews.sidebar.collapsedIconSize = null;
               _spec.reviews.sidebar.collapsedRowGap = null;
+              _spec.reviews.sidebar.itemHeight = null;
+              _spec.reviews.sidebar.itemPadding = null;
+              _spec.reviews.sidebar.itemSpacing = null;
+              _spec.reviews.sidebar.trailingSpacing = null;
+              _spec.reviews.sidebar.badgeSpacing = null;
             }
             _mode.reviews.reset(surfaceSlot);
             _spec.reviews.reset(surfaceSlot);

@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import '../../painting/hyper_surface_border.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -215,7 +217,7 @@ class _HyperBlendedAvatarState extends State<HyperBlendedAvatar> {
                 height: side,
                 clipBehavior: Clip.antiAlias,
                 decoration: ShapeDecoration(
-                  shape: shape,
+                  shape: normalizeHyperShapeBorder(shape),
                   shadows: resolved.boxShadow,
                   color: windmill ? resolved.backgroundColor : null,
                   gradient: windmill

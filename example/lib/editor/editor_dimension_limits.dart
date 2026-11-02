@@ -85,6 +85,23 @@ double editorSidebarIconSizeLimit(
   return (height < width ? height : width).floorToDouble();
 }
 
+/// 根导航项的水平留白不得挤出前置图标。子项还受层级缩进和实际内容约束；
+/// 这里是编辑器对根条目的几何边界，不是组件默认规格或 API 上限。
+double editorSidebarItemPaddingLimit(HyperSidebarSize sizes) =>
+    ((sizes.width - sizes.horizontalPadding * 2 - sizes.iconSize) / 2)
+        .clamp(0.0, double.infinity)
+        .floorToDouble();
+
+/// 单个内容间距不能超出根条目的可用内容宽度。尾部内容由调用方传入，
+/// 多个间距仍沿用 editorReviewBounds 的紧凑间距操作边界，待具体内容验证。
+double editorSidebarContentSpacingLimit(HyperSidebarSize sizes) =>
+    (sizes.width -
+            sizes.horizontalPadding * 2 -
+            (sizes.itemPadding ?? sizes.itemSpacing) * 2 -
+            sizes.iconSize)
+        .clamp(0.0, double.infinity)
+        .floorToDouble();
+
 // Content/feedback/navigation editor bounds: bounded illustrations, readable
 // panels, sidebars and breadcrumb items whose available width comes from a parent.
 // These are editor operation limits, not official default dimensions; validate per demo.

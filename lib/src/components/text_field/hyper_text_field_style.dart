@@ -59,7 +59,7 @@ final class HyperTextFieldStyle {
   final BorderRadiusGeometry? borderRadius;
   final List<BoxShadow>? boxShadow;
 
-  /// 期望高度；空间不足时先减少上下内边距，再允许内容撑高。
+  /// 显式表面高度；空间不足时先减少上下留白，内容不撑高表面。
   final double? height;
   final double? minimumHeight;
   final EdgeInsetsGeometry? padding;

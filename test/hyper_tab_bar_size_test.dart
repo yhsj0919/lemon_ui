@@ -32,7 +32,9 @@ void main() {
       final selected = tester.getRect(
         find.byKey(const ValueKey('hyper-tab-selection')),
       );
-      final selectedSurface = tester.widget<HyperNavigationSurface>(find.byKey(const ValueKey('hyper-tab-selection')));
+      final selectedSurface = tester.widget<HyperNavigationSurface>(
+        find.byKey(const ValueKey('hyper-tab-selection')),
+      );
       final theme = HyperTheme.of(tester.element(find.byType(HyperTabBar)));
       final expectedRadius =
           (theme.sizes
@@ -200,6 +202,10 @@ void main() {
     const sizes = HyperSizeThemeData();
     expect(sizes.phone.tabBar.height, 42);
     expect(sizes.phone.tabBar.itemSpacing, 4);
+    expect(sizes.phone.tabBar.itemHorizontalPadding, 20);
+    expect(sizes.tablet.tabBar.itemHorizontalPadding, 22);
+    expect(sizes.desktop.tabBar.itemHorizontalPadding, 16);
+    expect(sizes.watch.tabBar.itemHorizontalPadding, 16);
     for (final device in HyperDeviceType.values) {
       expect(sizes.resolve(device).tabBar.padding, const EdgeInsets.all(4));
       expect(sizes.resolve(device).tabBar.itemSpacing, 4);

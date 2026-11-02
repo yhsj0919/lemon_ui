@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon_ui/lemon_ui.dart';
+// Share the component painter so theme previews honor zero-width borders.
+// ignore: implementation_imports
+import 'package:lemon_ui/src/painting/hyper_box_decoration.dart';
 
 import '../../gallery/demo_section.dart';
 
@@ -147,7 +150,7 @@ class _StylePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = HyperButtonTheme.of(context).resolve(variant);
     final fill = style.background;
-    final decoration = BoxDecoration(
+    final decoration = HyperBoxDecoration(
       color: fill?.color,
       gradient: fill?.gradient,
       border: style.border == null || style.border == BorderSide.none

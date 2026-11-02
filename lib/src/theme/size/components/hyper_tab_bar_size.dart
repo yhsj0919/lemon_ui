@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-/// 当前设备两种标签栏共用的高度及各自的圆角、间距。
+/// 当前设备标签栏的高度、内容留白及各外观的几何规格。
 @immutable
 final class HyperTabBarSize {
   const HyperTabBarSize({
@@ -9,6 +9,7 @@ final class HyperTabBarSize {
     required this.segmentedRadius,
     required this.separatedRadius,
     required this.itemSpacing,
+    this.itemHorizontalPadding,
     required this.underlineThickness,
   });
 
@@ -21,6 +22,11 @@ final class HyperTabBarSize {
   /// 独立圆角标签之间的间距。
   final double itemSpacing;
 
+  /// 标签内容单侧的水平留白，不包含标签间距和标签栏边缘留白。
+  ///
+  /// 旧构造未指定时沿用当前设备的 controlPadding 水平单侧规格。
+  final double? itemHorizontalPadding;
+
   /// 下划线形态的指示线粗细。
   final double underlineThickness;
 
@@ -30,6 +36,7 @@ final class HyperTabBarSize {
     double? segmentedRadius,
     double? separatedRadius,
     double? itemSpacing,
+    double? itemHorizontalPadding,
     double? underlineThickness,
   }) => HyperTabBarSize(
     height: height ?? this.height,
@@ -37,6 +44,7 @@ final class HyperTabBarSize {
     segmentedRadius: segmentedRadius ?? this.segmentedRadius,
     separatedRadius: separatedRadius ?? this.separatedRadius,
     itemSpacing: itemSpacing ?? this.itemSpacing,
+    itemHorizontalPadding: itemHorizontalPadding ?? this.itemHorizontalPadding,
     underlineThickness: underlineThickness ?? this.underlineThickness,
   );
 
@@ -49,6 +57,11 @@ final class HyperTabBarSize {
         separatedRadius:
             a.separatedRadius + (b.separatedRadius - a.separatedRadius) * t,
         itemSpacing: a.itemSpacing + (b.itemSpacing - a.itemSpacing) * t,
+        itemHorizontalPadding:
+            a.itemHorizontalPadding == null || b.itemHorizontalPadding == null
+            ? (t < .5 ? a.itemHorizontalPadding : b.itemHorizontalPadding)
+            : a.itemHorizontalPadding! +
+                  (b.itemHorizontalPadding! - a.itemHorizontalPadding!) * t,
         underlineThickness:
             a.underlineThickness +
             (b.underlineThickness - a.underlineThickness) * t,
@@ -62,6 +75,7 @@ final class HyperTabBarSize {
       other.segmentedRadius == segmentedRadius &&
       other.separatedRadius == separatedRadius &&
       other.itemSpacing == itemSpacing &&
+      other.itemHorizontalPadding == itemHorizontalPadding &&
       other.underlineThickness == underlineThickness;
 
   @override
@@ -71,6 +85,7 @@ final class HyperTabBarSize {
     segmentedRadius,
     separatedRadius,
     itemSpacing,
+    itemHorizontalPadding,
     underlineThickness,
   );
 }

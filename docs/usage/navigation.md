@@ -32,8 +32,25 @@ TabBar 与 View 共用 DefaultTabController，或显式传入同一个 TabContro
 View 必须有有限高度，放 Column 中通常用 Expanded。
 底层导航和滚动由 Flutter TabBar/TabBarView 实现，三种外观由库配置；
 不是 HyperSegmentedButton 的操作选择集合。
-当前没有 HyperTabBarTheme/Style；配置使用 HyperSizeScheme.tabBar、
-全局字体与 Material TabBarTheme（具体支持字段以实现为准）。
+四端几何规格使用 HyperSizeScheme.tabBar；全局 tabBarTheme、局部 HyperTabBarTheme
+和实例 HyperTabBarStyle 提供按变体覆盖的外观与当前作用域尺寸配置。
+`tabBar.padding` 控制标签栏边缘留白，`itemSpacing` 控制独立圆角标签之间的间距，
+`itemHorizontalPadding` 控制每个标签内容单侧的水平留白，三者独立。
+例如将桌面标签内容留白设为 4：
+
+~~~dart
+theme.copyWith(
+  sizes: theme.sizes.copyWith(
+    desktop: theme.sizes.desktop.copyWith(
+      tabBar: theme.sizes.desktop.tabBar.copyWith(itemHorizontalPadding: 4),
+    ),
+  ),
+)
+~~~
+
+局部或实例可使用 `HyperTabBarStyle(itemHorizontalPadding: 4)`；0 可关闭内容留白。
+显式 `itemStyle.padding` / `selectedItemStyle.padding` 替换对应表面的默认留白，
+不再与默认内容留白叠加。固定标签仍由 Flutter 等分可用宽度；需要内容随留白缩窄时使用 `isScrollable: true`。
 [源码](../../lib/src/components/tab/hyper_tab_bar.dart)。
 
 ## HyperBreadcrumb 面包屑
@@ -83,6 +100,19 @@ header/footer 为插槽，badge 为单项附加内容。
 selectableParent 与 selectParentWhenChildSelected 控制父项选择关系；
 builder 可使用 defaultItem 包装原有交互，而不是重新实现全部键盘逻辑。
 全局 sidebarTheme、局部 HyperSidebarTheme、实例 HyperSidebarStyle。
+条目内部布局分别使用 `itemPadding`（左右内边距）、`itemSpacing`（前置图标到文字）、
+`trailingSpacing`（文字到尾部）和 `badgeSpacing`（徽标到展开箭头），互不联动。
+四端默认值由 `HyperSizeScheme.sidebar` 管理；`horizontalPadding` 是列表外围留白，
+`rowGap` 是条目之间的垂直间距。只需改变图标文字间距时可以写：
+
+~~~dart
+sidebarTheme: const HyperSidebarThemeData(
+  style: HyperSidebarStyle(itemPadding: 12, itemSpacing: 20),
+),
+~~~
+
+历史代码若依赖 `itemSpacing` 同时改变留白和尾部间距，应分别设置这四个字段。
+旧版自建 `HyperSidebarSize` 未指定新增字段时仍从该尺寸对象的 `itemSpacing` 继承原规格。
 [源码](../../lib/src/components/sidebar/hyper_sidebar.dart) ·
 [数据模型](../../lib/src/components/sidebar/hyper_sidebar_model.dart)。
 
@@ -183,4 +213,4 @@ style 管理列表行，menuStyle 管理菜单，transitionBuilder 替换展开�
 ## 菜单项间距
 
 菜单、Sidebar 与树的基础行间距统一继承各端 HyperSizeScheme.navigationItemSpacing，默认 4 个 Flutter 逻辑像素（用户确认的项目规格）。menu.itemSpacing、sidebar.rowGap、treeView.rowSpacing 默认为 null 表示继承，尺寸 copyWith 或各自实例 Style 可覆盖；0 表示紧贴。Sidebar.itemSpacing 仍只表示内部图标/文字间距。菜单仅在同组项目之间添加间隔，首尾不额外留白，分组仍使用 groupSpacing。下拉、右键菜单和子菜单复用同一菜单布局。
-HyperTabBar 的内容边缘留白由当前设备 sizes.tabBar.padding 管理；实例 padding 可覆盖，EdgeInsets.zero 可关闭。它与独立标签之间的 itemSpacing、标签内部的控件内边距各自独立。默认两侧留白沿用同端既有 overlaySpacing 的项目语义规格（D 级，逻辑像素）。
+HyperTabBar 的内容边缘留白由当前设备 sizes.tabBar.padding 管理；实例 padding 可覆盖，EdgeInsets.zero 可关闭。它与独立标签之间的 itemSpacing、标签内容的 itemHorizontalPadding 各自独立。标签内容单侧默认值为手机 20、平板 22、桌面 16、手表 16 逻辑像素，沿用拆分前同端 controlPadding 的水平单侧规格（D 级既有语义），不是新增官方视觉规格。独立标签的间距现在占外侧布局，不再混入内容内边距，默认外观保持一致。

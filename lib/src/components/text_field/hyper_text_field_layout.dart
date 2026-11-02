@@ -20,22 +20,22 @@ double resolveHyperTextFieldSuffixPadding({
   required double contentHeight,
   required double borderWidth,
 }) {
-  assert(height == null || height > 0);
+  assert(height == null || height >= 0);
   assert(contentHeight >= 0 && borderWidth >= 0);
   if (height == null) return (minimumHeight: minimumHeight, padding: padding);
-  final target = math.max(height, contentHeight + borderWidth * 2);
-  final budget = target - contentHeight - borderWidth * 2;
-  final top = math.max(0.0, padding.top - borderWidth);
-  final bottom = math.max(0.0, padding.bottom - borderWidth);
+  final target = height;
+  final budget = math.max(0.0, target - contentHeight - borderWidth * 2);
+  final top = math.max(0.0, padding.top);
+  final bottom = math.max(0.0, padding.bottom);
   final total = top + bottom;
   final factor = total == 0 ? 0.0 : math.min(1.0, budget / total);
   return (
     minimumHeight: target,
     padding: EdgeInsets.fromLTRB(
       padding.left,
-      borderWidth + top * factor,
+      top * factor,
       padding.right,
-      borderWidth + bottom * factor,
+      bottom * factor,
     ),
   );
 }

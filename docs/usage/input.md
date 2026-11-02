@@ -153,9 +153,10 @@ const HyperTextField(
 )
 ~~~
 
-height 是输入框表面的期望高度，不包含上方 label。降低高度时先减少上下内边距，
-保留字号、行高和系统文字缩放；文字、图标或多行内容放不下时，实际高度会自然撑高。
-不设置 height 时，继续使用主题 minimumHeight 和 padding。自定义前后缀也可能撑高输入框。
+height 是输入框表面的显式高度，不包含上方 label。降低高度时先减少上下内边距，
+保留字号、行高和系统文字缩放；预算不足时垂直留白归零，内容受表面约束和裁剪，不撑高表面。
+未设置 height 时继承控件组 itemHeight，并遵守父级高度约束。没有指定高度且父级空间充足时，
+继续使用主题 minimumHeight 和 padding，允许文字和自定义前后缀自然撑高。
 
 输入文字和占位文字默认采用 `TextLeadingDistribution.even`，让紧凑行高下的
 CJK 字体（如思源黑体）均匀分配上下 leading，避免可编辑行框与数字字形出现

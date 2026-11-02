@@ -14,6 +14,10 @@ void main() {
     m.iconSize = 29;
     m.collapsedIconSize = 24;
     m.expandIconSize = 10;
+    m.itemPadding = 5;
+    m.itemSpacing = 19;
+    m.trailingSpacing = 9;
+    m.badgeSpacing = 3;
     document.light.reviews.sidebarItem.iconColor = const EditorColor(
       argb: 0xFF112233,
     );
@@ -25,6 +29,12 @@ void main() {
     expect(theme.sizes.desktop.sidebar.iconSize, 29);
     expect(theme.sizes.desktop.sidebar.collapsedIconSize, 24);
     expect(theme.sizes.desktop.sidebar.expandIconSize, 10);
+    expect(theme.sizes.desktop.sidebar.itemPadding, 5);
+    expect(theme.sizes.desktop.sidebar.itemSpacing, 19);
+    expect(theme.sizes.desktop.sidebar.trailingSpacing, 9);
+    expect(theme.sizes.desktop.sidebar.badgeSpacing, 3);
+    expect(copy.resolve(true).sizes.desktop.sidebar.itemPadding, 5);
+    expect(theme.sizes.phone.sidebar.itemPadding, 12);
     expect(theme.sidebarTheme.style!.iconColor, const Color(0xFF112233));
     expect(
       theme.sidebarTheme.style!.selectedExpandIconColor,
@@ -41,6 +51,21 @@ void main() {
     expect(m.iconSize, 8);
     expect(m.collapsedIconSize, 8);
     expect(m.expandIconSize, 8);
+    m.width = 30;
+    m.horizontalPadding = 5;
+    m.itemPadding = 20;
+    m.itemSpacing = 30;
+    m.trailingSpacing = 30;
+    m.badgeSpacing = 30;
+    constrainEditorReviewDimensions(
+      'sidebar',
+      m,
+      HyperThemeData.light().sizes.desktop,
+    );
+    expect(m.itemPadding, 6);
+    expect(m.itemSpacing, 0);
+    expect(m.trailingSpacing, 0);
+    expect(m.badgeSpacing, 0);
   });
 
   testWidgets('侧栏图标入口独立调整大小与颜色，状态重置保留通用尺寸', (tester) async {
@@ -103,6 +128,24 @@ void main() {
     await select('编辑范围', 'item');
     await number('前置图标尺寸', 28.6);
     await number('展开收起图标尺寸', 10.2);
+    await number('条目左右内边距', 5.4);
+    await number('图标到文字间距', 17.7);
+    await number('文字到尾部间距', 9.2);
+    await number('徽标到箭头间距', 3.8);
+    HyperListTile homeTile() => tester.widget<HyperListTile>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('hyper-sidebar-item-home')).first,
+            matching: find.byType(HyperListTile),
+          )
+          .first,
+    );
+    expect(
+      homeTile().style!.padding!.resolve(TextDirection.ltr).horizontal,
+      10,
+    );
+    expect(homeTile().style!.leadingSpacing, 18);
+    expect(homeTile().style!.trailingSpacing, 9);
     await color('前置图标颜色', Colors.purple);
     await color('展开收起图标颜色', Colors.green);
     Icon home() => tester.widget<Icon>(find.byIcon(Icons.home_outlined).first);
@@ -132,6 +175,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(home().size, 29);
     expect(home().color?.toARGB32(), Colors.purple.toARGB32());
+    expect(
+      homeTile().style!.padding!.resolve(TextDirection.ltr).horizontal,
+      10,
+    );
+    expect(homeTile().style!.leadingSpacing, 18);
+    expect(homeTile().style!.trailingSpacing, 9);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
   });

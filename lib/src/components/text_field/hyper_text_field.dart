@@ -1,9 +1,8 @@
 import 'hyper_text_field_resolver.dart';
 import '../../painting/hyper_box_decoration.dart';
 
-import 'dart:ui' show SemanticsValidationResult;
-
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import '../../foundation/hyper_control_state.dart';
@@ -13,6 +12,7 @@ import '../card/hyper_card.dart';
 import '../menu/hyper_menu_surface.dart';
 import '../overlay/hyper_anchored_overlay.dart';
 import '../surface/hyper_material_surface.dart';
+import '../widget_group/hyper_widget_group_scope.dart';
 import 'hyper_text_field_style.dart';
 import 'hyper_text_field_layout.dart';
 
@@ -168,19 +168,85 @@ class _HyperTextFieldState extends State<HyperTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = HyperTheme.of(context);
     final states = <HyperControlState>{
       if (_hovered && widget.enabled) HyperControlState.hovered,
       if (_focus.hasFocus) HyperControlState.focused,
       if (_hasError) HyperControlState.error,
       if (!widget.enabled) HyperControlState.disabled,
     };
-    var resolved = resolveHyperTextFieldStyle(
+    final resolved = resolveHyperTextFieldStyle(
       context,
       states: states,
       style: widget.style,
     );
-    if (resolved.height != null) {
+    final direction = widget.textDirection ?? Directionality.of(context);
+    final scaler = MediaQuery.textScalerOf(context);
+    final groupHeight = HyperWidgetGroupScope.maybeOf(context)?.itemHeight;
+    final borderVertical = _contentBorderVertical(context, resolved);
+    // Adaptive layout still needs a preferred height when an intrinsic parent
+    // measures it before layout. Measure typography without executing a build
+    // callback speculatively; ordinary layout continues to use real constraints.
+    return _TextFieldIntrinsicHeight(
+      measure: (width) {
+        final padding = resolved.padding!.resolve(direction);
+        final textPainter =
+            TextPainter(
+              text: TextSpan(
+                text: _controller.text.isEmpty ? ' ' : _controller.text,
+                style: resolved.textStyle,
+              ),
+              textDirection: direction,
+              textScaler: scaler,
+              maxLines: widget.maxLines,
+            )..layout(
+              maxWidth: (width - padding.horizontal).clamp(
+                0.0,
+                double.infinity,
+              ),
+            );
+        final contentHeight = textPainter.height
+            .clamp(
+              textPainter.preferredLineHeight * (widget.minLines ?? 1),
+              double.infinity,
+            )
+            .clamp(resolved.iconSize!, double.infinity);
+        textPainter.dispose();
+        var height =
+            resolved.height ??
+            groupHeight ??
+            (contentHeight + padding.vertical + borderVertical).clamp(
+              resolved.minimumHeight!,
+              double.infinity,
+            );
+        if (widget.label != null) {
+          final labelPainter = TextPainter(
+            text: TextSpan(text: widget.label, style: resolved.labelStyle),
+            textDirection: direction,
+            textScaler: scaler,
+          )..layout(maxWidth: width);
+          height += labelPainter.height + resolved.labelGap!;
+          labelPainter.dispose();
+        }
+        return height;
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) =>
+            _build(context, constraints, resolved),
+      ),
+    );
+  }
+
+  Widget _build(
+    BuildContext context,
+    BoxConstraints constraints,
+    HyperTextFieldStyle resolved,
+  ) {
+    final theme = HyperTheme.of(context);
+    final groupHeight = HyperWidgetGroupScope.maybeOf(context)?.itemHeight;
+    double? effectiveHeight = resolved.height ?? groupHeight;
+    final borderVertical = _contentBorderVertical(context, resolved);
+    if (!widget.expands &&
+        (effectiveHeight != null || constraints.hasBoundedHeight)) {
       final textPainter = TextPainter(
         text: TextSpan(text: ' ', style: resolved.textStyle),
         textDirection: widget.textDirection ?? Directionality.of(context),
@@ -190,19 +256,42 @@ class _HyperTextFieldState extends State<HyperTextField> {
       textPainter.dispose();
       final contentHeight =
           lineHeight * (widget.minLines ?? widget.maxLines ?? 1);
+      final measuredContentHeight = contentHeight > resolved.iconSize!
+          ? contentHeight
+          : resolved.iconSize!;
+      final padding = resolved.padding!.resolve(Directionality.of(context));
+      if (constraints.hasBoundedHeight) {
+        var availableHeight = constraints.maxHeight;
+        if (widget.label != null) {
+          final labelPainter = TextPainter(
+            text: TextSpan(text: widget.label, style: resolved.labelStyle),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout(maxWidth: constraints.maxWidth);
+          availableHeight -= labelPainter.height + resolved.labelGap!;
+          labelPainter.dispose();
+        }
+        availableHeight = availableHeight.clamp(0.0, double.infinity);
+        final naturalHeight =
+            (measuredContentHeight + padding.vertical + borderVertical).clamp(
+              resolved.minimumHeight!,
+              double.infinity,
+            );
+        // A loose page constraint only caps content; it must not make an
+        // otherwise natural-height field fill the page.
+        if (effectiveHeight != null) {
+          effectiveHeight = effectiveHeight.clamp(0.0, availableHeight);
+        } else if (constraints.hasTightHeight ||
+            naturalHeight > availableHeight) {
+          effectiveHeight = availableHeight;
+        }
+      }
       final layout = resolveHyperTextFieldLayout(
-        height: resolved.height,
+        height: effectiveHeight,
         minimumHeight: resolved.minimumHeight!,
         padding: resolved.padding!.resolve(Directionality.of(context)),
-        contentHeight: contentHeight > resolved.iconSize!
-            ? contentHeight
-            : resolved.iconSize!,
-        borderWidth: resolved.border == null
-            ? resolved.borderWidth!
-            : resolved.border!.dimensions
-                      .resolve(Directionality.of(context))
-                      .vertical /
-                  2,
+        contentHeight: measuredContentHeight,
+        borderWidth: borderVertical / 2,
       );
       resolved = resolved.copyWith(
         minimumHeight: layout.minimumHeight,
@@ -368,22 +457,22 @@ class _HyperTextFieldState extends State<HyperTextField> {
             suffixIconConstraints: const BoxConstraints(),
           ),
         );
-        field = ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight:
-                (resolved.minimumHeight! -
-                        _contentBorderVertical(context, resolved))
-                    .clamp(0.0, double.infinity),
+        final contentMinimumHeight = (resolved.minimumHeight! - borderVertical)
+            .clamp(0.0, double.infinity);
+        final alignedField = Align(
+          alignment: Alignment(
+            0,
+            resolved.textAlignVertical?.y ?? (widget.maxLines == 1 ? 0 : -1),
           ),
-          child: Align(
-            alignment: Alignment(
-              0,
-              resolved.textAlignVertical?.y ?? (widget.maxLines == 1 ? 0 : -1),
-            ),
-            heightFactor: 1,
-            child: field,
-          ),
+          heightFactor: effectiveHeight == null || widget.expands ? 1 : null,
+          child: field,
         );
+        field = effectiveHeight != null && !widget.expands
+            ? SizedBox(height: contentMinimumHeight, child: alignedField)
+            : ConstrainedBox(
+                constraints: BoxConstraints(minHeight: contentMinimumHeight),
+                child: alignedField,
+              );
         Widget surface = AnimatedContainer(
           duration: duration,
           curve: curve,
@@ -662,6 +751,42 @@ class _ErrorHintState extends State<_ErrorHint> {
           child: child,
         ),
       );
+}
+
+class _TextFieldIntrinsicHeight extends SingleChildRenderObjectWidget {
+  const _TextFieldIntrinsicHeight({
+    required this.measure,
+    required super.child,
+  });
+  final double Function(double width) measure;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderTextFieldIntrinsicHeight(measure);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderTextFieldIntrinsicHeight renderObject,
+  ) {
+    renderObject.measure = measure;
+  }
+}
+
+class _RenderTextFieldIntrinsicHeight extends RenderProxyBox {
+  _RenderTextFieldIntrinsicHeight(this._measure);
+  double Function(double width) _measure;
+  set measure(double Function(double width) value) {
+    if (identical(value, _measure)) return;
+    _measure = value;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _measure(width);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _measure(width);
 }
 
 // Solid decoration borders consume layout space; material borders paint on top.

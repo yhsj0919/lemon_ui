@@ -176,6 +176,9 @@ class _HyperSidebarState extends State<HyperSidebar> {
           metrics.rowGap ??
           HyperTheme.sizesOf(context).navigationItemSpacing,
       itemSpacing: metrics.itemSpacing,
+      itemPadding: metrics.itemPadding ?? metrics.itemSpacing,
+      trailingSpacing: metrics.trailingSpacing ?? metrics.itemSpacing,
+      badgeSpacing: metrics.badgeSpacing ?? metrics.itemSpacing,
       rowGap:
           metrics.rowGap ?? HyperTheme.sizesOf(context).navigationItemSpacing,
       indent: metrics.indent,
@@ -272,7 +275,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                               if (!compact && group.title != null)
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                    resolved.itemSpacing!,
+                                    resolved.itemPadding!,
                                     resolved.sectionSpacing! / 2,
                                     0,
                                     resolved.sectionSpacing! / 2,
@@ -513,7 +516,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                                                       0) ...[
                                                 if (item.badge != null)
                                                   SizedBox(
-                                                    width: style.itemSpacing,
+                                                    width: style.badgeSpacing,
                                                   ),
                                                 AnimatedRotation(
                                                   turns: expanded ? .25 : 0,
@@ -540,7 +543,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                                       titleStyle: style.itemTextStyle,
                                       subtitleStyle: style.descriptionTextStyle,
                                       padding: EdgeInsetsDirectional.symmetric(
-                                        horizontal: style.itemSpacing!,
+                                        horizontal: style.itemPadding!,
                                       ),
                                       minHeight: item.description == null
                                           ? style.itemHeight
@@ -551,7 +554,7 @@ class _HyperSidebarState extends State<HyperSidebar> {
                                       leadingSize: style.iconSize,
                                       leadingIconSize: style.iconSize,
                                       leadingSpacing: style.itemSpacing,
-                                      trailingSpacing: style.itemSpacing,
+                                      trailingSpacing: style.trailingSpacing,
                                       trailingIconSize: style.iconSize,
                                     ),
                                   ),
@@ -600,9 +603,9 @@ class _HyperSidebarState extends State<HyperSidebar> {
                   children: [
                     Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(
-                        style.itemSpacing!,
+                        style.itemPadding!,
                         style.rowGap!,
-                        style.itemSpacing!,
+                        style.itemPadding!,
                         style.sectionSpacing! / 2,
                       ),
                       child: Text(item.label, style: style.groupTitleStyle),

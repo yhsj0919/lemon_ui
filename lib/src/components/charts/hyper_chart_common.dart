@@ -1,5 +1,6 @@
 // Adapted from local lemon_shadcn chart implementations.
 import 'hyper_chart_tokens.dart';
+import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:math' as math;
 
@@ -463,7 +464,7 @@ class _HyperChartKeyboardRegionState extends State<HyperChartKeyboardRegion> {
                 Positioned.fill(
                   child: IgnorePointer(
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
+                      decoration: HyperBoxDecoration(
                         border: Border.fromBorderSide(
                           BorderSide(
                             color: theme.colors.primary.withValues(alpha: 0.65),

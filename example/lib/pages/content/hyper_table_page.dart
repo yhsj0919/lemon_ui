@@ -131,6 +131,7 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
   Set<Object> _selected = {};
   HyperTableDataMode _mode = HyperTableDataMode.local;
   bool? _striped, _hoverLift;
+  bool _solidSelection = false;
   bool _paginate = false, _showDepartment = true, _failNext = false;
   String _message = '表头可拖动、点击排序、右键打开列菜单；名称与数量使用输入框，部门使用自定义下拉编辑器。';
   late final List<HyperTableColumn<_Record>> _columns = [
@@ -245,7 +246,7 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
       padding: EdgeInsets.all(s.pageHorizontalPadding),
       children: [
         const HyperText('数据表格', variant: HyperTextVariant.pageTitle),
-        const HyperText('默认主题审核：本页不覆盖实例样式。旧版只作功能对照，新版没有复制旧封装或补丁。'),
+        const HyperText('默认主题审核：普通示例不覆盖实例样式，内嵌示例显式启用 embedded，并由父卡片统一描边。'),
         SizedBox(height: s.compactSectionSpacing),
         Wrap(
           spacing: s.compactSectionSpacing,
@@ -347,8 +348,22 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
               onPressed: () => setState(() {
                 _hoverLift = null;
                 _striped = null;
+                _solidSelection = false;
               }),
               label: const Text('恢复表格外观继承'),
+            ),
+            HyperButton.tonal(
+              onPressed: () => setState(() {
+                _solidSelection = !_solidSelection;
+                if (_solidSelection &&
+                    _selected.isEmpty &&
+                    _records.isNotEmpty) {
+                  _selected = {_records.first.id};
+                }
+              }),
+              child: Text(
+                _solidSelection ? '实例覆盖 · 恢复主题选中背景' : '实例覆盖 · 实色选中背景',
+              ),
             ),
             HyperButton.tonal(
               onPressed: () =>
@@ -429,6 +444,11 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
             onSelectionChanged: (keys) => setState(() => _selected = keys),
             striped: _striped,
             hoverLift: _hoverLift,
+            style: _solidSelection
+                ? HyperTableStyle(
+                    selectedBackground: HyperTheme.of(context).colors.primary,
+                  )
+                : null,
             reorderableRows: true,
             onRowsReordered: (rows) => setState(() {
               _records = rows;
@@ -459,6 +479,34 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
                 },
               ),
             ],
+          ),
+        ),
+        SizedBox(height: s.sectionSpacing),
+        const HyperText(
+          '内嵌模式 · 父卡片统一描边',
+          variant: HyperTextVariant.subsectionTitle,
+        ),
+        const HyperText('组合示例：卡片显式设置描边和裁切，表格仅设置 embedded: true；没有第二层外描边。'),
+        SizedBox(height: s.compactSectionSpacing),
+        HyperCard(
+          style: HyperCardStyle(
+            padding: EdgeInsets.zero,
+            border: s.table.borderWidth <= 0
+                ? const Border()
+                : Border.all(
+                    color: HyperTheme.of(context).colors.outline,
+                    width: s.table.borderWidth,
+                  ),
+            clipBehavior: Clip.antiAlias,
+          ),
+          child: SizedBox(
+            height: 240,
+            child: HyperTable<_Record>(
+              embedded: true,
+              columns: _columns,
+              rows: _records.take(3).toList(),
+              rowKey: (row) => row.id,
+            ),
           ),
         ),
         SizedBox(height: s.sectionSpacing),

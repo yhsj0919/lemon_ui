@@ -383,14 +383,16 @@ class _PalettePainter extends CustomPainter {
         ).createShader(rect),
     );
     final border = style.paletteBorder!;
-    canvas.drawCircle(
-      origin,
-      math.max(0, wheelRadius - border.width / 2),
-      Paint()
-        ..color = border.color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = border.width,
-    );
+    if (border.style != BorderStyle.none && border.width > 0) {
+      canvas.drawCircle(
+        origin,
+        math.max(0, wheelRadius - border.width / 2),
+        Paint()
+          ..color = border.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = border.width,
+      );
+    }
     final radius = style.markerRadius!.clamp(0.0, wheelRadius);
     final angle = (hsv.hue - 90) * math.pi / 180;
     final distance = math.min(
@@ -413,14 +415,16 @@ class _PalettePainter extends CustomPainter {
       radius,
       Paint()..color = hsv.withAlpha(1).toColor(),
     );
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..color = style.markerColor!
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = border.width,
-    );
+    if (border.style != BorderStyle.none && border.width > 0) {
+      canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..color = style.markerColor!
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = border.width,
+      );
+    }
   }
 
   @override

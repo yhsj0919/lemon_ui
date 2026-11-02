@@ -1,10 +1,64 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets(
+    'zero palette border matches disabled border without hairline rings',
+    (tester) async {
+      const key = ValueKey('palette-border');
+      Future<List<int>> pixels(BorderSide border) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: HyperTheme(
+              data: HyperThemeData.light(),
+              duration: Duration.zero,
+              child: Scaffold(
+                body: Center(
+                  child: RepaintBoundary(
+                    key: key,
+                    child: SizedBox(
+                      width: 280,
+                      child: HyperColorPicker(
+                        value: Colors.blue,
+                        onChanged: (_) {},
+                        style: HyperColorPickerStyle(paletteBorder: border),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final boundary = tester.renderObject<RenderRepaintBoundary>(
+          find.byKey(key),
+        );
+        final image = (await tester.runAsync(
+          () => boundary.toImage(pixelRatio: 1),
+        ))!;
+        final data = (await tester.runAsync(
+          () => image.toByteData(format: ui.ImageByteFormat.rawRgba),
+        ))!;
+        final result = data.buffer.asUint8List().toList();
+        image.dispose();
+        return result;
+      }
+
+      final zero = await pixels(const BorderSide(color: Colors.red, width: 0));
+      final none = await pixels(BorderSide.none);
+      expect(zero.length, none.length);
+      expect(
+        Iterable.generate(zero.length).where((i) => zero[i] != none[i]).length,
+        0,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('选色器明度关闭数值提示，不透明度仅拖动显示，不继承全局常显', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

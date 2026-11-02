@@ -12,6 +12,9 @@ final class HyperSidebarSize {
     this.collapsedIconSize,
     this.collapsedRowGap,
     required this.itemSpacing,
+    this.itemPadding,
+    this.trailingSpacing,
+    this.badgeSpacing,
     this.rowGap,
     required this.indent,
     required this.sectionSpacing,
@@ -28,6 +31,15 @@ final class HyperSidebarSize {
   final double? collapsedIconSize;
   final double? collapsedRowGap;
   final double itemSpacing;
+
+  /// 条目左右留白；旧构造未指定时沿用原 itemSpacing 规格。
+  final double? itemPadding;
+
+  /// 文字到尾部内容的距离，旧构造回退到 itemSpacing。
+  final double? trailingSpacing;
+
+  /// 尾部徽标到展开箭头的距离，旧构造回退到 itemSpacing。
+  final double? badgeSpacing;
   final double? rowGap;
   final double indent;
   final double sectionSpacing;
@@ -44,6 +56,9 @@ final class HyperSidebarSize {
     double? collapsedIconSize,
     double? collapsedRowGap,
     double? itemSpacing,
+    double? itemPadding,
+    double? trailingSpacing,
+    double? badgeSpacing,
     double? rowGap,
     double? indent,
     double? sectionSpacing,
@@ -59,6 +74,9 @@ final class HyperSidebarSize {
     collapsedIconSize: collapsedIconSize ?? this.collapsedIconSize,
     collapsedRowGap: collapsedRowGap ?? this.collapsedRowGap,
     itemSpacing: itemSpacing ?? this.itemSpacing,
+    itemPadding: itemPadding ?? this.itemPadding,
+    trailingSpacing: trailingSpacing ?? this.trailingSpacing,
+    badgeSpacing: badgeSpacing ?? this.badgeSpacing,
     rowGap: rowGap ?? this.rowGap,
     indent: indent ?? this.indent,
     sectionSpacing: sectionSpacing ?? this.sectionSpacing,
@@ -72,6 +90,8 @@ final class HyperSidebarSize {
     HyperSidebarSize b,
     double t,
   ) {
+    if (a == b || t == 0) return a;
+    if (t == 1) return b;
     double value(double x, double y) => x + (y - x) * t;
     return HyperSidebarSize(
       width: value(a.width, b.width),
@@ -89,6 +109,18 @@ final class HyperSidebarSize {
           ? (t < .5 ? a.collapsedRowGap : b.collapsedRowGap)
           : value(a.collapsedRowGap!, b.collapsedRowGap!),
       itemSpacing: value(a.itemSpacing, b.itemSpacing),
+      itemPadding: value(
+        a.itemPadding ?? a.itemSpacing,
+        b.itemPadding ?? b.itemSpacing,
+      ),
+      trailingSpacing: value(
+        a.trailingSpacing ?? a.itemSpacing,
+        b.trailingSpacing ?? b.itemSpacing,
+      ),
+      badgeSpacing: value(
+        a.badgeSpacing ?? a.itemSpacing,
+        b.badgeSpacing ?? b.itemSpacing,
+      ),
       rowGap: a.rowGap == null || b.rowGap == null
           ? (t < .5 ? a.rowGap : b.rowGap)
           : value(a.rowGap!, b.rowGap!),
@@ -112,6 +144,9 @@ final class HyperSidebarSize {
           other.collapsedIconSize == collapsedIconSize &&
           other.collapsedRowGap == collapsedRowGap &&
           other.itemSpacing == itemSpacing &&
+          other.itemPadding == itemPadding &&
+          other.trailingSpacing == trailingSpacing &&
+          other.badgeSpacing == badgeSpacing &&
           other.rowGap == rowGap &&
           other.indent == indent &&
           other.sectionSpacing == sectionSpacing &&
@@ -129,6 +164,9 @@ final class HyperSidebarSize {
     collapsedIconSize,
     collapsedRowGap,
     itemSpacing,
+    itemPadding,
+    trailingSpacing,
+    badgeSpacing,
     rowGap,
     indent,
     sectionSpacing,

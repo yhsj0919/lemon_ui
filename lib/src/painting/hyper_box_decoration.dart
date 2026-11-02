@@ -1,5 +1,7 @@
 import 'package:flutter/painting.dart';
 
+import 'hyper_surface_border.dart';
+
 /// 保留自定义 BoxBorder 的插值，复用 Flutter 的颜色、渐变和阴影插值。
 class HyperBoxDecoration extends BoxDecoration {
   const HyperBoxDecoration({
@@ -18,10 +20,15 @@ class HyperBoxDecoration extends BoxDecoration {
   final bool outerShadowsOnly;
 
   @override
-  BoxPainter createBoxPainter([VoidCallback? onChanged]) =>
-      outerShadowsOnly && (boxShadow?.isNotEmpty ?? false)
-      ? _OuterShadowPainter(this, onChanged)
-      : super.createBoxPainter(onChanged);
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
+    final paintBorder = normalizeHyperBoxBorder(border);
+    if (!identical(paintBorder, border)) {
+      return _NormalizedBorderPainter(this, paintBorder!, onChanged);
+    }
+    return outerShadowsOnly && (boxShadow?.isNotEmpty ?? false)
+        ? _OuterShadowPainter(this, onChanged)
+        : super.createBoxPainter(onChanged ?? () {});
+  }
 
   static BoxDecoration _withoutBorder(BoxDecoration d) => BoxDecoration(
     color: d.color,
@@ -71,6 +78,45 @@ class HyperBoxDecoration extends BoxDecoration {
   HyperBoxDecoration scale(double factor) => _blend(null, this, factor);
 }
 
+class _NormalizedBorderPainter extends BoxPainter {
+  _NormalizedBorderPainter(
+    HyperBoxDecoration decoration,
+    BoxBorder border,
+    super.onChanged,
+  ) : background = HyperBoxDecoration(
+        color: decoration.color,
+        image: decoration.image,
+        borderRadius: decoration.borderRadius,
+        boxShadow: decoration.boxShadow,
+        gradient: decoration.gradient,
+        backgroundBlendMode: decoration.backgroundBlendMode,
+        shape: decoration.shape,
+        outerShadowsOnly: decoration.outerShadowsOnly,
+      ).createBoxPainter(onChanged ?? () {}),
+      outline =
+          (decoration.shape == BoxShape.circle
+                  ? BoxDecoration(shape: BoxShape.circle, border: border)
+                  : hyperSurfaceBorderDecoration(
+                      border,
+                      decoration.borderRadius,
+                    )!)
+              .createBoxPainter(onChanged ?? () {});
+  final BoxPainter background, outline;
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    background.paint(canvas, offset, configuration);
+    outline.paint(canvas, offset, configuration);
+  }
+
+  @override
+  void dispose() {
+    background.dispose();
+    outline.dispose();
+    super.dispose();
+  }
+}
+
 BoxBorder? lerpHyperBoxBorder(BoxBorder? a, BoxBorder? b, double t) {
   if ((a == null || a is Border || a is BorderDirectional) &&
       (b == null || b is Border || b is BorderDirectional)) {
@@ -90,7 +136,7 @@ class _OuterShadowPainter extends BoxPainter {
         borderRadius: decoration.borderRadius,
         shape: decoration.shape,
         boxShadow: decoration.boxShadow,
-      ).createBoxPainter(onChanged),
+      ).createBoxPainter(onChanged ?? () {}),
       surface = BoxDecoration(
         color: decoration.color,
         image: decoration.image,
@@ -99,7 +145,7 @@ class _OuterShadowPainter extends BoxPainter {
         gradient: decoration.gradient,
         backgroundBlendMode: decoration.backgroundBlendMode,
         shape: decoration.shape,
-      ).createBoxPainter(onChanged),
+      ).createBoxPainter(onChanged ?? () {}),
       super(onChanged);
   final HyperBoxDecoration decoration;
   final BoxPainter shadow, surface;

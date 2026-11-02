@@ -88,12 +88,16 @@ void main() {
       argb: 0xFF654321,
     );
     d.desktop.reviews.tabBar.height = 43;
+    d.desktop.reviews.tabBar.itemHorizontalPadding = 5;
     d.light.reviews.tooltip.shadow.shadows = [];
     final copy = EditorThemeDocument.decode(d.encode());
     final desktop = copy.resolve(false, deviceType: HyperDeviceType.desktop);
     expect(desktop.sizes.desktop.notification.iconSize, 31);
     expect(desktop.sizes.phone.notification.iconSize, 19);
     expect(desktop.sizes.desktop.tabBar.height, 43);
+    expect(desktop.sizes.desktop.tabBar.itemHorizontalPadding, 5);
+    expect(copy.resolve(true).sizes.desktop.tabBar.itemHorizontalPadding, 5);
+    expect(desktop.sizes.phone.tabBar.itemHorizontalPadding, 20);
     expect(desktop.alertTheme.error!.iconColor, const Color(0xFF123456));
     expect(desktop.alertTheme.success?.iconColor, isNull);
     expect(

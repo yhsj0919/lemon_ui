@@ -94,6 +94,9 @@ class EditorReviewFields {
   double? collapsedWidth;
   double? itemHeight;
   double? itemSpacing;
+  double? itemPadding;
+  double? trailingSpacing;
+  double? badgeSpacing;
   double? rowGap;
   double? indent;
   double? sectionSpacing;
@@ -281,6 +284,9 @@ class EditorReviewFields {
     if (collapsedWidth != null) 'collapsedWidth': collapsedWidth,
     if (itemHeight != null) 'itemHeight': itemHeight,
     if (itemSpacing != null) 'itemSpacing': itemSpacing,
+    if (itemPadding != null) 'itemPadding': itemPadding,
+    if (trailingSpacing != null) 'trailingSpacing': trailingSpacing,
+    if (badgeSpacing != null) 'badgeSpacing': badgeSpacing,
     if (rowGap != null) 'rowGap': rowGap,
     if (indent != null) 'indent': indent,
     if (sectionSpacing != null) 'sectionSpacing': sectionSpacing,
@@ -483,6 +489,9 @@ class EditorReviewFields {
       'collapsedWidth',
       'itemHeight',
       'itemSpacing',
+      'itemPadding',
+      'trailingSpacing',
+      'badgeSpacing',
       'rowGap',
       'indent',
       'sectionSpacing',
@@ -690,6 +699,9 @@ class EditorReviewFields {
       ..collapsedWidth = number(j['collapsedWidth'], min: 0)
       ..itemHeight = number(j['itemHeight'], min: 0)
       ..itemSpacing = number(j['itemSpacing'], min: 0)
+      ..itemPadding = number(j['itemPadding'], min: 0)
+      ..trailingSpacing = number(j['trailingSpacing'], min: 0)
+      ..badgeSpacing = number(j['badgeSpacing'], min: 0)
       ..rowGap = number(j['rowGap'], min: 0)
       ..indent = number(j['indent'], min: 0)
       ..sectionSpacing = number(j['sectionSpacing'], min: 0)
@@ -2103,6 +2115,9 @@ HyperThemeData applyEditorReviews(
         collapsedIconSize: d.sidebar.collapsedIconSize,
         collapsedRowGap: d.sidebar.collapsedRowGap,
         itemSpacing: d.sidebar.itemSpacing,
+        itemPadding: d.sidebar.itemPadding,
+        trailingSpacing: d.sidebar.trailingSpacing,
+        badgeSpacing: d.sidebar.badgeSpacing,
         rowGap: d.sidebar.rowGap,
         indent: d.sidebar.indent,
         sectionSpacing: d.sidebar.sectionSpacing,
@@ -2122,6 +2137,7 @@ HyperThemeData applyEditorReviews(
         segmentedRadius: d.tabBar.segmentedRadius,
         separatedRadius: d.tabBar.separatedRadius,
         itemSpacing: d.tabBar.itemSpacing,
+        itemHorizontalPadding: d.tabBar.itemHorizontalPadding,
         underlineThickness: d.tabBar.underlineThickness,
       ),
       stepIndicator: s.stepIndicator.copyWith(
@@ -3484,6 +3500,22 @@ void constrainEditorReviewDimensions(
       m.underlineThickness = cap(m.underlineThickness, height / 2);
       break;
     case 'sidebar':
+      final sidebar = s.sidebar.copyWith(
+        width: m.width,
+        horizontalPadding: m.horizontalPadding,
+        itemPadding: m.itemPadding,
+        iconSize: m.iconSize,
+      );
+      m.itemPadding = cap(
+        m.itemPadding,
+        editorSidebarItemPaddingLimit(sidebar),
+      );
+      final spacingLimit = editorSidebarContentSpacingLimit(
+        sidebar.copyWith(itemPadding: m.itemPadding),
+      );
+      m.itemSpacing = cap(m.itemSpacing, spacingLimit);
+      m.trailingSpacing = cap(m.trailingSpacing, spacingLimit);
+      m.badgeSpacing = cap(m.badgeSpacing, spacingLimit);
       final iconLimit = editorSidebarIconSizeLimit(
         s,
         itemHeight: m.itemHeight,

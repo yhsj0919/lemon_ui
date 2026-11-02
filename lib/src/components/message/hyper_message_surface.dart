@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../painting/hyper_box_decoration.dart';
+
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
@@ -115,7 +117,7 @@ class HyperMessageSurface extends StatelessWidget {
     );
     Widget result = Container(
       padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
+      decoration: HyperBoxDecoration(
         color: style.material == null ? style.background?.color : null,
         gradient: style.material == null ? style.background?.gradient : null,
         border: style.material == null ? style.border : null,

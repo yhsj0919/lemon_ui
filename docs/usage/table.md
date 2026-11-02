@@ -83,6 +83,52 @@ expandedKeys 为 null 时由组件管理展开；传入集合时由调用方结�
 
 ## 主题和尺寸
 
+选中行的默认单元格文字、树形展开 / 重试 / 加载图标及行拖动手柄使用
+`HyperTableStyle.selectedForeground`。未设置时，在最终选中背景（含浮起背景）上
+复用统一对比度主题自动取色；主色与主色容器优先使用对应的 onPrimary / onPrimaryContainer
+语义颜色，半透明背景先与表格底色合成。显式颜色优先，并支持全局、局部和实例逐字段覆盖。
+前景切换使用表格 Motion 并尊重减少动画。表头、选择框自身状态、自定义 cellBuilder
+和编辑器继续遵守各自主题，不整行强制包一层前景主题。
+
+```dart
+HyperTableStyle(
+  selectedBackground: theme.colors.primary,
+  selectedForeground: theme.colors.onPrimary,
+)
+```
+
+### 内嵌到卡片或面板
+
+`HyperTable(embedded: true, ...)` 将外层轮廓交给父容器：表格不绘制外描边、
+材质边缘或外阴影，外圆角为 0。未显式设置表格材质时使用语义实色底，
+不会继承父级的全局玻璃配方；显式表格材质仍可覆盖背景效果，但不增加外轮廓。
+父容器负责唯一一层描边和需要的圆角裁切，不需要额外的列表壳组件。
+
+```dart
+HyperCard(
+  style: HyperCardStyle(
+    padding: EdgeInsets.zero,
+    border: Border.all(color: theme.colors.outline),
+    clipBehavior: Clip.antiAlias,
+  ),
+  child: SizedBox(
+    height: 320,
+    child: HyperTable<Order>(
+      embedded: true,
+      columns: columns,
+      rows: orders,
+      rowKey: (row) => row.id,
+    ),
+  ),
+)
+```
+
+`embedded` 也可以通过全局 `tableTheme.style`、局部 `HyperTableTheme` 和实例
+`HyperTableStyle` 设置；控件参数优先，`false` 可恢复独立表面的主题配置。
+模式不改写原有圆角、描边和阴影配置，不重建网格状态。`borderWidth` 继续控制
+行分隔线、分页栏分隔线和内部提示线；内嵌模式只移除外层描边，不会连带删除这些线。
+排序、选择、编辑、滚动与分页行为保持一致。
+
 全局 `tableTheme`、局部 `HyperTableTheme` 与实例 `HyperTableStyle` 逐字段覆盖，文本深合并。尺寸集中在四端 `sizes.table`。单元格编辑器可通过 Style.editorStyle 覆盖，滚动条通过 Style.scrollbarTheme 覆盖。文字跟随系统 TextScaler，行与表头的实际高度至少容纳缩放后的单行文字及内边距；长文字单行省略，自定义单元格负责自己的内容布局。
 
 表面复用 HyperMaterialSurface，材质质量、默认配方和降级继承统一材质主题。行状态过渡使用 Motion，固定列与主体共享同一悬停身份。菜单复用 HyperContextMenu 和公共菜单表面。分页复用 HyperPagination。

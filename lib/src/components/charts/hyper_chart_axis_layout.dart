@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import '../../painting/hyper_surface_border.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/widgets.dart';
 
@@ -72,9 +74,11 @@ FlBorderData hyperChartGridBoundary(
       return BorderSide.none;
     }
     final line = grid.getDrawingHorizontalLine(value);
-    return BorderSide(
-      color: line.color ?? const Color(0x00000000),
-      width: line.strokeWidth,
+    return normalizeHyperBorderSide(
+      BorderSide(
+        color: line.color ?? const Color(0x00000000),
+        width: line.strokeWidth,
+      ),
     );
   }
 
@@ -86,9 +90,11 @@ FlBorderData hyperChartGridBoundary(
       return BorderSide.none;
     }
     final line = grid.getDrawingVerticalLine(value);
-    return BorderSide(
-      color: line.color ?? const Color(0x00000000),
-      width: line.strokeWidth,
+    return normalizeHyperBorderSide(
+      BorderSide(
+        color: line.color ?? const Color(0x00000000),
+        width: line.strokeWidth,
+      ),
     );
   }
 

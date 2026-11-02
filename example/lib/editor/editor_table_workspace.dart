@@ -5,6 +5,18 @@ extension _TableWorkspace on _ThemeEditorState {
     final t = _resolveTheme(_dark), s = t.sizes.resolve(_device).table;
     final m = _spec.tableMetrics, v = _mode.tableVisual;
     final font = t.textTheme.bodyMedium!.fontSize!;
+    final selectedBackground =
+        t.tableTheme.style.selectedBackground ?? t.colors.primaryContainer;
+    final selectedForeground =
+        t.tableTheme.style.selectedForeground ??
+        tableSelectedForeground(
+          t.colors,
+          t.contrastTheme,
+          background: selectedBackground,
+          canvasColor: t.tableTheme.style.background ?? t.colors.surface,
+          foreground:
+              t.tableTheme.style.textStyle?.color ?? t.colors.textPrimary,
+        );
     Widget flag(String label, bool? value, ValueChanged<bool?> set) =>
         _select<String>(
           label,
@@ -71,8 +83,20 @@ extension _TableWorkspace on _ThemeEditorState {
         (x) => v.headerForeground = x,
         inheritedColor: t.colors.textPrimary,
       ),
+      _color(
+        '表头背景',
+        v.headerBackground,
+        (x) => v.headerBackground = x,
+        inheritedColor: t.colors.surfaceMuted,
+      ),
       _heading('单元格'),
       flag('斑马纹', v.striped, (value) => v.striped = value),
+      _color(
+        '交替行背景',
+        v.stripeBackground,
+        (x) => v.stripeBackground = x,
+        inheritedColor: tableStripeBackground(t.colors),
+      ),
       n(
         '单元格最小高度',
         m.rowHeight,
@@ -217,11 +241,23 @@ extension _TableWorkspace on _ThemeEditorState {
             t.toMaterialThemeData().hoverColor,
           ),
         ),
-        'selected' => _color(
-          '当前状态背景',
-          v.selectedBackground,
-          (x) => v.selectedBackground = x,
-          inheritedColor: t.colors.primaryContainer,
+        'selected' => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _color(
+              '当前状态背景',
+              v.selectedBackground,
+              (x) => v.selectedBackground = x,
+              inheritedColor: selectedBackground,
+            ),
+            _color(
+              '选中行文字与图标',
+              v.selectedForeground,
+              (x) => v.selectedForeground = x,
+              inheritedColor: selectedForeground,
+            ),
+            const HyperText('默认按选中背景与统一对比度主题取色；自定义单元格和编辑器自管配色。'),
+          ],
         ),
         _ => const SizedBox.shrink(),
       },
@@ -262,19 +298,8 @@ extension _TableWorkspace on _ThemeEditorState {
         maxExtent: m.rowHeight ?? s.rowHeight,
       ),
       _heading('表格表面'),
-      _color(
-        '表头背景',
-        v.headerBackground,
-        (x) => v.headerBackground = x,
-        inheritedColor: t.colors.surfaceMuted,
-      ),
-
-      _color(
-        '交替行背景',
-        v.stripeBackground,
-        (x) => v.stripeBackground = x,
-        inheritedColor: tableStripeBackground(t.colors),
-      ),
+      flag('内嵌模式', v.embedded, (value) => v.embedded = value),
+      const HyperText('内嵌模式由父容器统一描边；表格外描边、圆角和外阴影不绘制，内部行分隔线保留。'),
       _color(
         '表格背景',
         v.background,

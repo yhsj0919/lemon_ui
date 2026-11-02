@@ -13,6 +13,7 @@ class _HyperSidebarPageState extends State<HyperSidebarPage> {
   bool _collapsed = false;
   bool _followParent = false;
   bool _alternateMotion = false;
+  bool _customSpacing = false;
   HyperSidebarSelectionStyle _selectionStyle = HyperSidebarSelectionStyle.text;
   String _selectedId = 'favorites';
 
@@ -65,6 +66,10 @@ class _HyperSidebarPageState extends State<HyperSidebarPage> {
                   setState(() => _alternateMotion = !_alternateMotion),
               child: HyperText(_alternateMotion ? '滑入动画' : '默认动画'),
             ),
+            HyperButton.tonal(
+              onPressed: () => setState(() => _customSpacing = !_customSpacing),
+              child: HyperText(_customSpacing ? '实例 Style · 独立间距' : '默认主题间距'),
+            ),
           ],
         ),
       ),
@@ -77,6 +82,10 @@ class _HyperSidebarPageState extends State<HyperSidebarPage> {
               onSelected: (id) => setState(() => _selectedId = id),
               selectParentWhenChildSelected: _followParent,
               style: HyperSidebarStyle(
+                itemPadding: _customSpacing ? 4 : null,
+                itemSpacing: _customSpacing ? 20 : null,
+                trailingSpacing: _customSpacing ? 8 : null,
+                badgeSpacing: _customSpacing ? 4 : null,
                 selectionStyle: _selectionStyle,
                 childrenTransitionBuilder: _alternateMotion
                     ? _slideChildren

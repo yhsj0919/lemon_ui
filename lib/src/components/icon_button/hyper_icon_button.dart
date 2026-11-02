@@ -1,4 +1,5 @@
 import '../surface/hyper_material_edge.dart';
+import '../../painting/hyper_box_decoration.dart';
 
 import 'dart:async';
 import 'dart:ui';
@@ -293,7 +294,7 @@ class _HyperIconButtonState extends State<HyperIconButton> {
       ),
       foregroundDecoration:
           overlay.a > 0 || (border != null && border != BorderSide.none)
-          ? BoxDecoration(
+          ? HyperBoxDecoration(
               color: overlay.a > 0 ? overlay : null,
               border: border == null || border == BorderSide.none
                   ? null

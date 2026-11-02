@@ -68,9 +68,9 @@ void main() {
       borderWidth: 1,
     );
     expect(layout.minimumHeight, 28);
-    expect(layout.padding, const EdgeInsets.fromLTRB(12, 4, 16, 4));
+    expect(layout.padding, const EdgeInsets.fromLTRB(12, 3, 16, 3));
   });
-  test('高度小于文字时保留内容和边框，允许撑高', () {
+  test('显式高度小于文字时清空垂直留白，不撑高', () {
     final layout = resolveHyperTextFieldLayout(
       height: 16,
       minimumHeight: 32,
@@ -78,8 +78,8 @@ void main() {
       contentHeight: 40,
       borderWidth: 2,
     );
-    expect(layout.minimumHeight, 44);
-    expect(layout.padding.vertical, 4);
+    expect(layout.minimumHeight, 16);
+    expect(layout.padding.vertical, 0);
     final unchanged = resolveHyperTextFieldLayout(
       height: null,
       minimumHeight: 32,

@@ -12,7 +12,10 @@ import 'package:trina_grid/trina_grid.dart' as trina;
 import 'package:trina_grid/src/ui/trina_base_row.dart' as trina_ui;
 
 import '../../foundation/hyper_fill.dart';
+import '../../foundation/hyper_surface_material.dart';
+import '../../painting/hyper_box_decoration.dart';
 import '../../theme/core/hyper_theme.dart';
+import '../../theme/color/hyper_contrast_theme.dart';
 import '../button/hyper_button.dart';
 import '../checkbox/hyper_checkbox.dart';
 import '../checkbox/hyper_checkbox_style.dart';
@@ -72,6 +75,7 @@ class HyperTable<T> extends StatefulWidget {
     this.onExpandedChanged,
     this.striped,
     this.hoverLift,
+    this.embedded,
     this.style,
     this.empty,
     this.noMore,
@@ -102,6 +106,14 @@ class HyperTable<T> extends StatefulWidget {
 
   /// Gives hovered rows the same lifted surface treatment as drag feedback.
   final bool? hoverLift;
+
+  /// Whether the parent owns the table's outer border, corners and shadow.
+  ///
+  /// Defaults to the style and theme, then `false`. Embedded tables have square
+  /// corners and no outer contour or material edge. Without an explicit table
+  /// material they use a solid semantic background instead of global glass.
+  /// Row separators, selection, editors and pagination retain their behavior.
+  final bool? embedded;
   final HyperTableController? controller;
   final HyperTableSelectionMode selectionMode;
   final Set<Object> selectedKeys;
@@ -135,6 +147,7 @@ class HyperTable<T> extends StatefulWidget {
 }
 
 class _HyperTableState<T> extends State<HyperTable<T>>
+    with TickerProviderStateMixin
     implements _HyperTableCommands {
   final Map<Object, List<T>> _children = {};
   final Set<Object> _expanded = {}, _childLoading = {};
@@ -149,6 +162,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   List<trina.TrinaRow> _gridRows = [];
   List<T> _remote = [];
   final ValueNotifier<Object?> _hoveredRow = ValueNotifier(null);
+  final _rowForegrounds = <Object, _TableRowForeground>{};
   final _hoveredHeader = ValueNotifier<String?>(null);
   final Map<String, double> _knownWidths = {};
   final Set<String> _userSized = {};
@@ -168,6 +182,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       widget.dataMode == HyperTableDataMode.infinite &&
       _data.isNotEmpty;
   HyperTableStyle? _resolved;
+  bool get _embedded => widget.embedded ?? _resolved?.embedded ?? false;
+  double get _surfaceBorderWidth => _embedded ? 0 : _resolved!.borderWidth!;
   bool get _hoverLift => widget.hoverLift ?? _resolved?.hoverLift ?? false;
   bool get _striped => widget.striped ?? _resolved?.striped ?? true;
   bool get _showColumnResizeHandles =>
@@ -198,7 +214,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final manager = _manager!, s = _resolved!;
     final available = _columnViewportWidth!;
     // The native vertical scrollbar overlays the body without reserving columns.
-    var remaining = math.max(0.0, available - s.borderWidth! * 2);
+    var remaining = math.max(0.0, available - _surfaceBorderWidth * 2);
     final targets = <trina.TrinaColumn, double>{};
     final flexible = <trina.TrinaColumn, HyperTableColumn<T>>{};
     double measure(String text, TextStyle style) {
@@ -281,7 +297,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final width = manager.columns
         .where((c) => !c.hide)
         .fold<double>(0, (sum, column) => sum + column.width);
-    final overflow = width > available - s.borderWidth! * 2 + .5;
+    final overflow = width > available - _surfaceBorderWidth * 2 + .5;
     if (_horizontalOverflow != overflow) {
       setState(() => _horizontalOverflow = overflow);
     }
@@ -420,6 +436,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   @override
   void initState() {
     super.initState();
+    _hoveredRow.addListener(_updateRowForegrounds);
     if (_remoteMode) scheduleMicrotask(reload);
   }
 
@@ -474,6 +491,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final previous = _resolved;
     final t = HyperTheme.of(context), m = HyperTheme.sizesOf(context).table;
     _resolved = HyperTableStyle(
+      embedded: false,
       hoverLift: false,
       striped: true,
       showColumnResizeHandles: false,
@@ -520,6 +538,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       liftDuration: t.motion.standardDuration,
       curve: t.motion.standardCurve,
     ).merge(HyperTableTheme.of(context).style).merge(widget.style);
+    _updateRowForegrounds();
     if (previous != null &&
         _manager != null &&
         !_metricsScheduled &&
@@ -705,6 +724,57 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     widget.onExpandedChanged?.call(Set.unmodifiable(next));
   }
 
+  Color _rowForeground(Object key) {
+    final s = _resolved!;
+    final normal = s.textStyle!.color!;
+    if (!widget.selectedKeys.contains(key)) return normal;
+    if (s.selectedForeground != null) return s.selectedForeground!;
+    final theme = HyperTheme.of(context);
+    return tableSelectedForeground(
+      theme.colors,
+      HyperContrastTheme.of(context),
+      background: _hoverLift && _hoveredRow.value == key
+          ? s.liftBackground ?? s.selectedBackground!
+          : s.selectedBackground!,
+      canvasColor: s.background!,
+      foreground: normal,
+    );
+  }
+
+  void _updateRowForegrounds() {
+    if (_resolved == null || !mounted) return;
+    final duration = MediaQuery.of(context).disableAnimations
+        ? Duration.zero
+        : (_hoverLift ? _resolved!.liftDuration! : _resolved!.duration!);
+    for (final entry in _rowForegrounds.entries) {
+      entry.value.update(
+        _rowForeground(entry.key),
+        duration,
+        _resolved!.curve!,
+      );
+    }
+  }
+
+  Widget _withRowForeground(T row, Widget Function(Color) builder) {
+    final key = widget.rowKey(row);
+    final foreground = _rowForegrounds.putIfAbsent(
+      key,
+      () => _TableRowForeground(_rowForeground(key), this),
+    );
+    return AnimatedBuilder(
+      animation: foreground,
+      builder: (context, _) => builder(foreground.color),
+    );
+  }
+
+  void _pruneRowForegrounds() {
+    final keys = _gridRows.map((row) => widget.rowKey(row.data as T)).toSet();
+    for (final key
+        in _rowForegrounds.keys.where((key) => !keys.contains(key)).toList()) {
+      _rowForegrounds.remove(key)!.dispose();
+    }
+  }
+
   Widget _treeCell(BuildContext context, T row, Widget child) {
     final key = widget.rowKey(row),
         s = _resolved!,
@@ -725,33 +795,41 @@ class _HyperTableState<T> extends State<HyperTable<T>>
           SizedBox(
             width: math.min(s.controlColumnWidth!, constraints.maxWidth),
             child: expandable
-                ? HyperIconButton.ghost(
-                    style: HyperIconButtonStyle(
-                      size: s.controlColumnWidth,
-                      minimumTapTargetSize: s.controlColumnWidth,
-                      iconSize: s.iconSize,
-                    ),
-                    tooltip: _childErrors.containsKey(key)
-                        ? '子级加载失败，点击重试'
-                        : expanded
-                        ? '收起子级'
-                        : '展开子级',
-                    icon: _childLoading.contains(key)
-                        ? HyperProgress.circular(size: s.iconSize)
-                        : AnimatedRotation(
-                            turns: expanded ? .25 : 0,
-                            duration: MediaQuery.of(context).disableAnimations
-                                ? Duration.zero
-                                : s.duration!,
-                            curve: s.curve!,
-                            child: Icon(
-                              _childErrors.containsKey(key)
-                                  ? HyperIcons.refreshCw
-                                  : HyperIcons.chevronRight,
+                ? _withRowForeground(
+                    row,
+                    (foreground) => HyperIconButton.ghost(
+                      style: HyperIconButtonStyle(
+                        foregroundColor: foreground,
+                        contrastMode: HyperContrastMode.standard,
+                        size: s.controlColumnWidth,
+                        minimumTapTargetSize: s.controlColumnWidth,
+                        iconSize: s.iconSize,
+                      ),
+                      tooltip: _childErrors.containsKey(key)
+                          ? '子级加载失败，点击重试'
+                          : expanded
+                          ? '收起子级'
+                          : '展开子级',
+                      icon: _childLoading.contains(key)
+                          ? HyperProgress.circular(
                               size: s.iconSize,
+                              color: foreground,
+                            )
+                          : AnimatedRotation(
+                              turns: expanded ? .25 : 0,
+                              duration: MediaQuery.of(context).disableAnimations
+                                  ? Duration.zero
+                                  : s.duration!,
+                              curve: s.curve!,
+                              child: Icon(
+                                _childErrors.containsKey(key)
+                                    ? HyperIcons.refreshCw
+                                    : HyperIcons.chevronRight,
+                                size: s.iconSize,
+                              ),
                             ),
-                          ),
-                    onPressed: () => _toggleTree(row),
+                      onPressed: () => _toggleTree(row),
+                    ),
                   )
                 : null,
           ),
@@ -920,12 +998,15 @@ class _HyperTableState<T> extends State<HyperTable<T>>
             final row = r.row.data as T;
             final content =
                 c.cellBuilder?.call(context, row, r.cell.value) ??
-                Text(
-                  '${r.cell.value ?? ''}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: c.textAlign,
-                  style: _resolved!.textStyle,
+                _withRowForeground(
+                  row,
+                  (foreground) => Text(
+                    '${r.cell.value ?? ''}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: c.textAlign,
+                    style: _resolved!.textStyle!.copyWith(color: foreground),
+                  ),
                 );
             return _tree &&
                     c.id == (widget.treeColumnId ?? widget.columns.first.id)
@@ -935,6 +1016,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         ),
     ];
     _gridRows = _rows();
+    _pruneRowForegrounds();
     _knownWidths
       ..clear()
       ..addEntries(_columns.map((c) => MapEntry(c.field, c.width)));
@@ -947,10 +1029,17 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   };
   Widget _rowDragHandle(trina.TrinaRow row) {
     final s = _resolved!;
-    final icon = Icon(
-      HyperIcons.gripVertical,
-      size: s.iconSize,
-      color: _canReorderRows ? s.textStyle!.color : s.borderColor,
+    final icon = _withRowForeground(
+      row.data as T,
+      (foreground) => Icon(
+        HyperIcons.gripVertical,
+        size: s.iconSize,
+        color:
+            _canReorderRows ||
+                widget.selectedKeys.contains(widget.rowKey(row.data as T))
+            ? foreground
+            : s.borderColor,
+      ),
     );
     if (!_canReorderRows) return icon;
     return Builder(
@@ -1012,7 +1101,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
           ),
           child: DecoratedBox(
             position: DecorationPosition.foreground,
-            decoration: BoxDecoration(
+            decoration: HyperBoxDecoration(
               borderRadius: BorderRadius.circular(s.liftRadius!),
               border: Border.fromBorderSide(
                 BorderSide.lerp(BorderSide.none, s.liftBorder!, value),
@@ -1432,7 +1521,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                     ? Duration.zero
                     : (_hoverLift ? s.liftDuration! : s.duration!),
                 curve: s.curve!,
-                foregroundDecoration: BoxDecoration(
+                foregroundDecoration: HyperBoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                       color: hideSeparator
@@ -1482,7 +1571,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                   ? Duration.zero
                   : _resolved!.duration!,
               curve: _resolved!.curve!,
-              foregroundDecoration: BoxDecoration(
+              foregroundDecoration: HyperBoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: candidates.isEmpty
@@ -1592,6 +1681,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
 
   void _replaceRows() {
     _gridRows = _rows();
+    _pruneRowForegrounds();
     final m = _manager;
     if (m != null) {
       m.removeAllRows(notify: false);
@@ -1885,6 +1975,10 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     _hoverLiftRect.dispose();
     _hoveredHeader.dispose();
     _hoveredRow.dispose();
+    for (final foreground in _rowForegrounds.values) {
+      foreground.dispose();
+    }
+    _rowForegrounds.clear();
     widget.controller?._detach(this);
     _releaseManager();
     super.dispose();
@@ -1908,20 +2002,24 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       scaler.scale(headerFont) * (s.headerTextStyle?.height ?? 1.5) +
           2 * s.verticalPadding!,
     );
-    final radius = BorderRadius.circular(s.radius!);
+    final radius = BorderRadius.circular(_embedded ? 0 : s.radius!);
     return LayoutBuilder(
       builder: (context, constraints) {
         _scheduleColumnLayout(constraints.maxWidth);
         return RepaintBoundary(
           key: _captureKey,
           child: HyperMaterialSurface(
-            material: s.material,
+            material:
+                s.material ??
+                (_embedded ? const HyperSurfaceMaterial.solid() : null),
             quality: s.materialQuality,
             reduceTransparency: s.reduceTransparency,
             semanticBackground: HyperFill.color(s.background!),
-            border: Border.all(color: s.borderColor!, width: s.borderWidth!),
+            border: _surfaceBorderWidth <= 0
+                ? const Border()
+                : Border.all(color: s.borderColor!, width: _surfaceBorderWidth),
             borderRadius: radius,
-            boxShadow: s.boxShadow,
+            boxShadow: _embedded ? const [] : s.boxShadow,
             child: ClipRRect(
               borderRadius: radius,
               child: Column(
@@ -2000,10 +2098,14 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                       rowCheckedColor: Colors.transparent,
                                       activatedColor: Colors.transparent,
                                       gridBorderWidth: 0,
-                                      gridBorderColor: s.borderColor!,
+                                      // Trina uses Border.all(width: 0), which
+                                      // still paints a hairline. Hyper owns
+                                      // the only outer contour in both modes.
+                                      gridBorderColor: Colors.transparent,
                                       borderColor: s.borderColor!,
                                       activatedBorderColor: Colors.transparent,
-                                      inactivatedBorderColor: Colors.transparent,
+                                      inactivatedBorderColor:
+                                          Colors.transparent,
                                       enableCellBorderVertical: false,
                                       enableCellBorderHorizontal: false,
                                       // Row separators are painted inside _rowSurface. Do not
@@ -2406,7 +2508,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                     SizedBox(
                       width: double.infinity,
                       child: DecoratedBox(
-                        decoration: BoxDecoration(
+                        decoration: HyperBoxDecoration(
                           color: s.background,
                           border: Border(
                             top: BorderSide(
@@ -2447,6 +2549,54 @@ class _HyperTableState<T> extends State<HyperTable<T>>
 
 // Paint above all grid segments so later rows cannot cover the lifted shadow.
 // Excluding the row interior keeps its live controls and colors untouched.
+// The grid may remount cells on selection changes. Keep each row's animation
+// here so fixed cells, ordinary cells and controls share the same current color.
+class _TableRowForeground extends ChangeNotifier {
+  _TableRowForeground(this._target, this._vsync) : _from = _target;
+  final TickerProvider _vsync;
+  AnimationController? _controller;
+  Color _from, _target;
+  Curve _curve = Curves.linear;
+
+  Color get color => _controller == null
+      ? _target
+      : Color.lerp(_from, _target, _curve.transform(_controller!.value))!;
+
+  void update(Color target, Duration duration, Curve curve) {
+    if (target == _target) {
+      if (duration == Duration.zero && (_controller?.isAnimating ?? false)) {
+        _controller!.value = 1;
+      } else {
+        // Row loading/error state and typography can change without a new hue.
+        notifyListeners();
+      }
+      return;
+    }
+    final current = color;
+    _from = current;
+    _target = target;
+    _curve = curve;
+    if (duration == Duration.zero || !hasListeners) {
+      if (_controller != null) {
+        _controller!.value = 1;
+      } else {
+        notifyListeners();
+      }
+      return;
+    }
+    _controller ??= AnimationController(vsync: _vsync)
+      ..addListener(notifyListeners);
+    _controller!.duration = duration;
+    _controller!.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+}
+
 class _HyperTableLiftPainter extends CustomPainter {
   const _HyperTableLiftPainter({
     required this.rect,

@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import '../../painting/hyper_box_decoration.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
@@ -269,7 +271,7 @@ class _HyperWheelPickerState<T> extends State<HyperWheelPicker<T>> {
                         AnimatedContainer(
                           duration: duration,
                           curve: visual.curve ?? theme.motion.fastCurve,
-                          decoration: BoxDecoration(
+                          decoration: HyperBoxDecoration(
                             color:
                                 visual.selectionColor ??
                                 theme.colors.surfaceMuted,

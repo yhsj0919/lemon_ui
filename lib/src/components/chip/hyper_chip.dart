@@ -9,6 +9,7 @@ import '../../foundation/hyper_control_state.dart';
 import '../../foundation/hyper_fill.dart';
 import '../../interaction/hyper_pressable.dart';
 import '../../painting/hyper_box_decoration.dart';
+import '../../painting/hyper_surface_border.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../tooltip/hyper_tooltip.dart';
 import 'hyper_chip_style.dart';
@@ -317,10 +318,10 @@ class HyperChip extends StatelessWidget {
                                                     resolved
                                                         .selectedAvatarColor ??
                                                     colors.primary,
-                                                shape:
-                                                    resolved
-                                                        .selectedAvatarShape ??
-                                                    const CircleBorder(),
+                                                shape: normalizeHyperShapeBorder(
+                                                  resolved.selectedAvatarShape ??
+                                                      const CircleBorder(),
+                                                ),
                                               ),
                                             )
                                           else

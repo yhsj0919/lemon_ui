@@ -15,6 +15,7 @@ final class HyperCalendarStyle {
     this.selectedColor,
     this.selectedForegroundColor,
     this.rangeColor,
+    this.rangeBorder,
     this.disabledColor,
     this.weekdayColor,
     this.todayColor,
@@ -32,6 +33,9 @@ final class HyperCalendarStyle {
   final Color? selectedColor;
   final Color? selectedForegroundColor;
   final Color? rangeColor;
+
+  /// 范围中间日期的边框；[BorderSide.none] 或零宽表示关闭。
+  final BorderSide? rangeBorder;
   final Color? disabledColor;
   final Color? weekdayColor;
   final Color? todayColor;
@@ -49,6 +53,7 @@ final class HyperCalendarStyle {
     Color? selectedColor,
     Color? selectedForegroundColor,
     Color? rangeColor,
+    BorderSide? rangeBorder,
     Color? disabledColor,
     Color? weekdayColor,
     Color? todayColor,
@@ -67,6 +72,7 @@ final class HyperCalendarStyle {
       selectedColor: selectedColor,
       selectedForegroundColor: selectedForegroundColor,
       rangeColor: rangeColor,
+      rangeBorder: rangeBorder,
       disabledColor: disabledColor,
       weekdayColor: weekdayColor,
       todayColor: todayColor,
@@ -89,6 +95,7 @@ final class HyperCalendarStyle {
           selectedForegroundColor:
               other.selectedForegroundColor ?? selectedForegroundColor,
           rangeColor: other.rangeColor ?? rangeColor,
+          rangeBorder: other.rangeBorder ?? rangeBorder,
           disabledColor: other.disabledColor ?? disabledColor,
           weekdayColor: other.weekdayColor ?? weekdayColor,
           todayColor: other.todayColor ?? todayColor,
@@ -119,6 +126,9 @@ final class HyperCalendarStyle {
       t,
     ),
     rangeColor: Color.lerp(a.rangeColor, b.rangeColor, t),
+    rangeBorder: a.rangeBorder == null || b.rangeBorder == null
+        ? (t < .5 ? a.rangeBorder : b.rangeBorder)
+        : BorderSide.lerp(a.rangeBorder!, b.rangeBorder!, t),
     disabledColor: Color.lerp(a.disabledColor, b.disabledColor, t),
     weekdayColor: Color.lerp(a.weekdayColor, b.weekdayColor, t),
     todayColor: Color.lerp(a.todayColor, b.todayColor, t),
@@ -139,6 +149,7 @@ final class HyperCalendarStyle {
       other.selectedColor == selectedColor &&
       other.selectedForegroundColor == selectedForegroundColor &&
       other.rangeColor == rangeColor &&
+      other.rangeBorder == rangeBorder &&
       other.disabledColor == disabledColor &&
       other.weekdayColor == weekdayColor &&
       other.todayColor == todayColor &&
@@ -157,6 +168,7 @@ final class HyperCalendarStyle {
     selectedColor,
     selectedForegroundColor,
     rangeColor,
+    rangeBorder,
     disabledColor,
     weekdayColor,
     todayColor,

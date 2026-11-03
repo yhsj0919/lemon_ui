@@ -19,6 +19,122 @@ Widget host(Widget child, {double scale = 1, double width = 280}) =>
     );
 Finder day(int y, int m, int d) => find.byKey(ValueKey('calendar-$y-$m-$d'));
 void main() {
+  testWidgets(
+    'range middle border inherits themes and permits explicit removal',
+    (tester) async {
+      final value = DateTimeRange(
+        start: DateTime(2026, 10, 10),
+        end: DateTime(2026, 10, 20),
+      );
+      Future<BoxDecoration> decoration({
+        HyperCalendarStyle? style,
+        HyperCalendarStyle? local,
+      }) async {
+        await tester.pumpWidget(
+          host(
+            HyperCalendarTheme(
+              data: HyperCalendarThemeData(
+                style: local ?? const HyperCalendarStyle(),
+              ),
+              child: HyperCalendar.range(
+                value: value,
+                onChanged: (_) {},
+                style: style,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return tester
+            .widgetList<DecoratedBox>(
+              find.descendant(
+                of: day(2026, 10, 15),
+                matching: find.byType(DecoratedBox),
+              ),
+            )
+            .map((box) => box.decoration)
+            .whereType<BoxDecoration>()
+            .firstWhere(
+              (box) =>
+                  box.color ==
+                  HyperTheme.of(tester.element(day(2026, 10, 15)))
+                      .colors
+                      .surfaceMuted,
+            );
+      }
+
+      expect((await decoration()).border, isNotNull);
+      const custom = BorderSide(color: Colors.grey, width: 2);
+      expect(
+        (await decoration(local: const HyperCalendarStyle(rangeBorder: custom)))
+            .border,
+        Border.fromBorderSide(custom),
+      );
+      for (final border in [BorderSide.none, const BorderSide(width: 0)]) {
+        expect(
+          (await decoration(
+            local: const HyperCalendarStyle(rangeBorder: custom),
+            style: HyperCalendarStyle(rangeBorder: border),
+          )).border,
+          isNull,
+        );
+      }
+    },
+  );
+  test('range border participates in style copy, merge, interpolation and equality', () {
+    const a = HyperCalendarStyle(rangeBorder: BorderSide(color: Colors.grey));
+    final b = a.copyWith(
+      rangeBorder: const BorderSide(color: Colors.black, width: 3),
+    );
+    expect(a.merge(b), b);
+    expect(a, isNot(b));
+    expect(HyperCalendarStyle.lerp(a, b, .5).rangeBorder!.width, 2);
+    expect(
+      a.hashCode,
+      const HyperCalendarStyle(rangeBorder: BorderSide(color: Colors.grey))
+          .hashCode,
+    );
+  });
+  testWidgets(
+    'seeded range completes once then permits two-click reselection',
+    (tester) async {
+      DateTimeRange? result;
+      await tester.pumpWidget(
+        host(
+          StatefulBuilder(
+            builder: (context, setState) => HyperCalendar.range(
+              value: result,
+              initialRangeStart: DateTime(2026, 10, 10),
+              initialMonth: DateTime(2026, 10),
+              onChanged: (value) => setState(() => result = value),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(day(2026, 10, 15));
+      await tester.pumpAndSettle();
+      expect(
+        result,
+        DateTimeRange(
+          start: DateTime(2026, 10, 10),
+          end: DateTime(2026, 10, 15),
+        ),
+      );
+      await tester.tap(day(2026, 10, 20));
+      await tester.pumpAndSettle();
+      expect(result!.start.day, 10);
+      await tester.tap(day(2026, 10, 25));
+      await tester.pumpAndSettle();
+      expect(
+        result,
+        DateTimeRange(
+          start: DateTime(2026, 10, 20),
+          end: DateTime(2026, 10, 25),
+        ),
+      );
+    },
+  );
   testWidgets('range fill remains stable during second endpoint animation', (
     tester,
   ) async {

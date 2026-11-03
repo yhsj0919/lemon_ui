@@ -159,7 +159,7 @@ void main() {
   );
 
   testWidgets(
-    'desktop selected menu retains background and normal foreground',
+    'desktop selected menu retains background and uses primary foreground',
     (tester) async {
       final theme = HyperThemeData.light();
       await tester.pumpWidget(
@@ -187,7 +187,7 @@ void main() {
       );
       expect(
         tester.widget<Text>(find.text('Selected')).style!.color,
-        theme.colors.textPrimary,
+        theme.colors.primary,
       );
     },
   );

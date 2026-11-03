@@ -35,6 +35,68 @@ List<HyperTableColumn<String>> _columns() => [
 ];
 
 void main() {
+  testWidgets('flex header has final widths on every painted frame', (
+    tester,
+  ) async {
+    final controller = HyperTableController();
+    Future<HyperTablePage<String>> load(HyperTableQuery query) async =>
+        const HyperTablePage(items: [], total: 0);
+    Widget table({double width = 640, int generation = 0}) => _host(
+      HyperTable<String>(
+        key: ValueKey(generation),
+        controller: controller,
+        dataMode: HyperTableDataMode.paginated,
+        loader: load,
+        selectionMode: HyperTableSelectionMode.multiple,
+        columns: [
+          HyperTableColumn(
+            id: 'name',
+            title: '文件',
+            value: (row) => row,
+            widthMode: HyperTableColumnWidthMode.flex,
+          ),
+          HyperTableColumn(
+            id: 'date',
+            title: '清除日期',
+            value: (row) => '-',
+            width: 100,
+          ),
+        ],
+        rows: const [],
+        rowKey: (row) => row,
+        style: const HyperTableStyle(borderWidth: 0),
+      ),
+      width: width,
+    );
+    Future<void> verifyFrames(Widget widget, double width) async {
+      await tester.pumpWidget(widget);
+      for (var frame = 0; frame < 5; frame++) {
+        final title = find.text('清除日期');
+        if (title.evaluate().isNotEmpty) {
+          final grid = tester.getRect(find.byType(trina.TrinaGrid));
+          // The fixed final column must start at the final flex boundary,
+          // including frames before the grid's onLoaded callback settles.
+          expect(
+            tester.getTopLeft(title.first).dx,
+            greaterThan(grid.left + width - 100),
+            reason: 'Header collapsed on frame $frame at width $width',
+          );
+        }
+        await tester.pump();
+      }
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+
+    final initial = table();
+    await verifyFrames(initial, 640);
+    await controller.reload();
+    await verifyFrames(initial, 640);
+    // A parent refresh commonly creates new column descriptors.
+    await verifyFrames(table(), 640);
+    await verifyFrames(table(width: 720), 720);
+    await verifyFrames(table(generation: 1), 640);
+  });
   for (final mode in HyperTableSelectionMode.values) {
     testWidgets(
       'ordinary cell activation has no border in selection mode $mode',

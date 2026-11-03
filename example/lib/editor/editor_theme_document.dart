@@ -1428,11 +1428,9 @@ class EditorThemeDocument {
                   m.blurY ??
                   m.blur ??
                   const HyperSurfaceMaterial.clearFrostedGlass().blurSigmaX,
-              boxShadow:
-                  m.materialAppearance.shadows
-                      ?.map((s) => s.resolve(colors))
-                      .toList() ??
-                  const HyperSurfaceMaterial.clearFrostedGlass().boxShadow,
+              boxShadow: m.materialAppearance.shadows
+                  ?.map((s) => s.resolve(colors))
+                  .toList(),
             ),
           HyperSurfaceMaterialKind.softLightGlass =>
             HyperSurfaceMaterial.softLightGlass(
@@ -1456,7 +1454,7 @@ class EditorThemeDocument {
                   ?.map((s) => s.resolve(colors))
                   .toList() ??
               (m.material == HyperSurfaceMaterialKind.clearFrostedGlass
-                  ? const HyperSurfaceMaterial.clearFrostedGlass().boxShadow
+                  ? null
                   : const []),
         );
     final behavior = m.behavior;
@@ -2468,6 +2466,9 @@ class EditorThemeDocument {
           ),
           backgroundColor: m.calendar.background?.resolve(colors),
           disabledColor: m.calendar.disabledForeground?.resolve(colors),
+          rangeBorder: m.calendar.borderColor == null
+              ? null
+              : BorderSide(color: m.calendar.borderColor!.resolve(colors)),
         ),
       ),
       wheelPickerTheme: theme.wheelPickerTheme.copyWith(

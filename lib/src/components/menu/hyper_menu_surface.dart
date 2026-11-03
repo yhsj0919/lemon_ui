@@ -58,19 +58,15 @@ HyperCardStyle resolveHyperMenuSurfaceStyle({
       cardThemeStyle?.material ??
       globalMaterial;
   final shadow =
-      (effectiveMaterial?.boxShadow.isNotEmpty ?? false) ||
+      (effectiveMaterial != null &&
+              !effectiveMaterial.usesDefaultShadows &&
+              (effectiveMaterial.boxShadow.isNotEmpty ||
+                  effectiveMaterial.kind ==
+                      HyperSurfaceMaterialKind.clearFrostedGlass)) ||
           cardThemeStyle?.boxShadow != null ||
           style?.boxShadow != null
       ? null
-      : [
-          BoxShadow(
-            color: colors.scrim.withValues(
-              alpha: globalMaterial == null ? .10 : .12,
-            ),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ];
+      : HyperOverlayMaterial.defaultShadowsFor(colors);
   return HyperCardStyle(
     material: fallbackMaterial,
     materialEdge: true,

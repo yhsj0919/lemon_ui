@@ -274,7 +274,7 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
           child: Icon(s.expandIcon, textDirection: readingDirection),
         ),
       );
-      final expandSize = widget.separateExpansion
+      final expandHeight = widget.separateExpansion
           ? math.max(s.iconSize!, s.rowHeight!)
           : s.iconSize!;
       Widget content = Semantics(
@@ -325,8 +325,9 @@ class _TreeState<T> extends State<HyperTreeView<T>> {
                     data: IconThemeData(color: foreground, size: s.iconSize),
                     child: Row(
                       children: [
-                        SizedBox.square(
-                          dimension: expandSize,
+                        SizedBox(
+                          width: s.iconSize,
+                          height: expandHeight,
                           child: branch
                               ? widget.separateExpansion
                                     ? HyperPressable(

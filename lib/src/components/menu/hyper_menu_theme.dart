@@ -1,19 +1,30 @@
 import 'package:flutter/widgets.dart';
 
 import '../../theme/core/hyper_theme.dart';
+import '../button/hyper_button_style.dart';
 import 'hyper_menu_style.dart';
 
 @immutable
 final class HyperMenuThemeData {
-  const HyperMenuThemeData({this.style});
+  const HyperMenuThemeData({this.style, this.buttonStyle});
 
   final HyperMenuStyle? style;
 
-  HyperMenuThemeData copyWith({HyperMenuStyle? style}) =>
-      HyperMenuThemeData(style: this.style?.merge(style) ?? style);
+  /// 菜单触发按钮的样式；实例显式字段优先。
+  final HyperButtonStyle? buttonStyle;
 
-  HyperMenuThemeData merge(HyperMenuThemeData? other) =>
-      HyperMenuThemeData(style: style?.merge(other?.style) ?? other?.style);
+  HyperMenuThemeData copyWith({
+    HyperMenuStyle? style,
+    HyperButtonStyle? buttonStyle,
+  }) => HyperMenuThemeData(
+    style: this.style?.merge(style) ?? style,
+    buttonStyle: this.buttonStyle?.merge(buttonStyle) ?? buttonStyle,
+  );
+
+  HyperMenuThemeData merge(HyperMenuThemeData? other) => HyperMenuThemeData(
+    style: style?.merge(other?.style) ?? other?.style,
+    buttonStyle: buttonStyle?.merge(other?.buttonStyle) ?? other?.buttonStyle,
+  );
 
   static HyperMenuThemeData lerp(
     HyperMenuThemeData a,
@@ -23,14 +34,19 @@ final class HyperMenuThemeData {
     style: a.style == null || b.style == null
         ? (t < .5 ? a.style : b.style)
         : HyperMenuStyle.lerp(a.style!, b.style!, t),
+    buttonStyle: a.buttonStyle == null || b.buttonStyle == null
+        ? (t < .5 ? a.buttonStyle : b.buttonStyle)
+        : HyperButtonStyle.lerp(a.buttonStyle!, b.buttonStyle!, t),
   );
 
   @override
   bool operator ==(Object other) =>
-      other is HyperMenuThemeData && other.style == style;
+      other is HyperMenuThemeData &&
+      other.style == style &&
+      other.buttonStyle == buttonStyle;
 
   @override
-  int get hashCode => style.hashCode;
+  int get hashCode => Object.hash(style, buttonStyle);
 }
 
 /// 为当前子树局部覆盖菜单样式。

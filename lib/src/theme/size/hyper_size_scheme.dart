@@ -1238,7 +1238,7 @@ final class HyperSizeScheme {
           headerHeight: 36,
           columnWidth: 192,
           minimumColumnWidth: 36,
-          controlColumnWidth: 36,
+          controlColumnWidth: 48,
           horizontalPadding: 8,
           verticalPadding: 4,
           iconSize: 16,

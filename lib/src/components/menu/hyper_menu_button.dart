@@ -8,6 +8,7 @@ import '../overlay/hyper_anchored_overlay.dart';
 import 'hyper_menu.dart';
 import 'hyper_menu_model.dart';
 import 'hyper_menu_style.dart';
+import 'hyper_menu_theme.dart';
 
 /// 用 HyperButton 打开操作菜单；菜单内容仍由 HyperMenu 负责。
 class HyperMenuButton extends StatefulWidget {
@@ -52,41 +53,44 @@ class _HyperMenuButtonState extends State<HyperMenuButton> {
   @override
   Widget build(BuildContext context) {
     final onPressed = widget.enabled ? _toggle : null;
+    final buttonStyle =
+        HyperMenuTheme.of(context).buttonStyle?.merge(widget.buttonStyle) ??
+        widget.buttonStyle;
     final button = switch (widget.variant) {
       HyperButtonVariant.filled => HyperButton.filled(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
       HyperButtonVariant.tonal => HyperButton.tonal(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
       HyperButtonVariant.outlined => HyperButton.outlined(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
       HyperButtonVariant.ghost => HyperButton.ghost(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
       HyperButtonVariant.text => HyperButton.text(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
       HyperButtonVariant.gradient => HyperButton.gradient(
         onPressed: onPressed,
         size: widget.size,
-        style: widget.buttonStyle,
+        style: buttonStyle,
         child: widget.child,
       ),
     };

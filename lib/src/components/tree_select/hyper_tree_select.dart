@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -234,16 +232,9 @@ class _HyperTreeSelectState<T extends Object>
         sizes.deviceType == HyperDeviceType.phone ||
         sizes.deviceType == HyperDeviceType.tablet ||
         sizes.deviceType == HyperDeviceType.watch;
-    final treeOverrides = HyperTreeViewTheme.of(context).style
-        .merge(visual.treeStyle);
-    final iconSize = treeOverrides.iconSize ?? sizes.treeView.iconSize;
-    final rowHeight = treeOverrides.rowHeight ?? sizes.treeView.rowHeight;
-    // The expansion hit target already supplies half of its spare width
-    // between the chevron and label. Match the menu's visible icon gap.
-    final expansionInset = (math.max(iconSize, rowHeight) - iconSize) / 2;
     final treeStyle = HyperTreeViewStyle(
       rowPadding: EdgeInsets.zero,
-      contentSpacing: math.max(0, sizes.menu.iconSpacing - expansionInset),
+      contentSpacing: sizes.menu.iconSpacing,
       background: const HyperFill.none(),
       material: null,
       border: null,

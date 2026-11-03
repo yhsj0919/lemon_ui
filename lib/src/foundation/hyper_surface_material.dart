@@ -28,6 +28,7 @@ final class HyperSurfaceMaterial {
     this.tint,
     this.border,
     this.boxShadow = const [],
+    this.usesDefaultShadows = false,
     this.fallback,
     this.edgeGradient,
     this.edgeEnabled,
@@ -119,10 +120,7 @@ final class HyperSurfaceMaterial {
     BorderSide? border,
     Gradient? edgeGradient = clearGlassEdge,
     bool? edgeEnabled,
-    List<BoxShadow> boxShadow = const [
-      BoxShadow(color: Color(0x140F2035), blurRadius: 20, spreadRadius: -2),
-      BoxShadow(color: Color(0x080F2035), blurRadius: 4),
-    ],
+    List<BoxShadow>? boxShadow,
     bool outsideShadow = true,
     HyperSurfaceMaterial? fallback = const HyperSurfaceMaterial.solid(
       background: HyperFill.color(Color(0xFFF1F2F4)),
@@ -130,6 +128,7 @@ final class HyperSurfaceMaterial {
     ),
   }) : this._(
          kind: HyperSurfaceMaterialKind.clearFrostedGlass,
+         usesDefaultShadows: boxShadow == null,
          background: background,
          blurSigmaX: blurSigmaX,
          blurSigmaY: blurSigmaY,
@@ -137,7 +136,16 @@ final class HyperSurfaceMaterial {
          border: border,
          edgeGradient: edgeGradient,
          edgeEnabled: edgeEnabled,
-         boxShadow: boxShadow,
+         boxShadow:
+             boxShadow ??
+             const [
+               BoxShadow(
+                 color: Color(0x140F2035),
+                 blurRadius: 20,
+                 spreadRadius: -2,
+               ),
+               BoxShadow(color: Color(0x080F2035), blurRadius: 4),
+             ],
          outsideShadow: outsideShadow,
          fallback: fallback,
        );
@@ -204,6 +212,9 @@ final class HyperSurfaceMaterial {
   /// 材质表面阴影。
   final List<BoxShadow> boxShadow;
 
+  /// 高透材质未显式指定阴影，允许浮层使用其语义默认阴影。
+  final bool usesDefaultShadows;
+
   /// 普通质量或减少透明度时使用的不透明替代材质。
   final HyperSurfaceMaterial? fallback;
 
@@ -258,6 +269,7 @@ final class HyperSurfaceMaterial {
     tint: identical(tint, _unchanged) ? this.tint : tint as Color?,
     border: identical(border, _unchanged) ? this.border : border as BorderSide?,
     boxShadow: boxShadow ?? this.boxShadow,
+    usesDefaultShadows: boxShadow == null && usesDefaultShadows,
     fallback: identical(fallback, _unchanged)
         ? this.fallback
         : fallback as HyperSurfaceMaterial?,
@@ -291,6 +303,7 @@ final class HyperSurfaceMaterial {
           ? (t < .5 ? a.border : b.border)
           : BorderSide.lerp(a.border!, b.border!, t),
       boxShadow: BoxShadow.lerpList(a.boxShadow, b.boxShadow, t) ?? const [],
+      usesDefaultShadows: a.usesDefaultShadows && b.usesDefaultShadows,
       fallback: t < .5 ? a.fallback : b.fallback,
     );
   }
@@ -308,6 +321,7 @@ final class HyperSurfaceMaterial {
           other.blurSigmaY == blurSigmaY &&
           other.tint == tint &&
           other.border == border &&
+          other.usesDefaultShadows == usesDefaultShadows &&
           listEquals(other.boxShadow, boxShadow) &&
           other.fallback == fallback;
 
@@ -322,6 +336,7 @@ final class HyperSurfaceMaterial {
     blurSigmaY,
     tint,
     border,
+    usesDefaultShadows,
     Object.hashAll(boxShadow),
     fallback,
   );

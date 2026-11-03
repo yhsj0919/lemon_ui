@@ -4,6 +4,57 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_ui/lemon_ui.dart';
 
 void main() {
+  testWidgets('独立展开区宽度跟随图标，间距不受行高影响', (tester) async {
+    for (final rowHeight in [32.0, 48.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: Center(
+              child: SizedBox(
+                width: 300,
+                child: HyperTreeView<String>(
+                  separateExpansion: true,
+                  nodes: const [
+                    HyperTreeNode<String>(
+                      id: 'branch',
+                      label: Text('branch'),
+                      children: [
+                        HyperTreeNode<String>(id: 'leaf', label: Text('leaf')),
+                      ],
+                    ),
+                  ],
+                  style: HyperTreeViewStyle(
+                    rowHeight: rowHeight,
+                    iconSize: 16,
+                    contentSpacing: 6,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final arrow = find.byIcon(HyperIcons.chevronRight).first;
+      expect(
+        tester.getTopLeft(find.text('branch')).dx -
+            tester.getTopRight(arrow).dx,
+        6,
+      );
+      final target = find
+          .ancestor(of: arrow, matching: find.byType(HyperPressable))
+          .first;
+      expect(tester.getSize(target), Size(16, rowHeight));
+      await tester.tapAt(tester.getTopLeft(target) + const Offset(8, 2));
+      await tester.pumpAndSettle();
+      expect(find.text('leaf'), findsOneWidget);
+      await tester.tap(arrow);
+      await tester.pumpAndSettle();
+      expect(find.text('leaf'), findsNothing);
+    }
+  });
+
   testWidgets('独立展开按钮不叠加一块与整行不同的悬停底色', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

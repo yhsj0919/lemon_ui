@@ -179,7 +179,7 @@ HyperWidgetGroup(
 )
 ~~~
 
-- connected: true 由组接管外框，内置按钮去掉边框、独立圆角和阴影；默认项高度跟随基础按钮。
+- connected: true 由组接管外框，内置按钮去掉边框，默认不带独立圆角和阴影；按钮主题或实例可显式覆盖圆角与阴影，默认项高度跟随基础按钮。
 - false 为自由混合排列，各子组件保留自己的样式；任意第三方 Widget 不会自动被改写。
 - HyperWidgetGroupItem.width 指定宽度，flex 指定比例；二者互斥，flex 需要有限主轴约束。
 - direction 可为纵向；mainAxisSize 与对齐控制排列。纵向统一宽度由父约束/子项 width 组合。

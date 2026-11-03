@@ -41,6 +41,14 @@ void main() {
     );
     await tester.tap(find.text('请选择'));
     await tester.pumpAndSettle();
+    final treeContext = tester.element(
+      find.byType(HyperTreeView<HyperTreeSelectNode<String>>),
+    );
+    expect(
+      tester.getTopLeft(find.text('团队')).dx -
+          tester.getTopRight(find.byIcon(HyperIcons.chevronRight).first).dx,
+      HyperTheme.sizesOf(treeContext).menu.iconSpacing,
+    );
     await tester.tap(find.byIcon(HyperIcons.chevronRight).first);
     await tester.pumpAndSettle();
     expect(value, isNull);

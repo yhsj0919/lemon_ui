@@ -197,6 +197,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
               ),
               textDirection: direction,
               textScaler: scaler,
+              strutStyle: resolveHyperTextFieldStrut(resolved.textStyle!),
               maxLines: widget.maxLines,
             )..layout(
               maxWidth: (width - padding.horizontal).clamp(
@@ -251,6 +252,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
         text: TextSpan(text: ' ', style: resolved.textStyle),
         textDirection: widget.textDirection ?? Directionality.of(context),
         textScaler: MediaQuery.textScalerOf(context),
+        strutStyle: resolveHyperTextFieldStrut(resolved.textStyle!),
       );
       final lineHeight = textPainter.preferredLineHeight;
       textPainter.dispose();
@@ -414,6 +416,7 @@ class _HyperTextFieldState extends State<HyperTextField> {
           onEditingComplete: widget.onEditingComplete,
           onTap: widget.onTap,
           style: resolved.textStyle?.copyWith(color: resolved.foregroundColor),
+          strutStyle: resolveHyperTextFieldStrut(resolved.textStyle!),
           cursorColor: resolved.cursorColor,
           cursorWidth: resolved.cursorWidth!,
           cursorRadius: resolved.cursorRadius,

@@ -38,12 +38,14 @@ class HyperCalendar extends StatefulWidget {
     this.onDisplayedMonthChanged,
     this.panels = HyperCalendarPanels.adaptive,
   }) : range = false,
+       initialRangeStart = null,
        rangeValue = null,
        onRangeChanged = null;
   const HyperCalendar.range({
     super.key,
     required DateTimeRange? value,
     required ValueChanged<DateTimeRange>? onChanged,
+    this.initialRangeStart,
     this.firstDate,
     this.lastDate,
     this.initialMonth,
@@ -66,6 +68,11 @@ class HyperCalendar extends StatefulWidget {
   final bool useChineseLabels;
   final DateTime? value, firstDate, lastDate, initialMonth, currentDate;
   final DateTimeRange? rangeValue;
+
+  /// 首次打开时已选的范围起点；下一次点击直接完成区间。
+  ///
+  /// 仅初始化选取过程，完成后仍可通过两次点击重新选择范围。
+  final DateTime? initialRangeStart;
   final ValueChanged<DateTime>? onChanged, onDisplayedMonthChanged;
   final ValueChanged<DateTimeRange>? onRangeChanged;
   final bool Function(DateTime)? selectableDayPredicate;
@@ -94,9 +101,16 @@ class _HyperCalendarState extends State<HyperCalendar> {
       widget.initialMonth ??
           widget.value ??
           widget.rangeValue?.start ??
+          widget.initialRangeStart ??
           widget.currentDate ??
           DateTime.now(),
     );
+    final initialStart = widget.initialRangeStart;
+    if (widget.range &&
+        initialStart != null &&
+        available(_date(initialStart))) {
+      pending = _date(initialStart);
+    }
   }
 
   void _validate() {
@@ -247,6 +261,8 @@ class _HyperCalendarState extends State<HyperCalendar> {
                 !d.isBefore(_date(start)) &&
                 !d.isAfter(_date(end));
             final allowed = available(d);
+            final rangeBorder =
+                style.rangeBorder ?? BorderSide(color: theme.colors.outline);
             final color = selected
                 ? style.selectedForegroundColor ?? theme.colors.onPrimary
                 : !allowed
@@ -292,6 +308,13 @@ class _HyperCalendarState extends State<HyperCalendar> {
                                         theme.colors.surfaceMuted
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(radius),
+                              border:
+                                  inRange &&
+                                      !selected &&
+                                      rangeBorder.style != BorderStyle.none &&
+                                      rangeBorder.width > 0
+                                  ? Border.fromBorderSide(rangeBorder)
+                                  : null,
                             ),
                             child: AnimatedContainer(
                               duration: duration,

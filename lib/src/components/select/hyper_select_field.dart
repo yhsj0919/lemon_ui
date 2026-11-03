@@ -482,8 +482,8 @@ class _HyperSelectFieldState<T> extends State<HyperSelectField<T>> {
                 background:
                     HyperTextFieldTheme.of(context).style.background ??
                     HyperFill.color(HyperTheme.of(context).colors.surface),
-                height:
-                    HyperTextFieldTheme.of(context).style.height ??
+                height: HyperTextFieldTheme.of(context).style.height,
+                minimumHeight:
                     HyperTheme.sizesOf(context).select.minimumHeight ??
                     HyperTheme.sizesOf(context).textField.minimumHeight,
                 padding:

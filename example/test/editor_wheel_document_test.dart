@@ -5,6 +5,17 @@ import 'package:lemon_ui_example/editor/editor_wheel_fields.dart';
 import 'package:lemon_ui_example/editor/editor_dimension_limits.dart';
 
 void main() {
+  test('calendar range border color round trips and restores inheritance', () {
+    final doc = EditorThemeDocument();
+    doc.light.calendar.borderColor = const EditorColor(semantic: 'outline');
+    final loaded = EditorThemeDocument.decode(doc.encode());
+    expect(loaded.encode(), doc.encode());
+    final theme = loaded.resolve(false);
+    expect(theme.calendarTheme.style.rangeBorder!.color, theme.colors.outline);
+    expect(loaded.resolve(true).calendarTheme.style.rangeBorder, isNull);
+    loaded.light.calendar.borderColor = null;
+    expect(loaded.resolve(false).calendarTheme.style.rangeBorder, isNull);
+  });
   test('wheel appearance and device metrics round trip independently', () {
     final doc = EditorThemeDocument();
     doc.device(HyperDeviceType.desktop).wheelMetrics

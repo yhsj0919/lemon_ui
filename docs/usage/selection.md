@@ -103,6 +103,8 @@ expanded 等分横向宽度（需有限宽度）；单项 width/flex 互斥。di
 showSeparators 控制分隔线。默认中性选中背景，使用主题替换为品牌色。
 全局 segmentedButtonTheme、局部 HyperSegmentedButtonTheme、
 实例 HyperSegmentedButtonStyle.group / button / selectedButton 复用分组与按钮样式。
+选中背景可直接通过 `selectedButton.borderRadius` 设置圆角，悬停与按压表面使用同一圆角；
+无需通过 `group.itemBorderRadius` 裁剪。未显式配置时，连接项仍默认使用零圆角、空阴影。
 连接模式由组管理圆角和边框；页面导航请使用 Tab。
 [源码](../../lib/src/components/segmented_button/hyper_segmented_button.dart) ·
 [Demo](../../example/lib/pages/selection/hyper_segmented_button_page.dart)。

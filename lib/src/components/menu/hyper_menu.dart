@@ -297,7 +297,7 @@ class _HyperMenuState extends State<HyperMenu> {
       iconSpacing: metrics.iconSpacing,
       foregroundColor: theme.colors.textPrimary,
       disabledColor: theme.colors.disabled,
-      selectedForegroundColor: phone ? theme.colors.primary : null,
+      selectedForegroundColor: theme.colors.primary,
       selectedBackgroundColor: phone
           ? Colors.transparent
           : theme.colors.primary.withValues(alpha: .08),

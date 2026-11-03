@@ -6,6 +6,43 @@ import 'package:lemon_ui/src/components/overlay/hyper_overlay_material.dart';
 
 void main() {
   final colors = HyperThemeData.light().colors;
+  test('菜单默认外阴影采用 macOS 27 官方亮暗参数，降级保持一致', () {
+    for (final theme in [HyperThemeData.light(), HyperThemeData.dark()]) {
+      final colors = theme.colors;
+      final expected = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: .30),
+          blurRadius: 24,
+          offset: const Offset(0, 4),
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(
+            alpha: colors.brightness == Brightness.dark ? .80 : .20,
+          ),
+          spreadRadius: .5,
+        ),
+      ];
+      final surface = resolveHyperMenuSurfaceStyle(
+        colors: colors,
+        radius: 12,
+        padding: EdgeInsets.zero,
+      );
+      expect(surface.boxShadow, expected);
+      final material = HyperOverlayMaterial.fallbackFor(colors: colors)!;
+      for (final quality in HyperMaterialQuality.values) {
+        expect(material.resolve(quality: quality).boxShadow, expected);
+      }
+      expect(
+        material
+            .resolve(
+              quality: HyperMaterialQuality.advanced,
+              reduceTransparency: true,
+            )
+            .boxShadow,
+        expected,
+      );
+    }
+  });
   test('Card 无阴影材质保留浮层阴影，主题与实例阴影覆盖优先', () {
     const customShadow = [BoxShadow(blurRadius: 7)];
     for (final material in [
@@ -38,7 +75,7 @@ void main() {
       );
     }
   });
-  test('阴影依据最终材质解析，保留配方阴影及实例材质优先级', () {
+  test('高透默认阴影跟随菜单，显式配方阴影及实例材质优先', () {
     final surface = resolveHyperMenuSurfaceStyle(
       colors: colors,
       radius: 12,
@@ -47,7 +84,28 @@ void main() {
         material: const HyperSurfaceMaterial.clearFrostedGlass(),
       ),
     );
-    expect(surface.boxShadow, isNull);
+    expect(surface.boxShadow, HyperOverlayMaterial.defaultShadowsFor(colors));
+    for (final shadows in [
+      <BoxShadow>[],
+      const [BoxShadow(blurRadius: 7)],
+    ]) {
+      final custom = resolveHyperMenuSurfaceStyle(
+        colors: colors,
+        radius: 12,
+        padding: EdgeInsets.zero,
+        globalMaterial: HyperSurfaceMaterial.clearFrostedGlass(
+          boxShadow: shadows,
+        ),
+      );
+      expect(custom.boxShadow, isNull);
+    }
+    const inherited = HyperSurfaceMaterial.clearFrostedGlass();
+    expect(inherited.copyWith(tint: Colors.red).usesDefaultShadows, isTrue);
+    expect(inherited.copyWith(boxShadow: const []).usesDefaultShadows, isFalse);
+    expect(
+      inherited,
+      isNot(inherited.copyWith(boxShadow: inherited.boxShadow)),
+    );
     final overridden = resolveHyperMenuSurfaceStyle(
       colors: colors,
       radius: 12,

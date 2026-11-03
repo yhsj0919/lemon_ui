@@ -257,6 +257,16 @@ class _HyperButtonState extends State<HyperButton> {
     final groupScope = HyperWidgetGroupScope.maybeOf(context);
     final groupConnected = groupScope?.connected ?? false;
     final style = defaults
+        // Connected surfaces default to square, shadow-free items. Explicit
+        // theme/instance surfaces still own their radius and state shadows.
+        .merge(
+          groupConnected
+              ? HyperButtonStyle(
+                  borderRadius: BorderRadius.zero,
+                  boxShadow: const [],
+                )
+              : null,
+        )
         .merge(themedStyle)
         .merge(widget.style)
         .merge(
@@ -264,8 +274,6 @@ class _HyperButtonState extends State<HyperButton> {
               ? HyperButtonStyle(
                   border: BorderSide.none,
                   boxBorder: const Border(),
-                  borderRadius: BorderRadius.zero,
-                  boxShadow: const [],
                   margin: EdgeInsets.zero,
                   minimumTapTargetSize: Size.zero,
                   height: groupScope?.itemHeight,

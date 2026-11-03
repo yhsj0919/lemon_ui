@@ -19,6 +19,7 @@ import '../../theme/color/hyper_contrast_theme.dart';
 import '../button/hyper_button.dart';
 import '../checkbox/hyper_checkbox.dart';
 import '../checkbox/hyper_checkbox_style.dart';
+import '../checkbox/hyper_checkbox_theme.dart';
 import '../icon_button/hyper_icon_button.dart';
 import '../menu/hyper_context_menu.dart';
 import '../menu/hyper_menu_model.dart';
@@ -210,8 +211,10 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     });
   }
 
-  void _layoutColumnWidths() {
-    final manager = _manager!, s = _resolved!;
+  void _layoutColumnWidths({bool duringBuild = false}) {
+    final manager = _manager, s = _resolved!;
+    final columns = manager?.columns ?? _columns;
+    final rows = manager?.rows ?? _gridRows;
     final available = _columnViewportWidth!;
     // The native vertical scrollbar overlays the body without reserving columns.
     var remaining = math.max(0.0, available - _surfaceBorderWidth * 2);
@@ -228,7 +231,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       return width;
     }
 
-    for (final column in manager.columns.where((c) => !c.hide)) {
+    for (final column in columns.where((c) => !c.hide)) {
       if (column.field.startsWith('__hyper_')) {
         remaining -= column.width;
         continue;
@@ -245,7 +248,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
             s.horizontalPadding! * 2 +
             (definition.resizable ? s.iconSize! : 0) +
             (definition.sortable ? s.iconSize! : 0);
-        for (final row in manager.rows) {
+        for (final row in rows) {
           final value = row.cells[column.field]?.value;
           width = math.max(
             width,
@@ -288,18 +291,22 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         changed = true;
       }
     }
-    if (changed) {
+    if (changed && !duringBuild) {
       _hoverLiftRect.value = null;
-      manager.notifyResizingListeners();
-      manager.notifyListeners();
+      manager?.notifyResizingListeners();
+      manager?.notifyListeners();
     }
     _applyingMetrics = false;
-    final width = manager.columns
+    final width = columns
         .where((c) => !c.hide)
         .fold<double>(0, (sum, column) => sum + column.width);
     final overflow = width > available - _surfaceBorderWidth * 2 + .5;
     if (_horizontalOverflow != overflow) {
-      setState(() => _horizontalOverflow = overflow);
+      if (duringBuild) {
+        _horizontalOverflow = overflow;
+      } else {
+        setState(() => _horizontalOverflow = overflow);
+      }
     }
   }
 
@@ -1134,15 +1141,28 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   HyperCheckboxStyle _selectionStyle() {
     final s = _resolved!;
     final checkbox = HyperTheme.sizesOf(context).checkbox;
+    final colors = HyperTheme.of(context).colors;
     final size = math.min(s.iconSize!, s.controlColumnWidth!);
     final ratio = size / checkbox.size;
     return HyperCheckboxStyle(
-      size: size,
-      markSize: checkbox.markSize == null ? null : checkbox.markSize! * ratio,
-      markStrokeWidth: checkbox.markStrokeWidth * ratio,
-      borderRadius: BorderRadius.circular(checkbox.roundedRadius * ratio),
-      minimumTapTargetSize: s.controlColumnWidth,
-    );
+          inactiveColor: Colors.white,
+          border: BorderSide(color: colors.outline),
+          selectedBorder: BorderSide.none,
+        )
+        .merge(
+          HyperCheckboxTheme.of(context).resolve(HyperCheckboxVariant.rounded),
+        )
+        .merge(
+          HyperCheckboxStyle(
+            size: size,
+            markSize: checkbox.markSize == null
+                ? null
+                : checkbox.markSize! * ratio,
+            markStrokeWidth: checkbox.markStrokeWidth * ratio,
+            borderRadius: BorderRadius.circular(checkbox.roundedRadius * ratio),
+            minimumTapTargetSize: s.controlColumnWidth,
+          ),
+        );
   }
 
   Widget _selectionCell(T row) => Center(
@@ -2005,6 +2025,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final radius = BorderRadius.circular(_embedded ? 0 : s.radius!);
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Resolve before Trina paints, including its initial loading frame.
+        // onLoaded runs after layout and is too late to prevent a narrow header.
+        if (constraints.maxWidth.isFinite) {
+          _columnViewportWidth = constraints.maxWidth;
+          _layoutColumnWidths(duringBuild: true);
+        }
         _scheduleColumnLayout(constraints.maxWidth);
         return RepaintBoundary(
           key: _captureKey,

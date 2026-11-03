@@ -4,6 +4,7 @@ import '../select/hyper_selection_layout.dart';
 import '../wheel_picker/hyper_wheel_picker_style.dart';
 
 import '../button/hyper_button_theme.dart';
+import '../button/hyper_button.dart';
 
 import '../../foundation/hyper_device_type.dart';
 
@@ -933,6 +934,7 @@ class _RangePanelState extends State<_RangePanel> {
     widget.value?.start ?? DateTime.now(),
   );
   late DateTime end = widget.bounds.clamp(widget.value?.end ?? start);
+  late bool _hasEnd = widget.value != null;
   @override
   void initState() {
     super.initState();
@@ -946,12 +948,13 @@ class _RangePanelState extends State<_RangePanel> {
   @override
   Widget build(BuildContext context) {
     final gap = HyperTheme.sizesOf(context).menu.padding;
-    final valid = !start.isAfter(end);
+    final valid = _hasEnd && !start.isAfter(end);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (!valid &&
+        if (_hasEnd &&
+            !valid &&
             HyperTheme.sizesOf(context).deviceType == HyperDeviceType.desktop)
           Text(
             '结束不能早于开始',
@@ -962,15 +965,19 @@ class _RangePanelState extends State<_RangePanel> {
             HyperTheme.sizesOf(context).deviceType == HyperDeviceType.desktop)
           HyperCalendar.range(
             key: const ValueKey('range-calendar'),
-            value: DateTimeRange(
-              start: local(start),
-              end: local(end.isBefore(start) ? start : end),
-            ),
+            initialRangeStart: local(start),
+            value: !_hasEnd
+                ? null
+                : DateTimeRange(
+                    start: local(start),
+                    end: local(end.isBefore(start) ? start : end),
+                  ),
             firstDate: local(widget.bounds.min),
             lastDate: local(widget.bounds.max),
             panels: HyperCalendarPanels.doubleMonth,
             onChanged: (range) {
               setState(() {
+                _hasEnd = true;
                 start = widget.bounds.clamp(
                   DateTime.utc(
                     range.start.year,
@@ -1042,28 +1049,37 @@ class _RangePanelState extends State<_RangePanel> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text('结束'),
-                    _PickerPanel(
-                      key:
-                          widget.bounds.hasDate &&
-                              sizes.deviceType == HyperDeviceType.desktop
-                          ? ValueKey((
-                              'range-end',
-                              end.year,
-                              end.month,
-                              end.day,
-                            ))
-                          : const ValueKey('range-end'),
-                      showCalendar: false,
-                      bounds: widget.bounds,
-                      initial: end,
-                      onCancel: () {},
-                      onConfirm: (_) {},
-                      showActions: false,
-                      onDraftChanged: (v) {
-                        setState(() => end = v);
-                        widget.onValidationChanged(!start.isAfter(end));
-                      },
-                    ),
+                    if (!_hasEnd)
+                      HyperButton.text(
+                        onPressed: () => setState(() {
+                          end = start;
+                          _hasEnd = true;
+                        }),
+                        child: const Text('选择结束时间'),
+                      )
+                    else
+                      _PickerPanel(
+                        key:
+                            widget.bounds.hasDate &&
+                                sizes.deviceType == HyperDeviceType.desktop
+                            ? ValueKey((
+                                'range-end',
+                                end.year,
+                                end.month,
+                                end.day,
+                              ))
+                            : const ValueKey('range-end'),
+                        showCalendar: false,
+                        bounds: widget.bounds,
+                        initial: end,
+                        onCancel: () {},
+                        onConfirm: (_) {},
+                        showActions: false,
+                        onDraftChanged: (v) {
+                          setState(() => end = v);
+                          widget.onValidationChanged(!start.isAfter(end));
+                        },
+                      ),
                   ],
                 ),
               ];

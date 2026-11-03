@@ -1072,6 +1072,13 @@ class _ThemeEditorState extends State<ThemeEditor> {
         () => m.selectionRadius = null,
         m.selectionRadius != null,
       ),
+      _heading('范围中间日期边框'),
+      _color(
+        '边框颜色',
+        v.borderColor,
+        (c) => v.borderColor = c,
+        inheritedColor: theme.colors.outline,
+      ),
     ]);
   }
 

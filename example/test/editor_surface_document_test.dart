@@ -7,6 +7,22 @@ import 'package:lemon_ui/lemon_ui.dart';
 import 'package:lemon_ui_example/editor/editor_theme_document.dart';
 
 void main() {
+  test('高透材质未设置阴影时保留继承，保存导入不固化内置阴影', () {
+    final document = EditorThemeDocument();
+    document.light.material = HyperSurfaceMaterialKind.clearFrostedGlass;
+    final restored = EditorThemeDocument.decode(document.encode());
+    expect(
+      restored.resolve(false).materialTheme.material!.usesDefaultShadows,
+      isTrue,
+    );
+    restored.light.materialAppearance.shadows = [];
+    final disabled = EditorThemeDocument.decode(restored.encode())
+        .resolve(false)
+        .materialTheme
+        .material!;
+    expect(disabled.usesDefaultShadows, isFalse);
+    expect(disabled.boxShadow, isEmpty);
+  });
   test('内外标题和操作文字独立保存与解析', () {
     final d = EditorThemeDocument();
     d.desktop.cardMetrics

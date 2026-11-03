@@ -2,6 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/painting.dart';
 
+/// 以自然字体度量托住紧凑行高，避免中文及回退字形超出强制行框。
+/// 更大的主题行高仍由文字样式决定。
+StrutStyle resolveHyperTextFieldStrut(TextStyle style) =>
+    StrutStyle.fromTextStyle(
+      style,
+      height: kTextHeightNone,
+      forceStrutHeight: false,
+    );
+
 /// 按钮自身已包含图标两侧留白，外侧只补齐剩余的内容内边距。
 double resolveHyperTextFieldSuffixPadding({
   required double padding,

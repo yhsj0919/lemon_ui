@@ -48,6 +48,93 @@ Future<void> confirm(WidgetTester tester) async {
 }
 
 void main() {
+  for (final endDay in [3, 10]) {
+    testWidgets(
+      'existing range ending on $endDay selects end once on every opening',
+      (tester) async {
+        var value = DateTimeRange(
+          start: DateTime(2026, 11, 3),
+          end: DateTime(2026, 11, endDay),
+        );
+        await open(
+          tester,
+          StatefulBuilder(
+            builder: (context, setState) => HyperDateTimeRangePicker(
+              value: value,
+              mode: HyperDateTimePickerMode.date,
+              onChanged: (next) => setState(() => value = next!),
+            ),
+          ),
+          device: HyperDeviceType.desktop,
+        );
+        await tester.tap(find.byKey(const ValueKey('calendar-2026-11-15')));
+        await tester.pumpAndSettle();
+        await confirm(tester);
+        expect(
+          value,
+          DateTimeRange(
+            start: DateTime(2026, 11, 3),
+            end: DateTime(2026, 11, 15),
+          ),
+        );
+        await tester.tap(find.byType(HyperDropdown));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('calendar-2026-11-20')));
+        await tester.pumpAndSettle();
+        await confirm(tester);
+        expect(
+          value,
+          DateTimeRange(
+            start: DateTime(2026, 11, 3),
+            end: DateTime(2026, 11, 20),
+          ),
+        );
+      },
+    );
+  }
+  for (final mode in [
+    HyperDateTimePickerMode.date,
+    HyperDateTimePickerMode.dateTime,
+  ]) {
+    testWidgets('empty $mode range selects end in one calendar click', (
+      tester,
+    ) async {
+      DateTimeRange? result;
+      // Clamp the clock to a known valid day to keep the test deterministic.
+      final start = DateTime(2200, 1, 10, 9, 30);
+      await open(
+        tester,
+        HyperDateTimeRangePicker(
+          value: null,
+          mode: mode,
+          minimum: start,
+          maximum: DateTime(2200, 2, 28, 23, 59),
+          onChanged: (value) => result = value,
+        ),
+        device: HyperDeviceType.desktop,
+      );
+      expect(
+        tester.widget<HyperCalendar>(find.byType(HyperCalendar)).rangeValue,
+        isNull,
+      );
+      final confirmButton = tester.widget<HyperButton>(
+        find
+            .ancestor(of: find.text('确定'), matching: find.byType(HyperButton))
+            .first,
+      );
+      expect(confirmButton.onPressed, isNull);
+      await tester.tap(find.byKey(const ValueKey('calendar-2200-1-15')));
+      await tester.pumpAndSettle();
+      expect(result, isNull);
+      await confirm(tester);
+      expect(
+        result!.start,
+        mode == HyperDateTimePickerMode.date ? DateTime(2200, 1, 10) : start,
+      );
+      expect(result!.end.day, 15);
+      expect(result!.end.hour, mode == HyperDateTimePickerMode.date ? 0 : 9);
+    });
+  }
   testWidgets('range placeholder customizes only the empty label', (
     tester,
   ) async {

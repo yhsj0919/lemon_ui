@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../components/menu/hyper_menu_surface.dart';
+import '../components/overlay/hyper_overlay_material.dart';
 import '../painting/hyper_box_decoration.dart';
 import '../theme/core/hyper_theme.dart';
 import 'hyper_lift_style.dart';
@@ -58,11 +58,7 @@ HyperLiftStyle resolveHyperLiftStyle(
     pressedOffset: m.pressedOffset,
     hoverScale: 1.008,
     pressedScale: .995,
-    hoverShadows: resolveHyperMenuSurfaceStyle(
-      colors: t.colors,
-      radius: m.shadowRadius,
-      padding: EdgeInsets.zero,
-    ).boxShadow,
+    hoverShadows: [HyperOverlayMaterial.defaultElevationShadow],
     pressedShadows: const [],
     shadowRadius: m.shadowRadius,
     duration: t.motion.standardDuration,

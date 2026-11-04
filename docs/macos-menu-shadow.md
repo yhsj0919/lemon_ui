@@ -1,5 +1,8 @@
 # macOS 27 菜单默认外阴影
 
+`HyperMotion.lift` 仅复用主投影，不继承菜单轮廓层，避免在子卡片圆角外露出硬边。
+上浮主题与实例的显式阴影列表仍完整保留。
+
 用户于 2026-11-03 指定菜单默认阴影采用 macOS 27 官方参数，此项覆盖原有 HiUI 候选依据。
 
 来源为 [Apple Design Resources](https://developer.apple.com/design/resources/)

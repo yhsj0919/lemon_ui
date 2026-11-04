@@ -507,7 +507,12 @@ class HyperField extends StatelessWidget {
         );
         if (horizontal && showLabel) {
           return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: switch (visual.horizontalAlignment ??
+                HyperFieldAlignment.center) {
+              HyperFieldAlignment.start => CrossAxisAlignment.start,
+              HyperFieldAlignment.center => CrossAxisAlignment.center,
+              HyperFieldAlignment.end => CrossAxisAlignment.end,
+            },
             children: [
               SizedBox(width: labelWidth, child: title()),
               SizedBox(width: gap),

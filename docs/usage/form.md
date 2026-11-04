@@ -41,6 +41,11 @@ HyperForm(
 
 `horizontal` 为标签在左、控件在右；窄宽会重排。`labelHidden` 隐藏可见标签，仍应提供 label 或 semanticLabel 作为语义名称。`HyperFormSection(columns: 2)` 可组合多列，空间不足时减少列数；字段行高随内容增长。
 
+横向字段默认将标签与内容区纵向居中。`HyperFieldStyle.horizontalAlignment`
+可设置 `HyperFieldAlignment.start`、`center` 或 `end`；多行编辑区需要顶对齐时使用 `start`。
+该设置可通过 `HyperFormTheme`、`HyperFieldTheme` 或实例 `style` 逐字段覆盖；
+窄宽重排为纵向布局时不生效。内容区包含控件、说明和下方错误提示。
+
 `requiredIndicator` 只绘制星号；是否为空由明确的 validator 决定，false 和 0 不自动视为空。`asyncValidator` 在完整校验时运行；跨字段规则放在 controller.crossValidators，通过稳定 name 返回错误。默认仅提交时校验；原生 autovalidateMode 管理同步自动校验，异步与跨字段规则通过 controller.validate/submit 显式执行。
 
 ### 密码字段快捷入口

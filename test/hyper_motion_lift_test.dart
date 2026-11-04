@@ -42,6 +42,32 @@ HyperBoxDecoration shadow(WidgetTester tester) => tester
     .whereType<HyperBoxDecoration>()
     .first;
 void main() {
+  for (final dark in [false, true]) {
+    testWidgets('default lift excludes the menu outline, dark=$dark', (
+      tester,
+    ) async {
+      final states = WidgetStatesController();
+      await tester.pumpWidget(
+        host(
+          HyperMotion.lift(
+            statesController: states,
+            child: const SizedBox(width: 160, height: 80),
+          ),
+          theme: dark ? HyperThemeData.dark() : HyperThemeData.light(),
+        ),
+      );
+      states.update(WidgetState.hovered, true);
+      await tester.pumpAndSettle();
+      expect(shadow(tester).boxShadow, hasLength(1));
+      expect(shadow(tester).boxShadow!.single.blurRadius, greaterThan(0));
+      expect(shadow(tester).boxShadow!.single.spreadRadius, 0);
+      states.update(WidgetState.hovered, false);
+      await tester.pumpAndSettle();
+      expect(shadow(tester).boxShadow, isEmpty);
+      await tester.pumpWidget(const SizedBox());
+      states.dispose();
+    });
+  }
   testWidgets(
     'unmatched lift shadows fade without hardening, including reversal',
     (tester) async {

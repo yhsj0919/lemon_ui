@@ -8,14 +8,17 @@ import '../../theme/material/hyper_material_theme.dart';
 
 /// 浮层消费者共用的默认材质；显式配方由原消费者保持完整优先级。
 abstract final class HyperOverlayMaterial {
+  /// 柔和抬升投影；不包含菜单表面的硬轮廓层。
+  static BoxShadow get defaultElevationShadow => BoxShadow(
+    color: Colors.black.withValues(alpha: .30),
+    blurRadius: 24,
+    offset: const Offset(0, 4),
+  );
+
   /// macOS 27 UI Kit 的 Liquid Glass/Light|Dark/Menus 外阴影。
   /// 来源、单位与 Flutter 映射见 docs/macos-menu-shadow.md。
   static List<BoxShadow> defaultShadowsFor(HyperColorScheme colors) => [
-    BoxShadow(
-      color: Colors.black.withValues(alpha: .30),
-      blurRadius: 24,
-      offset: const Offset(0, 4),
-    ),
+    defaultElevationShadow,
     BoxShadow(
       color: Colors.black.withValues(
         alpha: colors.brightness == Brightness.dark ? .80 : .20,

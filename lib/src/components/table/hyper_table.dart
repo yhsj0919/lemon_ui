@@ -2120,6 +2120,58 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       scrollbarOrientation: Directionality.of(context) == TextDirection.rtl
           ? ScrollbarOrientation.left
           : ScrollbarOrientation.right,
+      // The table is already placed inside the caller's layout/safe area.
+      // Native row ListViews omit explicit padding and would otherwise add
+      // page safe-area insets to their scroll extents (also in frozen columns).
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
+        removeLeft: true,
+        removeRight: true,
+        child: _horizontalScrollbar(child),
+      ),
+    );
+  }
+
+  Widget _horizontalScrollbar(Widget child) {
+    final s = _resolved!;
+    final theme = s.scrollbarTheme ?? const ScrollbarThemeData();
+    final manager = _manager;
+    final controller = manager?.scroll.bodyRowsHorizontal;
+    double frozenWidth(trina.TrinaColumnFrozen pin) =>
+        manager?.showFrozenColumn == true
+        ? manager!.columns
+              .where((c) => !c.hide && c.frozen == pin)
+              .fold<double>(0, (sum, c) => sum + c.width)
+        : 0;
+    return RawScrollbar(
+      controller: controller,
+      scrollbarOrientation: ScrollbarOrientation.bottom,
+      notificationPredicate: (notification) =>
+          notification.metrics.axis == Axis.horizontal,
+      interactive: controller != null && (theme.interactive ?? true),
+      thumbVisibility: controller == null || !_horizontalOverflow
+          ? false
+          : theme.thumbVisibility?.resolve({}),
+      trackVisibility: !_horizontalOverflow
+          ? false
+          : theme.trackVisibility?.resolve({}),
+      thickness:
+          theme.thickness?.resolve({}) ??
+          const trina.TrinaGridScrollbarConfig().thickness,
+      minThumbLength:
+          theme.minThumbLength ??
+          const trina.TrinaGridScrollbarConfig().minThumbLength,
+      radius: theme.radius,
+      thumbColor: theme.thumbColor?.resolve({}) ?? s.borderColor,
+      trackColor: theme.trackColor?.resolve({}) ?? Colors.transparent,
+      trackBorderColor:
+          theme.trackBorderColor?.resolve({}) ?? Colors.transparent,
+      padding: EdgeInsetsDirectional.only(
+        start: frozenWidth(trina.TrinaColumnFrozen.start),
+        end: frozenWidth(trina.TrinaColumnFrozen.end),
+      ).resolve(Directionality.of(context)),
       child: child,
     );
   }
@@ -2237,7 +2289,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                         const trina.TrinaGridLocaleText.china(),
                                     scrollbar: trina.TrinaGridScrollbarConfig(
                                       showVertical: false,
-                                      showHorizontal: _horizontalOverflow,
+                                      showHorizontal: false,
                                       thickness:
                                           s.scrollbarTheme?.thickness?.resolve(
                                             {},

@@ -193,6 +193,8 @@ HyperTableEditContext 提供行、稳定行标识、列标识、当前值、文�
 
 ### 行高
 
+横向与纵向滚动条均采用覆盖式绘制，不为滚动条额外预留内容宽高。横向滚动条绑定主体滚动控制器，绘制和拖动范围避开两侧固定列；内容纵向恰好放下时，即使需要横向滚动，也不会被滚动条挤出额外纵向滚动。表格内部列表不重复继承页面安全区留白。
+
 表头默认自动换行，按当前列宽、标题字体、系统文字缩放、内边距及排序/调宽操作空间计算统一高度；`HyperTableStyle.headerHeight` 为最小高度。固定列与滚动列使用同一高度，调宽后自动缩回。排序图标预留稳定位置，避免排序时突然挤压标题。列可通过 `headerMaxLines` 显式限制表头行数，例如 `headerMaxLines: 1` 使用单行省略；未指定时完整显示标题。表头和正文的 `maxLines` 独立。
 
 `HyperTableStyle.rowHeight` 为统一的最小行高，正文默认换行并按内容自动增高（`rowHeightMode: content`），四端最小尺寸规格不变。需要统一行高及单行省略时显式使用 `rowHeightMode: HyperTableRowHeightMode.uniform`；只限制个别列可设置该列的 `maxLines`。

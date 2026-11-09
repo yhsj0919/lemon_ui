@@ -75,7 +75,7 @@ void main() {
         await tester.pumpWidget(table(320));
         await tester.pumpAndSettle();
         expect(nameWidth(), 192);
-        expect(grid().configuration.scrollbar.showHorizontal, isTrue);
+        expect(grid().configuration.scrollbar.showHorizontal, isFalse);
         expect(
           grid().columns.firstWhere((c) => c.field == 'detail').width,
           400,
@@ -247,7 +247,11 @@ void main() {
           closeTo(gridRect.width, .01),
         );
         final scrollbar = tester.widget<RawScrollbar>(
-          find.byType(RawScrollbar),
+          find.byWidgetPredicate(
+            (w) =>
+                w is RawScrollbar &&
+                w.scrollbarOrientation != ScrollbarOrientation.bottom,
+          ),
         );
         final scroll = scrollbar.controller!;
         if (count == 1) {

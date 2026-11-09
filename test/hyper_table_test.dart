@@ -35,6 +35,64 @@ List<HyperTableColumn<String>> _columns() => [
 ];
 
 void main() {
+  for (final scale in [1.0, 1.3, 2.0]) {
+    testWidgets(
+      'flex keeps a usable width when fixed columns overflow: $scale',
+      (tester) async {
+        Widget table(double viewport, {double? minWidth}) => _host(
+          HyperTable<String>(
+            reorderableRows: true,
+            columns: [
+              HyperTableColumn(
+                id: 'name',
+                title: '节目名称',
+                value: (row) => row,
+                widthMode: HyperTableColumnWidthMode.flex,
+                minWidth: minWidth,
+              ),
+              HyperTableColumn(
+                id: 'detail',
+                title: '行业分类',
+                value: (row) => '公益宣传',
+                width: 400,
+              ),
+            ],
+            rows: const ['节目名称内容'],
+            rowKey: (row) => row,
+            style: const HyperTableStyle(
+              columnWidth: 192,
+              minimumColumnWidth: 36,
+              borderWidth: 0,
+            ),
+          ),
+          width: viewport,
+          scale: scale,
+        );
+        trina.TrinaGrid grid() => tester.widget(find.byType(trina.TrinaGrid));
+        double nameWidth() =>
+            grid().columns.firstWhere((c) => c.field == 'name').width;
+
+        await tester.pumpWidget(table(320));
+        await tester.pumpAndSettle();
+        expect(nameWidth(), 192);
+        expect(grid().configuration.scrollbar.showHorizontal, isTrue);
+        expect(
+          grid().columns.firstWhere((c) => c.field == 'detail').width,
+          400,
+        );
+
+        await tester.pumpWidget(table(760));
+        await tester.pumpAndSettle();
+        expect(nameWidth(), greaterThan(192));
+        expect(grid().configuration.scrollbar.showHorizontal, isFalse);
+
+        await tester.pumpWidget(table(320, minWidth: 64));
+        await tester.pumpAndSettle();
+        expect(nameWidth(), 64);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets('flex header has final widths on every painted frame', (
     tester,
   ) async {

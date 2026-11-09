@@ -5,6 +5,9 @@ enum HyperTableColumnType { text, number }
 /// Fixed width, measured loaded content, or a share of available space.
 enum HyperTableColumnWidthMode { fixed, content, flex }
 
+/// Uniform minimum height, or height fitted to each row's cell content.
+enum HyperTableRowHeightMode { uniform, content }
+
 enum HyperTableColumnPin { none, start, end }
 
 enum HyperTableDataMode { local, paginated, infinite }
@@ -35,13 +38,22 @@ final class HyperTableColumn<T> {
     this.headerTextAlign = TextAlign.center,
     this.cellBuilder,
     this.editorBuilder,
+    this.maxLines,
+    this.headerMaxLines,
   }) : assert(width == null || width > 0),
        assert(minWidth == null || minWidth > 0),
-       assert(flex > 0);
+       assert(flex > 0),
+       assert(maxLines == null || maxLines > 0),
+       assert(headerMaxLines == null || headerMaxLines > 0);
   final String id, title;
   final Object? Function(T row) value;
   final HyperTableColumnType type;
-  final double? width, minWidth;
+  final double? width;
+
+  /// Minimum column width. In flex mode, defaults to [width] or the theme's
+  /// default column width, bounded below by the theme's minimum column width.
+  /// Set explicitly to allow a smaller proportional share.
+  final double? minWidth;
   final HyperTableColumnWidthMode widthMode;
 
   /// Relative share of remaining space in flex mode; equal values split evenly.
@@ -52,6 +64,15 @@ final class HyperTableColumn<T> {
 
   /// Header alignment, independent of cell content alignment.
   final TextAlign headerTextAlign;
+
+  /// Maximum lines for built-in text cells in content-height mode.
+  /// Null allows wrapping without a line limit. Uniform mode stays single-line.
+  /// Custom cell builders manage their own wrapping.
+  final int? maxLines;
+
+  /// Header line limit. Null wraps to show the entire title and grows the
+  /// shared header height. Set to 1 for an explicitly ellipsized single line.
+  final int? headerMaxLines;
   final Widget Function(BuildContext context, T row, Object? value)?
   cellBuilder;
 

@@ -10,7 +10,6 @@
 ```dart
 showHyperDialog<void>(
   context: context,
-  style: const HyperDialogStyle(maxWidth: 960),
   builder: (_) => HyperDialog(
     title: const HyperText('订单详情'),
     content: OrderDetails(order: order), // 应用自己的内容组件
@@ -20,26 +19,21 @@ showHyperDialog<void>(
 
 `style` 是本次调用的实例覆盖，不修改全局主题；也可写在 `HyperDialog(style: ...)`
 上，组件实例显式字段优先。`maxWidth` 控制宽度上限，`width` 指定期望宽度，
-最终均受可用窗口、安全区域、键盘和 insetPadding 约束。示例的 960 是业务内容
-宽度，不是新的组件默认规格，无需再包一层对话框或重复绘制背景。
+最终均受可用窗口、安全区域、键盘和 insetPadding 约束。未指定时已经继承当前端
+`sizes.dialog.maxWidth`，普通弹窗无需重复设置 width/maxWidth，也无需再包一层对话框。
 
-普通 Column、文字或详情内容沿用默认 `scrollable: true`，长内容滚动，标题和
-操作区固定。内容是 ListView、GridView 或自带滚动的预览器时，使用下列形式，
-不要叠加两层纵向滚动：
+默认 `scrollable: false`，正文直接获得扣除标题、按钮、内边距和键盘后的有限宽高。
+可直接放入 `Column + Expanded`、`height: double.infinity`、ListView、GridView 或
+自带滚动的预览器，通常无需再指定宽高，也不要叠加两层纵向滚动：
 
 ```dart
 showHyperDialog<void>(
   context: context,
-  style: const HyperDialogStyle(maxWidth: 960),
   builder: (dialogContext) => HyperDialog(
     title: const HyperText('素材选择'),
-    scrollable: false,
-    content: SizedBox(
-      height: 320, // 业务内容期望高度，仍受弹窗可用高度约束
-      child: ListView.builder(
-        itemCount: assets.length,
-        itemBuilder: (_, index) => Text(assets[index].name),
-      ),
+    content: ListView.builder(
+      itemCount: assets.length,
+      itemBuilder: (_, index) => Text(assets[index].name),
     ),
     actions: [
       HyperButton.tonal(
@@ -54,6 +48,16 @@ showHyperDialog<void>(
 返回所选内容时改用 `showHyperDialog<Asset>`，在内容内调用
 `HyperOverlay.close<Asset>(dialogContext, selectedAsset)`，打开方 await 接收结果。
 Dialog Demo 的“内容型大弹窗 · 实例宽度覆盖”提供可运行的列表例子。
+
+`Row` 的非 flex 子项会收到无限宽度，这是横排布局的约束规则。横排中的输入框、
+较长文本或 Column 应通过 `Expanded` / `Flexible` 分配剩余宽度，例如
+`Row(children: [Icon(...), Expanded(child: Column(...))])`。给弹窗或正文外层
+再加 maxWidth 不能改变 Row 传给这些子项的约束。
+
+长文字、长表单或自然高度的长 Column 如需弹窗提供滚动，显式设置 `scrollable: true`。
+这时正文高度无界，标题和操作区固定，内部不再使用纵向 Expanded 或非 shrinkWrap 的
+ListView。升级前依赖默认滚动的调用应补上此参数；`HyperMovableDialog` 同样默认有界。
+表单弹窗和选色对话框由其封装显式保留滚动正文，底部弹窗默认行为不变。
 
 ## 打开、关闭和返回结果
 
@@ -172,9 +176,9 @@ HyperDialogTheme(
 )
 ~~~
 
-默认正文置于 SingleChildScrollView 中，长内容滚动时标题和按钮保留。
-自带 ListView 等滚动内容可设 scrollable: false，使其接受剩余空间的有限高度。
-不要在默认滚动正文内使用需要有限主轴高度的 Expanded；正文内容、标题和任意操作 Widget 由使用方负责。
+默认正文接受剩余空间的有限宽高，支持 Expanded 和自带滚动的内容。
+显式设置 scrollable: true 时正文置于 SingleChildScrollView 中，长内容滚动且标题和按钮保留。
+该模式下不要在正文内使用需要有限主轴高度的纵向 Expanded。
 可隐藏标题或关闭入口；content 始终为自由内容，不预设表单结构。
 
 background 支持纯色、渐变或 HyperFill.none；material 支持统一材质配方。

@@ -83,7 +83,7 @@ class HyperMovableDialog extends StatefulWidget {
     this.closeButtonBuilder,
     this.maximizeButtonBuilder,
     this.onClose,
-    this.scrollable = true,
+    this.scrollable = false,
     this.onPositionChanged,
     this.resizable = true,
     this.resizeConstraints = const BoxConstraints(),

@@ -75,6 +75,7 @@ class _HyperColorPickerDialogState extends State<HyperColorPickerDialog> {
 
   @override
   Widget build(BuildContext context) => HyperDialog(
+    scrollable: true,
     title: widget.title ?? const Text('选择颜色'),
     style: widget.dialogStyle,
     content: HyperColorPicker(

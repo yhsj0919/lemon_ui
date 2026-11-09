@@ -64,7 +64,12 @@ final class HyperTableStyle {
   final EdgeInsetsGeometry? footerPadding;
   final ScrollbarThemeData? scrollbarTheme;
   final double? treeIndent;
+
+  /// Minimum body row height, before separators. Individual explicit heights
+  /// and content fitting never reduce this or the accessible text minimum.
   final double? rowHeight;
+
+  /// Minimum header height. Wrapped titles and system text scaling can grow it.
   final double? headerHeight;
   final double? columnWidth;
   final double? minimumColumnWidth;

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Dialog and movable dialog bodies now default to bounded layout
+  (`scrollable: false`). Use `scrollable: true` for long natural-height content
+  that needs the dialog's scrolling wrapper. Form and color-picker dialogs
+  explicitly retain scrolling.
+
 - Reset the package to a minimal skeleton.
 
 ## 0.0.1

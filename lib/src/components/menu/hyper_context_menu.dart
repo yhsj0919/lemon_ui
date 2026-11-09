@@ -18,6 +18,7 @@ class HyperContextMenu extends StatefulWidget {
     this.menuStyle,
     this.transitionBuilder,
     this.enabled = true,
+    this.enableLongPress = true,
   });
 
   final Widget child;
@@ -28,6 +29,10 @@ class HyperContextMenu extends StatefulWidget {
   final HyperMenuStyle? menuStyle;
   final HyperOverlayTransitionBuilder? transitionBuilder;
   final bool enabled;
+
+  /// Whether touch/primary-button long presses open the menu. Secondary click
+  /// and keyboard activation remain available when this is false.
+  final bool enableLongPress;
 
   @override
   State<HyperContextMenu> createState() => _HyperContextMenuState();
@@ -84,7 +89,7 @@ class _HyperContextMenuState extends State<HyperContextMenu> {
                 _show(details.localPosition);
               }
             : null,
-        onLongPressStart: widget.enabled
+        onLongPressStart: widget.enabled && widget.enableLongPress
             ? (details) {
                 _focusNode.requestFocus();
                 _show(details.localPosition);

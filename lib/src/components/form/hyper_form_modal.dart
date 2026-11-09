@@ -165,6 +165,7 @@ class _FormModalState extends State<_FormModal> {
               actions: actions,
             )
           : HyperDialog(
+              scrollable: true,
               title: widget.title,
               content: content,
               actions: actions,

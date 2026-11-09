@@ -29,7 +29,7 @@ class HyperDialog extends StatelessWidget {
     this.actions = const [],
     this.showCloseButton = true,
     this.onClose,
-    this.scrollable = true,
+    this.scrollable = false,
     this.semanticLabel,
     this.style,
     this.surfaceBuilder,
@@ -45,7 +45,11 @@ class HyperDialog extends StatelessWidget {
   final bool showCloseButton;
   final VoidCallback? onClose;
 
-  /// 默认正文滚动，标题和按钮固定；自带滚动的内容可关闭此包装。
+  /// 默认正文接受扣除标题和按钮后的有限宽高，不额外包装滚动容器。
+  ///
+  /// 支持纵向 Expanded、无限高度及 ListView/GridView，无需额外指定尺寸。
+  /// 长文字、长表单等需要外层滚动时显式设为 true；此时正文高度无界，
+  /// 标题和按钮固定，正文内部不应再使用需要有限高度的纵向 Expanded。
   final bool scrollable;
   final String? semanticLabel;
   final HyperDialogStyle? style;

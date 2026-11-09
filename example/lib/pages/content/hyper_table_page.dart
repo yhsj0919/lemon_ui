@@ -133,7 +133,7 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
   bool? _striped, _hoverLift;
   bool _solidSelection = false;
   bool _paginate = false, _showDepartment = true, _failNext = false;
-  String _message = '表头可拖动、点击排序、右键打开列菜单；名称与数量使用输入框，部门使用自定义下拉编辑器。';
+  String _message = '长按表头后可拖动、点击排序、右键打开列菜单；名称与数量使用输入框，部门使用自定义下拉编辑器。';
   late final List<HyperTableColumn<_Record>> _columns = [
     HyperTableColumn(
       id: 'id',
@@ -507,6 +507,55 @@ class _HyperTablePageState extends State<HyperTableDemoPage> {
               rows: _records.take(3).toList(),
               rowKey: (row) => row.id,
             ),
+          ),
+        ),
+        SizedBox(height: s.sectionSpacing),
+        const HyperText(
+          '逐行高度与内容自适应',
+          variant: HyperTextVariant.subsectionTitle,
+        ),
+        const HyperText(
+          '实例行为示例：第二行单独指定 96 逻辑像素；其他行按文字和自定义多条内容增高。拖动列宽可查看换行，地址最多显示三行。',
+        ),
+        SizedBox(height: s.compactSectionSpacing),
+        SizedBox(
+          height: 320,
+          child: HyperTable<int>(
+            rows: const [1, 2, 3],
+            rowKey: (row) => row,
+            rowHeightMode: HyperTableRowHeightMode.content,
+            rowHeightBuilder: (row) => row == 2 ? 96 : null,
+            columns: [
+              HyperTableColumn(
+                id: 'customer',
+                title: '客户',
+                value: (row) => '客户 $row',
+                width: 120,
+                pin: HyperTableColumnPin.start,
+              ),
+              HyperTableColumn(
+                id: 'entities',
+                title: '关联主体',
+                value: (row) => row,
+                widthMode: HyperTableColumnWidthMode.flex,
+                cellBuilder: (context, row, value) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < row; i++)
+                      HyperText('关联主体 ${i + 1}：客户 $row 的经营主体'),
+                  ],
+                ),
+              ),
+              HyperTableColumn(
+                id: 'address',
+                title: '详细地址',
+                value: (row) =>
+                    row == 1 ? '上海市' : '一段较长的详细地址，根据可用列宽自动换行，并最多显示三行内容。',
+                widthMode: HyperTableColumnWidthMode.flex,
+                maxLines: 3,
+              ),
+            ],
           ),
         ),
         SizedBox(height: s.sectionSpacing),

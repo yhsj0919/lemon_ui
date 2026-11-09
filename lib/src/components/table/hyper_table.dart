@@ -36,6 +36,7 @@ import 'hyper_table_defaults.dart';
 import 'hyper_table_style.dart';
 import 'hyper_table_theme.dart';
 part 'hyper_table_model.dart';
+part 'hyper_table_row_height.dart';
 
 /// A data grid with controlled selection and local or remote data loading.
 ///
@@ -80,10 +81,21 @@ class HyperTable<T> extends StatefulWidget {
     this.style,
     this.empty,
     this.noMore,
+    this.rowHeightMode = HyperTableRowHeightMode.content,
+    this.rowHeightBuilder,
   }) : assert(pageSize > 0),
        assert(dataMode == HyperTableDataMode.local || loader != null);
   final List<HyperTableColumn<T>> columns;
   final List<T> rows;
+
+  /// Rows grow to fit their cell content by default. Uniform mode explicitly
+  /// keeps built-in text on one line with ellipsis.
+  final HyperTableRowHeightMode rowHeightMode;
+
+  /// Explicit height for an individual row, before horizontal separators.
+  /// Null falls back to [rowHeightMode]. Positive finite values are required;
+  /// the accessible single-line minimum is always preserved.
+  final double? Function(T row)? rowHeightBuilder;
   final Object Function(T row) rowKey;
   final HyperTableLoader<T>? loader;
 
@@ -166,6 +178,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   final _rowForegrounds = <Object, _TableRowForeground>{};
   final _hoveredHeader = ValueNotifier<String?>(null);
   final Map<String, double> _knownWidths = {};
+  final Map<Object, Map<String, double>> _cellHeights = {};
+  final Map<_HyperTableTextMeasureKey, double> _textHeights = {};
+  bool _rowHeightsScheduled = false;
   final Set<String> _userSized = {};
   bool _applyingMetrics = false, _metricsScheduled = false;
   HyperTableSort? _sort;
@@ -199,6 +214,47 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   double? _columnViewportWidth;
   bool _columnLayoutScheduled = false;
   bool _horizontalOverflow = true;
+  double? _measuredHeaderHeight;
+
+  double _headerActionWidth(trina.TrinaColumn column) {
+    final count =
+        (column.enableSorting ? 1 : 0) + (column.enableDropToResize ? 1 : 0);
+    return math.min(
+      _resolved!.iconSize!,
+      math.max(0, column.width - 2 * _resolved!.horizontalPadding!) /
+          (count + 1),
+    );
+  }
+
+  double _resolveHeaderHeight() {
+    final s = _resolved!;
+    var height = s.headerHeight!;
+    for (final column in (_manager?.columns ?? _columns).where(
+      (c) => !c.hide && !c.field.startsWith('__hyper_'),
+    )) {
+      final definition = widget.columns.firstWhere((c) => c.id == column.field);
+      final slots =
+          (column.enableSorting ? 1 : 0) + (column.enableDropToResize ? 1 : 0);
+      final painter =
+          TextPainter(
+            text: TextSpan(text: column.title, style: s.headerTextStyle),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+            maxLines: definition.headerMaxLines,
+            ellipsis: definition.headerMaxLines == null ? null : '\u2026',
+          )..layout(
+            maxWidth: math.max(
+              0,
+              column.width -
+                  2 * s.horizontalPadding! -
+                  slots * _headerActionWidth(column),
+            ),
+          );
+      height = math.max(height, painter.height + 2 * s.verticalPadding!);
+      painter.dispose();
+    }
+    return height.ceilToDouble();
+  }
 
   void _scheduleColumnLayout(double width) {
     _columnViewportWidth = width;
@@ -208,6 +264,11 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       _columnLayoutScheduled = false;
       if (!mounted || _manager == null) return;
       _layoutColumnWidths();
+      _scheduleRowHeights();
+      final height = _resolveHeaderHeight();
+      if (_measuredHeaderHeight != height) {
+        setState(() => _measuredHeaderHeight = height);
+      }
     });
   }
 
@@ -297,6 +358,10 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       manager?.notifyListeners();
     }
     _applyingMetrics = false;
+    if (changed) {
+      _cellHeights.clear();
+      _textHeights.clear();
+    }
     final width = columns
         .where((c) => !c.hide)
         .fold<double>(0, (sum, column) => sum + column.width);
@@ -334,7 +399,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
       _rowLeadingInset(stack.size.width),
       origin.dy,
       width,
-      math.min(rowBox.size.height, _manager!.rowTotalHeight),
+      rowBox.size.height,
     );
     _hoverLiftRect.value = _lastHoverLiftRect;
   }
@@ -354,7 +419,10 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     }
   }
 
-  Future<void> _captureDragRow(BuildContext handleContext) async {
+  Future<void> _captureDragRow(
+    BuildContext handleContext,
+    trina.TrinaRow row,
+  ) async {
     _clearDragSnapshot();
     final epoch = _captureEpoch;
     final boundary =
@@ -363,7 +431,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final center = boundary.globalToLocal(
       handle.localToGlobal(handle.size.center(Offset.zero)),
     );
-    final height = _manager!.rowTotalHeight;
+    final height = _rowExtent(row);
     final source = Rect.fromLTWH(
       _rowLeadingInset(boundary.size.width),
       center.dy - height / 2,
@@ -450,6 +518,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _cellHeights.clear();
+    _textHeights.clear();
     _resolve();
     if (_columns.isEmpty) _createGrid();
   }
@@ -457,6 +527,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   @override
   void didUpdateWidget(HyperTable<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _cellHeights.clear();
+    _textHeights.clear();
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?._detach(this);
       if (_manager != null) widget.controller?._attach(this);
@@ -475,6 +547,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         oldWidget.paginateLocalRows != widget.paginateLocalRows ||
         oldWidget.expandedKeys != widget.expandedKeys ||
         oldWidget.dataMode != widget.dataMode ||
+        oldWidget.rowHeightMode != widget.rowHeightMode ||
+        oldWidget.rowHeightBuilder != widget.rowHeightBuilder ||
         oldWidget.childrenBuilder != widget.childrenBuilder ||
         oldWidget.childrenLoader != widget.childrenLoader) {
       _replaceRows();
@@ -848,11 +922,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
 
   List<trina.TrinaRow> _rows() {
     final keys = <Object>{};
-    return _visibleData().map((r) {
+    return _visibleData().map<trina.TrinaRow>((r) {
       final key = widget.rowKey(r);
       if (!keys.add(key)) throw ArgumentError('Duplicate table row key: $key');
       return trina.TrinaRow(
         data: r,
+        height: _initialRowHeight(r),
         key: ValueKey(key),
         cells: {
           for (final c in widget.columns)
@@ -878,7 +953,10 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   double _minimumWidth(HyperTableColumn<T> c) {
     final s = _resolved!;
     return math.max(
-      c.minWidth ?? s.minimumColumnWidth!,
+      c.minWidth ??
+          (c.widthMode == HyperTableColumnWidthMode.flex
+              ? math.max(s.minimumColumnWidth!, c.width ?? s.columnWidth!)
+              : s.minimumColumnWidth!),
       _tree && c.id == (widget.treeColumnId ?? widget.columns.first.id)
           ? s.controlColumnWidth! + 2 * s.horizontalPadding! + s.iconSize!
           : 0,
@@ -1007,18 +1085,31 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                 c.cellBuilder?.call(context, row, r.cell.value) ??
                 _withRowForeground(
                   row,
-                  (foreground) => Text(
-                    '${r.cell.value ?? ''}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: c.textAlign,
+                  // Reset the grid's inherited single-line limit. Text's null
+                  // maxLines otherwise inherits it even in content mode.
+                  (foreground) => DefaultTextStyle(
                     style: _resolved!.textStyle!.copyWith(color: foreground),
+                    child: Text(
+                      '${r.cell.value ?? ''}',
+                      style: _resolved!.textStyle!.copyWith(color: foreground),
+                      maxLines: _contentHeight(row) ? c.maxLines : 1,
+                      overflow: _contentHeight(row) && c.maxLines == null
+                          ? TextOverflow.clip
+                          : TextOverflow.ellipsis,
+                      textAlign: c.textAlign,
+                    ),
                   ),
                 );
-            return _tree &&
+            final cell =
+                _tree &&
                     c.id == (widget.treeColumnId ?? widget.columns.first.id)
                 ? _treeCell(context, row, content)
                 : content;
+            if (!_contentHeight(row) || c.cellBuilder == null) return cell;
+            return _HyperTableMeasureCell(
+              onHeight: (height) => _recordCellHeight(row, c.id, height),
+              child: cell,
+            );
           },
         ),
     ];
@@ -1051,7 +1142,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     if (!_canReorderRows) return icon;
     return Builder(
       builder: (handleContext) => Listener(
-        onPointerDown: (_) => unawaited(_captureDragRow(handleContext)),
+        onPointerDown: (_) {
+          unawaited(_captureDragRow(handleContext, row));
+        },
         child: Draggable<trina.TrinaRow>(
           data: row,
           onDragStarted: () {
@@ -1073,7 +1166,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                 _rowLeadingInset(
                   (this.context.findRenderObject() as RenderBox).size.width,
                 ),
-            _manager!.rowTotalHeight / 2,
+            _rowExtent(row) / 2,
           ),
           feedback: Builder(builder: (_) => _rowDragFeedback(row)),
           childWhenDragging: Icon(
@@ -1089,7 +1182,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
 
   Widget _rowDragFeedback(trina.TrinaRow? row, {Size? previewSize}) {
     final s = _resolved!;
-    final height = previewSize?.height ?? _manager!.rowTotalHeight;
+    final height =
+        previewSize?.height ??
+        (row == null ? _minimumRowHeight : _rowExtent(row));
     final width =
         previewSize?.width ??
         _visibleRowWidth((context.findRenderObject() as RenderBox).size.width);
@@ -1301,7 +1396,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         },
         builder: (context, candidates, rejected) => Listener(
           onPointerDown: (_) => unawaited(_captureDragColumn(headerContext)),
-          child: Draggable<trina.TrinaColumn>(
+          child: LongPressDraggable<trina.TrinaColumn>(
             data: column,
             axis: Axis.horizontal,
             maxSimultaneousDrags: 1,
@@ -1341,133 +1436,164 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     );
   }
 
-  Widget _header(trina.TrinaColumn c) => MouseRegion(
-    onEnter: (_) => _hoveredHeader.value = c.field,
-    onExit: (_) {
-      if (_hoveredHeader.value == c.field) _hoveredHeader.value = null;
-    },
-    child: ValueListenableBuilder<String?>(
-      valueListenable: _hoveredHeader,
-      builder: (context, hovered, _) => HyperContextMenu(
-        items: [
-          if (c.enableSorting) const HyperMenuItem(id: 'asc', label: '升序'),
-          if (c.enableSorting) const HyperMenuItem(id: 'desc', label: '降序'),
-          const HyperMenuItem(id: 'clear', label: '清除排序'),
-          const HyperMenuItem(id: 'start', label: '固定到起始侧'),
-          const HyperMenuItem(id: 'end', label: '固定到末尾侧'),
-          const HyperMenuItem(id: 'unpin', label: '取消固定'),
-          HyperMenuItem(
-            id: 'hide',
-            label: '隐藏此列',
-            enabled:
-                _columns
-                    .where((c) => !c.hide && !c.field.startsWith('__hyper_'))
-                    .length >
-                1,
-          ),
-          HyperMenuItem(
-            id: 'show',
-            label: '显示隐藏列',
-            children: [
-              for (final x in _columns.where((c) => c.hide))
-                HyperMenuItem(id: 'show:${x.field}', label: x.title),
-            ],
-          ),
-        ],
-        onSelected: (id) {
-          switch (id) {
-            case 'asc':
-              sort(HyperTableSort(c.field, HyperTableSortDirection.ascending));
-            case 'desc':
-              sort(HyperTableSort(c.field, HyperTableSortDirection.descending));
-            case 'clear':
-              sort(null);
-            case 'start':
-              pinColumn(c.field, HyperTableColumnPin.start);
-            case 'end':
-              pinColumn(c.field, HyperTableColumnPin.end);
-            case 'unpin':
-              pinColumn(c.field, HyperTableColumnPin.none);
-            case 'hide':
-              setColumnVisible(c.field, false);
-            default:
-              if (id.startsWith('show:')) {
-                setColumnVisible(id.substring(5), true);
-              }
-          }
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: _resolved!.horizontalPadding!,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: switch (c.titleTextAlign) {
-                    trina.TrinaColumnTextAlign.left => Alignment.centerLeft,
-                    trina.TrinaColumnTextAlign.right => Alignment.centerRight,
-                    trina.TrinaColumnTextAlign.center => Alignment.center,
-                    trina.TrinaColumnTextAlign.end =>
-                      AlignmentDirectional.centerEnd,
-                    trina.TrinaColumnTextAlign.start =>
-                      AlignmentDirectional.centerStart,
-                  },
-                  child: Text(
-                    c.title,
-                    style: _resolved!.headerTextStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+  Widget _header(trina.TrinaColumn c) {
+    final maxLines = widget.columns
+        .firstWhere((column) => column.id == c.field)
+        .headerMaxLines;
+    return MouseRegion(
+      onEnter: (_) => _hoveredHeader.value = c.field,
+      onExit: (_) {
+        if (_hoveredHeader.value == c.field) _hoveredHeader.value = null;
+      },
+      child: ValueListenableBuilder<String?>(
+        valueListenable: _hoveredHeader,
+        builder: (context, hovered, _) => HyperContextMenu(
+          enableLongPress: false,
+          items: [
+            if (c.enableSorting) const HyperMenuItem(id: 'asc', label: '升序'),
+            if (c.enableSorting) const HyperMenuItem(id: 'desc', label: '降序'),
+            const HyperMenuItem(id: 'clear', label: '清除排序'),
+            const HyperMenuItem(id: 'start', label: '固定到起始侧'),
+            const HyperMenuItem(id: 'end', label: '固定到末尾侧'),
+            const HyperMenuItem(id: 'unpin', label: '取消固定'),
+            HyperMenuItem(
+              id: 'hide',
+              label: '隐藏此列',
+              enabled:
+                  _columns
+                      .where((c) => !c.hide && !c.field.startsWith('__hyper_'))
+                      .length >
+                  1,
+            ),
+            HyperMenuItem(
+              id: 'show',
+              label: '显示隐藏列',
+              children: [
+                for (final x in _columns.where((c) => c.hide))
+                  HyperMenuItem(id: 'show:${x.field}', label: x.title),
+              ],
+            ),
+          ],
+          onSelected: (id) {
+            switch (id) {
+              case 'asc':
+                sort(
+                  HyperTableSort(c.field, HyperTableSortDirection.ascending),
+                );
+              case 'desc':
+                sort(
+                  HyperTableSort(c.field, HyperTableSortDirection.descending),
+                );
+              case 'clear':
+                sort(null);
+              case 'start':
+                pinColumn(c.field, HyperTableColumnPin.start);
+              case 'end':
+                pinColumn(c.field, HyperTableColumnPin.end);
+              case 'unpin':
+                pinColumn(c.field, HyperTableColumnPin.none);
+              case 'hide':
+                setColumnVisible(c.field, false);
+              default:
+                if (id.startsWith('show:')) {
+                  setColumnVisible(id.substring(5), true);
+                }
+            }
+          },
+          child: Padding(
+            padding: EdgeInsetsDirectional.only(
+              start: _resolved!.horizontalPadding!,
+              end: c.enableDropToResize ? 0 : _resolved!.horizontalPadding!,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: switch (c.titleTextAlign) {
+                      trina.TrinaColumnTextAlign.left => Alignment.centerLeft,
+                      trina.TrinaColumnTextAlign.right => Alignment.centerRight,
+                      trina.TrinaColumnTextAlign.center => Alignment.center,
+                      trina.TrinaColumnTextAlign.end =>
+                        AlignmentDirectional.centerEnd,
+                      trina.TrinaColumnTextAlign.start =>
+                        AlignmentDirectional.centerStart,
+                    },
+                    child: Text(
+                      c.title,
+                      style: _resolved!.headerTextStyle,
+                      textAlign: switch (c.titleTextAlign) {
+                        trina.TrinaColumnTextAlign.left => TextAlign.left,
+                        trina.TrinaColumnTextAlign.right => TextAlign.right,
+                        trina.TrinaColumnTextAlign.center => TextAlign.center,
+                        trina.TrinaColumnTextAlign.start => TextAlign.start,
+                        trina.TrinaColumnTextAlign.end => TextAlign.end,
+                      },
+                      maxLines: maxLines,
+                      overflow: maxLines == null
+                          ? TextOverflow.clip
+                          : TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-              ),
-              if (c.sort != trina.TrinaColumnSort.none)
-                Icon(
-                  c.sort == trina.TrinaColumnSort.ascending
-                      ? HyperIcons.arrowUp
-                      : HyperIcons.arrowDown,
-                  size: _resolved!.iconSize,
-                ),
-              if (c.enableDropToResize)
-                MouseRegion(
-                  cursor: SystemMouseCursors.resizeColumn,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onHorizontalDragUpdate: (details) => _manager?.resizeColumn(
-                      c,
-                      details.delta.dx *
-                          (Directionality.of(context) == TextDirection.rtl
-                              ? -1
-                              : 1),
-                    ),
-                    child: SizedBox(
-                      width: _resolved!.iconSize,
-                      height: double.infinity,
-                      child: AnimatedOpacity(
-                        opacity: _showColumnResizeHandles || hovered == c.field
-                            ? 1
-                            : 0,
-                        duration: MediaQuery.of(context).disableAnimations
-                            ? Duration.zero
-                            : _resolved!.duration!,
-                        curve: _resolved!.curve!,
-                        child: Center(
-                          child: SizedBox(
-                            width: _resolved!.borderWidth,
-                            height: _resolved!.iconSize,
-                            child: ColoredBox(color: _resolved!.borderColor!),
+                if (c.enableSorting)
+                  SizedBox(
+                    width: _headerActionWidth(c),
+                    child: c.sort == trina.TrinaColumnSort.none
+                        ? null
+                        : Icon(
+                            c.sort == trina.TrinaColumnSort.ascending
+                                ? HyperIcons.arrowUp
+                                : HyperIcons.arrowDown,
+                            size: _headerActionWidth(c),
+                          ),
+                  ),
+                if (c.enableDropToResize)
+                  MouseRegion(
+                    cursor: SystemMouseCursors.resizeColumn,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onHorizontalDragUpdate: (details) =>
+                          _manager?.resizeColumn(
+                            c,
+                            details.delta.dx *
+                                (Directionality.of(context) == TextDirection.rtl
+                                    ? -1
+                                    : 1),
+                          ),
+                      child: SizedBox(
+                        width:
+                            _headerActionWidth(c) +
+                            _resolved!.horizontalPadding!,
+                        height: double.infinity,
+                        child: AnimatedOpacity(
+                          opacity:
+                              _showColumnResizeHandles || hovered == c.field
+                              ? 1
+                              : 0,
+                          duration: MediaQuery.of(context).disableAnimations
+                              ? Duration.zero
+                              : _resolved!.duration!,
+                          curve: _resolved!.curve!,
+                          child: Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: SizedBox(
+                              width: _resolved!.borderWidth,
+                              height: _resolved!.iconSize,
+                              child: ColoredBox(color: _resolved!.borderColor!),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
+
   BorderRadius _liftSegmentRadius(BuildContext segmentContext) {
     final stack =
         _rowsStackKey.currentContext?.findRenderObject() as RenderBox?;
@@ -1498,6 +1624,21 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     trina.TrinaGridStateManager manager,
   ) {
     final data = row.data as T, key = widget.rowKey(data);
+    // Every visible column contributes to content height, including columns
+    // outside the horizontal viewport. Keep vertical row virtualization, but
+    // lay out all cells of mounted content-height rows in the same subtree.
+    final rowChild =
+        _contentHeight(data) &&
+            child is trina_ui.TrinaBaseRow &&
+            child.visibilityLayout
+        ? trina_ui.TrinaBaseRow(
+            key: child.key,
+            rowIdx: child.rowIdx,
+            row: child.row,
+            columns: child.columns,
+            stateManager: child.stateManager,
+          )
+        : child;
     final surface = ValueListenableBuilder<Object?>(
       key: ValueKey(key),
       valueListenable: _hoveredRow,
@@ -1572,7 +1713,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                             : null,
                       )
                     : null,
-                child: child,
+                child: rowChild,
               ),
             ),
           ),
@@ -1584,7 +1725,12 @@ class _HyperTableState<T> extends State<HyperTable<T>>
             onWillAcceptWithDetails: (details) => details.data.key != row.key,
             onAcceptWithDetails: (details) {
               final index = manager.rows.indexOf(row);
-              if (index >= 0) manager.moveRowsByIndex([details.data], index);
+              final source = manager.rows
+                  .where((r) => r.key == details.data.key)
+                  .firstOrNull;
+              if (index >= 0 && source != null) {
+                manager.moveRowsByIndex([source], index);
+              }
             },
             builder: (context, candidates, rejected) => AnimatedContainer(
               duration: MediaQuery.of(context).disableAnimations
@@ -1608,6 +1754,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final rowContent = widget.rowContextMenuBuilder == null
         ? content
         : HyperContextMenu(
+            enableLongPress: false,
             key: ValueKey(key),
             items: widget.rowContextMenuBuilder!(context, data),
             child: content,
@@ -1628,7 +1775,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(height: manager.rowTotalHeight, child: rowContent),
+        SizedBox(height: _rowExtent(row), child: rowContent),
         SizedBox(
           height: tailHeight,
           child: isBody
@@ -1679,6 +1826,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   void _releaseManager() {
     widget.controller?._detach(this);
     _manager?.removeListener(_managerChanged);
+    _manager?.resizingChangeNotifier.removeListener(_managerChanged);
     _manager = null;
   }
 
@@ -1690,6 +1838,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     if (m == null) return;
     for (final c in m.refColumns.originalList) {
       if (_knownWidths[c.field] != c.width) {
+        _cellHeights.clear();
+        _textHeights.clear();
         _knownWidths[c.field] = c.width;
         if (!_applyingMetrics) _userSized.add(c.field);
         if (!c.field.startsWith('__hyper_')) {
@@ -1700,6 +1850,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   }
 
   void _replaceRows() {
+    _cellHeights.clear();
+    _textHeights.clear();
     _gridRows = _rows();
     _pruneRowForegrounds();
     final m = _manager;
@@ -2011,15 +2163,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     final scaler = MediaQuery.textScalerOf(context);
     final font =
         s.textStyle?.fontSize ?? DefaultTextStyle.of(context).style.fontSize!;
-    final headerFont = s.headerTextStyle?.fontSize ?? font;
     final rowHeight = math.max(
       s.rowHeight!,
       scaler.scale(font) * (s.textStyle?.height ?? 1.5) +
-          2 * s.verticalPadding!,
-    );
-    final headerHeight = math.max(
-      s.headerHeight!,
-      scaler.scale(headerFont) * (s.headerTextStyle?.height ?? 1.5) +
           2 * s.verticalPadding!,
     );
     final radius = BorderRadius.circular(_embedded ? 0 : s.radius!);
@@ -2030,8 +2176,14 @@ class _HyperTableState<T> extends State<HyperTable<T>>
         if (constraints.maxWidth.isFinite) {
           _columnViewportWidth = constraints.maxWidth;
           _layoutColumnWidths(duringBuild: true);
+          if (_manager == null &&
+              widget.rowHeightMode == HyperTableRowHeightMode.content) {
+            _gridRows = _rows();
+          }
         }
         _scheduleColumnLayout(constraints.maxWidth);
+        final headerHeight = _resolveHeaderHeight();
+        _measuredHeaderHeight = headerHeight;
         return RepaintBoundary(
           key: _captureKey,
           child: HyperMaterialSurface(
@@ -2072,6 +2224,9 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                   columns: _columns,
                                   rows: _gridRows,
                                   configuration: trina.TrinaGridConfiguration(
+                                    shortcut: trina.TrinaGridShortcut(
+                                      actions: _hyperTableRowHeightShortcuts,
+                                    ),
                                     rowWrapperIsConstantHeight:
                                         widget.dataMode !=
                                         HyperTableDataMode.infinite,
@@ -2164,6 +2319,8 @@ class _HyperTableState<T> extends State<HyperTable<T>>
                                     widget.controller?._attach(this);
                                     _manager!.setSortOnlyEvent(true);
                                     _manager!.addListener(_managerChanged);
+                                    _manager!.resizingChangeNotifier
+                                        .addListener(_managerChanged);
                                     _syncSelection();
                                     if (_columnViewportWidth != null) {
                                       _scheduleColumnLayout(

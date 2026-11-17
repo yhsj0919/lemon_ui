@@ -37,6 +37,7 @@ final class HyperDialogStyle {
     this.curve,
     this.transitionBuilder,
     this.clipBehavior,
+    this.reduceTransparencyWhenCovered,
   });
   final HyperFill? background;
   final HyperSurfaceMaterial? material;
@@ -64,6 +65,12 @@ final class HyperDialogStyle {
   final Curve? curve;
   final RouteTransitionsBuilder? transitionBuilder;
   final Clip? clipBehavior;
+
+  /// Reduce only this surface when its modal route is no longer current.
+  ///
+  /// Defaults to false. Input focus and window focus do not affect this option.
+  /// Null inherits the component theme; a dialog without a route is unaffected.
+  final bool? reduceTransparencyWhenCovered;
   HyperDialogStyle copyWith({
     HyperFill? background,
     HyperSurfaceMaterial? material,
@@ -91,6 +98,7 @@ final class HyperDialogStyle {
     Curve? curve,
     RouteTransitionsBuilder? transitionBuilder,
     Clip? clipBehavior,
+    bool? reduceTransparencyWhenCovered,
   }) => HyperDialogStyle(
     background: background ?? this.background,
     material: material ?? this.material,
@@ -118,6 +126,8 @@ final class HyperDialogStyle {
     curve: curve ?? this.curve,
     transitionBuilder: transitionBuilder ?? this.transitionBuilder,
     clipBehavior: clipBehavior ?? this.clipBehavior,
+    reduceTransparencyWhenCovered:
+        reduceTransparencyWhenCovered ?? this.reduceTransparencyWhenCovered,
   );
   HyperDialogStyle merge(HyperDialogStyle? other) => other == null
       ? this
@@ -149,6 +159,7 @@ final class HyperDialogStyle {
           curve: other.curve,
           transitionBuilder: other.transitionBuilder,
           clipBehavior: other.clipBehavior,
+          reduceTransparencyWhenCovered: other.reduceTransparencyWhenCovered,
         );
   static HyperDialogStyle lerp(
     HyperDialogStyle a,
@@ -252,6 +263,9 @@ final class HyperDialogStyle {
           : t < .5
           ? a.transitionBuilder
           : b.transitionBuilder,
+      reduceTransparencyWhenCovered: t < .5
+          ? a.reduceTransparencyWhenCovered
+          : b.reduceTransparencyWhenCovered,
       clipBehavior: a.clipBehavior == null || b.clipBehavior == null
           ? (t < .5 ? a.clipBehavior : b.clipBehavior)
           : t < .5
@@ -288,7 +302,8 @@ final class HyperDialogStyle {
       duration == other.duration &&
       curve == other.curve &&
       transitionBuilder == other.transitionBuilder &&
-      clipBehavior == other.clipBehavior;
+      clipBehavior == other.clipBehavior &&
+      reduceTransparencyWhenCovered == other.reduceTransparencyWhenCovered;
   @override
   int get hashCode => Object.hashAll([
     background,
@@ -317,5 +332,6 @@ final class HyperDialogStyle {
     curve,
     transitionBuilder,
     clipBehavior,
+    reduceTransparencyWhenCovered,
   ]);
 }

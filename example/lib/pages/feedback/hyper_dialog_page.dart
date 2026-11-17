@@ -116,6 +116,25 @@ class _HyperDialogPageState extends State<HyperDialogPage> {
                     label: const Text('长正文'),
                     onPressed: () => _open(context, longContent: true),
                   ),
+                  HyperButton.tonal(
+                    label: const Text('覆盖降级 · 实例样式'),
+                    onPressed: () => showHyperDialog<void>(
+                      context: context,
+                      style: const HyperDialogStyle(
+                        reduceTransparencyWhenCovered: true,
+                      ),
+                      builder: (lowerContext) => HyperDialog(
+                        title: const Text('下层弹窗'),
+                        content: const Text('使用当前主题材质。玻璃材质在路由被覆盖时降级，关闭上层后恢复。'),
+                        actions: [
+                          HyperButton.filled(
+                            label: const Text('打开上层弹窗'),
+                            onPressed: () => _open(lowerContext),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

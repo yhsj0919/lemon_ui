@@ -158,6 +158,12 @@ class HyperDialog extends StatelessWidget {
       surface = HyperMaterialSurface(
         material: resolved.material,
         materialEdge: false,
+        // Leave null when current so inherited accessibility policy still wins.
+        reduceTransparency:
+            resolved.reduceTransparencyWhenCovered == true &&
+                ModalRoute.isCurrentOf(context) == false
+            ? true
+            : null,
         boxShadow: resolved.boxShadow,
         border: resolved.border,
         semanticBackground: resolved.background,

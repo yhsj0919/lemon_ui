@@ -1,5 +1,13 @@
 # 对话框
 
+可通过 `HyperDialogStyle(reduceTransparencyWhenCovered: true)` 开启路由覆盖降级，
+默认关闭。选项支持全局 `dialogTheme`、局部 `HyperDialogTheme` 及实例覆盖；
+`HyperMovableDialog` 通过 `dialogStyle` 使用同一选项。
+所属 `ModalRoute.isCurrent` 为 false 时，仅对弹窗表面应用统一材质的
+`reduceTransparency: true`，停用背景滤镜并使用已有 fallback；回到顶层后恢复继承策略。
+输入框失焦、窗口失焦及同一路由内 WebView 原地放大均不触发；没有所属路由时不触发。
+这不是 WebView 合成问题的完整修复，实际效果仍需目标平台验证。
+
 [返回目录](README.md)
 
 ## 内容型弹窗的标准写法

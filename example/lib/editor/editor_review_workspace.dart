@@ -3259,6 +3259,22 @@ extension _ReviewWorkspace on _ThemeEditorState {
               'easeInOut': '缓入缓出',
               'fastOutSlowIn': '快出慢入',
             }, (x) => _change(() => v.curve = x == 'inherit' ? null : x)),
+            _heading('路由覆盖'),
+            _select(
+              '被上层路由覆盖时自动降低透明度',
+              v.reduceTransparencyWhenCovered?.toString() ?? 'inherit',
+              {
+                'inherit':
+                    '继承（${native.reduceTransparencyWhenCovered == true ? '开启' : '关闭'}）',
+                'true': '开启',
+                'false': '关闭',
+              },
+              (value) => _change(
+                () => v.reduceTransparencyWhenCovered = value == 'inherit'
+                    ? null
+                    : value == 'true',
+              ),
+            ),
             _heading('表面与留白'),
             ...material(v),
             if (state == 'common')

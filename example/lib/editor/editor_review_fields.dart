@@ -19,6 +19,7 @@ class EditorReviewFields {
   String? breadcrumbSeparator;
   String? materialKind;
   bool? materialEdgeEnabled;
+  bool? reduceTransparencyWhenCovered;
   bool? liftSurface;
   bool? liftShowShadow;
   double? materialBlurX, materialBlurY;
@@ -196,6 +197,8 @@ class EditorReviewFields {
     if (dotBorderColor != null) 'dotBorderColor': dotBorderColor!.toJson(),
     if (materialKind != null) 'materialKind': materialKind,
     if (materialEdgeEnabled != null) 'materialEdgeEnabled': materialEdgeEnabled,
+    if (reduceTransparencyWhenCovered != null)
+      'reduceTransparencyWhenCovered': reduceTransparencyWhenCovered,
     if (liftSurface != null) 'liftSurface': liftSurface,
     if (liftShowShadow != null) 'liftShowShadow': liftShowShadow,
     if (materialBlurX != null) 'materialBlurX': materialBlurX,
@@ -413,6 +416,7 @@ class EditorReviewFields {
       'dotBorderColor',
       'materialKind',
       'materialEdgeEnabled',
+      'reduceTransparencyWhenCovered',
       'liftSurface',
       'liftShowShadow',
       'materialBlurX',
@@ -617,6 +621,8 @@ class EditorReviewFields {
           : EditorColor.fromJson(j['dotBorderColor'] as Map<String, dynamic>)
       ..materialKind = j['materialKind'] as String?
       ..materialEdgeEnabled = j['materialEdgeEnabled'] as bool?
+      ..reduceTransparencyWhenCovered =
+          j['reduceTransparencyWhenCovered'] as bool?
       ..liftSurface = j['liftSurface'] as bool?
       ..liftShowShadow = j['liftShowShadow'] as bool?
       ..materialBlurX = number(j['materialBlurX'], min: 0)
@@ -2564,6 +2570,7 @@ HyperThemeData applyEditorReviews(
   HyperDialogStyle dialog(EditorReviewFields v) {
     final m = d.dialog;
     return HyperDialogStyle(
+      reduceTransparencyWhenCovered: v.reduceTransparencyWhenCovered,
       material: resolveEditorReviewMaterial(v, theme),
       actionsAlignment: v.actionsAlignment == null
           ? null

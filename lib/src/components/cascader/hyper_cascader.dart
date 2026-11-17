@@ -20,6 +20,7 @@ import '../select/hyper_select_model.dart';
 import '../select/hyper_select_style.dart';
 import '../select/hyper_select_theme.dart';
 import '../select/hyper_selection_theme.dart';
+import '../select/hyper_selection_tags.dart';
 import '../text/hyper_scrolling_text.dart';
 import 'hyper_cascader_model.dart';
 import 'hyper_cascader_style.dart';
@@ -644,10 +645,29 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
       style: _visual(context).selectStyle,
       surfaceStyle: widget.surfaceStyle,
       modalTitle: _modalTitle(),
-      label: HyperScrollingText(
-        label.isEmpty ? widget.placeholder : label,
-        trigger: HyperTextScrollTrigger.hover,
-      ),
+      label: widget.multiple && label.isNotEmpty
+          ? Semantics(
+              label: label,
+              excludeSemantics: true,
+              child: HyperSelectionTags(
+                tags: [
+                  for (final path in widget.values)
+                    if (path.isNotEmpty)
+                      Text(
+                        pathLabel(path),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                ],
+                overflowBuilder: (count) => Text('+$count', maxLines: 1),
+                spacing: HyperTheme.sizesOf(context).selection.chipSpacing,
+                direction: Directionality.of(context),
+              ),
+            )
+          : HyperScrollingText(
+              label.isEmpty ? widget.placeholder : label,
+              trigger: HyperTextScrollTrigger.hover,
+            ),
       panelBuilder: _panel,
     );
   }

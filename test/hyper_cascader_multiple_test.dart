@@ -15,6 +15,52 @@ const nodes = [
 ];
 
 void main() {
+  testWidgets('overflow reports hidden paths and updates when resized', (
+    tester,
+  ) async {
+    final seen = <String>{};
+    for (final width in [100.0, 120.0, 140.0, 160.0, 180.0, 220.0, 500.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HyperTheme(
+            data: HyperThemeData.light(),
+            child: Scaffold(
+              body: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: width,
+                  child: HyperCascader<int>.multiple(
+                    nodes: const [
+                      HyperCascaderNode(value: 1, label: '食品'),
+                      HyperCascaderNode(value: 2, label: '饮料'),
+                      HyperCascaderNode(value: 3, label: '米面粮油及调味品'),
+                    ],
+                    values: const [
+                      [1],
+                      [2],
+                      [3],
+                    ],
+                    onSelectionChanged: (_) {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      for (final counter in ['+1', '+2']) {
+        if (find.text(counter).hitTestable().evaluate().isNotEmpty) {
+          seen.add(counter);
+        }
+      }
+      expect(tester.takeException(), isNull);
+    }
+    expect(seen, containsAll(['+1', '+2']));
+    expect(find.text('+1').hitTestable(), findsNothing);
+    expect(find.text('+2').hitTestable(), findsNothing);
+    expect(find.text('米面粮油及调味品').hitTestable(), findsOneWidget);
+  });
   for (final scale in [1.0, 1.3, 2.0]) {
     testWidgets('async multiple compares paths by value at text scale $scale', (
       tester,
@@ -70,7 +116,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.text('2、2').first);
+      await tester.tap(find.text('2').first);
       await tester.pumpAndSettle();
       expect(loads, 1);
       expect(changes, isEmpty);

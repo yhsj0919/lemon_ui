@@ -210,23 +210,27 @@ class _HyperInlineEditState<T> extends State<HyperInlineEdit<T>> {
 
   void start() {
     if (!widget.enabled || _editing || _dialogOpen) return;
-    setState(() {
-      _draft = widget.value;
-      _editing = true;
-      _error = null;
-      _session++;
-      _overlayDepth = 0;
-    });
-    widget.onEditingChanged?.call(true);
-    if (widget.dialogBuilder != null) {
-      unawaited(openDialog());
-      return;
-    }
-    final session = _session;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _editing && _session == session) {
-        requestEditorFocus();
+    // 等当前 pointer / MouseTracker 更新结束，再换显示与编辑树。
+    Future<void>.delayed(Duration.zero, () {
+      if (!mounted || !widget.enabled || _editing || _dialogOpen) return;
+      setState(() {
+        _draft = widget.value;
+        _editing = true;
+        _error = null;
+        _session++;
+        _overlayDepth = 0;
+      });
+      widget.onEditingChanged?.call(true);
+      if (widget.dialogBuilder != null) {
+        unawaited(openDialog());
+        return;
       }
+      final session = _session;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _editing && _session == session) {
+          requestEditorFocus();
+        }
+      });
     });
   }
 

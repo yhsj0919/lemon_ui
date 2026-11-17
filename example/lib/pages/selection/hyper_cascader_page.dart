@@ -44,6 +44,7 @@ class HyperCascaderPage extends StatefulWidget {
 }
 
 class _HyperCascaderPageState extends State<HyperCascaderPage> {
+  List<List<String>> _multiplePaths = [];
   List<String> _region = [],
       _remote = [],
       _local = [],
@@ -92,6 +93,25 @@ class _HyperCascaderPageState extends State<HyperCascaderPage> {
                 onChanged: (value) => setState(() => _region = value),
               ),
               HyperText(_region.isEmpty ? '尚未选择' : _region.join(' → ')),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: '默认主题 · 多选二级地区',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HyperCascader<String>.multiple(
+                nodes: _regions,
+                values: _multiplePaths,
+                maxDepth: 2,
+                placeholder: '选择多个城市',
+                onSelectionChanged: (values) =>
+                    setState(() => _multiplePaths = values),
+              ),
+              HyperText(
+                _multiplePaths.map((path) => path.join(' → ')).join('；'),
+              ),
             ],
           ),
         ),

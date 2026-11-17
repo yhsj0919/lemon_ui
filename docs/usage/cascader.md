@@ -1,5 +1,31 @@
 # 级联选择
 
+## 多选路径
+
+`HyperCascader<T>.multiple` 使用 `List<List<T>> values` 和
+`onSelectionChanged` 表示多条完整路径。父节点只展开，不提交或批量选择；
+叶子点击切换勾选，面板保持打开，点“完成”关闭。每次勾选立即通知调用方，
+完成和关闭不额外提交或撤销。`maxDepth: 2` 将第二级视为可选末级，
+可用于“相邻行业排它”选择多个二级行业；提前遇到自然叶子仍可选。
+
+```dart
+HyperCascader<String>.multiple(
+  nodes: industryNodes,
+  values: excludedIndustryPaths,
+  maxDepth: 2,
+  onSelectionChanged: (paths) => setState(() => excludedIndustryPaths = paths),
+)
+```
+
+路径按内容比较，回调去重且内外列表均不可修改。组件保持受控，调用方需将新值写回
+`values`；业务需要叶子 ID 时可读取 `paths.map((path) => path.last).toSet()`。
+空回调或 `enabled: false` 禁用交互。清空发出空路径列表，多选面板保持打开。
+未知历史路径保留并通过 `labelBuilder` 回显，异步加载复用单选的缓存与错误重试。
+
+桌面多选仍使用多级菜单；手机多选使用底部弹窗内逐级列表，平板和手表同样使用
+逐级列表，允许返回后选择其他分支。手机单选继续使用原有滚轮。
+多选复用现有 Cascader、Menu 和 Select 主题，不增加独立设备尺寸或材质配方。
+
 `HyperCascader<T>` 是受控单选器，`value` 和 `onChanged` 使用从根到末级的完整值路径。
 根节点通过 `nodes` 提供，每个 `HyperCascaderNode<T>` 包含 `value`、文字 `label`、
 可选首部 `leading`、静态 `children`、动态分支标记 `hasChildren` 和 `enabled`。

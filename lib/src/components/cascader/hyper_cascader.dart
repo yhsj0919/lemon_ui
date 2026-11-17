@@ -26,7 +26,7 @@ import 'hyper_cascader_style.dart';
 import 'hyper_cascader_theme.dart';
 import 'hyper_cascader_wheel_panel.dart';
 
-/// A controlled single selection represented by its complete root-to-node path.
+/// A controlled cascade selection represented by complete root-to-node paths.
 ///
 /// Browsing and dismissal never change [value]. Leaves or nodes at [maxDepth]
 /// commit a selection.
@@ -48,7 +48,41 @@ class HyperCascader<T> extends StatefulWidget {
     this.presentation,
     this.style,
     this.surfaceStyle,
-  }) : assert(maxDepth == null || maxDepth > 0);
+  }) : multiple = false,
+       values = const [],
+       onSelectionChanged = null,
+       assert(maxDepth == null || maxDepth > 0);
+
+  const HyperCascader.multiple({
+    super.key,
+    required this.nodes,
+    required this.values,
+    required this.onSelectionChanged,
+    this.loadChildren,
+    this.maxDepth,
+    this.enabled = true,
+    this.allowClear = true,
+    this.placeholder = '请选择',
+    this.rootLabel = '全部',
+    this.backLabel = '返回上一级',
+    this.pathSeparator = ' / ',
+    this.labelBuilder,
+    this.presentation,
+    this.style,
+    this.surfaceStyle,
+  }) : multiple = true,
+       value = const [],
+       onChanged = null,
+       assert(maxDepth == null || maxDepth > 0);
+
+  final bool multiple;
+
+  /// Complete selected paths. Paths are compared by their values, not identity.
+  final List<List<T>> values;
+
+  /// Receives deduplicated, deeply unmodifiable paths after each leaf toggle.
+  /// Null disables the multiple-selection control.
+  final ValueChanged<List<List<T>>>? onSelectionChanged;
 
   /// The roots of an immutable tree with globally unique node values.
   final List<HyperCascaderNode<T>> nodes;
@@ -99,7 +133,40 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
   late HyperCascaderController<T> _controller;
   final _updates = ValueNotifier<int>(0);
   bool _open = false;
-  bool get _enabled => widget.enabled && widget.onChanged != null;
+  bool get _enabled =>
+      widget.enabled &&
+      (widget.multiple
+          ? widget.onSelectionChanged != null
+          : widget.onChanged != null);
+  List<List<T>> get _paths => widget.multiple ? widget.values : [widget.value];
+  List<T> get _browsePath =>
+      widget.multiple ? (widget.values.firstOrNull ?? const []) : widget.value;
+  bool get _hasSelection => _paths.any((path) => path.isNotEmpty);
+  bool _selected(List<T> path) =>
+      _paths.any((value) => listEquals(value, path));
+
+  void _publishPaths(Iterable<List<T>> paths) {
+    if (!_enabled) return;
+    final unique = <List<T>>[];
+    for (final path in paths) {
+      if (path.isNotEmpty && !unique.any((value) => listEquals(value, path))) {
+        unique.add(List<T>.unmodifiable(path));
+      }
+    }
+    widget.onSelectionChanged?.call(List<List<T>>.unmodifiable(unique));
+  }
+
+  void _choose(List<T> path, VoidCallback close) {
+    if (!widget.multiple) {
+      _commit(path, close);
+      return;
+    }
+    _publishPaths(
+      _selected(path)
+          ? widget.values.where((value) => !listEquals(value, path))
+          : [...widget.values, path],
+    );
+  }
 
   @override
   void initState() {
@@ -142,7 +209,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
           !_usesSubmenus(context) &&
           !_usesWheels(context) &&
           (changed || !listEquals(oldWidget.value, widget.value))) {
-        unawaited(_controller.browse(widget.value));
+        if (!widget.multiple) unawaited(_controller.browse(widget.value));
       }
       _updates.value++;
     });
@@ -168,6 +235,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
   }
 
   bool _usesWheels(BuildContext context) =>
+      !widget.multiple &&
       HyperTheme.sizesOf(context).deviceType == HyperDeviceType.phone &&
       !_usesSubmenus(context);
 
@@ -191,7 +259,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
           if (widget.allowClear)
             HyperButton.text(
               style: _clearStyle(context),
-              onPressed: _enabled && widget.value.isNotEmpty
+              onPressed: _enabled && _hasSelection
                   ? () => _commit([], () => _openChanged(false))
                   : null,
               label: Text(selection.clearText ?? '清空'),
@@ -205,7 +273,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
     if (!mounted) return;
     setState(() => _open = open && _enabled);
     if (_open && !_usesSubmenus(context) && !_usesWheels(context)) {
-      unawaited(_controller.browse(widget.value));
+      unawaited(_controller.browse(_browsePath));
     } else {
       _controller.cancelNavigation();
     }
@@ -213,6 +281,10 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
 
   void _commit(List<T> value, VoidCallback close) {
     if (!_enabled) return;
+    if (widget.multiple) {
+      _publishPaths(value.isEmpty ? [] : [value]);
+      return;
+    }
     widget.onChanged?.call(List.unmodifiable(value));
     close();
   }
@@ -243,8 +315,10 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
     item = (node, ancestors, id) {
       final path = [...ancestors, node];
       final values = path.map((node) => node.value).toList();
-      if (widget.value.length >= path.length &&
-          listEquals(widget.value.take(path.length).toList(), values)) {
+      if (widget.multiple
+          ? _selected(values)
+          : widget.value.length >= path.length &&
+                listEquals(widget.value.take(path.length).toList(), values)) {
         selected.add(id);
       }
       final branch = _controller.isBranch(node);
@@ -257,6 +331,10 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
         leading: node.leading,
         enabled: _enabled && node.enabled,
         wrapLabel: true,
+        dismissOnPressed: !widget.multiple,
+        onPressed: widget.multiple && !branch
+            ? () => _choose(values, close)
+            : null,
         submenuIcon: visual.branchIcon,
         onSubmenuOpened: branch
             ? () => unawaited(_controller.loadBranch(path))
@@ -332,12 +410,18 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
             if (values != null) _commit(values, close);
           },
         ),
+        if (widget.multiple)
+          HyperButton.text(
+            style: visual.navigationStyle,
+            onPressed: close,
+            label: Text(selection.doneText ?? '完成'),
+          ),
         if (widget.allowClear)
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: HyperButton.text(
               style: _clearStyle(context),
-              onPressed: _enabled && widget.value.isNotEmpty
+              onPressed: _enabled && _hasSelection
                   ? () => _commit([], close)
                   : null,
               label: Text(selection.clearText ?? '清空'),
@@ -413,12 +497,14 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
           style: menuStyle,
           selectedIds: {
             for (final (index, node) in options.indexed)
-              if (widget.value.length > path.length &&
-                  listEquals(
-                    widget.value.take(path.length).toList(),
-                    path.map((node) => node.value).toList(),
-                  ) &&
-                  widget.value[path.length] == node.value)
+              if (widget.multiple
+                  ? _selected([...path.map((node) => node.value), node.value])
+                  : widget.value.length > path.length &&
+                        listEquals(
+                          widget.value.take(path.length).toList(),
+                          path.map((node) => node.value).toList(),
+                        ) &&
+                        widget.value[path.length] == node.value)
                 '$index',
           },
           items: [
@@ -428,6 +514,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
                 label: node.label,
                 leading: node.leading,
                 enabled: _enabled && node.enabled,
+                dismissOnPressed: !widget.multiple,
                 trailing: _controller.isBranch(node)
                     ? Icon(
                         visual.branchIcon ?? HyperIcons.chevronRight,
@@ -442,7 +529,7 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
             if (_controller.isBranch(node)) {
               unawaited(_controller.enter(node));
             } else {
-              _commit([...path.map((node) => node.value), node.value], close);
+              _choose([...path.map((node) => node.value), node.value], close);
             }
           },
         );
@@ -502,12 +589,18 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
                 ),
               ),
             ),
+            if (widget.multiple)
+              HyperButton.text(
+                style: visual.navigationStyle,
+                onPressed: close,
+                label: Text(selection.doneText ?? '完成'),
+              ),
             if (widget.allowClear)
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: HyperButton.text(
                   style: _clearStyle(context),
-                  onPressed: _enabled && widget.value.isNotEmpty
+                  onPressed: _enabled && _hasSelection
                       ? () => _commit([], close)
                       : null,
                   label: Text(selection.clearText ?? '清空'),
@@ -521,13 +614,22 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final known = _controller.resolvePath(widget.value);
-    final label = [
-      for (final (index, value) in widget.value.indexed)
-        index < known.length
-            ? known[index].label
-            : widget.labelBuilder?.call(value) ?? '$value',
-    ].join(widget.pathSeparator);
+    String pathLabel(List<T> path) {
+      final known = _controller.resolvePath(path);
+      return [
+        for (final (index, value) in path.indexed)
+          index < known.length
+              ? known[index].label
+              : widget.labelBuilder?.call(value) ?? '$value',
+      ].join(widget.pathSeparator);
+    }
+
+    final label = widget.multiple
+        ? widget.values
+              .map(pathLabel)
+              .where((label) => label.isNotEmpty)
+              .join('、')
+        : pathLabel(widget.value);
     return HyperDropdown(
       isOpen: _open,
       onOpenChanged: _openChanged,

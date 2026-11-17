@@ -6,6 +6,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'hyper_description_row.dart';
+
 import '../../foundation/hyper_fill.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../theme/material/hyper_material_theme.dart';
@@ -185,27 +187,22 @@ class HyperDescriptionList extends StatelessWidget {
               ],
             );
           } else {
-            content = Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            final available = math.max(0.0, placement.width - separation);
+            final labelWidth = cs.labelWidth == null
+                ? available * cs.labelFlex! / (cs.labelFlex! + cs.valueFlex!)
+                : math.min(
+                    math.max(0.0, cs.labelWidth!),
+                    math.max(0.0, available - padding.horizontal),
+                  );
+            content = HyperDescriptionRow(
+              widths: [labelWidth, separation, available - labelWidth],
+              direction: direction,
               children: [
-                if (cs.labelWidth == null)
-                  Expanded(flex: cs.labelFlex!, child: label)
-                else
-                  SizedBox(
-                    width: math.min(
-                      math.max(0, cs.labelWidth!),
-                      math.max(
-                        0,
-                        placement.width - separation - padding.horizontal,
-                      ),
-                    ),
-                    child: label,
-                  ),
-                SizedBox(
-                  width: separation,
-                  child: bordered ? ColoredBox(color: cs.borderColor!) : null,
-                ),
-                Expanded(flex: cs.valueFlex!, child: value),
+                label,
+                bordered
+                    ? ColoredBox(color: cs.borderColor!)
+                    : const SizedBox(),
+                value,
               ],
             );
           }
@@ -256,22 +253,26 @@ class HyperDescriptionList extends StatelessWidget {
                       ? ColoredBox(color: s.borderColor!)
                       : null,
                 ),
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var c = 0; c < layout.rows[r].length; c++) ...[
-                      if (c > 0) SizedBox(width: gap),
-                      KeyedSubtree(
-                        key: ValueKey(layout.rows[r][c].item.id),
-                        child: cell(
-                          layout.rows[r][c],
-                          c == layout.rows[r].length - 1,
-                        ),
-                      ),
-                    ],
+              HyperDescriptionRow(
+                direction: direction,
+                widths: [
+                  for (var c = 0; c < layout.rows[r].length; c++) ...[
+                    if (c > 0) gap,
+                    layout.rows[r][c].width,
                   ],
-                ),
+                ],
+                children: [
+                  for (var c = 0; c < layout.rows[r].length; c++) ...[
+                    if (c > 0) SizedBox(width: gap),
+                    KeyedSubtree(
+                      key: ValueKey(layout.rows[r][c].item.id),
+                      child: cell(
+                        layout.rows[r][c],
+                        c == layout.rows[r].length - 1,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ],

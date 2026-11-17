@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../theme/core/hyper_theme.dart';
 import '../../foundation/hyper_control_state.dart';
 import '../../interaction/hyper_pressable.dart';
+import '../../interaction/hyper_tap_region_scope.dart';
 import '../button/hyper_button.dart';
 import '../text/hyper_text.dart';
 import '../text_field/hyper_text_field.dart';
@@ -183,6 +184,7 @@ class _HyperInlineEditState<T> extends State<HyperInlineEdit<T>> {
   final _editorFocus = FocusNode();
   final _displayFocus = FocusNode();
   final _groupFocus = FocusNode();
+  final _tapGroup = Object();
   final _defaultTransitionChildKey = GlobalKey();
   late T _draft;
   bool _editing = false, _saving = false;
@@ -560,6 +562,7 @@ class _HyperInlineEditState<T> extends State<HyperInlineEdit<T>> {
         ),
       );
       child = TapRegion(
+        groupId: _tapGroup,
         onTapOutside: (_) {
           if (widget.saveOnBlur && _overlayDepth == 0 && !_saving) {
             unawaited(submit(fromBlur: true));
@@ -567,6 +570,7 @@ class _HyperInlineEditState<T> extends State<HyperInlineEdit<T>> {
         },
         child: child,
       );
+      child = HyperTapRegionScope(groupId: _tapGroup, child: child);
     }
     // Size-only animation never puts advanced backdrop filters in opacity layers.
     if (widget.transitionBuilder != null) {

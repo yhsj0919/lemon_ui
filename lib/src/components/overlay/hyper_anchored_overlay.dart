@@ -2,9 +2,13 @@ import 'hyper_backdrop_safe_opacity.dart';
 import 'hyper_overlay.dart';
 
 import 'dart:async';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+
+import '../../interaction/hyper_tap_region_scope.dart';
+
 import 'package:flutter/services.dart';
 
 import '../../theme/core/hyper_theme.dart';
@@ -233,7 +237,10 @@ class _HyperAnchoredOverlayState<T> extends State<HyperAnchoredOverlay<T>>
   @override
   Widget build(BuildContext context) {
     // 子浮层沿用祖先的点击区域，点击深层菜单时不会提前关闭上层浮层。
-    final tapGroup = _HyperOverlayTapGroup.maybeOf(context) ?? _tapGroup;
+    final tapGroup =
+        _HyperOverlayTapGroup.maybeOf(context) ??
+        HyperTapRegionScope.maybeOf(context) ??
+        _tapGroup;
     final motion = HyperTheme.of(context).motion;
     final opacity = _animation.drive(CurveTween(curve: motion.fastCurve));
     Widget anchor =

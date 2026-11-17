@@ -70,7 +70,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.text('行业 / 2、行业 / 2').first);
+      await tester.tap(find.text('2、2').first);
       await tester.pumpAndSettle();
       expect(loads, 1);
       expect(changes, isEmpty);
@@ -154,7 +154,8 @@ void main() {
       expect(values, [
         [1, 3],
       ]);
-      await tester.tap(find.text('行业 / 硬件').first);
+      expect(find.text('行业 / 硬件'), findsNothing);
+      await tester.tap(find.text('硬件').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('清空').last);
       await tester.pumpAndSettle();

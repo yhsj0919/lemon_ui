@@ -615,7 +615,13 @@ class _HyperCascaderState<T> extends State<HyperCascader<T>> {
   @override
   Widget build(BuildContext context) {
     String pathLabel(List<T> path) {
+      if (path.isEmpty) return '';
       final known = _controller.resolvePath(path);
+      if (widget.multiple) {
+        return known.length == path.length
+            ? known.last.label
+            : widget.labelBuilder?.call(path.last) ?? '${path.last}';
+      }
       return [
         for (final (index, value) in path.indexed)
           index < known.length

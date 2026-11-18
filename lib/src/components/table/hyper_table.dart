@@ -964,6 +964,7 @@ class _HyperTableState<T> extends State<HyperTable<T>>
   }
 
   void _rebuildGrid(HyperTable<T> previous) {
+    _clearRowHover();
     final old = List<trina.TrinaColumn>.of(
       _manager?.refColumns.originalList ?? _columns,
     );
@@ -1849,7 +1850,16 @@ class _HyperTableState<T> extends State<HyperTable<T>>
     }
   }
 
+  void _clearRowHover() {
+    // Removing a MouseRegion does not guarantee an exit callback. Cached row
+    // geometry also becomes invalid when sorting, paging or replacing rows.
+    _hoverLiftRect.value = null;
+    _lastHoverLiftRect = null;
+    _hoveredRow.value = null;
+  }
+
   void _replaceRows() {
+    _clearRowHover();
     _cellHeights.clear();
     _textHeights.clear();
     _gridRows = _rows();

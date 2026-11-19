@@ -1,3 +1,12 @@
+## 全局消息宿主（2026-11-19，未确认）
+
+`HyperMessages` 提供无 BuildContext 的按窗口调用入口，`HyperMessageHost` 可放在
+MaterialApp.router 的 builder、HyperTheme 下，提供 Navigator 上方的 Overlay。
+Toast、Snackbar 与 HyperNotification 共用既有消息队列和安全材质过渡；通知卡片
+通过请求 builder 复用自身强类型主题，不新增尺寸、材质默认值或独立降级策略。
+切换默认呈现只影响后续消息，宿主卸载或替换服务完成旧句柄并清理队列。
+Demo 和主题编辑器入口位于“未确认”，视觉编辑分别链接现有消息及通知卡片主题。
+
 ## 零宽边框与表格内嵌（2026-11-02）
 
 Hyper 组件的零宽边框表示关闭绘制，不沿用 Flutter 原生的发丝线语义。

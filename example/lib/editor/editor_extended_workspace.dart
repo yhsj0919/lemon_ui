@@ -3,6 +3,7 @@ part of 'theme_editor.dart';
 extension _ExtendedWorkspace on _ThemeEditorState {
   bool get _isExtendedPage => const {
     'hyper-rating',
+    'hyper-global-message',
     'hyper-transfer',
     'hyper-resizable',
     'hyper-movable-dialog',
@@ -52,7 +53,15 @@ extension _ExtendedWorkspace on _ThemeEditorState {
         );
     final spacingLimit = editorExtendedSpacingLimit(s);
     final widgets = <Widget>[const HyperText('尺寸按当前设备保存，颜色按当前亮暗外观保存。')];
-    if (_page == 'hyper-rating') {
+    if (_page == 'hyper-global-message') {
+      widgets.addAll([
+        _heading('消息呈现'),
+        const HyperText('呈现类型在预览中切换；队列、位置与时长由宿主或调用方管理。'),
+        _heading('消息主题与表面'),
+        link('编辑 Toast / Snackbar 主题', 'hyper-message', 'toastReview'),
+        link('编辑通知卡片主题', 'hyper-notification', 'notificationReview'),
+      ]);
+    } else if (_page == 'hyper-rating') {
       final state =
           const {
             'common': '通用（所有状态）',

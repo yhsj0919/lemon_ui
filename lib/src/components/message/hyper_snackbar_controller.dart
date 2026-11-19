@@ -36,6 +36,7 @@ class HyperMessageRequest {
     this.action,
     this.semanticLabel,
     this.style,
+    this.builder,
     required this.handle,
   });
   final Widget content;
@@ -46,6 +47,8 @@ class HyperMessageRequest {
   final Widget? action;
   final String? semanticLabel;
   final HyperMessageStyle? style;
+  final Widget Function(BuildContext context, HyperMessageHandle handle)?
+  builder;
   final HyperMessageHandle handle;
   HyperMessageCloseReason? _reason;
   bool _presented = false;
@@ -116,6 +119,7 @@ class HyperSnackbarController extends ChangeNotifier {
     Widget? action,
     String? semanticLabel,
     HyperMessageStyle? style,
+    Widget Function(BuildContext context, HyperMessageHandle handle)? builder,
   }) {
     if (_disposed) throw StateError('提示队列已经销毁。');
     if (duration.isNegative) throw ArgumentError.value(duration, 'duration');
@@ -133,6 +137,7 @@ class HyperSnackbarController extends ChangeNotifier {
       action: action,
       semanticLabel: semanticLabel,
       style: style,
+      builder: builder,
       handle: handle,
     );
     _requests.add(request);

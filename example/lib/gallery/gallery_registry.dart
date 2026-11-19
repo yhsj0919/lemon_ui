@@ -1,5 +1,6 @@
 import '../pages/pending/hyper_motion_lift_page.dart';
 import '../pages/pending/hyper_image_gradient_page.dart';
+import '../pages/pending/hyper_global_message_page.dart';
 import '../pages/content/hyper_image_tools_pages.dart';
 import '../pages/content/hyper_image_page.dart';
 import '../pages/interaction/hyper_popover_page.dart';
@@ -94,6 +95,13 @@ final List<GallerySection> gallerySections = [
   GallerySection(
     title: '未确认',
     items: [
+      GalleryItem(
+        id: 'hyper-global-message',
+        title: '全局消息',
+        description: '无 context 调用，切换 Toast、Snackbar 与通知卡片。',
+        icon: Icons.notifications_active_outlined,
+        builder: (_) => const HyperGlobalMessagePage(),
+      ),
       GalleryItem(
         id: 'hyper-image-gradient',
         title: '图片取色渐变',

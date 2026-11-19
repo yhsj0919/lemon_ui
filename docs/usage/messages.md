@@ -2,6 +2,47 @@
 
 [返回目录](README.md)
 
+## 全局调用（未确认）
+
+在应用 builder 的 HyperTheme 下使用 `HyperMessageHost`。它提供 Navigator 上方所需的
+Overlay，并复用现有宿主的队列、暂停、计时和安全材质过渡，无需保存 BuildContext。
+
+```dart
+MaterialApp.router(
+  routerConfig: router,
+  builder: (context, child) => HyperTheme(
+    data: appTheme,
+    child: HyperMessageHost(child: child!),
+  ),
+);
+
+// 在宿主已挂载后，从业务层或事件回调调用。
+HyperMessages.global.show(content: const Text('保存成功'));
+
+// 修改后续统一调用的默认类型；不会替换已显示的消息。
+HyperMessages.global.presentation = HyperMessagePresentation.notification;
+
+// 也可单次覆盖，带标题和操作的消息使用通知卡片或 Snackbar。
+final handle = HyperMessages.global.show(
+  presentation: HyperMessagePresentation.notification,
+  title: const Text('保存成功'),
+  content: const Text('修改已生效'),
+  duration: const Duration(seconds: 4),
+);
+handle.close();
+HyperMessages.global.clear();
+```
+
+Toast 不接收 action；标题仅用于通知卡片。`style` 覆盖 Toast/Snackbar 与宿主过渡，
+`notificationStyle` 覆盖通知卡片。通知卡片提供关闭按钮，和 Snackbar 共享交互消息队列；
+三种呈现均继承宿主处的实时主题、全局材质质量与减少透明度设置。
+零时长表示常驻，`handle.closed` 提供关闭原因。卸载宿主会清理可见与等待消息；
+未挂载时调用 show 抛出明确错误，不缓存失效的 context。
+
+多窗口各自创建 `HyperMessages()`，传给 `HyperMessageHost(messages: messages, child: ...)`，
+业务层持有对应实例。一实例只连接一个宿主；自建实例在移除宿主后 dispose，
+`HyperMessages.global` 可随宿主重新挂载，无需销毁。
+
 ## 宿主与轻提示
 
 在页面或窗口外包一层 HyperSnackbarHost，使用其下方 Builder 的 context 打开提示。

@@ -90,7 +90,8 @@ class _HyperSnackbarHostState extends State<HyperSnackbarHost> {
     if (oldWidget.controller != widget.controller) {
       _detach(oldWidget.controller == null);
       _visible = [];
-      _portal.hide();
+      // Portal visibility changes must wait until the current build ends.
+      // _schedule below synchronizes the replacement queue after this frame.
       _attach();
     } else {
       _configure();
@@ -340,13 +341,15 @@ class _MessageItemState extends State<_MessageItem>
   Widget build(BuildContext context) {
     final request = widget.request;
     final style = resolveMessageStyle(context, request.toast, request.style);
-    final body = HyperMessageSurface(
-      content: request.content,
-      icon: request.icon,
-      action: request.action,
-      semanticLabel: request.semanticLabel,
-      style: style,
-    );
+    final body =
+        request.builder?.call(context, request.handle) ??
+        HyperMessageSurface(
+          content: request.content,
+          icon: request.icon,
+          action: request.action,
+          semanticLabel: request.semanticLabel,
+          style: style,
+        );
     return AnimatedBuilder(
       animation: _curved!,
       builder: (context, child) => Align(

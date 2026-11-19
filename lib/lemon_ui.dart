@@ -32,6 +32,7 @@ export 'src/components/message/hyper_snackbar_theme.dart';
 export 'src/components/message/hyper_snackbar_host.dart';
 export 'src/components/message/hyper_snackbar_controller.dart';
 export 'src/components/message/hyper_message_style.dart';
+export 'src/components/message/hyper_messages.dart';
 export 'src/theme/size/components/hyper_message_size.dart';
 
 export 'src/adaptive/hyper_device_detector.dart';
